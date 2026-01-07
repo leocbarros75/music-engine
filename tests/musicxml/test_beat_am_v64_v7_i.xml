@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Piano</part-name>
+    </score-part>
+  </part-list>
+
+  <part id="P1">
+
+    <!-- Measure 1: Am/E (A C E), chord held for the whole measure -->
+    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+
+      <note>
+        <pitch><step>E</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>A</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>C</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 2: E7 (E G# B D), held for the whole measure -->
+    <measure number="2">
+      <note>
+        <pitch><step>E</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>G</step><alter>1</alter><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>B</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>D</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 3: Am (A C E), held for the whole measure -->
+    <measure number="3">
+      <note>
+        <pitch><step>A</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>C</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>E</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+  </part>
+</score-partwise>

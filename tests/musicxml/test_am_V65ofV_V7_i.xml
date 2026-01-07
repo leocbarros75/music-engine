@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC
+  "-//Recordare//DTD MusicXML 3.1 Partwise//EN"
+  0
+  "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Piano</part-name>
+    </score-part>
+  </part-list>
+
+  <part id="P1">
+
+    <!-- Measure 1: V65/V in A minor = B7/D# (D# F# A B). Bass = D# -->
+    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+
+      <note>
+        <pitch><step>D</step><alter>1</alter><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>F</step><alter>1</alter><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>A</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>B</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 2: V7 in A minor = E7 (E G# B D). Bass = E -->
+    <measure number="2">
+      <note>
+        <pitch><step>E</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>G</step><alter>1</alter><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>B</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>D</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 3: i in A minor = Am (A C E). Bass = A -->
+    <measure number="3">
+      <note>
+        <pitch><step>A</step><octave>2</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>C</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>E</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+  </part>
+</score-partwise>

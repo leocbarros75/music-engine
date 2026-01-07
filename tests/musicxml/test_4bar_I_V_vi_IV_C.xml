@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC
+  "-//Recordare//DTD MusicXML 3.1 Partwise//EN"
+  "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise version="3.1">
+
+  <part-list>
+    <score-part id="P1">
+      <part-name>Piano</part-name>
+    </score-part>
+  </part-list>
+
+  <part id="P1">
+
+    <!-- Measure 1: I (C major) -->
+    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+
+      <!-- Beat 1: C–E–G (whole measure sustain) -->
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>E</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 2: V (G major) -->
+    <measure number="2">
+      <!-- Beat 1: G–B–D (whole measure sustain) -->
+      <note>
+        <pitch><step>G</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>B</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>D</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 3: vi (A minor) -->
+    <measure number="3">
+      <!-- Beat 1: A–C–E (whole measure sustain) -->
+      <note>
+        <pitch><step>A</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>E</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+    <!-- Measure 4: IV (F major) -->
+    <measure number="4">
+      <!-- Beat 1: F–A–C (whole measure sustain) -->
+      <note>
+        <pitch><step>F</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>A</step><octave>3</octave></pitch>
+        <duration>16</duration>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>16</duration>
+      </note>
+    </measure>
+
+  </part>
+</score-partwise>
