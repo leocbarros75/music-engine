@@ -1,0 +1,35 @@
+# ---- OS / editor ----
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# ---- dependencies / builds ----
+node_modules/
+dist/
+*.tsbuildinfo
+
+# ---- logs ----
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# ---- backups / temp ----
+*.bak
+*.backup
+*.tmp
+*.swp
+*.swo
+
+# If you intentionally keep these in-repo, delete these lines
+src/**/.DS_Store
+tests/**/.DS_Store
+
+# ---- test artifacts / outputs ----
+out_*.musicxml
+*.musicxml~
+
+# ---- misc ----
+.env
+.env.*
