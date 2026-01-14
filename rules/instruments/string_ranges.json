@@ -1,0 +1,14 @@
+{
+  "violin": {
+    "low": "G3",
+    "high": "E7"
+  },
+  "viola": {
+    "low": "C3",
+    "high": "A6"
+  },
+  "cello": {
+    "low": "C2",
+    "high": "G5"
+  }
+}

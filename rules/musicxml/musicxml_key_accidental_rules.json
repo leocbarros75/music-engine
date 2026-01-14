@@ -1,0 +1,6 @@
+{
+  "enforce_key_signature": true,
+  "prevent_key_drift": true,
+  "accidental_policy": "explicit_when_needed",
+  "key_signature_in_measure_1_required": true
+}

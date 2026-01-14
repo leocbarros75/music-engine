@@ -1,0 +1,15 @@
+{
+  "no_crossing": true,
+  "no_overlap": true,
+  "max_spacing": {
+    "between_SA": "octave",
+    "between_AT": "octave",
+    "between_TB": "twelfth",
+    "between_upper_voices": "octave"
+  },
+  "doubling_preferences": {
+    "root_position": "double_root",
+    "first_inversion": "double_soprano_or_root",
+    "second_inversion": "double_bass"
+  }
+}

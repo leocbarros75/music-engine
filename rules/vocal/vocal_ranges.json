@@ -1,0 +1,42 @@
+{
+  "soprano": {
+    "comfortable": [
+      "C4",
+      "A5"
+    ],
+    "absolute": [
+      "B3",
+      "C6"
+    ]
+  },
+  "alto": {
+    "comfortable": [
+      "G3",
+      "D5"
+    ],
+    "absolute": [
+      "F3",
+      "F5"
+    ]
+  },
+  "tenor": {
+    "comfortable": [
+      "C3",
+      "G4"
+    ],
+    "absolute": [
+      "B2",
+      "C5"
+    ]
+  },
+  "bass": {
+    "comfortable": [
+      "E2",
+      "D4"
+    ],
+    "absolute": [
+      "C2",
+      "E4"
+    ]
+  }
+}

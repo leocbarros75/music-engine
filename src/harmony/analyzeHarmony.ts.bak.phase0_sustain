@@ -1,7 +1,7 @@
 // src/harmony/analyzeHarmony.ts
 
 import type { HarmonyAnalyzeRequest, HarmonyAnalysisError } from "./types";
-import { pitchToMidi, midiToPc, pcToName } from "./pitch";
+import { pitchToMidi, midiToPc } from "./pitch";
 import { detectChordFromPcs } from "./chordDetect";
 import { keyFromMetaOrBestGuess } from "./keyEstimate";
 import { analyzeRomanNumeral, chordNotesToNames } from "./roman";
@@ -30,20 +30,6 @@ type HarmonyWarning = {
   expected?: string;
   found?: string;
 };
-
-type SustainPolicy = "none" | "carry" | "overlap";
-
-function sendSustainPolicy(x: unknown): SustainPolicy {
-  const s = String(x ?? "").toLowerCase().trim();
-  if (s === "carry") return "carry";
-  if (s === "overlap") return "overlap";
-  if (s === "none") return "none";
-  return "overlap";
-}
-
-function isObject(x: unknown): x is Json {
-  return typeof x === "object" && x !== null && !Array.isArray(x);
-}
 
 function getMeasureCount(score: any): number {
   const parts = score?.parts ?? [];
@@ -171,7 +157,6 @@ function noteNameToPc(name: string): number | null {
   const s = String(name ?? "").trim().toUpperCase();
   if (!s) return null;
 
-  // normalize unicode accidental chars
   const clean = s.replace("♯", "#").replace("♭", "B");
   const m = clean.match(/^([A-G])([#B]{0,2})$/);
   if (!m) return null;
@@ -185,6 +170,13 @@ function noteNameToPc(name: string): number | null {
     if (ch === "B") pc -= 1;
   }
   return normPc(pc);
+}
+
+function pcToName(pc: number, preferSharps: boolean): string {
+  const SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  const FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+  const p = normPc(pc);
+  return preferSharps ? SHARP[p] : FLAT[p];
 }
 
 function dominantPcFromKey(key: any): number | null {
@@ -233,11 +225,6 @@ function asMode(x: unknown): "major" | "minor" | null {
   if (s === "major") return "major";
   if (s === "minor") return "minor";
   return null;
-}
-
-function preferSharpsFromTonicName(tonic: string | null): boolean {
-  const t = String(tonic ?? "").trim();
-  return t === "G" || t === "D" || t === "A" || t === "E" || t === "B" || t === "F#" || t === "C#";
 }
 
 /**
@@ -640,72 +627,76 @@ function trackSecondaryResolutionsMeasurewise(measures: MeasureHarmony[], key: a
   }
 }
 
-function applySustainCarryToBeats(beats: BeatHarmony[], sustainPolicy: SustainPolicy): void {
-  if (sustainPolicy === "none") return;
-
-  let lastNonNC: BeatHarmony | null = null;
-
-  for (let i = 0; i < beats.length; i++) {
-    const b = beats[i];
-    const r = String(b?.roman?.roman ?? "");
-    if (!looksLikeNC(r)) {
-      lastNonNC = b;
-      continue;
-    }
-
-    if (!lastNonNC) continue;
-
-    // Carry forward the last known harmony
-    b.chord = lastNonNC.chord;
-    b.roman = lastNonNC.roman;
-  }
-}
-
 /**
- * Phase 0 key stabilizer for short excerpts with no key signature/meta.
- * If the final non-empty chord is a clear triad, anchor the key to that tonic.
+ * Heuristic for very short excerpts with no key signature:
+ * If the ending looks like V(7) -> I (or V(7) -> i), prefer the final chord as tonic.
+ * This prevents short snippets (like V7-I in C) from being guessed as G by histogram-only key detection.
  */
-function anchorKeyToFinalTriadIfNeeded(params: {
+function maybeOverrideKeyFromEnding(params: {
   score: any;
   measureCount: number;
   ignorePercussion: boolean;
   key: any;
-  hadKeySig: boolean;
-  hadMetaKey: boolean;
-  hadForceKey: boolean;
 }): any {
-  const { score, measureCount, ignorePercussion, key, hadKeySig, hadMetaKey, hadForceKey } = params;
-  if (hadForceKey) return key;
-  if (hadMetaKey) return key;
-  if (hadKeySig) return key;
+  const { score, measureCount, ignorePercussion, key } = params;
 
-  // Only anchor when the current key is a best-guess (short excerpt risk).
-  const curConf = typeof key?.confidence === "number" ? key.confidence : 0;
-  if (curConf >= 0.98) return key;
+  if (!score || measureCount <= 0) return key;
 
-  for (let mi = measureCount - 1; mi >= 0; mi--) {
-    const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, mi, ignorePercussion);
+  // Find last measure with any pitched content.
+  let lastIdx = -1;
+  let lastChord: any | null = null;
+
+  for (let i = Math.min(measureCount - 1, getMeasureCount(score) - 1); i >= 0; i--) {
+    const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, i, ignorePercussion);
     if (!pcs || pcs.length === 0) continue;
-
-    const chord = detectChordFromPcs(pcs, true, bassPc);
-    const q = String(chord?.quality ?? "").toLowerCase();
-    const rootPc = typeof chord?.rootPc === "number" ? chord.rootPc : null;
-    if (rootPc === null) continue;
-
-    // Anchor only on simple triads
-    if (q !== "maj" && q !== "min") continue;
-
-    const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
-    const tonicName = pcToName(rootPc, preferSharps);
-
-    return {
-      tonic: tonicName,
-      mode: q === "maj" ? "major" : "minor",
-      confidence: Math.max(curConf, 0.99)
-    };
+    lastIdx = i;
+    lastChord = detectChordFromPcs(pcs, true, bassPc);
+    break;
   }
 
-  return key;
+  if (lastIdx < 0 || !lastChord || typeof lastChord?.rootPc !== "number") return key;
+
+  const lastQuality = String(lastChord?.quality ?? "").toLowerCase();
+  const isLastTonicLike = lastQuality === "maj" || lastQuality === "min";
+  if (!isLastTonicLike) return key;
+
+  // Find previous measure with pitched content.
+  let prevChord: any | null = null;
+  for (let i = lastIdx - 1; i >= 0; i--) {
+    const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, i, ignorePercussion);
+    if (!pcs || pcs.length === 0) continue;
+    prevChord = detectChordFromPcs(pcs, true, bassPc);
+    break;
+  }
+
+  if (!prevChord || typeof prevChord?.rootPc !== "number") return key;
+
+  const prevQuality = String(prevChord?.quality ?? "").toLowerCase();
+  const prevIsDominantLike = prevQuality === "dom7" || prevQuality === "maj";
+  if (!prevIsDominantLike) return key;
+
+  const tonicPc = normPc(lastChord.rootPc);
+  const domPc = normPc(tonicPc + 7);
+  const prevRootPc = normPc(prevChord.rootPc);
+
+  // Require a dominant-root-to-tonic-root motion (G -> C, E -> A, etc.)
+  if (prevRootPc !== domPc) return key;
+
+  const mode: "major" | "minor" = lastQuality === "min" ? "minor" : "major";
+
+  // Keep spelling stable: prefer sharps for sharp-side keys, flats otherwise.
+  const preferSharps =
+    tonicPc === 7 || // G
+    tonicPc === 2 || // D
+    tonicPc === 9 || // A
+    tonicPc === 4 || // E
+    tonicPc === 11 || // B
+    tonicPc === 6 || // F#
+    tonicPc === 1; // C#
+
+  const tonicName = pcToName(tonicPc, preferSharps);
+
+  return { tonic: tonicName, mode, confidence: 0.99 };
 }
 
 export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysisError {
@@ -713,11 +704,10 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
     const score = req?.scoreModel;
     if (!score) return { ok: false, error: "Provide either 'scoreModel' or 'musicxml' in the request body." };
 
-    const options = (req?.options ?? {}) as any;
+    const options = req?.options ?? {};
     const granularity = options.granularity === "beat" ? "beat" : "measure";
     const maxMeasures = typeof options.maxMeasures === "number" ? options.maxMeasures : 128;
     const ignorePercussion = options.ignorePercussion === true;
-    const sustainPolicy = sendSustainPolicy(options.sustainPolicy);
 
     const measureCount = Math.min(getMeasureCount(score), maxMeasures);
     if (measureCount <= 0) {
@@ -732,33 +722,20 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
     let key: any = null;
 
-    const hadForceKey =
-      !!(options.forceKey?.tonic && (options.forceKey.mode === "major" || options.forceKey.mode === "minor"));
-    const hadMetaKey = !!(preferKeyFromMeta && metaKey);
-    const sigKey = !hadForceKey && !hadMetaKey ? keyFromScoreModelKeySignature(score, hist) : null;
-    const hadKeySig = !!sigKey;
-
     // 1) forceKey always wins
-    if (hadForceKey) {
+    if (options.forceKey?.tonic && (options.forceKey.mode === "major" || options.forceKey.mode === "minor")) {
       key = { tonic: options.forceKey.tonic, mode: options.forceKey.mode, confidence: 1 };
-    } else if (hadMetaKey) {
+    } else if (preferKeyFromMeta && metaKey) {
       // 2) metaKey if present (and preferred)
       key = keyFromMetaOrBestGuess(metaKey, hist, true);
     } else {
-      // 3) scoreModel key signature if present, else best guess
+      // 3) robust scoreModel key signature (fifths/mode) if present
+      const sigKey = keyFromScoreModelKeySignature(score, hist);
       key = sigKey ?? keyFromMetaOrBestGuess(null, hist, true);
     }
 
-    // Phase 0: stabilize short excerpts (like V7->I in 2 bars) by anchoring to final triad
-    key = anchorKeyToFinalTriadIfNeeded({
-      score,
-      measureCount,
-      ignorePercussion,
-      key,
-      hadKeySig,
-      hadMetaKey,
-      hadForceKey
-    });
+    // 4) short-excerpt override: V(7)->I/i at the end should win (fixes V7-I 2-bar tests with no key signature)
+    key = maybeOverrideKeyFromEnding({ score, measureCount, ignorePercussion, key });
 
     if (granularity === "measure") {
       const measures: MeasureHarmony[] = [];
@@ -781,7 +758,7 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
       return {
         ok: true,
-        engine: { phase: "3.3", granularity: "measure", romanNumerals: true, tonicizations: "brief", sustainPolicy },
+        engine: { phase: "3.3", granularity: "measure", romanNumerals: true, tonicizations: "brief", sustainPolicy: "overlap" },
         key,
         measures,
         cadences,
@@ -799,7 +776,15 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
         const { pcs, bassPc } = collectBeatPcsAndBassPc(score, mi, b, ignorePercussion);
         const chord = detectChordFromPcs(pcs, true, bassPc);
 
-        const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+        const preferSharps =
+          key?.tonic === "G" ||
+          key?.tonic === "D" ||
+          key?.tonic === "A" ||
+          key?.tonic === "E" ||
+          key?.tonic === "B" ||
+          key?.tonic === "F#" ||
+          key?.tonic === "C#";
+
         const notes = chordNotesToNames(chord.pcs, preferSharps);
 
         let roman = analyzeRomanNumeral(chord, key, notes);
@@ -809,9 +794,6 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
       }
     }
 
-    // Phase 0: sustain/carry to avoid N.C. spam
-    applySustainCarryToBeats(beats, sustainPolicy);
-
     applyCadential64LabelingBeatwise(beats, key, warnings);
     trackSecondaryResolutionsBeatwise(beats, key, warnings);
 
@@ -820,7 +802,7 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
     return {
       ok: true,
-      engine: { phase: "3.3", granularity: "beat", romanNumerals: true, tonicizations: "brief", sustainPolicy },
+      engine: { phase: "3.3", granularity: "beat", romanNumerals: true, tonicizations: "brief", sustainPolicy: "overlap" },
       key,
       beats,
       cadences,

@@ -1,0 +1,23 @@
+{
+  "root": "score-partwise",
+  "required_sections": [
+    "part-list",
+    "part",
+    "measure"
+  ],
+  "note_requirements": {
+    "pitch": {
+      "required_if_not_rest": true,
+      "fields": [
+        "step",
+        "octave"
+      ],
+      "alter_optional": true
+    },
+    "duration_required": true,
+    "type_required": true
+  },
+  "measure_validation": {
+    "sum_durations_to_time_signature": true
+  }
+}

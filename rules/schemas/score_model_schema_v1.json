@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "note_event": {
+    "t": "int",
+    "dur": "int",
+    "type": "note|rest",
+    "pitch": {
+      "step": "A-G",
+      "alter": "int?",
+      "octave": "int"
+    },
+    "voice": "int",
+    "staff": "int?"
+  },
+  "measure": {
+    "number": "int",
+    "attributes": {
+      "divisions": "int",
+      "key_fifths": "int",
+      "time": {
+        "beats": "int",
+        "beat_type": "int"
+      }
+    },
+    "events": "note_event[]"
+  },
+  "part": {
+    "part_id": "string",
+    "name": "string",
+    "instrument": "string",
+    "clef": "string",
+    "staff": "int",
+    "measures": "measure[]"
+  },
+  "score_model": {
+    "score_id": "string",
+    "meta": "object",
+    "global": "object",
+    "parts": "part[]",
+    "harmony_timeline": "array",
+    "analysis_cache": "object"
+  }
+}

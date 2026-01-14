@@ -1,0 +1,22 @@
+// src/arrange/arrangeRouter.ts
+import type { ScoreModel } from "../score/types";
+import { mapPianoToStringQuartetOpen } from "./mapToEnsemble";
+
+export type ArrangeIntent = "instrumentation_only" | "new_arrangement";
+
+export type ArrangeRequest = {
+  intent: ArrangeIntent;
+  target: {
+    ensemble: "string_quartet";
+    spacing?: "open_classical" | "compact";
+  };
+};
+
+export function arrangeScoreModel(score: ScoreModel, req: ArrangeRequest): ScoreModel {
+  // For now, only one target supported (string quartet), open spacing
+  // Later: brass ensemble, woodwind ensemble, jazz band = add more mappings here.
+  if (req.target.ensemble === "string_quartet") {
+    return mapPianoToStringQuartetOpen(score);
+  }
+  return score;
+}

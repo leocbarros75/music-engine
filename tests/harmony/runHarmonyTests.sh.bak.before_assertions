@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GRANULARITY="${1:-beat}"
+
+echo "== harmony tests =="
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+echo "root: ${ROOT}"
+echo
+
+run_one () {
+  local file="$1"
+  echo "-> ${file} (${GRANULARITY})"
+  (cd "${ROOT}" && npx --yes tsx "tests/harmony/runHarmonyTest.ts" "${file}" "${GRANULARITY}")
+  echo
+}
+
+run_one "tests/musicxml/test_am_i64_v7_i.xml"
+run_one "tests/musicxml/test_c_major_plagal_4bars.xml"
+run_one "tests/musicxml/test_c_major_applied_dominant_deceptive.xml"
+
+echo "== done =="

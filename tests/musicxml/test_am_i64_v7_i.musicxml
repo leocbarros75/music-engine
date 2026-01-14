@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC
-  "-//Recordare//DTD MusicXML 3.1 Partwise//EN"
-  "http://www.musicxml.org/dtds/partwise.dtd">
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="3.1">
   <part-list>
     <score-part id="P1">
@@ -10,8 +8,6 @@
   </part-list>
 
   <part id="P1">
-
-    <!-- Measure 1: i64 in A minor (A–C–E over E) -->
     <measure number="1">
       <attributes>
         <divisions>4</divisions>
@@ -24,67 +20,77 @@
           <beat-type>4</beat-type>
         </time>
         <clef>
-          <sign>F</sign>
-          <line>4</line>
+          <sign>G</sign>
+          <line>2</line>
         </clef>
       </attributes>
 
+      <!-- i64 in A minor: Am/E = E A C (bass E) -->
       <note>
-        <pitch><step>E</step><octave>2</octave></pitch>
+        <pitch><step>E</step><octave>4</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>A</step><octave>2</octave></pitch>
+        <pitch><step>A</step><octave>4</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>C</step><octave>3</octave></pitch>
+        <pitch><step>C</step><octave>5</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
     </measure>
 
-    <!-- Measure 2: V7 in A minor (E7) -->
     <measure number="2">
+      <!-- V7 in A minor: E7 = E G# B D (bass E) -->
       <note>
-        <pitch><step>E</step><octave>2</octave></pitch>
+        <pitch><step>E</step><octave>4</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>G</step><alter>1</alter><octave>2</octave></pitch>
+        <pitch><step>G</step><alter>1</alter><octave>4</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>B</step><octave>2</octave></pitch>
+        <pitch><step>B</step><octave>4</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>D</step><octave>3</octave></pitch>
+        <pitch><step>D</step><octave>5</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
     </measure>
 
-    <!-- Measure 3: i in A minor (A–C–E) -->
     <measure number="3">
+      <!-- i in A minor: Am = A C E (bass A) -->
       <note>
-        <pitch><step>A</step><octave>2</octave></pitch>
+        <pitch><step>A</step><octave>4</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>C</step><octave>3</octave></pitch>
+        <pitch><step>C</step><octave>5</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
       <note>
         <chord/>
-        <pitch><step>E</step><octave>3</octave></pitch>
+        <pitch><step>E</step><octave>5</octave></pitch>
         <duration>16</duration>
+        <type>whole</type>
       </note>
     </measure>
-
   </part>
 </score-partwise>

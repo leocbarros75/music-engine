@@ -1,0 +1,37 @@
+{
+  "classical_simple": {
+    "notes": "Mixed classical rhythm vocabulary; avoid monotony."
+  },
+  "alberti": {
+    "pattern": [
+      "low",
+      "high",
+      "mid",
+      "high"
+    ],
+    "staff": "left_hand",
+    "meter_fit": [
+      "4/4",
+      "2/4",
+      "3/4",
+      "6/8"
+    ]
+  },
+  "waltz": {
+    "meter_preferred": [
+      "3/4"
+    ],
+    "meter_allowed": [
+      "3/4",
+      "6/8"
+    ],
+    "pattern": [
+      "bass",
+      "chord",
+      "chord"
+    ]
+  },
+  "free": {
+    "notes": "No fixed pattern; select appropriate rhythm cells."
+  }
+}

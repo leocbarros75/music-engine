@@ -11,22 +11,13 @@
 
   <part id="P1">
 
-    <!-- Measure 1: i64 in A minor (A–C–E over E) -->
+    <!-- Measure 1: i64 in A minor = Am/E (A C E). Bass = E -->
     <measure number="1">
       <attributes>
         <divisions>4</divisions>
-        <key>
-          <fifths>0</fifths>
-          <mode>minor</mode>
-        </key>
-        <time>
-          <beats>4</beats>
-          <beat-type>4</beat-type>
-        </time>
-        <clef>
-          <sign>F</sign>
-          <line>4</line>
-        </clef>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
       </attributes>
 
       <note>
@@ -45,7 +36,7 @@
       </note>
     </measure>
 
-    <!-- Measure 2: V7 in A minor (E7) -->
+    <!-- Measure 2: V7 in A minor = E7 (E G# B D). Bass = E -->
     <measure number="2">
       <note>
         <pitch><step>E</step><octave>2</octave></pitch>
@@ -68,7 +59,7 @@
       </note>
     </measure>
 
-    <!-- Measure 3: i in A minor (A–C–E) -->
+    <!-- Measure 3: i in A minor = Am (A C E). Bass = A -->
     <measure number="3">
       <note>
         <pitch><step>A</step><octave>2</octave></pitch>

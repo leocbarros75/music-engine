@@ -1,0 +1,12 @@
+{
+  "piano": {
+    "staves": 2,
+    "staff_1": "treble",
+    "staff_2": "bass",
+    "no_swapping": true
+  },
+  "grand_staff_required_for_instrument": [
+    "piano",
+    "keyboard"
+  ]
+}

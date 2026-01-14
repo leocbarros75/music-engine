@@ -1,0 +1,21 @@
+{
+  "name": "master_ruleset_v3_musicxml_stability",
+  "version": "3.0.0",
+  "load_order": [
+    "musicxml/musicxml_structure_rules.json",
+    "musicxml/musicxml_staff_clef_rules.json",
+    "musicxml/musicxml_key_accidental_rules.json",
+    "instruments/string_ranges.json",
+    "vocal/vocal_ranges.json",
+    "harmony/harmony_rules_functional.json",
+    "counterpoint/counterpoint_species_rules.json",
+    "rhythm/rhythm_cells_library.json",
+    "rhythm/rhythm_patterns.json",
+    "harmony/voiceleading_rules.json"
+  ],
+  "priority": "musicxml_validity_over_musical_freedom",
+  "failsafe": {
+    "on_error": "engine_blocked",
+    "no_silence": true
+  }
+}

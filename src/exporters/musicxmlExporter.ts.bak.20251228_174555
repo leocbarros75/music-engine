@@ -1,0 +1,246 @@
+/* src/exporters/musicxmlExporter.ts
+   MusicXML 3.1 exporter for ScoreModel.
+   - Supports multi-part export
+   - Adds clef per instrument (fixes Bassoon clef)
+   - Adds <transpose> for transposing instruments (Bb, F)
+*/
+
+import type { ScoreModel } from "../score/types";
+
+type Pitch = { step: string; alter?: number; octave: number };
+
+function esc(s: string): string {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function pitchXml(p: Pitch): string {
+  const step = esc(String(p.step ?? "C"));
+  const octave = Number.isFinite(p.octave) ? p.octave : 4;
+  const alter = p.alter;
+
+  const alterTag =
+    typeof alter === "number" && alter !== 0 ? `<alter>${alter}</alter>` : "";
+
+  return `<pitch><step>${step}</step>${alterTag}<octave>${octave}</octave></pitch>`;
+}
+
+function durationType(divisions: number, dur: number): string | null {
+  // Very small, pragmatic mapping. MuseScore accepts missing <type>, but it helps.
+  if (!divisions || !dur) return null;
+
+  const q = divisions; // quarter note
+  if (dur === 4 * q) return "whole";
+  if (dur === 2 * q) return "half";
+  if (dur === 1 * q) return "quarter";
+  if (dur === q / 2) return "eighth";
+  if (dur === q / 4) return "16th";
+  if (dur === q / 8) return "32nd";
+  return null;
+}
+
+type ClefSpec = { sign: "G" | "F" | "C"; line: 2 | 3 | 4 };
+
+function clefForInstrument(inst: string, staves: number): ClefSpec[] {
+  const i = (inst ?? "").toLowerCase();
+
+  // Piano: two staves
+  if (staves === 2 && i.includes("piano")) {
+    return [
+      { sign: "G", line: 2 }, // staff 1
+      { sign: "F", line: 4 }  // staff 2
+    ];
+  }
+
+  // Woodwinds
+  if (i.includes("bassoon")) return [{ sign: "F", line: 4 }];
+  if (i.includes("clarinet")) return [{ sign: "G", line: 2 }];
+  if (i.includes("oboe")) return [{ sign: "G", line: 2 }];
+  if (i.includes("flute")) return [{ sign: "G", line: 2 }];
+
+  // Brass
+  if (i.includes("trombone")) return [{ sign: "F", line: 4 }];
+  if (i.includes("tuba")) return [{ sign: "F", line: 4 }];
+  if (i.includes("horn")) return [{ sign: "G", line: 2 }];
+  if (i.includes("trumpet")) return [{ sign: "G", line: 2 }];
+
+  // Strings (fallback)
+  if (i.includes("cello")) return [{ sign: "F", line: 4 }];
+  if (i.includes("viola")) return [{ sign: "C", line: 3 }];
+  if (i.includes("violin")) return [{ sign: "G", line: 2 }];
+
+  // Default treble
+  return [{ sign: "G", line: 2 }];
+}
+
+type TransposeSpec = { diatonic: number; chromatic: number };
+
+// MusicXML transpose: how written should be transposed to SOUND.
+// Bb instruments: written C sounds Bb => transpose -2 chromatic, -1 diatonic.
+// Horn in F: written C sounds F => transpose -7 chromatic, -4 diatonic.
+function transposeForInstrument(inst: string): TransposeSpec | null {
+  const i = (inst ?? "").toLowerCase();
+
+  // Trumpet in Bb
+  if (i.includes("trumpet") && i.includes("bb")) return { diatonic: -1, chromatic: -2 };
+
+  // Clarinet in Bb
+  if (i.includes("clarinet") && i.includes("bb")) return { diatonic: -1, chromatic: -2 };
+
+  // Horn in F
+  if (i.includes("horn") && (i.includes("_f") || i.includes(" in f") || i === "horn_f")) {
+    return { diatonic: -4, chromatic: -7 };
+  }
+
+  // Everything else: concert
+  return null;
+}
+
+function measureAttributesXml(part: any, m: any, isFirstMeasure: boolean): string {
+  const divisions = Number(m?.attributes?.divisions ?? m?.attributes?.divisions ?? 480);
+  const keyFifths = Number(m?.attributes?.key_fifths ?? 0);
+  const beats = Number(m?.attributes?.time?.beats ?? 4);
+  const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+
+  const staves = Number(part?.staves ?? 1);
+  const inst = String(part?.instrument ?? "");
+
+  const clefs = clefForInstrument(inst, staves);
+  const transpose = transposeForInstrument(inst);
+
+  // Write <attributes> at every measure in this simple exporter.
+  // (MusicXML allows reusing, but repeating is fine.)
+  const clefXml =
+    staves === 2 && clefs.length >= 2
+      ? `<clef number="1"><sign>${clefs[0].sign}</sign><line>${clefs[0].line}</line></clef>` +
+        `<clef number="2"><sign>${clefs[1].sign}</sign><line>${clefs[1].line}</line></clef>`
+      : `<clef><sign>${clefs[0].sign}</sign><line>${clefs[0].line}</line></clef>`;
+
+  const stavesXml = staves === 2 ? `<staves>2</staves>` : "";
+
+  const transposeXml = transpose
+    ? `<transpose><diatonic>${transpose.diatonic}</diatonic><chromatic>${transpose.chromatic}</chromatic></transpose>`
+    : "";
+
+  return (
+    `<attributes>` +
+      `<divisions>${divisions}</divisions>` +
+      `<key><fifths>${keyFifths}</fifths></key>` +
+      `<time><beats>${beats}</beats><beat-type>${beatType}</beat-type></time>` +
+      stavesXml +
+      transposeXml +
+      clefXml +
+    `</attributes>`
+  );
+}
+
+function eventXml(ev: any, divisions: number): string {
+  const dur = Number(ev?.dur ?? 0);
+  const voice = Number(ev?.voice ?? 1);
+  const staff = Number(ev?.staff ?? 1);
+
+  const typeTag = durationType(divisions, dur);
+  const typeXml = typeTag ? `<type>${typeTag}</type>` : "";
+
+  if (ev?.type === "rest") {
+    return (
+      `<note>` +
+        `<rest/>` +
+        `<duration>${dur}</duration>` +
+        `<voice>${voice}</voice>` +
+        typeXml +
+        `<staff>${staff}</staff>` +
+      `</note>`
+    );
+  }
+
+  if (ev?.type === "note") {
+    const p = ev?.pitch;
+    // Defensive: if pitch missing, export as rest (prevents crashes)
+    if (!p || p.step == null || p.octave == null) {
+      return (
+        `<note>` +
+          `<rest/>` +
+          `<duration>${dur}</duration>` +
+          `<voice>${voice}</voice>` +
+          typeXml +
+          `<staff>${staff}</staff>` +
+        `</note>`
+      );
+    }
+
+    return (
+      `<note>` +
+        pitchXml(p) +
+        `<duration>${dur}</duration>` +
+        `<voice>${voice}</voice>` +
+        typeXml +
+        `<staff>${staff}</staff>` +
+      `</note>`
+    );
+  }
+
+  // Unknown event: ignore
+  return "";
+}
+
+export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
+  const ensembleTitle = esc(scoreModel?.meta?.ensemble ?? "ensemble");
+
+  const parts = Array.isArray(scoreModel?.parts) ? scoreModel.parts : [];
+  const partListXml =
+    `<part-list>` +
+    parts
+      .map((p: any) => {
+        const id = esc(p?.part_id ?? "P1");
+        const name = esc(p?.name ?? id);
+        return `<score-part id="${id}"><part-name>${name}</part-name></score-part>`;
+      })
+      .join("") +
+    `</part-list>`;
+
+  const scorePartsXml = parts
+    .map((p: any) => {
+      const pid = esc(p?.part_id ?? "P1");
+      const measures = Array.isArray(p?.measures) ? p.measures : [];
+
+      const measuresXml = measures
+        .map((m: any, idx: number) => {
+          const mNum = Number(m?.number ?? (idx + 1));
+          const divisions = Number(m?.attributes?.divisions ?? scoreModel?.global?.divisions ?? 480);
+
+          const attrsXml = measureAttributesXml(p, m, idx === 0);
+
+          const events = Array.isArray(m?.events) ? m.events : [];
+          // Sort by onset time for stable output
+          const sorted = events.slice().sort((a: any, b: any) => Number(a?.t ?? 0) - Number(b?.t ?? 0));
+
+          const evXml = sorted
+            .map((ev: any) => eventXml(ev, divisions))
+            .filter(Boolean)
+            .join("");
+
+          return `<measure number="${mNum}">${attrsXml}${evXml}</measure>`;
+        })
+        .join("");
+
+      return `<part id="${pid}">${measuresXml}</part>`;
+    })
+    .join("");
+
+  // Compact but valid MusicXML 3.1 Partwise
+  return (
+    `<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n` +
+    `<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"\n` +
+    `  "http://www.musicxml.org/dtds/partwise.dtd">\n` +
+    `<score-partwise version="3.1">` +
+      `<work><work-title>${ensembleTitle}</work-title></work>` +
+      partListXml +
+      scorePartsXml +
+    `</score-partwise>\n`
+  );
+}

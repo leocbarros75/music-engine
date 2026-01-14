@@ -1,0 +1,20 @@
+{
+  "project_meta": {
+    "mode": "compose",
+    "ensemble": "piano_solo",
+    "skill_level": "intermediate",
+    "key": "C major",
+    "time_signature": "4/4",
+    "tempo_bpm": 96,
+    "length_measures": 8,
+    "form": "binary",
+    "texture": "homophonic",
+    "rhythm_style": "alberti",
+    "counterpoint_style": "none",
+    "harmony_mode": "functional",
+    "analysis_enabled": true,
+    "validate_only": false,
+    "debug": true
+  },
+  "task": "Compose an 8-measure Classical-style piano piece with clear Alberti bass accompaniment."
+}

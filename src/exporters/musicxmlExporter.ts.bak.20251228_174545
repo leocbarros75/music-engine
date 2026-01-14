@@ -1,0 +1,92 @@
+// src/exporters/musicxmlExporter.ts
+import type { ScoreModel } from "../score/types";
+import { InstrumentCatalog } from "../instruments/instrumentCatalog";
+
+function esc(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function clefXmlForInstrument(partInstrument?: string) {
+  const spec = partInstrument ? (InstrumentCatalog as any)[partInstrument] : null;
+  const clef = spec?.clef ?? "treble";
+
+  if (clef === "bass") return `<clef><sign>F</sign><line>4</line></clef>`;
+  if (clef === "alto") return `<clef><sign>C</sign><line>3</line></clef>`;
+  return `<clef><sign>G</sign><line>2</line></clef>`;
+}
+
+function pitchXml(p: any) {
+  const step = esc(p.step);
+  const octave = Number(p.octave);
+  const alter = p.alter != null ? `<alter>${Number(p.alter)}</alter>` : "";
+  return `<pitch><step>${step}</step>${alter}<octave>${octave}</octave></pitch>`;
+}
+
+export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
+  const title = esc(scoreModel?.meta?.ensemble ?? "ensemble");
+
+  const parts = scoreModel?.parts ?? [];
+  const divisions = scoreModel?.global?.divisions ?? 480;
+
+  // Concert pitch view:
+  // - We do NOT emit <transpose> tags.
+  // - We emit pitches exactly as stored in ScoreModel.
+  const partList = parts
+    .map(p => `<score-part id="${esc(p.part_id)}"><part-name>${esc(p.name ?? p.part_id)}</part-name></score-part>`)
+    .join("");
+
+  let xml = "";
+  xml += `<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n`;
+  xml += `<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"\n`;
+  xml += `  "http://www.musicxml.org/dtds/partwise.dtd">\n`;
+  xml += `<score-partwise version="3.1">`;
+  xml += `<work><work-title>${title}</work-title></work>`;
+  xml += `<part-list>${partList}</part-list>`;
+
+  for (const part of parts) {
+    xml += `<part id="${esc(part.part_id)}">`;
+
+    const measures = part.measures ?? [];
+    for (const m of measures) {
+      const mNum = Number(m.number ?? 1);
+      const keyFifths = m.attributes?.key_fifths ?? 0;
+      const beats = m.attributes?.time?.beats ?? 4;
+      const beatType = m.attributes?.time?.beat_type ?? 4;
+
+      xml += `<measure number="${mNum}">`;
+
+      xml += `<attributes>`;
+      xml += `<divisions>${divisions}</divisions>`;
+      xml += `<key><fifths>${keyFifths}</fifths></key>`;
+      xml += `<time><beats>${beats}</beats><beat-type>${beatType}</beat-type></time>`;
+      xml += clefXmlForInstrument(part.instrument);
+      xml += `</attributes>`;
+
+      const events = m.events ?? [];
+      for (const ev of events) {
+        if (ev.type === "rest") {
+          xml += `<note><rest/><duration>${Number(ev.dur ?? 480)}</duration><voice>${Number(ev.voice ?? 1)}</voice></note>`;
+          continue;
+        }
+        if (ev.type === "note") {
+          xml += `<note>`;
+          xml += pitchXml(ev.pitch);
+          xml += `<duration>${Number(ev.dur ?? 480)}</duration>`;
+          xml += `<voice>${Number(ev.voice ?? 1)}</voice>`;
+          xml += `</note>`;
+        }
+      }
+
+      xml += `</measure>`;
+    }
+
+    xml += `</part>`;
+  }
+
+  xml += `</score-partwise>\n`;
+  return xml;
+}

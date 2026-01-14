@@ -1,0 +1,45 @@
+{
+  "species_1": {
+    "note_ratio": "1:1",
+    "allowed_consonances": [
+      "m3",
+      "M3",
+      "P5",
+      "m6",
+      "M6",
+      "P8"
+    ],
+    "forbidden_intervals": [
+      "P4"
+    ],
+    "no_parallels": [
+      "P5",
+      "P8"
+    ],
+    "melodic_preferences": {
+      "stepwise_preferred": true,
+      "leaps_limit": 8
+    }
+  },
+  "species_2": {
+    "note_ratio": "2:1",
+    "passing_tones_allowed": true,
+    "strong_beat_consonant_required": true
+  },
+  "species_3": {
+    "note_ratio": "4:1",
+    "stepwise_preferred": true,
+    "dissonance_on_weak_parts_only": true
+  },
+  "species_4": {
+    "note_ratio": "syncopation",
+    "suspensions_allowed": true,
+    "prepare_suspension": true,
+    "resolve_down_by_step": true
+  },
+  "species_5": {
+    "note_ratio": "florid",
+    "mixture_allowed": true,
+    "dissonance_controls": "species_2_3_4_rules_apply"
+  }
+}

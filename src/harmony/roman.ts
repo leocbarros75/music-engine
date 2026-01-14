@@ -54,7 +54,10 @@ function functionTagFromDegree(deg: number | null): RomanAnalysis["functionTag"]
   return "other";
 }
 
-function detectSecondaryDominant(chordRootPc: number, key: KeyEstimate): { roman: string; secondaryOf: string } | null {
+function detectSecondaryDominant(
+  chordRootPc: number,
+  key: KeyEstimate
+): { roman: string; secondaryOf: string } | null {
   const tonicPc = tonicNameToPc(key.tonic);
   const scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
 
@@ -119,7 +122,6 @@ function inversionFigure(chord: ChordInfo): string {
     return "";
   }
 
-  // 7th chord figures
   if (bass === r) return "7";
   if (third !== null && bass === third) return "65";
   if (fifth !== null && bass === fifth) return "43";
@@ -134,18 +136,12 @@ function applyInversionToRoman(roman: string, figure: string): string {
   if (slash >= 0) {
     const left = roman.slice(0, slash);
     const right = roman.slice(slash);
-    // If left already has a figure, do not double-append
     if (/\d$/.test(left)) return roman;
     return `${left}${figure}${right}`;
   }
 
-  // If roman already ends with digits, do not double-append
   if (/\d$/.test(roman)) return roman;
   return `${roman}${figure}`;
-}
-
-function isMajorTriadQuality(q: string): boolean {
-  return q === "maj";
 }
 
 export function analyzeRomanNumeral(chord: ChordInfo, key: KeyEstimate, notes: string[]): RomanAnalysis {
@@ -155,26 +151,6 @@ export function analyzeRomanNumeral(chord: ChordInfo, key: KeyEstimate, notes: s
 
   const deg = degreeFromPcInKey(chord.rootPc, key);
   const functionTag = functionTagFromDegree(deg);
-
-  // 0) Borrowed bVII in major (mixture), example: C major -> Bb major = bVII
-  // This fixes cases where chordDetect names it "A#" and degreeFromPcInKey returns null.
-  if (key?.mode === "major" && deg === null && isMajorTriadQuality(chord.quality)) {
-    const tonicPc = tonicPcFromKey(key);
-    const bVIIpc = mod12(tonicPc - 2);
-
-    if (mod12(chord.rootPc) === bVIIpc) {
-      const fig = inversionFigure(chord);
-      let roman = "bVII";
-      if (fig === "6" || fig === "64") roman = applyInversionToRoman(roman, fig);
-
-      return {
-        roman,
-        degree: 7,
-        functionTag: "predominant",
-        notes
-      };
-    }
-  }
 
   // 1) Secondary dominants: only for dominant-7 quality
   if (chord.quality === "dom7") {
@@ -192,24 +168,18 @@ export function analyzeRomanNumeral(chord: ChordInfo, key: KeyEstimate, notes: s
     }
   }
 
-  // 2) Diatonic roman + inversion figure (this fixes V65 etc)
+  // 2) Diatonic roman + inversion figure
   let roman = deg ? romanFromDegree(deg, chord.quality) : chord.name;
 
-  // If it is a 7th chord, romanFromDegree already includes "7" (V7).
-  // For inversions we want V65, V43, V42 (replace the 7 figure).
   const fig = inversionFigure(chord);
   const is7 = isSeventhChordQuality(chord.quality);
 
   if (is7) {
     if (fig === "65" || fig === "43" || fig === "42") {
-      roman = roman.replace(/7$/, ""); // remove trailing 7 before adding inversion
+      roman = roman.replace(/7$/, "");
       roman = applyInversionToRoman(roman, fig);
-    } else {
-      // root position remains V7
-      // keep roman as-is
     }
   } else {
-    // Triads: add 6 / 64 when applicable
     if (fig === "6" || fig === "64") roman = applyInversionToRoman(roman, fig);
   }
 

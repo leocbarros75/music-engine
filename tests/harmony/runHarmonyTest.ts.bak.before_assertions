@@ -1,0 +1,45 @@
+// tests/harmony/runHarmonyTest.ts
+import fs from "node:fs";
+import path from "node:path";
+import process from "node:process";
+
+import { parseMusicXMLToScoreModel } from "../../src/parsers/musicxmlParser";
+import { analyzeHarmony } from "../../src/harmony/analyzeHarmony";
+
+function usage(): never {
+  // eslint-disable-next-line no-console
+  console.error("Usage: tsx tests/harmony/runHarmonyTest.ts <path-to-xml> [beat|measure]");
+  process.exit(1);
+}
+
+const filePathArg = process.argv[2];
+const granularityArg = process.argv[3];
+
+const granularity = granularityArg === "measure" || granularityArg === "beat" ? granularityArg : "beat";
+
+if (!filePathArg) usage();
+
+const filePath = path.resolve(process.cwd(), filePathArg);
+
+if (!fs.existsSync(filePath)) {
+  // eslint-disable-next-line no-console
+  console.error(`File not found: ${filePath}`);
+  process.exit(1);
+}
+
+const xml = fs.readFileSync(filePath, "utf8");
+
+// IMPORTANT: Use the same parser as src/server.ts
+const scoreModel = parseMusicXMLToScoreModel(xml);
+
+const out = analyzeHarmony({
+  scoreModel,
+  options: {
+    granularity,
+    ignorePercussion: true
+  }
+} as any);
+
+// Pretty print for test logs
+// eslint-disable-next-line no-console
+console.log(JSON.stringify(out, null, 2));
