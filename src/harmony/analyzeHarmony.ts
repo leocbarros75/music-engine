@@ -41,10 +41,6 @@ function sendSustainPolicy(x: unknown): SustainPolicy {
   return "overlap";
 }
 
-function isObject(x: unknown): x is Json {
-  return typeof x === "object" && x !== null && !Array.isArray(x);
-}
-
 function getMeasureCount(score: any): number {
   const parts = score?.parts ?? [];
   let max = 0;
@@ -344,7 +340,10 @@ function keyFromFifths(
 /**
  * Use key signature if present. If key signature has no mode, choose major vs minor using histogram fit.
  */
-function keyFromScoreModelKeySignature(score: any, hist: number[]): { tonic: string; mode: string; confidence: number } | null {
+function keyFromScoreModelKeySignature(
+  score: any,
+  hist: number[]
+): { tonic: string; mode: string; confidence: number } | null {
   const ks = findFirstKeySig(score);
   if (!ks) return null;
 
@@ -655,10 +654,85 @@ function applySustainCarryToBeats(beats: BeatHarmony[], sustainPolicy: SustainPo
 
     if (!lastNonNC) continue;
 
-    // Carry forward the last known harmony
     b.chord = lastNonNC.chord;
     b.roman = lastNonNC.roman;
   }
+}
+
+function isTriadQuality(q: string): boolean {
+  const x = String(q ?? "").toLowerCase();
+  return x === "maj" || x === "min";
+}
+
+function isDominantOf(domRootPc: number, tonicRootPc: number): boolean {
+  return normPc(domRootPc) === normPc(tonicRootPc + 7);
+}
+
+/**
+ * Phase 4 key stabilizer:
+ * If the ending shows a dominant -> tonic cadence (by chord roots), anchor the key to that tonic.
+ * This uses chord roots + quality only, so it does not depend on roman output.
+ */
+function anchorKeyFromCadenceIfNeeded(params: {
+  score: any;
+  measureCount: number;
+  ignorePercussion: boolean;
+  key: any;
+  hadKeySig: boolean;
+  hadMetaKey: boolean;
+  hadForceKey: boolean;
+}): any {
+  const { score, measureCount, ignorePercussion, key, hadKeySig, hadMetaKey, hadForceKey } = params;
+
+  if (hadForceKey) return key;
+  if (hadMetaKey) return key;
+  if (hadKeySig) return key;
+
+  const curConf = typeof key?.confidence === "number" ? key.confidence : 0;
+  if (curConf >= 0.995) return key;
+
+  const lastChords: any[] = [];
+  for (let mi = measureCount - 1; mi >= 0 && lastChords.length < 6; mi--) {
+    const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, mi, ignorePercussion);
+    if (!pcs || pcs.length === 0) continue;
+
+    const chord = detectChordFromPcs(pcs, true, bassPc);
+    if (!chord) continue;
+    if (typeof chord?.rootPc !== "number") continue;
+
+    lastChords.push(chord);
+  }
+
+  if (lastChords.length < 2) return key;
+
+  const last = lastChords[0];
+  const prev = lastChords[1];
+
+  const lastQ = String(last?.quality ?? "").toLowerCase();
+  const prevQ = String(prev?.quality ?? "").toLowerCase();
+
+  const lastRoot = typeof last?.rootPc === "number" ? last.rootPc : null;
+  const prevRoot = typeof prev?.rootPc === "number" ? prev.rootPc : null;
+
+  if (lastRoot === null || prevRoot === null) return key;
+
+  if (!isTriadQuality(lastQ)) return key;
+
+  const prevIsDom7 = prevQ === "dom7";
+  const prevIsTriad = isTriadQuality(prevQ);
+
+  if (!(prevIsDom7 || prevIsTriad)) return key;
+  if (!isDominantOf(prevRoot, lastRoot)) return key;
+
+  const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+  const tonicName = pcToName(lastRoot, preferSharps);
+  const mode = lastQ === "maj" ? "major" : "minor";
+
+  return {
+    tonic: tonicName,
+    mode,
+    confidence: Math.max(curConf, 0.995)
+  };
 }
 
 /**
@@ -679,7 +753,6 @@ function anchorKeyToFinalTriadIfNeeded(params: {
   if (hadMetaKey) return key;
   if (hadKeySig) return key;
 
-  // Only anchor when the current key is a best-guess (short excerpt risk).
   const curConf = typeof key?.confidence === "number" ? key.confidence : 0;
   if (curConf >= 0.98) return key;
 
@@ -692,7 +765,6 @@ function anchorKeyToFinalTriadIfNeeded(params: {
     const rootPc = typeof chord?.rootPc === "number" ? chord.rootPc : null;
     if (rootPc === null) continue;
 
-    // Anchor only on simple triads
     if (q !== "maj" && q !== "min") continue;
 
     const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
@@ -738,18 +810,26 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
     const sigKey = !hadForceKey && !hadMetaKey ? keyFromScoreModelKeySignature(score, hist) : null;
     const hadKeySig = !!sigKey;
 
-    // 1) forceKey always wins
     if (hadForceKey) {
       key = { tonic: options.forceKey.tonic, mode: options.forceKey.mode, confidence: 1 };
     } else if (hadMetaKey) {
-      // 2) metaKey if present (and preferred)
       key = keyFromMetaOrBestGuess(metaKey, hist, true);
     } else {
-      // 3) scoreModel key signature if present, else best guess
       key = sigKey ?? keyFromMetaOrBestGuess(null, hist, true);
     }
 
-    // Phase 0: stabilize short excerpts (like V7->I in 2 bars) by anchoring to final triad
+    // Phase 4: cadence-based anchor first
+    key = anchorKeyFromCadenceIfNeeded({
+      score,
+      measureCount,
+      ignorePercussion,
+      key,
+      hadKeySig,
+      hadMetaKey,
+      hadForceKey
+    });
+
+    // Phase 0: final triad anchor fallback
     key = anchorKeyToFinalTriadIfNeeded({
       score,
       measureCount,
@@ -781,7 +861,7 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
       return {
         ok: true,
-        engine: { phase: "3.3", granularity: "measure", romanNumerals: true, tonicizations: "brief", sustainPolicy },
+        engine: { phase: "4.1", granularity: "measure", romanNumerals: true, tonicizations: "brief", sustainPolicy },
         key,
         measures,
         cadences,
@@ -809,7 +889,6 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
       }
     }
 
-    // Phase 0: sustain/carry to avoid N.C. spam
     applySustainCarryToBeats(beats, sustainPolicy);
 
     applyCadential64LabelingBeatwise(beats, key, warnings);
@@ -820,7 +899,7 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
     return {
       ok: true,
-      engine: { phase: "3.3", granularity: "beat", romanNumerals: true, tonicizations: "brief", sustainPolicy },
+      engine: { phase: "4.1", granularity: "beat", romanNumerals: true, tonicizations: "brief", sustainPolicy },
       key,
       beats,
       cadences,

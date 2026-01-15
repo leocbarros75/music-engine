@@ -18,7 +18,9 @@ function isIshRoman(roman: string): boolean {
 
 function isIVishRoman(roman: string): boolean {
   const r = String(roman ?? "").trim();
-  return r === "IV" || r === "iv";
+  // Treat borrowed backdoor chords as plagal-ish:
+  // bVII -> I is a common "backdoor" cadence in major.
+  return r === "IV" || r === "iv" || r === "bVII";
 }
 
 function isVIishRoman(roman: string): boolean {
@@ -30,10 +32,7 @@ function looksLikeV7(prev: MeasureHarmony): boolean {
   const prevRoman = up(prev?.roman?.roman ?? "");
   const q = prev?.chord?.quality ?? "unknown";
 
-  // Strong signal: detected dominant seventh quality
   if (q === "dom7") return true;
-
-  // Backup: roman text contains 7 on a V
   if (prevRoman.startsWith("V") && prevRoman.includes("7")) return true;
 
   return false;
@@ -54,7 +53,6 @@ export function detectCadences(measures: MeasureHarmony[]): CadenceDetection[] {
 
     // Authentic cadence: V(7) -> I
     if (isVishRoman(prevR) && isIshRoman(lastR)) {
-      // If we can tell it's V7, treat as "perfect" with higher confidence.
       if (looksLikeV7(prev)) {
         type = "authentic_perfect";
         conf = 0.9;
@@ -73,10 +71,10 @@ export function detectCadences(measures: MeasureHarmony[]): CadenceDetection[] {
       type = "half";
       conf = 0.6;
     }
-    // Plagal: IV -> I
+    // Plagal / backdoor: IV (or bVII) -> I
     else if (isIVishRoman(prevR) && isIshRoman(lastR)) {
       type = "plagal";
-      conf = 0.6;
+      conf = prevR === "bVII" ? 0.55 : 0.6;
     }
 
     if (type !== "none") {

@@ -22,6 +22,7 @@ run_one () {
 
 run_one "tests/musicxml/test_am_i64_v7_i.xml"
 run_one "tests/musicxml/test_c_major_plagal_4bars.xml"
+run_one "tests/musicxml/test_c_major_backdoor_plagal_2bars.xml"
 run_one "tests/musicxml/test_c_major_applied_dominant_deceptive.xml"
 run_one "tests/musicxml/test_c_major_v7_i_2bars.xml"
 

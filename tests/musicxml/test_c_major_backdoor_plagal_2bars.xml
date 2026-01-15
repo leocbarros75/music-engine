@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"
+  "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Piano</part-name>
+    </score-part>
+  </part-list>
+
+  <part id="P1">
+    <!-- Measure 1: Bb major (bVII in C major), stacked chord -->
+    <measure number="1">
+      <attributes>
+        <divisions>480</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+
+      <!-- Bb-D-F stacked as a whole-note chord.
+           In MusicXML, the 2nd+ notes in a chord need <chord/>. -->
+      <note>
+        <pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch>
+        <duration>1920</duration>
+        <type>whole</type>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>D</step><octave>5</octave></pitch>
+        <duration>1920</duration>
+        <type>whole</type>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>F</step><octave>5</octave></pitch>
+        <duration>1920</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+
+    <!-- Measure 2: C major (I), stacked chord -->
+    <measure number="2">
+      <!-- C-E-G stacked as a whole-note chord -->
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>1920</duration>
+        <type>whole</type>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>1920</duration>
+        <type>whole</type>
+      </note>
+      <note>
+        <chord/>
+        <pitch><step>G</step><octave>5</octave></pitch>
+        <duration>1920</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

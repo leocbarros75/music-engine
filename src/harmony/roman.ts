@@ -144,6 +144,33 @@ function applyInversionToRoman(roman: string, figure: string): string {
   return `${roman}${figure}`;
 }
 
+function borrowedMixtureRomanIfAny(
+  chord: ChordInfo,
+  key: KeyEstimate
+): { roman: string; degree: number; functionTag: RomanAnalysis["functionTag"] } | null {
+  const mode = String(key?.mode ?? "").toLowerCase();
+  if (mode !== "major") return null;
+
+  const root = chord?.rootPc;
+  if (typeof root !== "number") return null;
+
+  const tonicPc = tonicNameToPc(key.tonic);
+  const rel = mod12(root - tonicPc);
+
+  const q = String(chord?.quality ?? "").toLowerCase();
+
+  // Common borrowed chords in major:
+  // bIII (rel=3) major triad
+  // bVI  (rel=8) major triad
+  // bVII (rel=10) major triad
+  if (q === "maj" && rel === 3) return { roman: "bIII", degree: 3, functionTag: "tonic" };
+  if (q === "maj" && rel === 8) return { roman: "bVI", degree: 6, functionTag: "predominant" };
+  if (q === "maj" && rel === 10) return { roman: "bVII", degree: 7, functionTag: "predominant" };
+
+  // Borrowed iv is already handled diatonically (degree 4) when root is diatonic (IV) and quality is min.
+  return null;
+}
+
 export function analyzeRomanNumeral(chord: ChordInfo, key: KeyEstimate, notes: string[]): RomanAnalysis {
   if (!chord || chord.rootPc === null) {
     return { roman: "N.C.", degree: null, functionTag: "other", notes };
@@ -168,7 +195,17 @@ export function analyzeRomanNumeral(chord: ChordInfo, key: KeyEstimate, notes: s
     }
   }
 
-  // 2) Diatonic roman + inversion figure
+  // 2) Borrowed mixture in major when degree is non-diatonic (deg=null)
+  if (deg === null) {
+    const mix = borrowedMixtureRomanIfAny(chord, key);
+    if (mix) {
+      const fig = inversionFigure(chord);
+      const roman = applyInversionToRoman(mix.roman, fig);
+      return { roman, degree: mix.degree, functionTag: mix.functionTag, notes };
+    }
+  }
+
+  // 3) Diatonic roman + inversion figure, else chord name
   let roman = deg ? romanFromDegree(deg, chord.quality) : chord.name;
 
   const fig = inversionFigure(chord);

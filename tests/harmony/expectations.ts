@@ -69,7 +69,6 @@ export const EXPECTATIONS_BY_BASENAME: Record<string, Expectation> = {
     requireNonEmptyChordOnBeat1OfMeasures: [1, 2, 3, 4]
   },
 
-  // NEW: C major V7 -> I, 2 bars
   "test_c_major_v7_i_2bars.xml": {
     id: "c_major_v7_i_2bars",
     key: { tonic: "C", mode: "major" },
@@ -79,6 +78,18 @@ export const EXPECTATIONS_BY_BASENAME: Record<string, Expectation> = {
     ],
     cadenceTypes: [{ atMeasure: 2, type: "authentic_perfect" }],
     cadenceEvidence: [{ atMeasure: 2, prevRoman: "V7", lastRoman: "I" }],
+    requireNonEmptyChordOnBeat1OfMeasures: [1, 2]
+  },
+
+  "test_c_major_backdoor_plagal_2bars.xml": {
+    id: "c_major_backdoor_plagal_2bars",
+    key: { tonic: "C", mode: "major" },
+    beatRomans: [
+      { measure: 1, beat: 1, roman: "bVII" },
+      { measure: 2, beat: 1, roman: "I" }
+    ],
+    cadenceTypes: [{ atMeasure: 2, type: "plagal" }],
+    cadenceEvidence: [{ atMeasure: 2, prevRoman: "bVII", lastRoman: "I" }],
     requireNonEmptyChordOnBeat1OfMeasures: [1, 2]
   }
 };
