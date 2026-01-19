@@ -9,7 +9,7 @@
   </part-list>
 
   <part id="P1">
-    <!-- Measure 1: I (C-E-G) -->
+    <!-- Measure 1: I (C-E-G) as a chord -->
     <measure number="1">
       <attributes>
         <divisions>1</divisions>
@@ -27,42 +27,42 @@
         </clef>
       </attributes>
 
-      <!-- C -->
+      <!-- Chord: C-E-G -->
       <note>
         <pitch><step>C</step><octave>4</octave></pitch>
         <duration>4</duration>
         <type>whole</type>
       </note>
-      <!-- E -->
       <note>
+        <chord/>
         <pitch><step>E</step><octave>4</octave></pitch>
         <duration>4</duration>
         <type>whole</type>
       </note>
-      <!-- G -->
       <note>
+        <chord/>
         <pitch><step>G</step><octave>4</octave></pitch>
         <duration>4</duration>
         <type>whole</type>
       </note>
     </measure>
 
-    <!-- Measure 2: V (G-B-D) -->
+    <!-- Measure 2: V (G-B-D) as a chord -->
     <measure number="2">
-      <!-- G -->
+      <!-- Chord: G-B-D -->
       <note>
         <pitch><step>G</step><octave>4</octave></pitch>
         <duration>4</duration>
         <type>whole</type>
       </note>
-      <!-- B -->
       <note>
+        <chord/>
         <pitch><step>B</step><octave>4</octave></pitch>
         <duration>4</duration>
         <type>whole</type>
       </note>
-      <!-- D -->
       <note>
+        <chord/>
         <pitch><step>D</step><octave>5</octave></pitch>
         <duration>4</duration>
         <type>whole</type>
