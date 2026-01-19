@@ -91,5 +91,17 @@ export const EXPECTATIONS_BY_BASENAME: Record<string, Expectation> = {
     cadenceTypes: [{ atMeasure: 2, type: "plagal" }],
     cadenceEvidence: [{ atMeasure: 2, prevRoman: "bVII", lastRoman: "I" }],
     requireNonEmptyChordOnBeat1OfMeasures: [1, 2]
+  },
+
+  "test_c_major_half_cadence_2bars.xml": {
+    id: "c_major_half_cadence_2bars",
+    key: { tonic: "C", mode: "major" },
+    beatRomans: [
+      { measure: 1, beat: 1, roman: "I" },
+      { measure: 2, beat: 1, roman: "V" }
+    ],
+    cadenceTypes: [{ atMeasure: 2, type: "half" }],
+    cadenceEvidence: [{ atMeasure: 2, prevRoman: "I", lastRoman: "V" }],
+    requireNonEmptyChordOnBeat1OfMeasures: [1, 2]
   }
 };
