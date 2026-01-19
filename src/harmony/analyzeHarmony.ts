@@ -738,6 +738,10 @@ function anchorKeyFromCadenceIfNeeded(params: {
 /**
  * Phase 0 key stabilizer for short excerpts with no key signature/meta.
  * If the final non-empty chord is a clear triad, anchor the key to that tonic.
+ *
+ * Updated rule:
+ * - If the excerpt is short and ends on a triad that is the dominant of the opening triad,
+ *   prefer the opening triad as tonic (common half-cadence behavior: I -> V).
  */
 function anchorKeyToFinalTriadIfNeeded(params: {
   score: any;
@@ -756,6 +760,10 @@ function anchorKeyToFinalTriadIfNeeded(params: {
   const curConf = typeof key?.confidence === "number" ? key.confidence : 0;
   if (curConf >= 0.98) return key;
 
+  // Identify last triad (scan backward)
+  let lastTriadRoot: number | null = null;
+  let lastTriadQuality: "maj" | "min" | null = null;
+
   for (let mi = measureCount - 1; mi >= 0; mi--) {
     const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, mi, ignorePercussion);
     if (!pcs || pcs.length === 0) continue;
@@ -767,17 +775,59 @@ function anchorKeyToFinalTriadIfNeeded(params: {
 
     if (q !== "maj" && q !== "min") continue;
 
+    lastTriadRoot = rootPc;
+    lastTriadQuality = q as any;
+    break;
+  }
+
+  if (lastTriadRoot === null || lastTriadQuality === null) return key;
+
+  // Identify opening triad (scan forward)
+  let firstTriadRoot: number | null = null;
+  let firstTriadQuality: "maj" | "min" | null = null;
+
+  for (let mi = 0; mi < measureCount; mi++) {
+    const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, mi, ignorePercussion);
+    if (!pcs || pcs.length === 0) continue;
+
+    const chord = detectChordFromPcs(pcs, true, bassPc);
+    const q = String(chord?.quality ?? "").toLowerCase();
+    const rootPc = typeof chord?.rootPc === "number" ? chord.rootPc : null;
+    if (rootPc === null) continue;
+
+    if (q !== "maj" && q !== "min") continue;
+
+    firstTriadRoot = rootPc;
+    firstTriadQuality = q as any;
+    break;
+  }
+
+  // Half-cadence protection (short excerpts): if last triad is V of the first triad, keep the first triad as tonic
+  if (
+    firstTriadRoot !== null &&
+    firstTriadQuality !== null &&
+    measureCount <= 4 &&
+    isDominantOf(lastTriadRoot, firstTriadRoot)
+  ) {
     const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
-    const tonicName = pcToName(rootPc, preferSharps);
+    const tonicName = pcToName(firstTriadRoot, preferSharps);
 
     return {
       tonic: tonicName,
-      mode: q === "maj" ? "major" : "minor",
+      mode: firstTriadQuality === "maj" ? "major" : "minor",
       confidence: Math.max(curConf, 0.99)
     };
   }
 
-  return key;
+  // Default: anchor to final triad
+  const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+  const tonicName = pcToName(lastTriadRoot, preferSharps);
+
+  return {
+    tonic: tonicName,
+    mode: lastTriadQuality === "maj" ? "major" : "minor",
+    confidence: Math.max(curConf, 0.99)
+  };
 }
 
 export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysisError {
@@ -829,7 +879,7 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
       hadForceKey
     });
 
-    // Phase 0: final triad anchor fallback
+    // Phase 0: final triad anchor fallback (with half-cadence protection)
     key = anchorKeyToFinalTriadIfNeeded({
       score,
       measureCount,
