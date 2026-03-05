@@ -1,0 +1,6227 @@
+{
+  "ok": true,
+  "scoreModel": {
+    "meta": {
+      "inputKeyFifths": 1,
+      "inputKeyMode": "major",
+      "inputTime": {
+        "beats": 4,
+        "beat_type": 4,
+        "beatType": 4
+      },
+      "inputDivisions": 8,
+      "inputChords": [
+        {
+          "measure": 1,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 1,
+          "t": 2,
+          "symbol": "D"
+        },
+        {
+          "measure": 1,
+          "t": 3,
+          "symbol": "G/B"
+        },
+        {
+          "measure": 2,
+          "t": 0,
+          "symbol": "C"
+        },
+        {
+          "measure": 2,
+          "t": 1,
+          "symbol": "C/E"
+        },
+        {
+          "measure": 2,
+          "t": 2,
+          "symbol": "G"
+        },
+        {
+          "measure": 3,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 3,
+          "t": 2,
+          "symbol": "C"
+        },
+        {
+          "measure": 4,
+          "t": 0,
+          "symbol": "G/D"
+        },
+        {
+          "measure": 4,
+          "t": 1,
+          "symbol": "D7"
+        },
+        {
+          "measure": 4,
+          "t": 2,
+          "symbol": "G"
+        },
+        {
+          "measure": 5,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 5,
+          "t": 2,
+          "symbol": "D"
+        },
+        {
+          "measure": 5,
+          "t": 3,
+          "symbol": "G/B"
+        },
+        {
+          "measure": 6,
+          "t": 0,
+          "symbol": "C"
+        },
+        {
+          "measure": 6,
+          "t": 1,
+          "symbol": "C/E"
+        },
+        {
+          "measure": 6,
+          "t": 2,
+          "symbol": "G"
+        },
+        {
+          "measure": 7,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 7,
+          "t": 2,
+          "symbol": "C"
+        },
+        {
+          "measure": 8,
+          "t": 0,
+          "symbol": "G/D"
+        },
+        {
+          "measure": 8,
+          "t": 1,
+          "symbol": "D"
+        },
+        {
+          "measure": 8,
+          "t": 2,
+          "symbol": "G"
+        },
+        {
+          "measure": 9,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 9,
+          "t": 2,
+          "symbol": "D/F#"
+        },
+        {
+          "measure": 9,
+          "t": 3,
+          "symbol": "G"
+        },
+        {
+          "measure": 10,
+          "t": 0,
+          "symbol": "C/E"
+        },
+        {
+          "measure": 10,
+          "t": 1,
+          "symbol": "G"
+        },
+        {
+          "measure": 10,
+          "t": 2,
+          "symbol": "D"
+        },
+        {
+          "measure": 11,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 11,
+          "t": 2,
+          "symbol": "D"
+        },
+        {
+          "measure": 11,
+          "t": 3,
+          "symbol": "G/B"
+        },
+        {
+          "measure": 12,
+          "t": 0,
+          "symbol": "Am"
+        },
+        {
+          "measure": 12,
+          "t": 1,
+          "symbol": "G/B"
+        },
+        {
+          "measure": 12,
+          "t": 2,
+          "symbol": "D"
+        },
+        {
+          "measure": 13,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 13,
+          "t": 1,
+          "symbol": "G/B"
+        },
+        {
+          "measure": 13,
+          "t": 2,
+          "symbol": "F#m/A"
+        },
+        {
+          "measure": 13,
+          "t": 3,
+          "symbol": "G"
+        },
+        {
+          "measure": 14,
+          "t": 0,
+          "symbol": "C"
+        },
+        {
+          "measure": 14,
+          "t": 1,
+          "symbol": "C/E"
+        },
+        {
+          "measure": 14,
+          "t": 2,
+          "symbol": "D/F#"
+        },
+        {
+          "measure": 14,
+          "t": 3,
+          "symbol": "D"
+        },
+        {
+          "measure": 15,
+          "t": 0,
+          "symbol": "G"
+        },
+        {
+          "measure": 15,
+          "t": 1,
+          "symbol": "C/E"
+        },
+        {
+          "measure": 15,
+          "t": 2,
+          "symbol": "C"
+        },
+        {
+          "measure": 16,
+          "t": 0,
+          "symbol": "G/D"
+        },
+        {
+          "measure": 16,
+          "t": 1,
+          "symbol": "D"
+        },
+        {
+          "measure": 16,
+          "t": 2,
+          "symbol": "G"
+        }
+      ],
+      "ensemble": "piano",
+      "harmonize": {
+        "mode": "satb_from_chords_or_melody",
+        "version": "0.7.3",
+        "note": "If chords are empty, infer diatonic triads on strong beats from melody using key signature; final cadence enforces Bass root on final I at t=0.",
+        "chords": [
+          {
+            "measure": 1,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 1,
+            "t": 2,
+            "symbol": "D"
+          },
+          {
+            "measure": 1,
+            "t": 3,
+            "symbol": "G/B"
+          },
+          {
+            "measure": 2,
+            "t": 0,
+            "symbol": "C"
+          },
+          {
+            "measure": 2,
+            "t": 1,
+            "symbol": "C/E"
+          },
+          {
+            "measure": 2,
+            "t": 2,
+            "symbol": "G"
+          },
+          {
+            "measure": 3,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 3,
+            "t": 2,
+            "symbol": "C"
+          },
+          {
+            "measure": 4,
+            "t": 0,
+            "symbol": "G/D"
+          },
+          {
+            "measure": 4,
+            "t": 1,
+            "symbol": "D7"
+          },
+          {
+            "measure": 4,
+            "t": 2,
+            "symbol": "G"
+          },
+          {
+            "measure": 5,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 5,
+            "t": 2,
+            "symbol": "D"
+          },
+          {
+            "measure": 5,
+            "t": 3,
+            "symbol": "G/B"
+          },
+          {
+            "measure": 6,
+            "t": 0,
+            "symbol": "C"
+          },
+          {
+            "measure": 6,
+            "t": 1,
+            "symbol": "C/E"
+          },
+          {
+            "measure": 6,
+            "t": 2,
+            "symbol": "G"
+          },
+          {
+            "measure": 7,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 7,
+            "t": 2,
+            "symbol": "C"
+          },
+          {
+            "measure": 8,
+            "t": 0,
+            "symbol": "G/D"
+          },
+          {
+            "measure": 8,
+            "t": 1,
+            "symbol": "D"
+          },
+          {
+            "measure": 8,
+            "t": 2,
+            "symbol": "G"
+          },
+          {
+            "measure": 9,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 9,
+            "t": 2,
+            "symbol": "D/F#"
+          },
+          {
+            "measure": 9,
+            "t": 3,
+            "symbol": "G"
+          },
+          {
+            "measure": 10,
+            "t": 0,
+            "symbol": "C/E"
+          },
+          {
+            "measure": 10,
+            "t": 1,
+            "symbol": "G"
+          },
+          {
+            "measure": 10,
+            "t": 2,
+            "symbol": "D"
+          },
+          {
+            "measure": 11,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 11,
+            "t": 2,
+            "symbol": "D"
+          },
+          {
+            "measure": 11,
+            "t": 3,
+            "symbol": "G/B"
+          },
+          {
+            "measure": 12,
+            "t": 0,
+            "symbol": "Am"
+          },
+          {
+            "measure": 12,
+            "t": 1,
+            "symbol": "G/B"
+          },
+          {
+            "measure": 12,
+            "t": 2,
+            "symbol": "D"
+          },
+          {
+            "measure": 13,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 13,
+            "t": 1,
+            "symbol": "G/B"
+          },
+          {
+            "measure": 13,
+            "t": 2,
+            "symbol": "F#m/A"
+          },
+          {
+            "measure": 13,
+            "t": 3,
+            "symbol": "G"
+          },
+          {
+            "measure": 14,
+            "t": 0,
+            "symbol": "C"
+          },
+          {
+            "measure": 14,
+            "t": 1,
+            "symbol": "C/E"
+          },
+          {
+            "measure": 14,
+            "t": 2,
+            "symbol": "D/F#"
+          },
+          {
+            "measure": 15,
+            "t": 0,
+            "symbol": "G"
+          },
+          {
+            "measure": 15,
+            "t": 1,
+            "symbol": "C/E"
+          },
+          {
+            "measure": 15,
+            "t": 2,
+            "symbol": "C"
+          },
+          {
+            "measure": 16,
+            "t": 0,
+            "symbol": "G/D"
+          },
+          {
+            "measure": 16,
+            "t": 1,
+            "symbol": "D"
+          },
+          {
+            "measure": 16,
+            "t": 2,
+            "symbol": "G"
+          }
+        ],
+        "debug": {
+          "usedInference": false,
+          "beatsPerMeasure": 4,
+          "chordEventCount": 47,
+          "chordEventSample": [
+            {
+              "measure": 1,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 1,
+              "t": 2,
+              "symbol": "D"
+            },
+            {
+              "measure": 1,
+              "t": 3,
+              "symbol": "G/B"
+            },
+            {
+              "measure": 2,
+              "t": 0,
+              "symbol": "C"
+            },
+            {
+              "measure": 2,
+              "t": 1,
+              "symbol": "C/E"
+            },
+            {
+              "measure": 2,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 3,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 3,
+              "t": 2,
+              "symbol": "C"
+            },
+            {
+              "measure": 4,
+              "t": 0,
+              "symbol": "G/D"
+            },
+            {
+              "measure": 4,
+              "t": 1,
+              "symbol": "D7"
+            },
+            {
+              "measure": 4,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 5,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 5,
+              "t": 2,
+              "symbol": "D"
+            },
+            {
+              "measure": 5,
+              "t": 3,
+              "symbol": "G/B"
+            },
+            {
+              "measure": 6,
+              "t": 0,
+              "symbol": "C"
+            },
+            {
+              "measure": 6,
+              "t": 1,
+              "symbol": "C/E"
+            },
+            {
+              "measure": 6,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 7,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 7,
+              "t": 2,
+              "symbol": "C"
+            },
+            {
+              "measure": 8,
+              "t": 0,
+              "symbol": "G/D"
+            },
+            {
+              "measure": 8,
+              "t": 1,
+              "symbol": "D"
+            },
+            {
+              "measure": 8,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 9,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 9,
+              "t": 2,
+              "symbol": "D/F#"
+            },
+            {
+              "measure": 9,
+              "t": 3,
+              "symbol": "G"
+            },
+            {
+              "measure": 10,
+              "t": 0,
+              "symbol": "C/E"
+            },
+            {
+              "measure": 10,
+              "t": 1,
+              "symbol": "G"
+            },
+            {
+              "measure": 10,
+              "t": 2,
+              "symbol": "D"
+            },
+            {
+              "measure": 11,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 11,
+              "t": 2,
+              "symbol": "D"
+            },
+            {
+              "measure": 11,
+              "t": 3,
+              "symbol": "G/B"
+            },
+            {
+              "measure": 12,
+              "t": 0,
+              "symbol": "Am"
+            }
+          ],
+          "repairWarnings": [
+            "[leap] WARN m2 t1: Alto contrary step 57 rejected due to ordering.",
+            "[leap] WARN m2 t2: Alto contrary step 62 rejected due to ordering.",
+            "[leap] WARN m6 t1: Alto contrary step 57 rejected due to ordering.",
+            "[leap] WARN m6 t2: Alto contrary step 62 rejected due to ordering.",
+            "[satb][repair] m14 t=0: Hard constraint collision, used closest chord tones.",
+            "[leap] WARN m14 t1: Alto contrary step 57 rejected due to ordering.",
+            "[leap] WARN m14 t2: Alto contrary step 62 rejected due to ordering.",
+            "[leap] WARN m15 t1: Alto contrary step 60 rejected due to ordering."
+          ],
+          "accompanimentType": "homophonic"
+        }
+      },
+      "textureAnalysis": {
+        "type": "polyphony",
+        "density": {
+          "measures": 16,
+          "parts": 2,
+          "totalNotes": 332,
+          "avgNotesPerMeasure": 20.75,
+          "densityScore": 22.02,
+          "densityLevel": "dense",
+          "perMeasure": [
+            20,
+            20,
+            24,
+            20,
+            20,
+            20,
+            24,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            20,
+            24,
+            20
+          ]
+        },
+        "motionSummary": {
+          "total": 50,
+          "parallel": 2,
+          "similar": 23,
+          "contrary": 21,
+          "oblique": 4,
+          "parallelPerfect": 0
+        },
+        "partCount": 2,
+        "activeParts": 2,
+        "rhythmSimilarity": 0,
+        "pitchSimilarity": 0.0392156862745098,
+        "spacingQuality": "tight",
+        "notesPerPart": [
+          {
+            "partId": "P_MEL",
+            "name": "Melody",
+            "noteCount": 51
+          },
+          {
+            "partId": "P_PNO",
+            "name": "Piano",
+            "noteCount": 281
+          }
+        ]
+      },
+      "title": "Come",
+      "tempo_bpm": 89,
+      "app": {
+        "settingsUsed": {
+          "title": "Come",
+          "ensemble": "piano",
+          "keySignature": "original",
+          "keySignatureMode": "original",
+          "targetKey": "original",
+          "timeSignature": "original",
+          "timeSignatureMode": "original",
+          "tempo": 89,
+          "style": "classical",
+          "level": "advanced",
+          "accompanimentType": "homophonic",
+          "accompaniment": "homophonic",
+          "ruleStrictness": "standard",
+          "textureMode": "homophony_melody_accompaniment",
+          "styleProfile": "classical",
+          "modernMode": "modernTonal",
+          "bassActivity": "high_active",
+          "tenorActivity": "high_active",
+          "altoActivity": "high_active",
+          "sopranoActivity": "active",
+          "vln1Activity": "grounded",
+          "vln2Activity": "high_active",
+          "vlaActivity": "high_active",
+          "vcActivity": "high_active",
+          "cbActivity": "high_active",
+          "sopranoMelodyShare": 30,
+          "randomizeOffsets": true
+        },
+        "detectedInputKeyFifths": 1,
+        "detectedInputKeyMode": "major",
+        "appliedTransposeSemitones": 0,
+        "exporterDivisions": 4,
+        "warnings": [
+          "[rhythm] Homophonic accompaniment: copied melody rhythm to inner voices and Bass.",
+          "[piano] m2 t=0: Tenor/Alto spacing clamped to octave.",
+          "[piano] m3 t=3: adjusted alto to chord tone.",
+          "[piano] m3 t=3: adjusted tenor to chord tone.",
+          "[piano] m3 t=2: Tenor/Alto spacing clamped to octave.",
+          "[piano] m3 t=2: Tenor raised to maintain bass interval.",
+          "[piano] m3 t=2.5: Bass/Tenor spacing clamped to octave.",
+          "[piano] m3 t=2: hand span clamped to octave.",
+          "[piano] m3 t=2: Tenor raised to maintain bass interval.",
+          "[piano] m3 t=2.5: Tenor adjusted to maintain bass interval.",
+          "[piano] m3 t=2.5: Tenor raised to maintain bass interval.",
+          "[piano] m6 t=0: Tenor/Alto spacing clamped to octave.",
+          "[piano] m7 t=3: adjusted alto to chord tone.",
+          "[piano] m7 t=3: adjusted tenor to chord tone.",
+          "[piano] m7 t=2.5: Tenor/Alto spacing clamped to octave.",
+          "[piano] m7 t=2.5: Tenor raised to maintain bass interval.",
+          "[piano] m7 t=2: hand span clamped to octave.",
+          "[piano] m7 t=2: hand span clamped to octave.",
+          "[piano] m7 t=2: Tenor raised to maintain bass interval.",
+          "[piano] m7 t=2.5: Tenor raised to maintain bass interval.",
+          "[piano] m11 t=2: Tenor/Alto spacing clamped to octave.",
+          "[piano] m11 t=2: Bass/Tenor interval clamped to minimum.",
+          "[piano] m11 t=2: adjusted note to chord tone on strong beat.",
+          "[piano] m11 t=2: adjusted note to chord tone on strong beat.",
+          "[piano] m11 t=2: Tenor clamped to maintain bass interval.",
+          "[piano] m11 t=2: adjusted note to chord tone on strong beat.",
+          "[piano] m14 t=0: Tenor/Alto spacing clamped to octave.",
+          "[piano] m15 t=3: adjusted alto to chord tone.",
+          "[piano] m15 t=3: adjusted tenor to chord tone.",
+          "[piano] m15 t=2.5: Tenor/Alto spacing clamped to octave.",
+          "[piano] m15 t=2.5: Tenor raised to maintain bass interval.",
+          "[piano] m15 t=2: hand span clamped to octave.",
+          "[piano] m15 t=2: hand span clamped to octave.",
+          "[piano] m15 t=2: Tenor raised to maintain bass interval.",
+          "[piano] m15 t=2.5: Tenor raised to maintain bass interval.",
+          "[chord-check] 1 chord event(s) have bass pitch mismatches."
+        ],
+        "styleUsed": "classical",
+        "cadenceMeasures": [],
+        "chordSource": "request",
+        "debug": {
+          "melodyVoice": null,
+          "melodyNoteCount": null,
+          "chordEventCount": 47,
+          "chordEventSample": [
+            {
+              "measure": 1,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 1,
+              "t": 2,
+              "symbol": "D"
+            },
+            {
+              "measure": 1,
+              "t": 3,
+              "symbol": "G/B"
+            },
+            {
+              "measure": 2,
+              "t": 0,
+              "symbol": "C"
+            },
+            {
+              "measure": 2,
+              "t": 1,
+              "symbol": "C/E"
+            },
+            {
+              "measure": 2,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 3,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 3,
+              "t": 2,
+              "symbol": "C"
+            },
+            {
+              "measure": 4,
+              "t": 0,
+              "symbol": "G/D"
+            },
+            {
+              "measure": 4,
+              "t": 1,
+              "symbol": "D7"
+            },
+            {
+              "measure": 4,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 5,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 5,
+              "t": 2,
+              "symbol": "D"
+            },
+            {
+              "measure": 5,
+              "t": 3,
+              "symbol": "G/B"
+            },
+            {
+              "measure": 6,
+              "t": 0,
+              "symbol": "C"
+            },
+            {
+              "measure": 6,
+              "t": 1,
+              "symbol": "C/E"
+            },
+            {
+              "measure": 6,
+              "t": 2,
+              "symbol": "G"
+            },
+            {
+              "measure": 7,
+              "t": 0,
+              "symbol": "G"
+            },
+            {
+              "measure": 7,
+              "t": 2,
+              "symbol": "C"
+            },
+            {
+              "measure": 8,
+              "t": 0,
+              "symbol": "G/D"
+            }
+          ],
+          "chordCheck": {
+            "measuresChecked": 16,
+            "mismatches": [],
+            "eventMismatches": [],
+            "eventBassMismatches": [
+              {
+                "measure": 13,
+                "t": 0,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "B"
+              }
+            ],
+            "spellingMismatches": [],
+            "spellingSample": [
+              {
+                "measure": 1,
+                "t": 0,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 1,
+                "t": 2,
+                "chord": "D",
+                "expectedBass": "D",
+                "actualBass": "D"
+              },
+              {
+                "measure": 1,
+                "t": 3,
+                "chord": "G/B",
+                "expectedBass": "B",
+                "actualBass": "B"
+              },
+              {
+                "measure": 2,
+                "t": 0,
+                "chord": "C",
+                "expectedBass": "C",
+                "actualBass": "C"
+              },
+              {
+                "measure": 2,
+                "t": 1,
+                "chord": "C/E",
+                "expectedBass": "E",
+                "actualBass": "E"
+              },
+              {
+                "measure": 2,
+                "t": 2,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 3,
+                "t": 0,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 3,
+                "t": 2,
+                "chord": "C",
+                "expectedBass": "C",
+                "actualBass": "C"
+              },
+              {
+                "measure": 4,
+                "t": 0,
+                "chord": "G/D",
+                "expectedBass": "D",
+                "actualBass": "D"
+              },
+              {
+                "measure": 4,
+                "t": 1,
+                "chord": "D7",
+                "expectedBass": "D",
+                "actualBass": "D"
+              },
+              {
+                "measure": 4,
+                "t": 2,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 5,
+                "t": 0,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 5,
+                "t": 2,
+                "chord": "D",
+                "expectedBass": "D",
+                "actualBass": "D"
+              },
+              {
+                "measure": 5,
+                "t": 3,
+                "chord": "G/B",
+                "expectedBass": "B",
+                "actualBass": "B"
+              },
+              {
+                "measure": 6,
+                "t": 0,
+                "chord": "C",
+                "expectedBass": "C",
+                "actualBass": "C"
+              },
+              {
+                "measure": 6,
+                "t": 1,
+                "chord": "C/E",
+                "expectedBass": "E",
+                "actualBass": "E"
+              },
+              {
+                "measure": 6,
+                "t": 2,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 7,
+                "t": 0,
+                "chord": "G",
+                "expectedBass": "G",
+                "actualBass": "G"
+              },
+              {
+                "measure": 7,
+                "t": 2,
+                "chord": "C",
+                "expectedBass": "C",
+                "actualBass": "C"
+              },
+              {
+                "measure": 8,
+                "t": 0,
+                "chord": "G/D",
+                "expectedBass": "D",
+                "actualBass": "D"
+              }
+            ]
+          },
+          "ruleViolations": [],
+          "ruleWarnings": [],
+          "rulesVersion": "choral-v1",
+          "textureAnalysis": {
+            "type": "polyphony",
+            "density": {
+              "measures": 16,
+              "parts": 2,
+              "totalNotes": 332,
+              "avgNotesPerMeasure": 20.75,
+              "densityScore": 22.02,
+              "densityLevel": "dense",
+              "perMeasure": [
+                20,
+                20,
+                24,
+                20,
+                20,
+                20,
+                24,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                24,
+                20
+              ]
+            },
+            "motionSummary": {
+              "total": 50,
+              "parallel": 2,
+              "similar": 23,
+              "contrary": 21,
+              "oblique": 4,
+              "parallelPerfect": 0
+            },
+            "partCount": 2,
+            "activeParts": 2,
+            "rhythmSimilarity": 0,
+            "pitchSimilarity": 0.0392156862745098,
+            "spacingQuality": "tight",
+            "notesPerPart": [
+              {
+                "partId": "P_MEL",
+                "name": "Melody",
+                "noteCount": 51
+              },
+              {
+                "partId": "P_PNO",
+                "name": "Piano",
+                "noteCount": 281
+              }
+            ]
+          },
+          "rhythmDensity": {
+            "voices": {
+              "part1": {
+                "avgNotesPerMeasure": 3.1875,
+                "totalNotes": 51,
+                "measures": [
+                  {
+                    "measure": 1,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 2,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 3,
+                    "notes": 4
+                  },
+                  {
+                    "measure": 4,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 5,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 6,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 7,
+                    "notes": 4
+                  },
+                  {
+                    "measure": 8,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 9,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 10,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 11,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 12,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 13,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 14,
+                    "notes": 3
+                  },
+                  {
+                    "measure": 15,
+                    "notes": 4
+                  },
+                  {
+                    "measure": 16,
+                    "notes": 3
+                  }
+                ]
+              },
+              "part2": {
+                "avgNotesPerMeasure": 17.5625,
+                "totalNotes": 281,
+                "measures": [
+                  {
+                    "measure": 1,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 2,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 3,
+                    "notes": 20
+                  },
+                  {
+                    "measure": 4,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 5,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 6,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 7,
+                    "notes": 20
+                  },
+                  {
+                    "measure": 8,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 9,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 10,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 11,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 12,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 13,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 14,
+                    "notes": 17
+                  },
+                  {
+                    "measure": 15,
+                    "notes": 20
+                  },
+                  {
+                    "measure": 16,
+                    "notes": 17
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "parts": [
+      {
+        "part_id": "P_MEL",
+        "name": "Melody",
+        "instrument": "voice",
+        "staves": 1,
+        "measures": [
+          {
+            "number": 1,
+            "attributes": {
+              "divisions": 4,
+              "source_divisions": 8,
+              "time": {
+                "beats": 4,
+                "beat_type": 4,
+                "beatType": 4
+              },
+              "key_fifths": 1,
+              "key_mode": "major"
+            },
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "midi": 66,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 62,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 3,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 5
+                },
+                "midi": 72,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 4,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "midi": 66,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 5,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "midi": 66,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 6,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 62,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 7,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 5
+                },
+                "midi": 72,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 8,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "midi": 66,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 9,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 10,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 5
+                },
+                "midi": 72,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 11,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 12,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 5
+                },
+                "midi": 72,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 13,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "midi": 66,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 14,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 62,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          },
+          {
+            "number": 15,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 71,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 5
+                },
+                "midi": 72,
+                "voice": 1,
+                "source_t": 2
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69,
+                "voice": 1,
+                "source_t": 3
+              }
+            ]
+          },
+          {
+            "number": 16,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 0
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "midi": 66,
+                "voice": 1,
+                "source_t": 1
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67,
+                "voice": 1,
+                "source_t": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "P_PNO",
+        "name": "Piano",
+        "instrument": "piano",
+        "staves": 2,
+        "measures": [
+          {
+            "number": 1,
+            "attributes": {
+              "divisions": 4,
+              "source_divisions": 8,
+              "time": {
+                "beats": 4,
+                "beat_type": 4,
+                "beatType": 4
+              },
+              "key_fifths": 1,
+              "key_mode": "major"
+            },
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-0",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-2"
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 47,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-1-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-0",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 55
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 40,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-2-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 3,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-3-0",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-3-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-3-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-3-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-3-2",
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-3-2.5",
+                "midi": 66
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-3-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-3-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 4,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-0.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-2"
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-4-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 5,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-2"
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 47,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-5-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 6,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 55
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 40,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-6-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 7,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-7-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-7-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-7-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-7-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-7-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-7-2.5",
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-7-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-7-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 8,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-8-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 9,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-9-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-2"
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 42,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-2.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-9-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 10,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-10-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 40,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-10-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-10-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-10-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-10-2"
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-10-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-10-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-10-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 11,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-11-0",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-11-0.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-11-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-11-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-11-2",
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 66
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 54
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-11-2.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-11-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 47,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-11-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 12,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-12-0",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 45,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-12-0.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-12-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 47,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-12-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-12-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-12-2.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-12-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-12-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 13,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-0",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 47,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-2"
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 45,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-13-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 14,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 55
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 40,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 42,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-2.5"
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-14-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 15,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-15-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-15-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-15-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 40,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-15-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-15-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-15-2.5",
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 5
+                },
+                "chord": false,
+                "id": "1-1-n-15-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "2-1-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "id": "3-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-3",
+                "chord": false,
+                "isRest": false,
+                "midi": 48,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-15-3.5",
+                "__melody": true
+              }
+            ]
+          },
+          {
+            "number": 16,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-0"
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "id": "3-2-n-0",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-0",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-0.5"
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-1",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "id": "3-2-n-1",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 3
+                },
+                "id": "4-2-n-1",
+                "chord": false,
+                "isRest": false,
+                "midi": 50,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 1.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-1.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-2",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 2,
+                "staff": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "id": "2-1-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 3,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "id": "3-2-n-2",
+                "chord": false,
+                "isRest": false
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 2,
+                "voice": 4,
+                "staff": 2,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 2
+                },
+                "id": "4-2-n-2",
+                "chord": false,
+                "isRest": false,
+                "midi": 43,
+                "__lockPitch": true
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 1,
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-2.5",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-3",
+                "__melody": true
+              },
+              {
+                "type": "note",
+                "t": 3.5,
+                "dur": 0.5,
+                "voice": 1,
+                "staff": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 4
+                },
+                "chord": false,
+                "id": "1-1-n-16-3.5",
+                "__melody": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

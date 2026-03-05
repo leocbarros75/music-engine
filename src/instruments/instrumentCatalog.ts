@@ -7,6 +7,7 @@ export type InstrumentId =
   | "violin_2"
   | "viola"
   | "cello"
+  | "double_bass"
   | "piano"
   | "flute"
   | "oboe"
@@ -120,6 +121,15 @@ export const InstrumentCatalog: Record<InstrumentId, InstrumentSpec> = {
     midi_high: 84, // C6
     preferred_low: 43, // G2
     preferred_high: 64 // E4
+  },
+  double_bass: {
+    id: "double_bass",
+    name: "Double Bass",
+    clef: "bass",
+    midi_low: 28, // E1
+    midi_high: 67, // G4
+    preferred_low: 31, // G1
+    preferred_high: 55 // G3
   },
 
   // ---- Woodwinds (concert pitch) ----
@@ -272,6 +282,7 @@ function normalizeInstrumentId(raw: string): string {
   if (s === "v2" || s === "violin2" || s === "violin_ii" || s === "violin ii") return "violin_2";
   if (s === "va" || s === "vla") return "viola";
   if (s === "vc" || s === "vlc") return "cello";
+  if (s === "db" || s === "doublebass" || s === "double_bass" || s === "contrabass") return "double_bass";
 
   // winds/brass aliases (just in case)
   if (s === "tpt1") return "trumpet_bb_1";

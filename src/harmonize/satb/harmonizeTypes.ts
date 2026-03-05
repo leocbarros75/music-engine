@@ -1,0 +1,19 @@
+// src/harmonize/satb/harmonizeTypes.ts
+
+export type HarmonizeChordEvent = {
+  measure: number; // 1-based measure number
+  t?: number; // onset within measure in divisions, default 0
+  symbol: string; // e.g. C, Am, G7, Fmaj7, Ddim
+};
+
+export type HarmonizeSatbOptions = {
+  keepMelodyInSoprano?: boolean; // default true
+};
+
+export type HarmonizeSatbFromChordsRequest = {
+  musicxml?: string;
+  scoreModel?: unknown;
+  chords: HarmonizeChordEvent[];
+  options?: HarmonizeSatbOptions;
+  settings?: unknown;
+};

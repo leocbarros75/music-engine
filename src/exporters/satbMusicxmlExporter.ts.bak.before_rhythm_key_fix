@@ -1,0 +1,210 @@
+// src/exporters/satbMusicxmlExporter.ts
+import type { ScoreModel } from "../score/types";
+
+type Pitch = { step: string; alter?: number; octave: number };
+
+function escXml(s: string): string {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function asInt(x: unknown, fallback: number): number {
+  const n = typeof x === "number" ? x : Number(x);
+  return Number.isFinite(n) ? Math.trunc(n) : fallback;
+}
+
+function getFirstMeasureAttributes(score: ScoreModel): any | null {
+  const p0: any = (score as any).parts?.[0];
+  const m0: any = p0?.measures?.[0];
+  return m0?.attributes ?? null;
+}
+
+function getTime(score: ScoreModel): { beats: number; beatType: number } {
+  const attrs = getFirstMeasureAttributes(score);
+  const t = attrs?.time;
+  const beats = asInt(t?.beats, 4);
+  const beatType = asInt(t?.beat_type ?? t?.beatType, 4);
+  return { beats, beatType };
+}
+
+function getKey(score: ScoreModel): { fifths: number; mode: string } {
+  const attrs = getFirstMeasureAttributes(score);
+  const k = attrs?.key;
+  const fifths = asInt(k?.fifths, 0);
+  const mode = typeof k?.mode === "string" ? k.mode : "major";
+  return { fifths, mode };
+}
+
+function voiceClefXml(voiceName: string): string {
+  const v = voiceName.toLowerCase();
+
+  // Soprano / Alto: treble
+  if (v.includes("soprano") || v.includes("alto")) {
+    return `<clef><sign>G</sign><line>2</line></clef>`;
+  }
+
+  // Tenor: treble 8vb (octave down)
+  if (v.includes("tenor")) {
+    return `<clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change></clef>`;
+  }
+
+  // Bass: bass clef
+  return `<clef><sign>F</sign><line>4</line></clef>`;
+}
+
+function pitchXml(p: Pitch): string {
+  const step = escXml(String(p.step));
+  const octave = asInt(p.octave, 4);
+  const alter = p.alter;
+
+  if (typeof alter === "number" && alter !== 0) {
+    return `<pitch><step>${step}</step><alter>${alter}</alter><octave>${octave}</octave></pitch>`;
+  }
+  return `<pitch><step>${step}</step><octave>${octave}</octave></pitch>`;
+}
+
+function durationToType(durationDivs: number, beatType: number): string {
+  // This exporter uses divisions=1 and assumes quarter-note beats in common cases.
+  // For now we map 1 division -> quarter. If beatType differs, we still keep it simple.
+  if (durationDivs <= 0) return "quarter";
+  if (durationDivs === 1) return "quarter";
+  if (durationDivs === 2) return "half";
+  if (durationDivs === 4) return "whole";
+  return "quarter";
+}
+
+function ensureSatbOrder(parts: any[]): any[] {
+  const get = (name: string): any | null =>
+    parts.find((p) => String(p?.name ?? "").toLowerCase() === name.toLowerCase()) ?? null;
+
+  const s = get("Soprano");
+  const a = get("Alto");
+  const t = get("Tenor");
+  const b = get("Bass");
+
+  const ordered = [s, a, t, b].filter(Boolean);
+  if (ordered.length === 4) return ordered;
+
+  // fallback: keep original order if something is missing
+  return parts;
+}
+
+export function exportSatbScoreModelToMusicXML(score: ScoreModel): string {
+  const partsAny: any[] = Array.isArray((score as any).parts) ? (score as any).parts : [];
+  const parts = ensureSatbOrder(partsAny);
+
+  const title = typeof (score as any).meta?.title === "string" ? (score as any).meta.title : "";
+  const composer = typeof (score as any).meta?.composer === "string" ? (score as any).meta.composer : "";
+
+  const { beats, beatType } = getTime(score);
+  const { fifths, mode } = getKey(score);
+
+  const divisions = 1;
+
+  // Determine measure count from first part
+  const measureCount = Array.isArray(parts?.[0]?.measures) ? parts[0].measures.length : 0;
+
+  const partListXml = parts
+    .map((p) => {
+      const id = escXml(String(p.part_id ?? p.id ?? `P_${String(p.name ?? "X")}`));
+      const nm = escXml(String(p.name ?? id));
+      return `<score-part id="${id}"><part-name>${nm}</part-name></score-part>`;
+    })
+    .join("");
+
+  const headerXml =
+    `<work>${title ? `<work-title>${escXml(title)}</work-title>` : ""}</work>` +
+    `<identification>${
+      composer ? `<creator type="composer">${escXml(composer)}</creator>` : ""
+    }</identification>`;
+
+  const xmlParts = parts
+    .map((p) => {
+      const partId = escXml(String(p.part_id ?? p.id ?? `P_${String(p.name ?? "X")}`));
+      const voiceName = String(p.name ?? "");
+
+      const measures: any[] = Array.isArray(p.measures) ? p.measures : [];
+
+      const measuresXml = Array.from({ length: measureCount }, (_, i) => {
+        const m = measures[i] ?? { number: i + 1, events: [] };
+        const num = asInt(m.number, i + 1);
+
+        // Only measure 1 gets attributes
+        const attributesXml =
+          num === 1
+            ? `<attributes>
+                <divisions>${divisions}</divisions>
+                <key><fifths>${fifths}</fifths><mode>${escXml(mode)}</mode></key>
+                <time><beats>${beats}</beats><beat-type>${beatType}</beat-type></time>
+                ${voiceClefXml(voiceName)}
+              </attributes>`
+            : "";
+
+        const events: any[] = Array.isArray(m.events) ? m.events : [];
+
+        // Sort events by time, stable
+        const evSorted = events.slice().sort((a, b) => asInt(a?.t, 0) - asInt(b?.t, 0));
+
+        // If no events in a measure, emit a whole-measure rest
+        const notesXml =
+          evSorted.length === 0
+            ? `<note><rest/><duration>${beats * divisions}</duration><type>${durationToType(
+                beats * divisions,
+                beatType
+              )}</type></note>`
+            : evSorted
+                .map((e) => {
+                  const type = String(e?.type ?? "");
+                  const durBeats = asInt(e?.dur, 1);
+                  const durDivs = Math.max(1, durBeats * divisions);
+
+                  if (type === "rest") {
+                    return `<note><rest/><duration>${durDivs}</duration><type>${durationToType(
+                      durDivs,
+                      beatType
+                    )}</type></note>`;
+                  }
+
+                  if (type === "note") {
+                    const pitch = e?.pitch as Pitch | undefined;
+                    if (!pitch || !pitch.step || pitch.octave === undefined) {
+                      return `<note><rest/><duration>${durDivs}</duration><type>${durationToType(
+                        durDivs,
+                        beatType
+                      )}</type></note>`;
+                    }
+
+                    return `<note>${pitchXml(pitch)}<duration>${durDivs}</duration><type>${durationToType(
+                      durDivs,
+                      beatType
+                    )}</type></note>`;
+                  }
+
+                  // unknown event type -> rest
+                  return `<note><rest/><duration>${durDivs}</duration><type>${durationToType(
+                    durDivs,
+                    beatType
+                  )}</type></note>`;
+                })
+                .join("");
+
+        return `<measure number="${num}">${attributesXml}${notesXml}</measure>`;
+      }).join("");
+
+      return `<part id="${partId}">${measuresXml}</part>`;
+    })
+    .join("");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  ${headerXml}
+  <part-list>${partListXml}</part-list>
+  ${xmlParts}
+</score-partwise>
+`;
+}

@@ -27,5 +27,17 @@ run_one "tests/musicxml/test_c_major_applied_dominant_deceptive.xml"
 run_one "tests/musicxml/test_c_major_v7_i_2bars.xml"
 run_one "tests/musicxml/test_c_major_half_cadence_2bars.xml"
 
+# Phase 4.3 tests
+run_one "tests/musicxml/test_c_major_secondary_triad_v_of_v.xml"
+run_one "tests/musicxml/test_c_major_secondary_leadingtone_viio_of_v.xml"
+
+echo ""
+echo "== roman confidence suppression =="
+npx tsx tests/harmony/runRomanConfidenceTest.ts
+
+echo ""
+echo "== musicxml exporter sanity =="
+npx tsx tests/harmony/runMusicXMLExportTest.ts
+
 echo ""
 echo "== done =="

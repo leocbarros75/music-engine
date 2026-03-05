@@ -55,28 +55,42 @@ function addNote(
  * Later we’ll add idiomatic brass ranges/articulations, transposition, and voice-leading.
  */
 export function mapPianoToBrassEnsembleOpen(score: ScoreModel): ScoreModel {
-  const partsOut = BRASS_ENSEMBLE_PARTS.map(p => makePart(p.part_id, p.name, p.instrument, p.staves));
+  const partsOut = BRASS_ENSEMBLE_PARTS.map((p) => makePart(p.part_id, p.name, p.instrument, p.staves));
 
-  const srcPart = score.parts[0];
-  const measureMap: Record<string, any[]> = {};
+  const srcPart = score.parts?.[0];
+  if (!srcPart || !Array.isArray(srcPart.measures)) {
+    return {
+      score_id: `ARR_${Math.random().toString(16).slice(2, 10)}`,
+      meta: { ensemble: "brass_ensemble" },
+      global: { ...score.global },
+      parts: partsOut
+    } as any;
+  }
+
+  const measureMap: Record<number, any[]> = {};
 
   for (const m of srcPart.measures) {
     const shells = partsOut.map(() => cloneMeasureShell(m));
-    measureMap[String(m.number)] = shells;
+    const mNum = Number(m.number ?? 1);
+    measureMap[mNum] = shells;
     for (let i = 0; i < partsOut.length; i++) partsOut[i].measures.push(shells[i]);
   }
 
   const chords = extractOnsetChords(score);
 
+  // Use a safe view for catalog lookups (avoids TS property errors)
+  const CATALOG: any = InstrumentCatalog as any;
+
   for (const ch of chords) {
-    const mShells = measureMap[String(ch.measure)];
+    const mNum = Number(ch.measure ?? 1);
+    const mShells = measureMap[mNum];
     if (!mShells) continue;
 
-    const notes = ch.notes.slice().sort((a: any, b: any) => a.midi - b.midi);
+    const notes = (ch.notes ?? []).slice().sort((a: any, b: any) => a.midi - b.midi);
     if (notes.length === 0) continue;
 
-    const t = ch.t;
-    const dur = Math.max(...notes.map((n: any) => (n.dur ?? 480)), 1);
+    const t = Number(ch.t ?? 0);
+    const dur = Math.max(...notes.map((n: any) => Number(n.dur ?? 480)), 1);
 
     const low = notes[0].midi;
     const high = notes[notes.length - 1].midi;
@@ -94,18 +108,20 @@ export function mapPianoToBrassEnsembleOpen(score: ScoreModel): ScoreModel {
     let mTpt1 = high;
 
     // Range enforcement using your InstrumentCatalog
-    const rTpt = InstrumentCatalog.trumpet;
-    const rHorn = InstrumentCatalog.horn;
-    const rTbn = InstrumentCatalog.trombone;
-    const rBTbn = InstrumentCatalog.bass_trombone ?? InstrumentCatalog.trombone;
-    const rTuba = InstrumentCatalog.tuba;
+    const rTpt = CATALOG.trumpet ?? CATALOG.trumpet_bb ?? CATALOG.trumpetBb;
+    const rHorn = CATALOG.horn ?? CATALOG.horn_f ?? CATALOG.f_horn;
+    const rTbn = CATALOG.trombone;
+    const rBTbn = CATALOG.bass_trombone ?? CATALOG.bassTrombone ?? CATALOG.trombone;
+    const rTuba = CATALOG.tuba;
 
-    mTpt1 = shiftOctavesIntoRange(mTpt1, rTpt.midi_low, rTpt.midi_high);
-    mTpt2 = shiftOctavesIntoRange(mTpt2, rTpt.midi_low, rTpt.midi_high);
-    mHorn = shiftOctavesIntoRange(mHorn, rHorn.midi_low, rHorn.midi_high);
-    mTbn = shiftOctavesIntoRange(mTbn, rTbn.midi_low, rTbn.midi_high);
-    mBTbn = shiftOctavesIntoRange(mBTbn, rBTbn.midi_low, rBTbn.midi_high);
-    mTuba = shiftOctavesIntoRange(mTuba, rTuba.midi_low, rTuba.midi_high);
+    if (rTpt) {
+      mTpt1 = shiftOctavesIntoRange(mTpt1, rTpt.midi_low, rTpt.midi_high);
+      mTpt2 = shiftOctavesIntoRange(mTpt2, rTpt.midi_low, rTpt.midi_high);
+    }
+    if (rHorn) mHorn = shiftOctavesIntoRange(mHorn, rHorn.midi_low, rHorn.midi_high);
+    if (rTbn) mTbn = shiftOctavesIntoRange(mTbn, rTbn.midi_low, rTbn.midi_high);
+    if (rBTbn) mBTbn = shiftOctavesIntoRange(mBTbn, rBTbn.midi_low, rBTbn.midi_high);
+    if (rTuba) mTuba = shiftOctavesIntoRange(mTuba, rTuba.midi_low, rTuba.midi_high);
 
     // Write notes into the proper measure shells
     // Order matches BRASS_ENSEMBLE_PARTS

@@ -1,4 +1,4 @@
-import type { Pitch } from "../instruments/instrumentCatalog";
+import type { Pitch } from "../../instruments/instrumentCatalog";
 
 export type HarmonyMode = "major" | "minor" | "unknown";
 

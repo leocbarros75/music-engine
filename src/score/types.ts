@@ -26,6 +26,7 @@ export type Measure = {
   attributes?: {
     divisions?: number;
     key_fifths?: number;
+    key_mode?: string;
     time?: { beats: number; beat_type: number };
   };
   events: NoteEvent[];

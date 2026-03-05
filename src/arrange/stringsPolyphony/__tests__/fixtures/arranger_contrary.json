@@ -1,0 +1,24 @@
+{
+  "type": "arranger",
+  "name": "contrary_motion",
+  "divisions": 1,
+  "keyFifths": 0,
+  "keyMode": "major",
+  "melody": [
+    { "measure": 1, "t": 0, "dur": 1, "midi": 67 },
+    { "measure": 1, "t": 1, "dur": 1, "midi": 69 },
+    { "measure": 1, "t": 2, "dur": 1, "midi": 71 },
+    { "measure": 1, "t": 3, "dur": 1, "midi": 72 },
+    { "measure": 2, "t": 0, "dur": 1, "midi": 71 },
+    { "measure": 2, "t": 1, "dur": 1, "midi": 69 },
+    { "measure": 2, "t": 2, "dur": 1, "midi": 67 },
+    { "measure": 2, "t": 3, "dur": 1, "midi": 65 }
+  ],
+  "chords": [
+    { "measure": 1, "t": 0, "symbol": "C" },
+    { "measure": 1, "t": 2, "symbol": "G" },
+    { "measure": 2, "t": 0, "symbol": "Am" },
+    { "measure": 2, "t": 2, "symbol": "F" }
+  ],
+  "expectContraryMin": 1
+}

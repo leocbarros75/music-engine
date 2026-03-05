@@ -1,0 +1,124 @@
+// tests/harmony/runHarmonyTest.ts
+import fs from "node:fs";
+import path from "node:path";
+import process from "node:process";
+import { parseMusicXMLToScoreModel } from "../../src/parsers/musicxmlParser";
+import { analyzeHarmony } from "../../src/harmony/analyzeHarmony";
+import { EXPECTATIONS_BY_BASENAME } from "./expectations";
+function die(msg) {
+    // eslint-disable-next-line no-console
+    console.error(msg);
+    process.exit(1);
+}
+function usage() {
+    die("Usage: tsx tests/harmony/runHarmonyTest.ts <path-to-xml> [beat|measure]");
+}
+function assert(cond, msg) {
+    if (!cond)
+        die(`ASSERTION FAILED: ${msg}`);
+}
+function findBeat(out, measure, beat) {
+    const beats = out.beats ?? [];
+    return beats.find((b) => b.measureNumber === measure && b.beatNumber === beat) ?? null;
+}
+function findMeasure(out, measure) {
+    const measures = out.measures ?? [];
+    return measures.find((m) => m.measureNumber === measure) ?? null;
+}
+function hasCadenceType(out, atMeasure, type) {
+    const cadences = out.cadences ?? [];
+    return cadences.some((c) => c.atMeasure === atMeasure && c.type === type);
+}
+function hasCadenceEvidence(out, atMeasure, prevRoman, lastRoman) {
+    const cadences = out.cadences ?? [];
+    return cadences.some((c) => c.atMeasure === atMeasure &&
+        (c.evidence?.prevRoman ?? "") === prevRoman &&
+        (c.evidence?.lastRoman ?? "") === lastRoman);
+}
+function hasWarning(out, atMeasure, type, atBeat) {
+    const warnings = out.warnings ?? [];
+    return warnings.some((w) => {
+        if (w.atMeasure !== atMeasure)
+            return false;
+        if ((w.type ?? "") !== type)
+            return false;
+        if (typeof atBeat === "number")
+            return w.atBeat === atBeat;
+        return true;
+    });
+}
+const filePathArg = process.argv[2];
+const granularityArg = process.argv[3];
+const granularity = granularityArg === "measure" || granularityArg === "beat" ? granularityArg : "beat";
+if (!filePathArg)
+    usage();
+const filePath = path.resolve(process.cwd(), filePathArg);
+if (!fs.existsSync(filePath)) {
+    die(`File not found: ${filePath}`);
+}
+const xml = fs.readFileSync(filePath, "utf8");
+const scoreModel = parseMusicXMLToScoreModel(xml);
+const out = analyzeHarmony({
+    scoreModel,
+    options: {
+        granularity,
+        ignorePercussion: true
+    }
+});
+// --- assertions ---
+const base = path.basename(filePath);
+const exp = EXPECTATIONS_BY_BASENAME[base];
+assert(!!out && typeof out === "object", "Output must be an object.");
+assert(out.ok === true, `Output ok must be true for ${base}.`);
+if (!exp) {
+    die(`ASSERTION FAILED: No expectations found for ${base}. Add it to tests/harmony/expectations.ts (EXPECTATIONS_BY_BASENAME).`);
+}
+if (exp.key) {
+    assert((out.key?.tonic ?? "") === exp.key.tonic, `Key tonic expected ${exp.key.tonic}, got ${out.key?.tonic ?? "?"}.`);
+    assert((out.key?.mode ?? "") === exp.key.mode, `Key mode expected ${exp.key.mode}, got ${out.key?.mode ?? "?"}.`);
+}
+// Sanity check: chords are not empty for beat 1 in beat mode, or for measure snapshots in measure mode
+for (const m of exp.requireNonEmptyChordOnBeat1OfMeasures ?? []) {
+    if (granularity === "beat") {
+        const b = findBeat(out, m, 1);
+        assert(!!b, `Missing beat record for measure ${m} beat 1.`);
+        const pcs = b?.chord?.pcs ?? [];
+        assert(Array.isArray(pcs) && pcs.length > 0, `Expected non-empty chord pcs on measure ${m} beat 1.`);
+    }
+    else {
+        const mm = findMeasure(out, m);
+        assert(!!mm, `Missing measure record for measure ${m}.`);
+        const pcs = mm?.chord?.pcs ?? [];
+        assert(Array.isArray(pcs) && pcs.length > 0, `Expected non-empty chord pcs on measure ${m}.`);
+    }
+}
+// Beat romans
+if (granularity === "beat") {
+    for (const br of exp.beatRomans ?? []) {
+        const b = findBeat(out, br.measure, br.beat);
+        assert(!!b, `Missing beat record for measure ${br.measure} beat ${br.beat}.`);
+        const roman = b?.roman?.roman ?? "";
+        assert(roman === br.roman, `Expected roman ${br.roman} at m${br.measure} b${br.beat}, got ${roman || "?"}.`);
+    }
+}
+// Measure romans
+if (granularity === "measure") {
+    for (const mr of exp.measureRomans ?? []) {
+        const m = findMeasure(out, mr.measure);
+        assert(!!m, `Missing measure record for measure ${mr.measure}.`);
+        const roman = m?.roman?.roman ?? "";
+        assert(roman === mr.roman, `Expected roman ${mr.roman} at m${mr.measure}, got ${roman || "?"}.`);
+    }
+}
+for (const c of exp.cadenceTypes ?? []) {
+    assert(hasCadenceType(out, c.atMeasure, c.type), `Expected cadence type ${c.type} at measure ${c.atMeasure}.`);
+}
+for (const ce of exp.cadenceEvidence ?? []) {
+    assert(hasCadenceEvidence(out, ce.atMeasure, ce.prevRoman, ce.lastRoman), `Expected cadence evidence at m${ce.atMeasure}: ${ce.prevRoman} -> ${ce.lastRoman}.`);
+}
+for (const w of exp.warnings ?? []) {
+    assert(hasWarning(out, w.atMeasure, w.type, w.atBeat), `Expected warning type ${w.type} at measure ${w.atMeasure}${typeof w.atBeat === "number" ? ` beat ${w.atBeat}` : ""}.`);
+}
+// Print JSON (keeps your current logs)
+// eslint-disable-next-line no-console
+console.log(JSON.stringify(out, null, 2));

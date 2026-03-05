@@ -1,0 +1,889 @@
+// src/harmonize/satb/harmonizeSatbFromChords.ts
+import type { ScoreModel } from "../../score/types";
+import { midiToPitch } from "../../instruments/instrumentCatalog";
+import { inferChordsFromMelody } from "./inferChordsFromMelody";
+
+type ChordEvent = {
+  measure: number;
+  t: number;
+  symbol: string; // e.g. "C", "F", "G7", "Am", "Dm7", "C/E"
+};
+
+type HarmonizeOptions = {
+  keepMelodyInSoprano?: boolean;
+  forceRootInBass?: boolean; // default true
+};
+
+type VoiceName = "Soprano" | "Alto" | "Tenor" | "Bass";
+
+type Range = { min: number; max: number };
+
+// Sounding ranges (MIDI)
+const RANGES: Record<VoiceName, Range> = {
+  Soprano: { min: 60, max: 81 }, // C4..A5
+  Alto: { min: 55, max: 74 }, // G3..D5
+  Tenor: { min: 48, max: 69 }, // C3..A4
+  Bass: { min: 40, max: 64 } // E2..E4
+};
+
+function pc(midi: number): number {
+  return ((midi % 12) + 12) % 12;
+}
+
+function clampInt(x: number, lo: number, hi: number): number {
+  if (x < lo) return lo;
+  if (x > hi) return hi;
+  return x;
+}
+
+function motionDir(prev: number, next: number): -1 | 0 | 1 {
+  if (next > prev) return 1;
+  if (next < prev) return -1;
+  return 0;
+}
+
+function isPerfectConsonance(intervalPc: number): boolean {
+  // P8 (0), P5 (7).
+  return intervalPc === 0 || intervalPc === 7;
+}
+
+function isParallelPerfect(params: {
+  prevUpper: number;
+  prevLower: number;
+  nextUpper: number;
+  nextLower: number;
+}): boolean {
+  const { prevUpper, prevLower, nextUpper, nextLower } = params;
+
+  const prevInt = pc(prevUpper - prevLower);
+  const nextInt = pc(nextUpper - nextLower);
+
+  if (!isPerfectConsonance(prevInt)) return false;
+  if (!isPerfectConsonance(nextInt)) return false;
+
+  const du = motionDir(prevUpper, nextUpper);
+  const dl = motionDir(prevLower, nextLower);
+
+  if (du === 0 || dl === 0) return false;
+  if (du !== dl) return false;
+
+  return true;
+}
+
+function isDirectPerfect(params: {
+  prevUpper: number;
+  prevLower: number;
+  nextUpper: number;
+  nextLower: number;
+}): boolean {
+  const { prevUpper, prevLower, nextUpper, nextLower } = params;
+
+  const prevInt = pc(prevUpper - prevLower);
+  const nextInt = pc(nextUpper - nextLower);
+
+  if (isPerfectConsonance(prevInt)) return false;
+  if (!isPerfectConsonance(nextInt)) return false;
+
+  const du = motionDir(prevUpper, nextUpper);
+  const dl = motionDir(prevLower, nextLower);
+
+  if (du === 0 || dl === 0) return false;
+  if (du !== dl) return false;
+
+  return true;
+}
+
+const STEP_TO_PC: Record<string, number> = {
+  C: 0,
+  D: 2,
+  E: 4,
+  F: 5,
+  G: 7,
+  A: 9,
+  B: 11
+};
+
+function parseRootToken(tok: string): number | null {
+  const m = tok.match(/^([A-Ga-g])([#b]?)/);
+  if (!m) return null;
+  const step = m[1]!.toUpperCase();
+  const acc = m[2] ?? "";
+  const base = STEP_TO_PC[step];
+  if (typeof base !== "number") return null;
+  if (acc === "#") return (base + 1) % 12;
+  if (acc === "b") return (base + 11) % 12;
+  return base;
+}
+
+type ParsedChord = {
+  rootPc: number;
+  pcs: number[];
+  bassPcPref: number | null;
+  hasSeventh: boolean;
+  seventhPc: number | null;
+};
+
+function chordPcsFromSymbol(symbol: string): ParsedChord | null {
+  const s = symbol.trim();
+
+  // Slash bass: "C/E"
+  let main = s;
+  let slashBass: string | null = null;
+  if (s.includes("/")) {
+    const parts = s.split("/");
+    main = (parts[0] ?? "").trim();
+    slashBass = (parts[1] ?? "").trim();
+  }
+
+  const m = main.match(/^([A-Ga-g][#b]?)(.*)$/);
+  if (!m) return null;
+
+  const rootTok = m[1]!;
+  const qualTok = (m[2] ?? "").trim().toLowerCase();
+
+  const rootPc = parseRootToken(rootTok);
+  if (rootPc === null) return null;
+
+  const isMinorTriad =
+    qualTok === "m" ||
+    qualTok === "min" ||
+    qualTok.startsWith("m7") ||
+    qualTok.startsWith("min7");
+
+  const isMaj7 = qualTok === "maj7" || qualTok === "ma7";
+  const isMin7 = qualTok === "m7" || qualTok === "min7";
+  const isDom7 = qualTok === "7" || (qualTok.endsWith("7") && !isMaj7 && !isMin7);
+
+  const third = isMinorTriad ? 3 : 4;
+  const fifth = 7;
+
+  const pcs: number[] = [rootPc, (rootPc + third) % 12, (rootPc + fifth) % 12];
+
+  let hasSeventh = false;
+  let seventhPc: number | null = null;
+
+  if (isMaj7) {
+    hasSeventh = true;
+    seventhPc = (rootPc + 11) % 12;
+    pcs.push(seventhPc);
+  } else if (isDom7 || isMin7) {
+    hasSeventh = true;
+    seventhPc = (rootPc + 10) % 12;
+    pcs.push(seventhPc);
+  }
+
+  const bassPcPref = slashBass ? parseRootToken(slashBass) : null;
+
+  return {
+    rootPc,
+    pcs: Array.from(new Set(pcs)),
+    bassPcPref,
+    hasSeventh,
+    seventhPc
+  };
+}
+
+function midiCandidatesForPcInRange(pitchClass: number, range: Range): number[] {
+  const out: number[] = [];
+  for (let m = range.min; m <= range.max; m++) {
+    if (pc(m) === pitchClass) out.push(m);
+  }
+  return out;
+}
+
+function bestByPenalty(cands: number[], penalty: (m: number) => number): number | null {
+  if (!cands.length) return null;
+  let best = cands[0]!;
+  let bestP = penalty(best);
+  for (let i = 1; i < cands.length; i++) {
+    const m = cands[i]!;
+    const p = penalty(m);
+    if (p < bestP) {
+      bestP = p;
+      best = m;
+    }
+  }
+  return best;
+}
+
+function chooseVoiceNote(params: {
+  voice: VoiceName;
+  chordPcs: number[];
+  targetMidi: number;
+  range: Range;
+  belowMidi?: number;
+  aboveMidi?: number;
+  preferPc?: number | null;
+  avoidPcs?: number[];
+  extraPenalty?: (candidateMidi: number) => number;
+}): number | null {
+  const { chordPcs, targetMidi, range, belowMidi, aboveMidi, preferPc, avoidPcs, extraPenalty } = params;
+
+  let pcs = chordPcs.slice();
+  if (preferPc !== null && preferPc !== undefined) {
+    pcs = [preferPc, ...pcs.filter((x) => x !== preferPc)];
+  }
+
+  const avoidSet = new Set<number>(avoidPcs ?? []);
+
+  const allCands: number[] = [];
+  for (const p of pcs) {
+    if (avoidSet.has(p)) continue;
+    allCands.push(...midiCandidatesForPcInRange(p, range));
+  }
+
+  const filtered = allCands.filter((m) => {
+    if (belowMidi !== undefined && m >= belowMidi) return false;
+    if (aboveMidi !== undefined && m <= aboveMidi) return false;
+    return true;
+  });
+
+  if (!filtered.length) return null;
+
+  const mid = (range.min + range.max) / 2;
+  return bestByPenalty(filtered, (m) => {
+    const dist = Math.abs(m - targetMidi);
+    const center = Math.abs(m - mid) * 0.15;
+    const prefer = preferPc !== null && preferPc !== undefined && pc(m) === preferPc ? -1.2 : 0;
+    const extra = extraPenalty ? extraPenalty(m) : 0;
+    return dist + center + prefer + extra;
+  });
+}
+
+function getScoreBeatsPerMeasure(score: ScoreModel): number {
+  const m0 = score.parts?.[0]?.measures?.[0];
+  const beats = m0?.attributes?.time?.beats;
+  if (typeof beats === "number" && beats > 0) return beats;
+  return 4;
+}
+
+function buildChordMap(chords: ChordEvent[]): Map<string, ChordEvent> {
+  const map = new Map<string, ChordEvent>();
+  for (const c of chords) map.set(`${c.measure}:${c.t}`, c);
+  return map;
+}
+
+function getSopranoSource(score: ScoreModel): { partIndex: number; part: any } | null {
+  const parts = score.parts ?? [];
+  for (let i = 0; i < parts.length; i++) {
+    const name = String(parts[i]?.name ?? "").toLowerCase();
+    if (name.includes("soprano")) return { partIndex: i, part: parts[i] };
+  }
+  if (parts[0]) return { partIndex: 0, part: parts[0] };
+  return null;
+}
+
+function makeEmptyPart(part_id: string, name: string, measuresTemplate: any[]): any {
+  return {
+    part_id,
+    name,
+    measures: measuresTemplate.map((m) => ({
+      number: m.number,
+      attributes: m.attributes ? { ...m.attributes } : undefined,
+      events: []
+    }))
+  };
+}
+
+function ensureMeasureAttributesOnlyOnFirst(part: any): void {
+  const ms = part.measures ?? [];
+  for (let i = 0; i < ms.length; i++) {
+    if (i === 0) continue;
+    if (ms[i]?.attributes) delete ms[i].attributes;
+  }
+}
+
+function addNoteEvent(measure: any, t: number, dur: number, midi: number): void {
+  measure.events.push({
+    type: "note",
+    t,
+    dur,
+    pitch: midiToPitch(midi),
+    midi
+  });
+}
+
+function addRestEvent(measure: any, t: number, dur: number): void {
+  measure.events.push({
+    type: "rest",
+    t,
+    dur
+  });
+}
+
+type PendingResolution = {
+  voice: "Alto" | "Tenor";
+  toPc: number;
+  atMeasure: number;
+  atT: number;
+};
+
+function pickChordForBeat(chordMap: Map<string, ChordEvent>, measureNumber: number, t: number): ChordEvent | null {
+  // Prefer exact match at this beat, else fall back to beat 0 for the measure.
+  return chordMap.get(`${measureNumber}:${t}`) ?? chordMap.get(`${measureNumber}:0`) ?? null;
+}
+
+// Key helpers (ScoreModel uses attributes.key_fifths)
+function tonicPcFromFifthsMajor(fifths: number): number {
+  const map: Record<number, number> = {
+    "-7": 11,
+    "-6": 6,
+    "-5": 1,
+    "-4": 8,
+    "-3": 3,
+    "-2": 10,
+    "-1": 5,
+    "0": 0,
+    "1": 7,
+    "2": 2,
+    "3": 9,
+    "4": 4,
+    "5": 11,
+    "6": 6,
+    "7": 1
+  };
+  const k = String(fifths);
+  return map[k] ?? 0;
+}
+
+function getKeyFifths(score: ScoreModel): number {
+  const m0 = score.parts?.[0]?.measures?.[0];
+  const fifths = m0?.attributes?.key_fifths;
+  if (typeof fifths === "number" && Number.isFinite(fifths)) return fifths;
+  return 0;
+}
+
+function isCadenceVtoIAtBarline(params: { score: ScoreModel; cur: ParsedChord; next: ParsedChord | null }): boolean {
+  const { score, cur, next } = params;
+  if (!next) return false;
+
+  const tonic = tonicPcFromFifthsMajor(getKeyFifths(score));
+  const dominant = pc(tonic + 7);
+
+  const curIsV = pc(cur.rootPc) === dominant;
+  const nextIsI = pc(next.rootPc) === pc(tonic);
+
+  return curIsV && nextIsI;
+}
+
+export function harmonizeSatbFromChords(
+  inScore: ScoreModel,
+  chords: ChordEvent[],
+  optionsIn?: HarmonizeOptions
+): ScoreModel {
+  const options: HarmonizeOptions = optionsIn ?? {};
+  const keepMelody = options.keepMelodyInSoprano !== false;
+  const forceRootInBass = options.forceRootInBass !== false;
+
+  const beatsPerMeasure = getScoreBeatsPerMeasure(inScore);
+  const lastBeat = Math.max(0, beatsPerMeasure - 1);
+
+  const soprSrc = getSopranoSource(inScore);
+  if (!soprSrc) {
+    return {
+      ...(inScore as any),
+      meta: { ...(inScore as any).meta, ensemble: "satb" } as any,
+      parts: []
+    } as any;
+  }
+
+  const soprPart = soprSrc.part;
+  const measuresTemplate = (soprPart.measures ?? []).map((m: any) => ({
+    number: m.number,
+    attributes: m.attributes ? { ...m.attributes } : undefined
+  }));
+
+  const outS = makeEmptyPart("P_S", "Soprano", measuresTemplate);
+  const outA = makeEmptyPart("P_A", "Alto", measuresTemplate);
+  const outT = makeEmptyPart("P_T", "Tenor", measuresTemplate);
+  const outB = makeEmptyPart("P_B", "Bass", measuresTemplate);
+
+  const inputChordCount = (chords ?? []).length;
+  const usedInference = inputChordCount === 0;
+
+  // If chords are empty, infer them from melody.
+  const safeChords = inputChordCount ? (chords ?? []) : inferChordsFromMelody(inScore);
+  const chordMap = buildChordMap(safeChords);
+
+  if (keepMelody) {
+    for (let mi = 0; mi < measuresTemplate.length; mi++) {
+      const srcM = soprPart.measures?.[mi];
+      const dstM = outS.measures?.[mi];
+      if (!dstM) continue;
+
+      const srcEvents = (srcM?.events ?? []).filter((e: any) => e?.type === "note" || e?.type === "rest");
+      for (const e of srcEvents) dstM.events.push({ ...e });
+    }
+  }
+
+  let prevS: number | null = null;
+  let prevA: number | null = null;
+  let prevT: number | null = null;
+  let prevB: number | null = null;
+
+  let pending: PendingResolution | null = null;
+
+  for (let mi = 0; mi < measuresTemplate.length; mi++) {
+    const measureNumber = measuresTemplate[mi]?.number ?? mi + 1;
+
+    const mS = outS.measures?.[mi];
+    const mA = outA.measures?.[mi];
+    const mT = outT.measures?.[mi];
+    const mB = outB.measures?.[mi];
+    if (!mS || !mA || !mT || !mB) continue;
+
+    const nextMeasureNumber = (measuresTemplate[mi + 1]?.number ?? (measureNumber + 1)) as number;
+
+    for (let t = 0; t < beatsPerMeasure; t++) {
+      const chordEv = pickChordForBeat(chordMap, measureNumber, t);
+      const parsed = chordEv ? chordPcsFromSymbol(chordEv.symbol) : null;
+
+      const nextChordEv = chordMap.get(`${nextMeasureNumber}:0`);
+      const parsedNext = nextChordEv ? chordPcsFromSymbol(nextChordEv.symbol) : null;
+
+      if (!parsed) {
+        addRestEvent(mA, t, 1);
+        addRestEvent(mT, t, 1);
+        addRestEvent(mB, t, 1);
+        continue;
+      }
+
+      const chordPcs = parsed.pcs;
+      const rootPc = parsed.rootPc;
+
+      // Cadence enforcement (t=0 only):
+      // If this bar is V and next bar is I, force bass to ROOT on this downbeat.
+      const isCadenceDownbeat = t === 0 && isCadenceVtoIAtBarline({ score: inScore, cur: parsed, next: parsedNext });
+
+      // Prefer slash bass if present; otherwise root (default), but cadence downbeat always root.
+      const bassPcPref =
+        isCadenceDownbeat
+          ? rootPc
+          : parsed.bassPcPref !== null
+            ? parsed.bassPcPref
+            : forceRootInBass
+              ? rootPc
+              : null;
+
+      const forceTenorPc =
+        pending && pending.voice === "Tenor" && pending.atMeasure === measureNumber && pending.atT === t
+          ? pending.toPc
+          : null;
+
+      const forceAltoPc =
+        pending && pending.voice === "Alto" && pending.atMeasure === measureNumber && pending.atT === t
+          ? pending.toPc
+          : null;
+
+      if (pending && pending.atMeasure === measureNumber && pending.atT === t) {
+        pending = null;
+      }
+
+      let soprMidi: number | null = null;
+      const sEv = (mS.events ?? []).find((e: any) => e?.type === "note" && Number(e.t) === t);
+      if (sEv?.midi !== undefined) soprMidi = Number(sEv.midi);
+
+      if (soprMidi === null) {
+        addRestEvent(mA, t, 1);
+        addRestEvent(mT, t, 1);
+        addRestEvent(mB, t, 1);
+        continue;
+      }
+
+      const bassTarget = prevB ?? 48;
+
+      const bassExtraPenalty = (candB: number): number => {
+        if (prevS !== null && prevB !== null) {
+          const pPenalty = isParallelPerfect({
+            prevUpper: prevS,
+            prevLower: prevB,
+            nextUpper: prevS,
+            nextLower: candB
+          })
+            ? 50
+            : 0;
+
+          const dPenalty = isDirectPerfect({
+            prevUpper: prevS,
+            prevLower: prevB,
+            nextUpper: prevS,
+            nextLower: candB
+          })
+            ? 20
+            : 0;
+
+          return pPenalty + dPenalty;
+        }
+        return 0;
+      };
+
+      // If cadence downbeat, restrict bass candidates to the ROOT pc only (hard theory),
+      // but warn-only behavior will be handled by cadence checker downstream.
+      const bassChordPcs = isCadenceDownbeat ? [rootPc] : chordPcs;
+
+      const bassMidi =
+        chooseVoiceNote({
+          voice: "Bass",
+          chordPcs: bassChordPcs,
+          targetMidi: bassTarget,
+          range: RANGES.Bass,
+          belowMidi: soprMidi,
+          preferPc: bassPcPref,
+          extraPenalty: bassExtraPenalty
+        }) ??
+        chooseVoiceNote({
+          voice: "Bass",
+          chordPcs: bassChordPcs,
+          targetMidi: bassTarget,
+          range: RANGES.Bass,
+          preferPc: bassPcPref,
+          extraPenalty: bassExtraPenalty
+        });
+
+      if (bassMidi === null) {
+        addRestEvent(mA, t, 1);
+        addRestEvent(mT, t, 1);
+        addRestEvent(mB, t, 1);
+        prevS = soprMidi;
+        continue;
+      }
+
+      const chordHas7 = parsed.hasSeventh && parsed.seventhPc !== null;
+      const seventhPc = parsed.seventhPc;
+
+      const soprIs7 = chordHas7 && seventhPc !== null ? pc(soprMidi) === seventhPc : false;
+
+      const resolutionPc = chordHas7 && seventhPc !== null ? (seventhPc + 11) % 12 : null;
+
+      const canForceResolution =
+        chordHas7 &&
+        seventhPc !== null &&
+        resolutionPc !== null &&
+        parsedNext &&
+        parsedNext.pcs.includes(resolutionPc);
+
+      const shouldPlace7Now = chordHas7 && seventhPc !== null && t === lastBeat;
+      const avoid7Early = chordHas7 && seventhPc !== null && t !== lastBeat ? [seventhPc] : [];
+
+      const tenorTarget = prevT ?? clampInt(bassMidi + 12, RANGES.Tenor.min, RANGES.Tenor.max);
+
+      const tenorPreferPc =
+        forceTenorPc !== null ? forceTenorPc : shouldPlace7Now && !soprIs7 ? seventhPc : null;
+
+      const tenorAvoid: number[] = [];
+      tenorAvoid.push(...avoid7Early);
+
+      const tenorExtraPenalty = (candT: number): number => {
+        let pen = 0;
+
+        if (prevT !== null && prevB !== null) {
+          if (
+            isParallelPerfect({
+              prevUpper: prevT,
+              prevLower: prevB,
+              nextUpper: candT,
+              nextLower: bassMidi
+            })
+          )
+            pen += 40;
+          if (
+            isDirectPerfect({
+              prevUpper: prevT,
+              prevLower: prevB,
+              nextUpper: candT,
+              nextLower: bassMidi
+            })
+          )
+            pen += 15;
+        }
+
+        if (prevT !== null && prevS !== null) {
+          if (
+            isParallelPerfect({
+              prevUpper: prevS,
+              prevLower: prevT,
+              nextUpper: soprMidi!,
+              nextLower: candT
+            })
+          )
+            pen += 40;
+          if (
+            isDirectPerfect({
+              prevUpper: prevS,
+              prevLower: prevT,
+              nextUpper: soprMidi!,
+              nextLower: candT
+            })
+          )
+            pen += 15;
+        }
+
+        return pen;
+      };
+
+      let tenorMidi =
+        chooseVoiceNote({
+          voice: "Tenor",
+          chordPcs,
+          targetMidi: tenorTarget,
+          range: RANGES.Tenor,
+          aboveMidi: bassMidi,
+          preferPc: tenorPreferPc,
+          avoidPcs: tenorAvoid,
+          extraPenalty: tenorExtraPenalty
+        }) ??
+        chooseVoiceNote({
+          voice: "Tenor",
+          chordPcs,
+          targetMidi: tenorTarget,
+          range: RANGES.Tenor,
+          aboveMidi: bassMidi,
+          avoidPcs: tenorAvoid,
+          extraPenalty: tenorExtraPenalty
+        });
+
+      const altoTarget = prevA ?? clampInt(soprMidi - 5, RANGES.Alto.min, RANGES.Alto.max);
+      const altoCeil = soprMidi - 1;
+
+      const tenorTook7 =
+        chordHas7 && seventhPc !== null && tenorMidi !== null ? pc(tenorMidi) === seventhPc : false;
+
+      const altoPreferPc =
+        forceAltoPc !== null ? forceAltoPc : shouldPlace7Now && !soprIs7 && !tenorTook7 ? seventhPc : null;
+
+      const altoAvoid: number[] = [];
+      altoAvoid.push(...avoid7Early);
+      if (chordHas7 && seventhPc !== null && tenorTook7) altoAvoid.push(seventhPc);
+
+      const altoExtraPenalty = (candA: number): number => {
+        let pen = 0;
+
+        if (tenorMidi !== null && prevA !== null && prevT !== null) {
+          if (
+            isParallelPerfect({
+              prevUpper: prevA,
+              prevLower: prevT,
+              nextUpper: candA,
+              nextLower: tenorMidi
+            })
+          )
+            pen += 35;
+          if (
+            isDirectPerfect({
+              prevUpper: prevA,
+              prevLower: prevT,
+              nextUpper: candA,
+              nextLower: tenorMidi
+            })
+          )
+            pen += 12;
+        }
+
+        if (prevA !== null && prevB !== null) {
+          if (
+            isParallelPerfect({
+              prevUpper: prevA,
+              prevLower: prevB,
+              nextUpper: candA,
+              nextLower: bassMidi
+            })
+          )
+            pen += 35;
+          if (
+            isDirectPerfect({
+              prevUpper: prevA,
+              prevLower: prevB,
+              nextUpper: candA,
+              nextLower: bassMidi
+            })
+          )
+            pen += 12;
+        }
+
+        if (prevA !== null && prevS !== null) {
+          if (
+            isParallelPerfect({
+              prevUpper: prevS,
+              prevLower: prevA,
+              nextUpper: soprMidi!,
+              nextLower: candA
+            })
+          )
+            pen += 35;
+          if (
+            isDirectPerfect({
+              prevUpper: prevS,
+              prevLower: prevA,
+              nextUpper: soprMidi!,
+              nextLower: candA
+            })
+          )
+            pen += 12;
+        }
+
+        return pen;
+      };
+
+      let altoMidi =
+        chooseVoiceNote({
+          voice: "Alto",
+          chordPcs,
+          targetMidi: altoTarget,
+          range: RANGES.Alto,
+          aboveMidi: tenorMidi ?? bassMidi,
+          belowMidi: altoCeil,
+          preferPc: altoPreferPc,
+          avoidPcs: altoAvoid,
+          extraPenalty: altoExtraPenalty
+        }) ?? null;
+
+      if (altoMidi === null) {
+        const tenorBelow = soprMidi - 4;
+        const tenorLowerTarget = clampInt((tenorMidi ?? tenorTarget) - 7, RANGES.Tenor.min, RANGES.Tenor.max);
+
+        const altTenor =
+          chooseVoiceNote({
+            voice: "Tenor",
+            chordPcs,
+            targetMidi: tenorLowerTarget,
+            range: RANGES.Tenor,
+            aboveMidi: bassMidi,
+            belowMidi: tenorBelow,
+            preferPc: tenorPreferPc,
+            avoidPcs: tenorAvoid,
+            extraPenalty: tenorExtraPenalty
+          }) ??
+          chooseVoiceNote({
+            voice: "Tenor",
+            chordPcs,
+            targetMidi: tenorLowerTarget,
+            range: RANGES.Tenor,
+            aboveMidi: bassMidi,
+            belowMidi: tenorBelow,
+            avoidPcs: tenorAvoid,
+            extraPenalty: tenorExtraPenalty
+          });
+
+        if (altTenor !== null) {
+          tenorMidi = altTenor;
+
+          altoMidi =
+            chooseVoiceNote({
+              voice: "Alto",
+              chordPcs,
+              targetMidi: altoTarget,
+              range: RANGES.Alto,
+              aboveMidi: tenorMidi,
+              belowMidi: altoCeil,
+              preferPc: altoPreferPc,
+              avoidPcs: altoAvoid,
+              extraPenalty: altoExtraPenalty
+            }) ?? null;
+        }
+      }
+
+      if (altoMidi !== null && soprMidi - altoMidi > 12) {
+        const forcedTarget = soprMidi - 7;
+        const alt2 =
+          chooseVoiceNote({
+            voice: "Alto",
+            chordPcs,
+            targetMidi: forcedTarget,
+            range: RANGES.Alto,
+            aboveMidi: tenorMidi ?? bassMidi,
+            belowMidi: altoCeil,
+            preferPc: altoPreferPc,
+            avoidPcs: altoAvoid,
+            extraPenalty: altoExtraPenalty
+          }) ?? null;
+        if (alt2 !== null) altoMidi = alt2;
+      }
+
+      if (tenorMidi === null) {
+        const tenorFallbackTarget = clampInt(bassMidi + 7, RANGES.Tenor.min, RANGES.Tenor.max);
+        tenorMidi =
+          chooseVoiceNote({
+            voice: "Tenor",
+            chordPcs,
+            targetMidi: tenorFallbackTarget,
+            range: RANGES.Tenor,
+            aboveMidi: bassMidi,
+            avoidPcs: tenorAvoid,
+            extraPenalty: tenorExtraPenalty
+          }) ?? null;
+      }
+
+      if (altoMidi === null) {
+        const altoFallbackTarget = clampInt(soprMidi - 4, RANGES.Alto.min, RANGES.Alto.max);
+        altoMidi =
+          chooseVoiceNote({
+            voice: "Alto",
+            chordPcs,
+            targetMidi: altoFallbackTarget,
+            range: RANGES.Alto,
+            aboveMidi: tenorMidi ?? bassMidi,
+            belowMidi: soprMidi,
+            avoidPcs: altoAvoid,
+            extraPenalty: altoExtraPenalty
+          }) ?? null;
+      }
+
+      if (tenorMidi === null) addRestEvent(mT, t, 1);
+      else addNoteEvent(mT, t, 1, tenorMidi);
+
+      if (altoMidi === null) addRestEvent(mA, t, 1);
+      else addNoteEvent(mA, t, 1, altoMidi);
+
+      addNoteEvent(mB, t, 1, bassMidi);
+
+      if (shouldPlace7Now && canForceResolution && resolutionPc !== null) {
+        const tenorHas7Now = tenorMidi !== null && seventhPc !== null ? pc(tenorMidi) === seventhPc : false;
+        const altoHas7Now = altoMidi !== null && seventhPc !== null ? pc(altoMidi) === seventhPc : false;
+
+        if (tenorHas7Now) {
+          pending = { voice: "Tenor", toPc: resolutionPc, atMeasure: nextMeasureNumber, atT: 0 };
+        } else if (altoHas7Now) {
+          pending = { voice: "Alto", toPc: resolutionPc, atMeasure: nextMeasureNumber, atT: 0 };
+        }
+      }
+
+      prevS = soprMidi;
+      prevA = altoMidi ?? prevA;
+      prevT = tenorMidi ?? prevT;
+      prevB = bassMidi;
+    }
+  }
+
+  ensureMeasureAttributesOnlyOnFirst(outS);
+  ensureMeasureAttributesOnlyOnFirst(outA);
+  ensureMeasureAttributesOnlyOnFirst(outT);
+  ensureMeasureAttributesOnlyOnFirst(outB);
+
+  const chordEventSample = safeChords.slice(0, 32).map((c) => ({
+    measure: Number((c as any).measure),
+    t: Number((c as any).t),
+    symbol: String((c as any).symbol)
+  }));
+
+  const out: ScoreModel = {
+    ...(inScore as any),
+    meta: {
+      ...((inScore as any).meta ?? {}),
+      ensemble: "satb",
+      harmonize: {
+        mode: "satb_from_chords_or_melody",
+        version: "0.7.3",
+        note: "If chords are empty, infer diatonic triads on strong beats from melody using key signature; chord changes may occur within a measure. Cadence downbeat forces Bass root for V->I.",
+        debug: {
+          usedInference,
+          beatsPerMeasure,
+          chordEventCount: safeChords.length,
+          chordEventSample
+        }
+      }
+    },
+    parts: [outS, outA, outT, outB]
+  };
+
+  return out;
+}

@@ -1,0 +1,8 @@
+{
+  "type": "transition",
+  "name": "range_violation",
+  "prev": { "vln1": 72, "vln2": 67, "vla": 60, "vc": 55, "cb": 43 },
+  "next": { "vln1": 108, "vln2": 67, "vla": 60, "vc": 55, "cb": 43 },
+  "pending": { "vln1": null, "vln2": null, "vla": null, "vc": null, "cb": null },
+  "expectIds": ["range_violation"]
+}

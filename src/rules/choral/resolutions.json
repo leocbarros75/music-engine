@@ -1,0 +1,10 @@
+{
+  "description": "Resolution tendencies for tendency tones.",
+  "leadingTone": {
+    "direction": "up",
+    "exceptions": ["inner_voice_step_with_bass_third"]
+  },
+  "dominantSeventh": {
+    "direction": "down"
+  }
+}

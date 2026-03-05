@@ -1,0 +1,157 @@
+import type { Settings } from "../types";
+
+const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = [
+  { label: "choral (SATB)", value: "choral" },
+  { label: "piano", value: "piano" },
+  { label: "string ensemble", value: "string_ensemble" },
+  { label: "brass ensemble", value: "brass_ensemble" },
+  { label: "orchestra", value: "orchestra" }
+];
+
+const STYLE_OPTIONS: Settings["style"][] = ["classical", "worship", "latino", "pop", "rock", "funk", "samba"];
+const LEVEL_OPTIONS: Settings["level"][] = ["beginner", "intermediate", "advanced", "professional"];
+const ACCOMP_OPTIONS: Settings["accompaniment"][] = [
+  "choral",
+  "homophonic",
+  "polyphonic",
+  "alberti_bass",
+  "heterophonic"
+];
+
+const MAJOR_KEYS = ["Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"];
+const MINOR_KEYS = ["Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "D#", "A#"];
+const TIME_OPTIONS = ["2/4", "3/4", "4/4", "6/8", "9/8", "12/8"];
+
+type Props = {
+  settings: Settings;
+  onChange: (next: Settings) => void;
+};
+
+function titleize(input: string) {
+  return input.replace(/_/g, " ");
+}
+
+export default function SettingsForm({ settings, onChange }: Props) {
+  function update<K extends keyof Settings>(key: K, value: Settings[K]) {
+    onChange({ ...settings, [key]: value });
+  }
+
+  const isMinor = settings.keySignature.toLowerCase().includes("minor");
+  const majorSelection = !isMinor && MAJOR_KEYS.includes(settings.keySignature) ? settings.keySignature : "";
+  const minorSelection = isMinor ? settings.keySignature.replace(/\s*minor$/i, "") : "";
+
+  return (
+    <div className="settings-form">
+      <div className="field">
+        <label>Title</label>
+        <input
+          value={settings.title}
+          onChange={(e) => update("title", e.target.value)}
+          placeholder="Song title"
+        />
+      </div>
+
+      <div className="field">
+        <label>Ensemble</label>
+        <select value={settings.ensemble} onChange={(e) => update("ensemble", e.target.value as Settings["ensemble"])}>
+          {ENSEMBLE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        {settings.ensemble !== "choral" && <div className="pill warn">Coming soon (SATB only for MVP)</div>}
+      </div>
+
+      <div className="field">
+        <label>Key Signature</label>
+        <div className="muted">Major</div>
+        <select
+          value={majorSelection}
+          onChange={(e) => update("keySignature", e.target.value)}
+        >
+          <option value="">Select major key</option>
+          {MAJOR_KEYS.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+        <div className="muted">Minor</div>
+        <select
+          value={minorSelection}
+          onChange={(e) => update("keySignature", e.target.value ? `${e.target.value} minor` : "")}
+        >
+          <option value="">Select minor key</option>
+          {MINOR_KEYS.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt} minor
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="field">
+        <label>Time Signature</label>
+        <input
+          list="times"
+          value={settings.timeSignature}
+          onChange={(e) => update("timeSignature", e.target.value)}
+          placeholder="4/4"
+        />
+        <datalist id="times">
+          {TIME_OPTIONS.map((opt) => (
+            <option key={opt} value={opt} />
+          ))}
+        </datalist>
+      </div>
+
+      <div className="field">
+        <label>Tempo (BPM)</label>
+        <input
+          type="number"
+          min={30}
+          max={240}
+          value={settings.tempo}
+          onChange={(e) => update("tempo", Number(e.target.value))}
+        />
+      </div>
+
+      <div className="field">
+        <label>Style</label>
+        <select value={settings.style} onChange={(e) => update("style", e.target.value as Settings["style"])}>
+          {STYLE_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>
+              {titleize(opt)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="field">
+        <label>Level</label>
+        <select value={settings.level} onChange={(e) => update("level", e.target.value as Settings["level"])}>
+          {LEVEL_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>
+              {titleize(opt)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="field">
+        <label>Accompaniment Type</label>
+        <select
+          value={settings.accompaniment}
+          onChange={(e) => update("accompaniment", e.target.value as Settings["accompaniment"])}
+        >
+          {ACCOMP_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>
+              {titleize(opt)}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,237 @@
+import type { ScoreModel } from "../score/types";
+import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
+import { applyRhythmToBassFinalCadence } from "../rhythm/applyRhythmToBassFinalCadence";
+
+export type AppSettings = {
+  title?: string;
+  ensemble?: string;
+  keySignature?: string;
+  keyFifths?: number;
+  timeSignature?: string;
+  tempo?: number;
+  style?: string;
+  level?: "beginner" | "intermediate" | "advanced" | "professional";
+  accompanimentType?: string;
+  accompaniment?: string;
+};
+
+export type ApplySettingsResult = {
+  scoreModel: ScoreModel;
+  warnings: string[];
+  detectedInputKeyFifths: number;
+  appliedTransposeSemitones: number;
+  styleUsed: string;
+  cadenceMeasures: number[];
+};
+
+function getKeyFifths(score: ScoreModel): number {
+  const m0 = score.parts?.[0]?.measures?.[0];
+  const fifths = (m0 as any)?.attributes?.key_fifths;
+  if (typeof fifths === "number" && Number.isFinite(fifths)) return fifths;
+  return 0;
+}
+
+function setKeyFifths(score: ScoreModel, fifths: number): void {
+  for (const part of score.parts ?? []) {
+    const m0 = part.measures?.[0];
+    if (!m0) continue;
+    if (!m0.attributes) m0.attributes = {};
+    (m0.attributes as any).key_fifths = fifths;
+  }
+}
+
+function parseKeySignature(input: string): { fifths: number; mode: "major" | "minor" } | null {
+  const raw = String(input || "").trim();
+  if (!raw) return null;
+
+  const lower = raw.toLowerCase();
+  const isMinor = lower.includes("minor") || /m$/.test(lower);
+  const match = lower.match(/^\s*([a-g])\s*([#b]?)/i);
+  if (!match) return null;
+
+  const step = match[1].toUpperCase();
+  const acc = match[2] ?? "";
+  const keyName = `${step}${acc}`;
+
+  const MAJOR: Record<string, number> = {
+    C: 0,
+    G: 1,
+    D: 2,
+    A: 3,
+    E: 4,
+    B: 5,
+    "F#": 6,
+    "C#": 7,
+    F: -1,
+    Bb: -2,
+    Eb: -3,
+    Ab: -4,
+    Db: -5,
+    Gb: -6,
+    Cb: -7
+  };
+
+  const MINOR: Record<string, number> = {
+    A: 0,
+    E: 1,
+    B: 2,
+    "F#": 3,
+    "C#": 4,
+    "G#": 5,
+    "D#": 6,
+    "A#": 7,
+    D: -1,
+    G: -2,
+    C: -3,
+    F: -4,
+    Bb: -5,
+    Eb: -6,
+    Ab: -7
+  };
+
+  const map = isMinor ? MINOR : MAJOR;
+  if (keyName in map) {
+    return { fifths: map[keyName]!, mode: isMinor ? "minor" : "major" };
+  }
+
+  return null;
+}
+
+function tonicPcFromFifthsMajor(fifths: number): number {
+  const map: Record<number, number> = {
+    "-7": 11,
+    "-6": 6,
+    "-5": 1,
+    "-4": 8,
+    "-3": 3,
+    "-2": 10,
+    "-1": 5,
+    "0": 0,
+    "1": 7,
+    "2": 2,
+    "3": 9,
+    "4": 4,
+    "5": 11,
+    "6": 6,
+    "7": 1
+  };
+  return map[String(fifths)] ?? 0;
+}
+
+function tonicPcFromFifthsMinor(fifths: number): number {
+  const map: Record<number, number> = {
+    "-7": 8,
+    "-6": 3,
+    "-5": 10,
+    "-4": 5,
+    "-3": 0,
+    "-2": 7,
+    "-1": 2,
+    "0": 9,
+    "1": 4,
+    "2": 11,
+    "3": 6,
+    "4": 1,
+    "5": 8,
+    "6": 3,
+    "7": 10
+  };
+  return map[String(fifths)] ?? 9;
+}
+
+function computeTransposeSemitones(params: {
+  detectedFifths: number;
+  detectedMode: "major" | "minor";
+  targetFifths: number;
+  targetMode: "major" | "minor";
+}): number {
+  const { detectedFifths, detectedMode, targetFifths, targetMode } = params;
+  const fromPc = detectedMode === "minor" ? tonicPcFromFifthsMinor(detectedFifths) : tonicPcFromFifthsMajor(detectedFifths);
+  const toPc = targetMode === "minor" ? tonicPcFromFifthsMinor(targetFifths) : tonicPcFromFifthsMajor(targetFifths);
+  let diff = (toPc - fromPc + 12) % 12;
+  if (diff > 6) diff -= 12;
+  return diff;
+}
+
+function transposeScoreModel(score: ScoreModel, semitones: number): void {
+  if (!semitones) return;
+  for (const part of score.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      for (const ev of measure.events ?? []) {
+        if (ev.type !== "note" || !ev.pitch) continue;
+        const midi = pitchToMidi(ev.pitch as any);
+        const shifted = midi + semitones;
+        (ev as any).midi = shifted;
+        (ev as any).pitch = midiToPitch(shifted);
+      }
+    }
+  }
+}
+
+function resolveRhythmStyle(styleRaw: string | undefined, warnings: string[]): string {
+  const normalized = String(styleRaw || "classical").toLowerCase();
+  const supported = new Set(["classical", "pop", "rock", "funk", "samba"]);
+  if (!supported.has(normalized)) {
+    warnings.push(`Style "${styleRaw}" not supported by rhythm stage. Defaulting to "classical".`);
+    return "classical";
+  }
+  return normalized;
+}
+
+export function applyAppSettings(scoreModel: ScoreModel, settings: AppSettings): ApplySettingsResult {
+  const warnings: string[] = [];
+
+  const detectedInputKeyFifths = getKeyFifths(scoreModel);
+  const detectedMode: "major" | "minor" = "major";
+
+  let target = null;
+  if (typeof settings.keyFifths === "number" && Number.isFinite(settings.keyFifths)) {
+    target = { fifths: settings.keyFifths, mode: "major" as const };
+  } else if (settings.keySignature) {
+    target = parseKeySignature(settings.keySignature);
+    if (!target) warnings.push(`Could not parse key signature "${settings.keySignature}". Using detected key.`);
+  }
+
+  let appliedTransposeSemitones = 0;
+  if (target) {
+    appliedTransposeSemitones = computeTransposeSemitones({
+      detectedFifths: detectedInputKeyFifths,
+      detectedMode,
+      targetFifths: target.fifths,
+      targetMode: target.mode
+    });
+    if (appliedTransposeSemitones !== 0) {
+      transposeScoreModel(scoreModel, appliedTransposeSemitones);
+    }
+    setKeyFifths(scoreModel, target.fifths);
+  }
+
+  const styleUsed = resolveRhythmStyle(settings.style, warnings);
+
+  if (styleUsed === "funk" || styleUsed === "samba") {
+    // eslint-disable-next-line no-console
+    console.log("[rhythm] Bass leap policy: allow larger leaps for funk/samba.");
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(`[rhythm] Bass leap policy: keep bass grounded for style=\"${styleUsed}\".`);
+  }
+
+  const rhythmResult = applyRhythmToBassFinalCadence(scoreModel, {
+    style: styleUsed as any,
+    role: "bass",
+    applyOnlyFinalCadence: true,
+    warnOnly: true,
+    level: settings.level
+  });
+
+  warnings.push(...(rhythmResult.warnings ?? []));
+
+  return {
+    scoreModel,
+    warnings,
+    detectedInputKeyFifths,
+    appliedTransposeSemitones,
+    styleUsed,
+    cadenceMeasures: rhythmResult.appliedMeasureNumbers ?? []
+  };
+}

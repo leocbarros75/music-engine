@@ -1,0 +1,53 @@
+#!/bin/zsh
+set -euo pipefail
+
+cd ~/Desktop/music-engine
+
+mkdir -p tmp
+
+export XML="./tests/musicxml/test_4bar_melody_c_major.xml"
+
+# Build request JSON
+node <<'NODE' > ./tmp/request.json
+const fs = require("fs");
+const xml = fs.readFileSync(process.env.XML, "utf8");
+const body = {
+  musicxml: xml,
+  chords: [
+    { measure: 1, t: 0, symbol: "C" },
+    { measure: 2, t: 0, symbol: "F" },
+    { measure: 3, t: 0, symbol: "G7" },
+    { measure: 4, t: 0, symbol: "C" }
+  ],
+  options: { keepMelodyInSoprano: true }
+};
+
+process.stdout.write(JSON.stringify(body));
+NODE
+
+# Call server safely: write to a temp file, validate JSON, then move into place
+tmp_json="./tmp/satb_response.json.tmp"
+out_json="./tmp/satb_response.json"
+
+rm -f "$tmp_json" "$out_json"
+
+curl -sS -f -X POST "http://localhost:3001/harmonize_satb_from_chords" \
+  -H "Content-Type: application/json" \
+  -d @./tmp/request.json \
+  -o "$tmp_json"
+
+# Validate response is valid JSON and not empty
+node -e 'const fs=require("fs"); const s=fs.readFileSync(process.argv[1],"utf8"); if(!s || !s.trim()) { throw new Error("Empty response JSON"); } JSON.parse(s);' "$tmp_json"
+
+mv -f "$tmp_json" "$out_json"
+
+# Quick sanity check
+node -e 'const j=require("./tmp/satb_response.json"); console.log("ok:", j.ok); console.log("parts:", (j.scoreModel?.parts||[]).map(p=>p.name).join(", ")); for (const p of (j.scoreModel?.parts||[])) { const ms=p.measures||[]; const counts=ms.map(m => (m.events||[]).filter(e=>e.type==="note").length); console.log(`${p.name} measures: ${ms.length} noteCounts: ${counts.join(",")}`); }'
+
+# Export SATB scoreModel -> MusicXML using the SATB exporter
+npx tsx scripts/exportSatbResponseToMusicxml.ts ./tmp/satb_response.json ./tmp/satb_out.musicxml
+
+# Open the MusicXML
+open ./tmp/satb_out.musicxml
+
+echo "DONE: opened ./tmp/satb_out.musicxml"

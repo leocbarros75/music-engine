@@ -1,0 +1,22 @@
+{
+  "type": "candidate",
+  "name": "cello_free_range",
+  "slice": {
+    "index": 0,
+    "measure": 1,
+    "t": 0,
+    "dur": 1,
+    "melodyMidi": 67,
+    "chordSymbol": "C",
+    "isStrongBeat": true
+  },
+  "prevVoicing": { "vln1": null, "vln2": null, "vla": null, "vc": 48, "cb": 36 },
+  "keyFifths": 0,
+  "keyMode": "major",
+  "rhythmState": {
+    "totalAttacks": 5,
+    "perVoice": { "vln1": 0, "vln2": 0, "vla": 0, "vc": 1, "cb": 4 }
+  },
+  "expectVoice": "vc",
+  "expectMinMidi": 60
+}

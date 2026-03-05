@@ -1,0 +1,119 @@
+import { XMLParser } from "fast-xml-parser";
+import crypto from "crypto";
+function asArray(x) {
+    if (!x)
+        return [];
+    return Array.isArray(x) ? x : [x];
+}
+function makeId(prefix) {
+    return `${prefix}_${crypto.randomBytes(6).toString("hex")}`;
+}
+export function musicxmlToScoreModel(xml) {
+    const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: "@_",
+        allowBooleanAttributes: true
+    });
+    const doc = parser.parse(xml);
+    const spw = doc["score-partwise"];
+    if (!spw) {
+        throw new Error("Not a score-partwise MusicXML document.");
+    }
+    // PART LIST map id -> name
+    const partList = spw["part-list"];
+    const scoreParts = asArray(partList?.["score-part"]);
+    const partNameById = {};
+    for (const p of scoreParts) {
+        const id = p?.["@_id"];
+        const nm = p?.["part-name"];
+        if (id)
+            partNameById[id] = typeof nm === "string" ? nm : (nm?.["#text"] ?? "Part");
+    }
+    const partsXml = asArray(spw["part"]);
+    let globalDivisions = 480; // default fallback
+    const parts = partsXml.map((pXml) => {
+        const part_id = pXml?.["@_id"] ?? "P1";
+        const name = partNameById[part_id] ?? "Piano";
+        const measuresXml = asArray(pXml["measure"]);
+        let currentDivisions = globalDivisions;
+        const measures = measuresXml.map((mXml) => {
+            const number = Number(mXml?.["@_number"] ?? 1);
+            const attributes = mXml["attributes"];
+            // read divisions / key / time (if present)
+            const div = attributes?.["divisions"] != null ? Number(attributes["divisions"]) : undefined;
+            if (div && Number.isFinite(div))
+                currentDivisions = div;
+            if (number === 1 && div && Number.isFinite(div))
+                globalDivisions = div;
+            const keyFifths = attributes?.["key"]?.["fifths"] != null ? Number(attributes["key"]["fifths"]) : undefined;
+            const beats = attributes?.["time"]?.["beats"] != null ? Number(attributes["time"]["beats"]) : undefined;
+            const beatType = attributes?.["time"]?.["beat-type"] != null
+                ? Number(attributes["time"]["beat-type"])
+                : undefined;
+            const notesXml = asArray(mXml["note"]);
+            let t = 0;
+            // For <chord/> notes: they share the same onset as the previous note
+            let lastOnset = 0;
+            const events = notesXml.map((nXml, idx) => {
+                const dur = nXml["duration"] != null ? Number(nXml["duration"]) : 0;
+                const voice = nXml["voice"] != null ? Number(nXml["voice"]) : 1;
+                const staff = nXml["staff"] != null ? Number(nXml["staff"]) : 1;
+                const isRest = nXml["rest"] != null;
+                const isChordTone = nXml["chord"] != null;
+                // onset: if chord tone, do NOT advance time
+                const onset = isChordTone ? lastOnset : t;
+                const id = makeId(`P${part_id}_M${number}_N${idx}`);
+                let ev;
+                if (isRest) {
+                    ev = { id, t: onset, dur, type: "rest", voice, staff, isRest: true };
+                }
+                else {
+                    const pitchXml = nXml["pitch"];
+                    const step = pitchXml?.["step"];
+                    const octave = pitchXml?.["octave"];
+                    if (!step || octave == null) {
+                        ev = { id, t: onset, dur, type: "rest", voice, staff, isRest: true };
+                    }
+                    else {
+                        const alter = pitchXml?.["alter"] != null ? Number(pitchXml["alter"]) : undefined;
+                        const pitch = { step: String(step), octave: Number(octave) };
+                        if (alter !== undefined && Number.isFinite(alter))
+                            pitch.alter = alter;
+                        ev = { id, t: onset, dur, type: "note", pitch, voice, staff };
+                    }
+                }
+                // update lastOnset and time cursor
+                if (!isChordTone) {
+                    lastOnset = onset;
+                    t += dur;
+                }
+                return ev;
+            });
+            return {
+                number,
+                attributes: {
+                    divisions: currentDivisions,
+                    key_fifths: keyFifths,
+                    time: beats && beatType ? { beats, beat_type: beatType } : undefined
+                },
+                events
+            };
+        });
+        return {
+            part_id,
+            name,
+            instrument: "piano",
+            staves: 2,
+            measures
+        };
+    });
+    return {
+        score_id: makeId("SCORE"),
+        meta: {
+            ensemble: "piano_solo"
+        },
+        global: { divisions: globalDivisions },
+        parts
+    };
+}
+//# sourceMappingURL=musicxmlToScoreModel.js.map

@@ -1,0 +1,142 @@
+# Electron App Repo Skill (music-engine)
+
+## Goal
+Create an Electron desktop app that uses the existing music-engine Node/TS server and scripts to:
+- load a real MusicXML file
+- configure generation settings (title, ensemble, key, time, tempo, style, level, accompaniment texture)
+- run harmonize + rhythm steps
+- export MusicXML
+- open the result
+- show logs and warnings
+
+## Repo paths (source of truth)
+- Repo root: `~/Desktop/music-engine`
+- Server entry: `src/server.ts` (HTTP on port 3001 by default)
+- Health: `GET http://localhost:3001/health`
+- Harmonize: `POST http://localhost:3001/harmonize_satb_from_chords`
+- Exporter script: `scripts/exportSatbResponseToMusicxml.ts`
+- Rhythm apply script: `scripts/applyRhythmToSatbResponse.ts`
+- Test harness script example: `scripts/runSatbTest_rhythm_noChords.zsh`
+
+## Non-negotiables
+- Do not move pipelines into `scripts/`.
+- Do not break existing server routes.
+- Prefer new app code under `apps/electron/` (keep `src/` for engine).
+- Warnings: print and continue (do not crash the app).
+- Style: unknown style => warn + default to classical.
+- Use quarter-beat units; do not invent new timing semantics.
+
+## App architecture (recommended)
+Use Electron + Vite + React (fast UI), with a Node backend inside Electron main process.
+- `apps/electron/`
+  - `package.json`
+  - `electron/`
+    - `main.ts` (Electron main process)
+    - `preload.ts` (secure IPC bridge)
+  - `renderer/`
+    - `index.html`
+    - `src/` (React UI)
+  - `shared/` (types)
+- Keep the engine repo root as-is.
+
+## Security model
+- `contextIsolation: true`
+- `nodeIntegration: false`
+- Use `preload.ts` to expose a minimal `window.api`:
+  - `selectMusicXmlFile()`
+  - `runGenerateJob(settings)`
+  - `openFile(path)`
+  - `onLog(cb)`
+- Never expose arbitrary filesystem access to renderer.
+- Validate file extensions: `.musicxml`, `.xml`, `.mxl` (if supported later).
+
+## Server management
+### Requirement
+Electron must NOT fail if the server is already running.
+
+### Strategy
+On app start:
+1) try `GET /health` on `http://localhost:3001/health`
+2) if ok -> reuse existing server
+3) else spawn server process:
+   - command: `npx`
+   - args: `tsx`, `src/server.ts`
+   - cwd: repo root (`~/Desktop/music-engine`)
+4) stream stdout/stderr into app log view
+5) re-check `/health` with retries (short, finite) and then proceed
+
+If port 3001 is occupied but not our server:
+- warn user and allow choosing another port (future)
+- for now: try `PORT=3002` spawn, then use that base URL
+
+## Generate workflow (MVP)
+Inputs in UI:
+- Title (string)
+- Ensemble (enum): SATB choral | piano | string ensemble | brass ensemble | orchestra
+- Key signature (string / enum; for now informational unless engine uses it)
+- Time signature (e.g., 4/4, 3/4, 2/4)
+- Tempo BPM (number)
+- Style (enum): classical | worship | latino | pop | rock | funk | samba
+- Level (enum): beginner | intermediate | advanced | professional
+- Texture (enum): choral | homophonic | polyphonic | alberti bass | heterophonic
+- Upload MusicXML file
+
+MVP generation steps (keep it aligned with current engine):
+1) Read MusicXML file as string
+2) POST to `/harmonize_satb_from_chords` with:
+   - `musicxml: <string>`
+   - `chords: []` (let engine infer)
+   - `options: { keepMelodyInSoprano: true }`
+3) Save response JSON to `./tmp/app_satb_response.json`
+4) Apply rhythm only on final cadence:
+   - run: `npx tsx scripts/applyRhythmToSatbResponse.ts ./tmp/app_satb_response.json ./tmp/app_satb_response_rhythm.json <style>`
+   - If `<style>` not supported, warn + use `classical`
+5) Export MusicXML:
+   - run: `npx tsx scripts/exportSatbResponseToMusicxml.ts ./tmp/app_satb_response_rhythm.json ./tmp/app_out.musicxml`
+6) Open output:
+   - Electron shell open, OR `open ./tmp/app_out.musicxml` on macOS
+
+Note:
+- For now, ensemble choices other than SATB should be UI-only (warn: “not implemented yet”)
+- Keep the app honest: show what is implemented vs planned
+
+## Logging
+Match repo conventions:
+- `[warn] ...`
+- `[rhythm] ...`
+- `[cadence] ...`
+Renderer log panel should show:
+- timestamp
+- channel (info/warn/error)
+- message
+
+## File outputs
+Write all app-generated artifacts under:
+- `~/Desktop/music-engine/tmp/`
+Examples:
+- `tmp/app_request.json`
+- `tmp/app_satb_response.json`
+- `tmp/app_satb_response_rhythm.json`
+- `tmp/app_out.musicxml`
+
+## PDF / image future (planned, not MVP)
+- PDF ingestion is not implemented yet.
+- Put a placeholder UI: “PDF import (coming soon)”
+- When added later, use a dedicated module for OMR/recognition; do not mix into harmonizer.
+
+## Dev commands (must work)
+From repo root:
+- install app deps:
+  - `cd apps/electron`
+  - `npm install`
+- run dev:
+  - `npm run dev`
+- build:
+  - `npm run build`
+
+## Expectations for Codex output
+When Codex edits files:
+- always provide full file contents (line 1 to end)
+- include exact terminal commands to create/move/open/run files
+- do not add comments that cause zsh errors when pasted into terminal
+  (avoid pasting raw `# ...` lines directly unless they are inside a file)

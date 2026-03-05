@@ -54,34 +54,6 @@ function functionTagFromDegree(deg: number | null): RomanAnalysis["functionTag"]
   return "other";
 }
 
-function detectSecondaryDominant(
-  chordRootPc: number,
-  key: KeyEstimate
-): { roman: string; secondaryOf: string } | null {
-  const tonicPc = tonicNameToPc(key.tonic);
-  const scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
-
-  for (let i = 0; i < 7; i++) {
-    const targetDeg = i + 1;
-    if (targetDeg === 1) continue;
-
-    const targetPc = mod12(tonicPc + scale[i]);
-    const vOfTarget = mod12(targetPc + 7);
-
-    if (vOfTarget === mod12(chordRootPc)) {
-      const targetRoman =
-        targetDeg === 2 ? "ii" :
-        targetDeg === 3 ? "iii" :
-        targetDeg === 4 ? "IV" :
-        targetDeg === 5 ? "V" :
-        targetDeg === 6 ? "vi" :
-        "vii°";
-      return { roman: `V/${targetRoman}`, secondaryOf: targetRoman };
-    }
-  }
-  return null;
-}
-
 function isSeventhChordQuality(q: string): boolean {
   return q === "dom7" || q === "maj7" || q === "min7" || q === "hdim7" || q === "dim7";
 }
@@ -160,14 +132,96 @@ function borrowedMixtureRomanIfAny(
   const q = String(chord?.quality ?? "").toLowerCase();
 
   // Common borrowed chords in major:
-  // bIII (rel=3) major triad
-  // bVI  (rel=8) major triad
-  // bVII (rel=10) major triad
   if (q === "maj" && rel === 3) return { roman: "bIII", degree: 3, functionTag: "tonic" };
   if (q === "maj" && rel === 8) return { roman: "bVI", degree: 6, functionTag: "predominant" };
   if (q === "maj" && rel === 10) return { roman: "bVII", degree: 7, functionTag: "predominant" };
 
-  // Borrowed iv is already handled diatonically (degree 4) when root is diatonic (IV) and quality is min.
+  return null;
+}
+
+function targetRomanFromDegree(targetDeg: number): string {
+  return (
+    targetDeg === 2 ? "ii" :
+    targetDeg === 3 ? "iii" :
+    targetDeg === 4 ? "IV" :
+    targetDeg === 5 ? "V" :
+    targetDeg === 6 ? "vi" :
+    "vii°"
+  );
+}
+
+function diatonicPcSetForKey(key: KeyEstimate): Set<number> {
+  const tonicPc = tonicNameToPc(key.tonic);
+  const scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
+  const s = new Set<number>();
+  for (const rel of scale) s.add(mod12(tonicPc + rel));
+  return s;
+}
+
+function chordHasChromaticTone(chord: ChordInfo, key: KeyEstimate): boolean {
+  const pcs = Array.isArray(chord?.pcs) ? chord.pcs : [];
+  const diatonic = diatonicPcSetForKey(key);
+  for (const pc of pcs) {
+    const p = mod12(pc);
+    if (!diatonic.has(p)) return true;
+  }
+  return false;
+}
+
+/**
+ * Secondary function detection (Phase 4.3, conservative)
+ *
+ * Detect:
+ * - V/target as dom7 always (strong evidence)
+ * - V/target as MAJOR TRIAD only when the chord contains chromatic tones outside the key scale
+ * - vii°/target as dim / ø7 / °7 (these are typically chromatic anyway)
+ *
+ * Returns the roman string and "secondaryOf" = the target roman (expected resolution).
+ */
+function detectSecondaryFunction(
+  chord: ChordInfo,
+  key: KeyEstimate
+): { roman: string; secondaryOf: string } | null {
+  const rootPc = chord?.rootPc;
+  if (typeof rootPc !== "number") return null;
+
+  const q = String(chord?.quality ?? "").toLowerCase();
+
+  const tonicPc = tonicNameToPc(key.tonic);
+  const scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
+
+  const hasChromatic = chordHasChromaticTone(chord, key);
+
+  for (let i = 0; i < 7; i++) {
+    const targetDeg = i + 1;
+    if (targetDeg === 1) continue;
+
+    const targetPc = mod12(tonicPc + scale[i]);
+    const vOfTarget = mod12(targetPc + 7);
+    const ltOfTarget = mod12(targetPc - 1);
+
+    const targetRoman = targetRomanFromDegree(targetDeg);
+
+    // V/target as dom7 (allow even if chord tones happen to be diatonic)
+    if (q === "dom7" && mod12(rootPc) === vOfTarget) {
+      return { roman: `V/${targetRoman}`, secondaryOf: targetRoman };
+    }
+
+    // V/target as major triad ONLY with chromatic evidence
+    if (q === "maj" && hasChromatic && mod12(rootPc) === vOfTarget) {
+      return { roman: `V/${targetRoman}`, secondaryOf: targetRoman };
+    }
+
+    // vii°/target as dim / ø7 / °7
+    if ((q === "dim" || q === "hdim7" || q === "dim7") && mod12(rootPc) === ltOfTarget) {
+      const base =
+        q === "hdim7" ? "viiø7" :
+        q === "dim7" ? "vii°7" :
+        "vii°";
+      return { roman: `${base}/${targetRoman}`, secondaryOf: targetRoman };
+    }
+  }
+
   return null;
 }
 
@@ -179,9 +233,9 @@ export function analyzeRomanNumeral(chord: ChordInfo, key: KeyEstimate, notes: s
   const deg = degreeFromPcInKey(chord.rootPc, key);
   const functionTag = functionTagFromDegree(deg);
 
-  // 1) Secondary dominants: only for dominant-7 quality
-  if (chord.quality === "dom7") {
-    const sec = detectSecondaryDominant(chord.rootPc, key);
+  // 1) Secondary function chords (Phase 4.3, conservative)
+  {
+    const sec = detectSecondaryFunction(chord, key);
     if (sec) {
       const fig = inversionFigure(chord);
       const roman = applyInversionToRoman(sec.roman, fig);

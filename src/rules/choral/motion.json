@@ -1,0 +1,6 @@
+{
+  "description": "Preferred melodic motion shapes for choral lines.",
+  "prefer": ["step", "third"],
+  "largeLeapRequires": "compensating_step",
+  "avoid": ["augmented_second", "augmented_fourth_up", "diminished_fifth_down"]
+}

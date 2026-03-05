@@ -1,0 +1,44 @@
+export type EnsembleOption = "choral" | "piano" | "string_ensemble" | "brass_ensemble" | "orchestra";
+export type StyleOption = "classical" | "worship" | "latino" | "pop" | "rock" | "funk" | "samba";
+export type LevelOption = "beginner" | "intermediate" | "advanced" | "professional";
+export type AccompanimentOption = "choral" | "homophonic" | "polyphonic" | "alberti_bass" | "heterophonic";
+
+export type Settings = {
+  title: string;
+  ensemble: EnsembleOption;
+  keySignature: string;
+  timeSignature: string;
+  tempo: number;
+  style: StyleOption;
+  level: LevelOption;
+  accompaniment: AccompanimentOption;
+};
+
+export type MusicXmlFile = {
+  path: string;
+  name: string;
+};
+
+export type JobRequest = {
+  settings: Settings;
+  filePath: string;
+  prompt: string;
+};
+
+export type JobResult = {
+  ok: boolean;
+  outputPath?: string;
+  serverBaseUrl?: string;
+  styleUsed?: string;
+  cadenceMeasures?: number[];
+  warnings: string[];
+  error?: string;
+};
+
+export type LogLevel = "info" | "warn" | "error";
+
+export type LogEntry = {
+  ts: string;
+  level: LogLevel;
+  message: string;
+};

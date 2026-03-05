@@ -1,0 +1,8 @@
+{
+  "type": "transition",
+  "name": "weak_passing_dissonance",
+  "isStrongBeat": false,
+  "prev": { "vln1": 60, "vln2": null, "vla": null, "vc": null, "cb": 48 },
+  "next": { "vln1": 61, "vln2": null, "vla": null, "vc": null, "cb": 48 },
+  "expectIds": ["passing_dissonance"]
+}

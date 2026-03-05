@@ -1,5 +1,18 @@
-import type { ScoreModel } from "../score/types";
-import { pitchToMidi } from "../instruments/instrumentCatalog";
+/**
+ * Legacy harmony analyzer (v1) — FROZEN
+ *
+ * Legacy routes:
+ * - /analyze_harmony_v1
+ * - /attach_harmony_v1
+ *
+ * Policy:
+ * - Treat this module as frozen. Prefer creating a v2 module instead of extending v1.
+ * - Only apply minimal bug fixes that preserve output shape and semantics.
+ * - Do not add new features here (new features belong in v2).
+ */
+
+import type { ScoreModel } from "../../score/types";
+import { pitchToMidi } from "../../instruments/instrumentCatalog";
 import type {
   HarmonyAnalysis,
   HarmonyChord,
@@ -63,7 +76,7 @@ type Pattern = {
   intervals: number[]; // pitch-class intervals from root
 };
 
-// Common-practice core set (Phase 1)
+// Common-practice core set (v1)
 const PATTERNS: Pattern[] = [
   { quality: "maj", intervals: [0, 4, 7] },
   { quality: "min", intervals: [0, 3, 7] },
@@ -88,17 +101,14 @@ function bestChordMatch(pcs: number[], bassPc: number | null): Match | null {
       const expected = pat.intervals.map((i) => (root + i) % 12);
       const expectedSet = new Set(expected);
 
-      // Coverage score: how much of the chord is present
       let present = 0;
       for (const e of expectedSet) if (set.has(e)) present++;
 
       const coverage = present / expectedSet.size;
 
-      // Penalty for extra tones (helps avoid labeling clusters as a triad)
       const extras = pcs.filter((x) => !expectedSet.has(x)).length;
       const extraPenalty = extras > 0 ? Math.min(0.35, extras * 0.12) : 0;
 
-      // Bass agreement helps inversions/root detection
       let bassBoost = 0;
       if (bassPc !== null && expectedSet.has(bassPc)) bassBoost = 0.08;
 
@@ -117,7 +127,6 @@ function bestChordMatch(pcs: number[], bassPc: number | null): Match | null {
     }
   }
 
-  // Reject very weak fits
   if (best && best.score < 0.45) return null;
   return best;
 }
@@ -125,22 +134,21 @@ function bestChordMatch(pcs: number[], bassPc: number | null): Match | null {
 function computeInversion(
   rootPc: number,
   quality: ChordQuality,
-  bassPc:: number | null,
+  bassPc: number | null,
   chordPcs: number[]
 ): 0 | 1 | 2 | 3 {
   if (bassPc === null) return 0;
 
-  // chordPcs is already normalized (root + pattern)
   const uniq = Array.from(new Set(chordPcs));
-  // For triads: 0=root,1=3rd,2=5th. For 7ths: 3=7th.
   const idx = uniq.findIndex((x) => x === bassPc);
   if (idx < 0) return 0;
+
   if (quality === "maj" || quality === "min" || quality === "dim" || quality === "aug") {
     if (idx === 0) return 0;
     if (idx === 1) return 1;
     return 2;
   }
-  // 7th-chords
+
   if (idx === 0) return 0;
   if (idx === 1) return 1;
   if (idx === 2) return 2;
@@ -151,13 +159,11 @@ function getMeasureKeySignature(m: any): KeySignature | undefined {
   const fifths = m?.attributes?.key_fifths;
   if (typeof fifths !== "number") return undefined;
 
-  // Phase 1: mode is unknown; we can add heuristic later.
   const mode: HarmonyMode = "unknown";
   return { fifths, mode };
 }
 
 function collectOnsetNotesInMeasure(score: ScoreModel, measureIndex: number): Map<number, number[]> {
-  // Map onset t -> MIDI notes (concert pitch)
   const map = new Map<number, number[]>();
 
   for (const part of score.parts ?? []) {
@@ -186,21 +192,19 @@ function pickBassPc(midiNotes: number[]): number | null {
 }
 
 /**
- * Phase 1 harmony analyzer:
+ * Phase 1 harmony analyzer (v1):
  * - per measure
  * - on each onset time inside the measure, compute a chord label from pitch classes
  * - concert pitch only
+ *
+ * @deprecated v1 is frozen. Prefer using v2 analysis routes/modules for new work.
  */
 export function analyzeHarmonyPerMeasure(score: ScoreModel): HarmonyAnalysis {
-  const measureCount = Math.max(
-    0,
-    ...(score.parts ?? []).map((p) => (p.measures ?? []).length)
-  );
+  const measureCount = Math.max(0, ...(score.parts ?? []).map((p) => (p.measures ?? []).length));
 
   const measures: HarmonyMeasure[] = [];
 
   for (let mi = 0; mi < measureCount; mi++) {
-    // Use first part’s measure attributes as the key-signature source
     const firstMeasure = (score.parts?.[0]?.measures ?? [])[mi];
     const key = getMeasureKeySignature(firstMeasure);
 
@@ -251,12 +255,15 @@ export function analyzeHarmonyPerMeasure(score: ScoreModel): HarmonyAnalysis {
 
 /**
  * Helper to attach analysis into score.meta.harmony (internal only).
+ *
+ * @deprecated v1 is frozen. Prefer attaching v2 analysis in a dedicated v2 pipeline.
  */
 export function attachHarmonyToScore(score: ScoreModel): ScoreModel {
   const harmony = analyzeHarmonyPerMeasure(score);
 
   const meta = {
     ...(score.meta ?? {}),
+    ensemble: (score.meta as any)?.ensemble ?? "unknown",
     harmony
   };
 

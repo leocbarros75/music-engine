@@ -1,0 +1,8 @@
+{
+  "type": "transition",
+  "name": "recovery_after_leap",
+  "prev": { "vln1": 72, "vln2": 67, "vla": 60, "vc": 55, "cb": 43 },
+  "next": { "vln1": 72, "vln2": 67, "vla": 67, "vc": 55, "cb": 43 },
+  "pending": { "vln1": null, "vln2": null, "vla": "up", "vc": null, "cb": null },
+  "expectIds": ["recovery_missed"]
+}

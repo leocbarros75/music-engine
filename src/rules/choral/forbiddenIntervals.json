@@ -1,0 +1,11 @@
+{
+  "description": "Intervals to avoid in parallel motion.",
+  "parallelPerfect": {
+    "intervalClasses": [0, 7],
+    "labels": ["P1/P8", "P5"]
+  },
+  "directPerfect": {
+    "intervalClasses": [0, 7],
+    "upperVoiceLeapSemitones": 5
+  }
+}

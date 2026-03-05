@@ -1,0 +1,9 @@
+{
+  "description": "Adjacent voice spacing limits. Upper voices within an octave; tenor-bass can be wider.",
+  "adjacentMaxSemitones": {
+    "SA": 12,
+    "AT": 12,
+    "TB": 19
+  },
+  "allowOpenVoicing": true
+}

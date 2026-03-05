@@ -1,0 +1,23 @@
+{
+  "name": "music-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test:harmony": "bash tests/harmony/runHarmonyTests.sh",
+    "test:harmony:beat": "bash tests/harmony/runHarmonyTests.sh beat",
+    "test:harmony:measure": "bash tests/harmony/runHarmonyTests.sh measure",
+    "app": "npm --prefix apps/electron run dev",
+    "app:install": "npm --prefix apps/electron install"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.3.3"
+  }
+}

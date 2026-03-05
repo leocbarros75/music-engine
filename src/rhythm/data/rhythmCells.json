@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0",
+  "unit": "quarter",
+  "cells": [
+    { "id": "4_4_whole", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [4], "label": "4/4: whole", "tags": ["grounded"] },
+    { "id": "4_4_half_half", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [2, 2], "label": "4/4: 2+2", "tags": ["grounded"] },
+    { "id": "4_4_half_q_q", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [2, 1, 1], "label": "4/4: 2+1+1", "tags": ["balanced"] },
+    { "id": "4_4_q_q_half", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [1, 1, 2], "label": "4/4: 1+1+2", "tags": ["balanced"] },
+    { "id": "4_4_dottedHalf_q", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [3, 1], "label": "4/4: 3+1", "tags": ["cadence","grounded"] },
+    { "id": "4_4_q_half_q", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [1, 2, 1], "label": "4/4: 1+2+1", "tags": ["balanced"] },
+
+    { "id": "4_4_eighth_x8", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5], "label": "4/4: 8 eighths", "tags": ["busy","syncopated"] },
+    { "id": "4_4_4eighth_half", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [0.5,0.5,0.5,0.5,2], "label": "4/4: 4e + 2", "tags": ["pickup","balanced"] },
+    { "id": "4_4_half_4eighth", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [2,0.5,0.5,0.5,0.5], "label": "4/4: 2 + 4e", "tags": ["balanced"] },
+
+    { "id": "4_4_q_2e_q_2e", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [1,0.5,0.5,1,0.5,0.5], "label": "4/4: q ee q ee", "tags": ["syncopated"] },
+    { "id": "4_4_4e_2q", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [0.5,0.5,0.5,0.5,1,1], "label": "4/4: 4e + 2q", "tags": ["balanced"] },
+    { "id": "4_4_2q_4e", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [1,1,0.5,0.5,0.5,0.5], "label": "4/4: 2q + 4e", "tags": ["balanced"] },
+
+    { "id": "4_4_ee_q_ee_q", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [0.5,0.5,1,0.5,0.5,1], "label": "4/4: ee q ee q", "tags": ["syncopated"] },
+    { "id": "4_4_e_q_e", "meter": { "beats": 4, "beatType": 4 }, "unit": "quarter", "durs": [0.5,1,0.5,2], "label": "4/4: e q e (then hold)", "tags": ["pickup"] },
+
+    { "id": "2_4_half", "meter": { "beats": 2, "beatType": 4 }, "unit": "quarter", "durs": [2], "label": "2/4: half", "tags": ["grounded","cadence"] },
+    { "id": "3_4_dottedHalf", "meter": { "beats": 3, "beatType": 4 }, "unit": "quarter", "durs": [3], "label": "3/4: dotted half", "tags": ["grounded","cadence"] },
+    { "id": "3_4_half_q", "meter": { "beats": 3, "beatType": 4 }, "unit": "quarter", "durs": [2,1], "label": "3/4: 2+1", "tags": ["balanced"] },
+    { "id": "3_4_q_half", "meter": { "beats": 3, "beatType": 4 }, "unit": "quarter", "durs": [1,2], "label": "3/4: 1+2", "tags": ["balanced"] },
+
+    { "id": "6_8_dottedQuarter_dottedQuarter", "meter": { "beats": 6, "beatType": 8 }, "unit": "quarter", "durs": [1.5, 1.5], "label": "6/8: dq + dq", "tags": ["compound","grounded"] },
+    { "id": "6_8_threeEighth_threeEighth", "meter": { "beats": 6, "beatType": 8 }, "unit": "quarter", "durs": [0.5,0.5,0.5,0.5,0.5,0.5], "label": "6/8: 6 eighths", "tags": ["compound","busy"] }
+  ]
+}

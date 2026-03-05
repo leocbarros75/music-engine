@@ -20,7 +20,7 @@ type PercMap = {
 
 function getTransposeForInstrument(instrument: string | undefined): TransposeSpec | null {
   if (!instrument) return null;
-  const id = instrument.toLowerCase();
+  const id = instrument.toLowerCase().replace(/\s+/g, "_");
 
   if (
     id === "trumpet_bb" ||
@@ -44,7 +44,12 @@ function getTransposeForInstrument(instrument: string | undefined): TransposeSpe
     return { diatonic: -4, chromatic: -7, octaveChange: 0 };
   }
 
-  if (id === "bass" || id === "electric_bass" || id === "contrabass" || id === "double_bass") {
+  if (id === "contrabass" || id === "double_bass") {
+    // Traditional notation: write one octave higher than sounding.
+    return { diatonic: 0, chromatic: 0, octaveChange: -1 };
+  }
+
+  if (id === "bass" || id === "electric_bass") {
     return { diatonic: 0, chromatic: 0, octaveChange: -1 };
   }
 
@@ -102,6 +107,108 @@ function durToType(divisions: number, dur: number): string | null {
   if (dur === divisions / 2) return "eighth";
   if (dur === divisions / 4) return "16th";
   return null;
+}
+
+function beatsToDivisionsDuration(durBeats: number, divisions: number): number {
+  if (!Number.isFinite(durBeats) || durBeats <= 0) return Math.max(1, divisions);
+  if (!Number.isFinite(divisions) || divisions <= 0) return Math.max(1, Math.round(durBeats));
+  const raw = durBeats * divisions;
+  const rounded = Math.round(raw);
+  const epsilon = 1e-6;
+  if (Math.abs(raw - rounded) < epsilon) return Math.max(1, rounded);
+  return Math.max(1, rounded);
+}
+
+const SHARP_ORDER = ["F", "C", "G", "D", "A", "E", "B"];
+const FLAT_ORDER = ["B", "E", "A", "D", "G", "C", "F"];
+
+function keySignatureAlter(step: string, keyFifths: number): number {
+  const s = String(step || "").toUpperCase();
+  if (!s) return 0;
+  if (keyFifths > 0) {
+    const idx = Math.min(keyFifths, 7);
+    return SHARP_ORDER.slice(0, idx).includes(s) ? 1 : 0;
+  }
+  if (keyFifths < 0) {
+    const idx = Math.min(Math.abs(keyFifths), 7);
+    return FLAT_ORDER.slice(0, idx).includes(s) ? -1 : 0;
+  }
+  return 0;
+}
+
+function accidentalFromAlterForDisplay(alter: number): string | null {
+  if (alter === 0) return "natural";
+  if (alter === 1) return "sharp";
+  if (alter === -1) return "flat";
+  if (alter === 2) return "double-sharp";
+  if (alter === -2) return "double-flat";
+  return null;
+}
+
+function normalizePitchForKey(p: Pitch, keyFifths: number): Pitch {
+  const pc = mod(pitchToMidi(p), 12);
+
+  const flatTargets = [
+    [],
+    [10],
+    [10, 3],
+    [10, 3, 8],
+    [10, 3, 8, 1],
+    [10, 3, 8, 1, 6],
+    [10, 3, 8, 1, 6, 11],
+    [10, 3, 8, 1, 6, 11, 4]
+  ];
+
+  const sharpTargets = [
+    [],
+    [6],
+    [6, 1],
+    [6, 1, 8],
+    [6, 1, 8, 3],
+    [6, 1, 8, 3, 10],
+    [6, 1, 8, 3, 10, 5],
+    [6, 1, 8, 3, 10, 5, 0]
+  ];
+
+  const flatsByPc: Record<number, { step: string; alter: number }> = {
+    10: { step: "B", alter: -1 },
+    3: { step: "E", alter: -1 },
+    8: { step: "A", alter: -1 },
+    1: { step: "D", alter: -1 },
+    6: { step: "G", alter: -1 },
+    11: { step: "C", alter: -1 },
+    4: { step: "F", alter: -1 }
+  };
+
+  const sharpsByPc: Record<number, { step: string; alter: number }> = {
+    6: { step: "F", alter: 1 },
+    1: { step: "C", alter: 1 },
+    8: { step: "G", alter: 1 },
+    3: { step: "D", alter: 1 },
+    10: { step: "A", alter: 1 },
+    5: { step: "E", alter: 1 },
+    0: { step: "B", alter: 1 }
+  };
+
+  if (keyFifths < 0) {
+    const idx = Math.min(Math.abs(keyFifths), 7);
+    if (flatTargets[idx]?.includes(pc)) {
+      const mapped = flatsByPc[pc];
+      if (mapped) return { ...p, step: mapped.step, alter: mapped.alter };
+    }
+    return p;
+  }
+
+  if (keyFifths > 0) {
+    const idx = Math.min(Math.abs(keyFifths), 7);
+    if (sharpTargets[idx]?.includes(pc)) {
+      const mapped = sharpsByPc[pc];
+      if (mapped) return { ...p, step: mapped.step, alter: mapped.alter };
+    }
+    return p;
+  }
+
+  return p;
 }
 
 function clefForPart(p: { instrument?: string; part_id?: string; name?: string }, fallback: "G" | "F" = "G"): ClefSpec {
@@ -378,10 +485,51 @@ function scoreInstrumentXml(partId: string, pm: PercMap): { score: string; midi:
   return { score, midi };
 }
 
+function cadenceTypeToLabel(type: string): string {
+  const t = String(type ?? "").toLowerCase();
+  if (t === "authentic_perfect") return "PAC";
+  if (t === "authentic_imperfect") return "IAC";
+  if (t === "half") return "HC";
+  if (t === "plagal") return "PL";
+  if (t === "deceptive") return "DC";
+  if (t === "phrygian") return "Phryg";
+  if (t === "none") return "None";
+  return String(type ?? "Cadence");
+}
+
+function buildCadenceTextByMeasure(scoreModel: ScoreModel): Record<number, string> {
+  const out: Record<number, string> = {};
+
+  const cadences = (scoreModel as any)?.meta?.harmony?.cadences ?? (scoreModel as any)?.meta?.cadences ?? [];
+  if (!Array.isArray(cadences)) return out;
+
+  for (const c of cadences) {
+    const m = typeof c?.atMeasure === "number" ? c.atMeasure : null;
+    const type = typeof c?.type === "string" ? c.type : null;
+    if (!m || !type) continue;
+
+    const label = cadenceTypeToLabel(type);
+
+    const prev = String(c?.evidence?.prevRoman ?? "").trim();
+    const last = String(c?.evidence?.lastRoman ?? "").trim();
+    const ev = prev && last ? ` (${prev}→${last})` : "";
+
+    out[m] = `${label}${ev}`;
+  }
+
+  return out;
+}
+
 export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
-  const workTitle = xmlEscape(scoreModel?.meta?.ensemble ?? "ensemble");
+  const workTitle = xmlEscape((scoreModel as any)?.meta?.ensemble ?? "ensemble");
   const partsRaw = scoreModel?.parts ?? [];
   const parts = sortPartsOrchestrally(partsRaw);
+
+  const cadenceTextByMeasure = buildCadenceTextByMeasure(scoreModel);
+  const fallbackKeyFifths =
+    (scoreModel as any)?.meta?.inputKeyFifths ??
+    (scoreModel as any)?.meta?.app?.detectedInputKeyFifths;
+  let warnedMissingKey = false;
 
   const percUsedByPart: Record<string, Map<number, PercMap>> = {};
   for (const p of parts) {
@@ -391,8 +539,9 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
     const used = new Map<number, PercMap>();
     for (const m of p.measures ?? []) {
       for (const ev of m?.events ?? []) {
-        if (ev?.type !== "unpitched") continue;
-        const pm = getPercussionMap(ev.instrumentId ?? "");
+        const evAny: any = ev as any;
+        if (evAny?.type !== "unpitched") continue;
+        const pm = getPercussionMap(evAny.instrumentId ?? "");
         if (!pm) continue;
         used.set(pm.midiUnpitched, pm);
       }
@@ -431,16 +580,49 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
 
   for (const p of parts) {
     const pid = xmlEscape(p.part_id ?? "P1");
-    const transpose = getTransposeForInstrument(p.instrument);
+    const transpose = getTransposeForInstrument(p.instrument ?? p.name ?? p.part_id);
 
     out += `  <part id="${pid}">\n`;
 
-    for (const m of p.measures ?? []) {
+    const partMeasures = p.measures ?? [];
+    const lastMeasureNumber = partMeasures.length > 0 ? (partMeasures[partMeasures.length - 1]?.number ?? partMeasures.length) : 0;
+
+    const defaultDivisions =
+      (scoreModel as any)?.global?.divisions ??
+      (partMeasures[0]?.attributes?.divisions ?? 480);
+    let currentDivisions = Number.isFinite(defaultDivisions) ? Number(defaultDivisions) : 480;
+    let currentKeyFifths: number | undefined = undefined;
+    let currentKeyMode = "";
+    let currentTimeBeats = 4;
+    let currentTimeBeatType = 4;
+    let lastAttrKey: string | null = null;
+
+    for (const m of partMeasures) {
       const mNum = m.number ?? 1;
-      const divisions = m?.attributes?.divisions ?? scoreModel?.global?.divisions ?? 480;
-      const concertFifths = m?.attributes?.key_fifths ?? 0;
-      const timeBeats = m?.attributes?.time?.beats ?? 4;
-      const timeBeatType = m?.attributes?.time?.beat_type ?? 4;
+      const attrs = m?.attributes ?? {};
+      const hasDivisionsAttr = Number.isFinite((attrs as any)?.divisions);
+      const nextDivisions = hasDivisionsAttr ? Number((attrs as any).divisions) : currentDivisions;
+
+      let concertFifths = typeof (attrs as any)?.key_fifths === "number" ? (attrs as any).key_fifths : currentKeyFifths;
+      if (typeof concertFifths !== "number" && typeof fallbackKeyFifths === "number") {
+        concertFifths = fallbackKeyFifths;
+        if (!warnedMissingKey) {
+          warnedMissingKey = true;
+          // eslint-disable-next-line no-console
+          console.warn("[export] Missing key_fifths on measures; using inputKeyFifths fallback.");
+        }
+      }
+      if (typeof concertFifths !== "number") concertFifths = 0;
+
+      const timeBeats = Number.isFinite((attrs as any)?.time?.beats)
+        ? Number((attrs as any).time.beats)
+        : currentTimeBeats;
+      const timeBeatType = Number.isFinite((attrs as any)?.time?.beat_type)
+        ? Number((attrs as any).time.beat_type)
+        : currentTimeBeatType;
+
+      const rawMode = String((attrs as any)?.key_mode ?? currentKeyMode ?? "").toLowerCase();
+      const keyMode = rawMode === "minor" || rawMode === "major" ? rawMode : (currentKeyMode || "");
 
       const concert = isConcertKeyInstrument(p.instrument);
 
@@ -453,86 +635,205 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
       const isGrandStaff = piano || staves === 2;
 
       out += `    <measure number="${mNum}">`;
-      out += `<attributes>`;
-      out += `<divisions>${divisions}</divisions>`;
-      out += `<key><fifths>${fifthsToWrite}</fifths></key>`;
-      out += `<time><beats>${timeBeats}</beats><beat-type>${timeBeatType}</beat-type></time>`;
 
-      if (isGrandStaff) out += `<staves>2</staves>`;
-
-      if (transpose && !concert) {
-        out += `<transpose>`;
-        out += `<diatonic>${transpose.diatonic}</diatonic>`;
-        out += `<chromatic>${transpose.chromatic}</chromatic>`;
-        const oc = transpose.octaveChange ?? 0;
-        if (oc !== 0) out += `<octave-change>${oc}</octave-change>`;
-        out += `</transpose>`;
+      // Optional cadence annotation (placed near top of the measure)
+      const cadText = cadenceTextByMeasure[mNum];
+      if (cadText) {
+        out += `<direction placement="above"><direction-type><words>${xmlEscape(cadText)}</words></direction-type></direction>`;
       }
 
-      if (isGrandStaff) {
-        out += `<clef number="1"><sign>G</sign><line>2</line></clef>`;
-        out += `<clef number="2"><sign>F</sign><line>4</line></clef>`;
-      } else {
-        const clef = clefForPart(p);
-        if (clef.sign === "percussion") {
-          out += `<clef><sign>percussion</sign><line>2</line></clef>`;
-        } else if (clef.sign === "C") {
-          out += `<clef><sign>C</sign><line>3</line></clef>`;
+      const clefKey = isGrandStaff
+        ? "G2|F4"
+        : (() => {
+            const clef = clefForPart(p);
+            if (clef.sign === "percussion") return "PERC2";
+            if (clef.sign === "C") return "C3";
+            return `${clef.sign}${clef.line}`;
+          })();
+      const transposeKey = transpose ? `${transpose.diatonic},${transpose.chromatic},${transpose.octaveChange ?? 0}` : "0,0,0";
+      const attrKey = [
+        nextDivisions,
+        fifthsToWrite,
+        keyMode,
+        timeBeats,
+        timeBeatType,
+        isGrandStaff ? 2 : 1,
+        clefKey,
+        transposeKey
+      ].join("|");
+
+      const attrChanged = lastAttrKey === null || attrKey !== lastAttrKey;
+      if (attrChanged) {
+        out += `<attributes>`;
+        out += `<divisions>${nextDivisions}</divisions>`;
+        if (keyMode) {
+          out += `<key><fifths>${fifthsToWrite}</fifths><mode>${keyMode}</mode></key>`;
         } else {
-          out += `<clef><sign>${clef.sign}</sign><line>${clef.line}</line></clef>`;
+          out += `<key><fifths>${fifthsToWrite}</fifths></key>`;
         }
+        out += `<time><beats>${timeBeats}</beats><beat-type>${timeBeatType}</beat-type></time>`;
+
+        if (isGrandStaff) out += `<staves>2</staves>`;
+
+        if (transpose && !concert) {
+          out += `<transpose>`;
+          out += `<diatonic>${transpose.diatonic}</diatonic>`;
+          out += `<chromatic>${transpose.chromatic}</chromatic>`;
+          const oc = transpose.octaveChange ?? 0;
+          if (oc !== 0) out += `<octave-change>${oc}</octave-change>`;
+          out += `</transpose>`;
+        }
+
+        if (isGrandStaff) {
+          out += `<clef number="1"><sign>G</sign><line>2</line></clef>`;
+          out += `<clef number="2"><sign>F</sign><line>4</line></clef>`;
+        } else {
+          const clef = clefForPart(p);
+          if (clef.sign === "percussion") {
+            out += `<clef><sign>percussion</sign><line>2</line></clef>`;
+          } else if (clef.sign === "C") {
+            out += `<clef><sign>C</sign><line>3</line></clef>`;
+          } else {
+            out += `<clef><sign>${clef.sign}</sign><line>${clef.line}</line></clef>`;
+          }
+        }
+
+        out += `</attributes>`;
       }
 
-      out += `</attributes>`;
+      currentDivisions = nextDivisions;
+      currentKeyFifths = concertFifths;
+      currentKeyMode = keyMode;
+      currentTimeBeats = timeBeats;
+      currentTimeBeatType = timeBeatType;
+      lastAttrKey = attrKey;
 
-      const events = (m.events ?? []).slice().sort((a: any, b: any) => (a.t ?? 0) - (b.t ?? 0));
+      const measureBeats = (Number(timeBeats) || 4) * (4 / (Number(timeBeatType) || 4));
+      const measureDur = beatsToDivisionsDuration(measureBeats, currentDivisions);
+      const events = (m.events ?? []).slice();
+      const byVoice = new Map<number, any[]>();
 
       for (const ev of events) {
-        const dur = ev.dur ?? divisions;
-        const voice = ev.voice ?? 1;
-        const staff = isGrandStaff ? (ev.staff ?? 1) : 1;
-        const type = durToType(divisions, dur);
+        const v = (ev as any).voice ?? 1;
+        const list = byVoice.get(v) ?? [];
+        list.push(ev);
+        byVoice.set(v, list);
+      }
 
-        if (ev.type === "rest") {
-          out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
-          if (type) out += `<type>${type}</type>`;
-          out += `<staff>${staff}</staff></note>`;
-          continue;
+      const voiceNumbers = Array.from(byVoice.keys()).sort((a, b) => a - b);
+      for (let vi = 0; vi < voiceNumbers.length; vi++) {
+        const voice = voiceNumbers[vi] ?? 1;
+        if (vi > 0) {
+          out += `<backup><duration>${measureDur}</duration></backup>`;
         }
 
-        if (ev.type === "unpitched") {
-          const pm = getPercussionMap(ev.instrumentId ?? "");
-          if (!pm) {
-            out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
-            if (type) out += `<type>${type}</type>`;
-            out += `<staff>${staff}</staff></note>`;
+        const voiceEvents = (byVoice.get(voice) ?? [])
+          .slice()
+          .sort((a: any, b: any) => (a.t ?? 0) - (b.t ?? 0));
+        let cursor = 0;
+        let idx = 0;
+        const EPS = 1e-6;
+        while (idx < voiceEvents.length) {
+          const ev0: any = voiceEvents[idx] as any;
+          const rawT = Number(ev0?.t ?? cursor);
+          let t = Number.isFinite(rawT) ? rawT : cursor;
+          if (t < cursor - EPS) t = cursor;
+          if (t > cursor + EPS) {
+            const gapBeats = t - cursor;
+            const gapDur = beatsToDivisionsDuration(gapBeats, currentDivisions);
+            const restType = durToType(currentDivisions, gapDur);
+            const gapStaff = isGrandStaff ? (ev0?.staff ?? 1) : 1;
+            out += `<note><rest/><duration>${gapDur}</duration><voice>${voice}</voice>`;
+            if (restType) out += `<type>${restType}</type>`;
+            out += `<staff>${gapStaff}</staff></note>`;
+            cursor = t;
+          }
+
+          const group: any[] = [];
+          while (idx < voiceEvents.length) {
+            const candidate: any = voiceEvents[idx] as any;
+            const ct = Number(candidate?.t ?? cursor);
+            if (!Number.isFinite(ct)) break;
+            if (Math.abs(ct - t) > EPS) break;
+            group.push(candidate);
+            idx += 1;
+          }
+
+          if (!group.length) {
+            idx += 1;
             continue;
           }
 
-          const instXmlId = `${pid}-I${pm.midiUnpitched}`;
+          const notes = group.filter((g) => g?.type === "note" || g?.type === "unpitched");
+          const rests = group.filter((g) => g?.type === "rest");
+          const useGroup = notes.length ? notes : rests;
 
-          out += `<note>`;
-          out += `<unpitched><display-step>${pm.displayStep}</display-step><display-octave>${pm.displayOctave}</display-octave></unpitched>`;
-          out += `<duration>${dur}</duration>`;
-          out += `<instrument id="${xmlEscape(instXmlId)}"/>`;
-          out += `<voice>${voice}</voice>`;
-          if (type) out += `<type>${type}</type>`;
-          if (pm.notehead && pm.notehead !== "normal") out += `<notehead>${pm.notehead}</notehead>`;
-          out += `<staff>${staff}</staff>`;
-          out += `</note>`;
-          continue;
-        }
+          let groupMaxDur = 0;
+          for (let gi = 0; gi < useGroup.length; gi++) {
+            const evAny: any = useGroup[gi] as any;
+            const durBeats = Number.isFinite(evAny.dur) ? Number(evAny.dur) : 1;
+            const dur = beatsToDivisionsDuration(durBeats, currentDivisions);
+            if (durBeats > groupMaxDur) groupMaxDur = durBeats;
+            const staff = isGrandStaff ? (evAny.staff ?? 1) : 1;
+            const type = durToType(currentDivisions, dur);
 
-        if (ev.type === "note" && ev.pitch?.step) {
-          const wp = toWrittenPitch(ev.pitch, transpose, p.instrument);
-          out += `<note><pitch><step>${xmlEscape(wp.step)}</step>`;
-          if (typeof wp.alter === "number" && wp.alter !== 0) out += `<alter>${wp.alter}</alter>`;
-          out += `<octave>${wp.octave}</octave></pitch>`;
-          out += `<duration>${dur}</duration><voice>${voice}</voice>`;
-          if (type) out += `<type>${type}</type>`;
-          out += `<staff>${staff}</staff></note>`;
-          continue;
+            if (evAny.type === "rest") {
+              out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
+              if (type) out += `<type>${type}</type>`;
+              out += `<staff>${staff}</staff></note>`;
+              continue;
+            }
+
+            if (evAny.type === "unpitched") {
+              const pm = getPercussionMap(evAny.instrumentId ?? "");
+              if (!pm) {
+                out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
+                if (type) out += `<type>${type}</type>`;
+                out += `<staff>${staff}</staff></note>`;
+                continue;
+              }
+
+              const instXmlId = `${pid}-I${pm.midiUnpitched}`;
+
+              out += `<note>`;
+              if (gi > 0) out += `<chord/>`;
+              out += `<unpitched><display-step>${pm.displayStep}</display-step><display-octave>${pm.displayOctave}</display-octave></unpitched>`;
+              out += `<duration>${dur}</duration>`;
+              out += `<instrument id="${xmlEscape(instXmlId)}"/>`;
+              out += `<voice>${voice}</voice>`;
+              if (type) out += `<type>${type}</type>`;
+              if (pm.notehead && pm.notehead !== "normal") out += `<notehead>${pm.notehead}</notehead>`;
+              out += `<staff>${staff}</staff>`;
+              out += `</note>`;
+              continue;
+            }
+
+            if (evAny.type === "note" && evAny.pitch?.step) {
+              const wpBase = toWrittenPitch(evAny.pitch, transpose, p.instrument);
+              const wp = evAny.preserveSpelling ? wpBase : normalizePitchForKey(wpBase, fifthsToWrite);
+              const alterVal = typeof wp.alter === "number" ? wp.alter : 0;
+              const expectedAlter = keySignatureAlter(wp.step, fifthsToWrite);
+              const accidental =
+                alterVal === expectedAlter ? null : accidentalFromAlterForDisplay(alterVal);
+              out += `<note>`;
+              if (gi > 0 || evAny.chord === true) out += `<chord/>`;
+              out += `<pitch><step>${xmlEscape(wp.step)}</step>`;
+              if (typeof wp.alter === "number" && wp.alter !== 0) out += `<alter>${wp.alter}</alter>`;
+              out += `<octave>${wp.octave}</octave></pitch>`;
+              out += `<duration>${dur}</duration><voice>${voice}</voice>`;
+              if (type) out += `<type>${type}</type>`;
+              if (accidental) out += `<accidental>${accidental}</accidental>`;
+              out += `<staff>${staff}</staff></note>`;
+              continue;
+            }
+          }
+          cursor = Math.max(cursor, t + groupMaxDur);
         }
+      }
+
+      // Final barline on the last measure of the part
+      if (mNum === lastMeasureNumber) {
+        out += `<barline location="right"><bar-style>light-heavy</bar-style></barline>`;
       }
 
       out += `</measure>\n`;

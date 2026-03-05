@@ -1,0 +1,8 @@
+{
+  "type": "transition",
+  "name": "parallel_perfects",
+  "isStrongBeat": true,
+  "prev": { "vln1": 60, "vln2": 55, "vla": 52, "vc": 48, "cb": 36 },
+  "next": { "vln1": 62, "vln2": 57, "vla": 53, "vc": 50, "cb": 38 },
+  "expectIds": ["parallel_perfect"]
+}

@@ -30,6 +30,13 @@ export type ChordInfo = {
   bassPc: number | null; // 0..11 (lowest pitch class detected in the window)
   quality: ChordQuality;
   name: string; // "C", "G7", "F#m", etc
+
+  // Optional but recommended:
+  // 0..1 confidence from chord detection (used by roman suppression).
+  confidence?: number;
+
+  // Raw detector score (implementation detail, still useful for debugging).
+  score?: number;
 };
 
 export type RomanAnalysis = {
@@ -72,32 +79,48 @@ export type CadenceDetection = {
   };
 };
 
+export type HarmonyWarningType =
+  | "cadential64_skipped"
+  | "secondary_resolution"
+  | "low_confidence_roman_suppressed";
+
+export type HarmonyWarning = {
+  atMeasure: number;
+  atBeat?: number;
+  type: HarmonyWarningType;
+  message: string;
+  expected?: string;
+  found?: string;
+};
+
+export type HarmonyEngineInfo = {
+  phase: string; // e.g. "4.2"
+  granularity: "measure" | "beat";
+  romanNumerals: true;
+  tonicizations: "brief";
+  sustainPolicy: "none" | "carry" | "overlap";
+
+  // Added in phase 4.2
+  romanMinConfidence?: number;
+  suppressLowConfidenceRoman?: boolean;
+};
+
 export type HarmonyAnalysisResult =
   | {
       ok: true;
-      engine: {
-        phase: string; // "3.2"
-        granularity: "measure";
-        romanNumerals: true;
-        tonicizations: "brief";
-        sustainPolicy: "overlap";
-      };
+      engine: HarmonyEngineInfo & { granularity: "measure" };
       key: KeyEstimate;
       measures: MeasureHarmony[];
       cadences: CadenceDetection[];
+      warnings?: HarmonyWarning[];
     }
   | {
       ok: true;
-      engine: {
-        phase: string; // "3.2"
-        granularity: "beat";
-        romanNumerals: true;
-        tonicizations: "brief";
-        sustainPolicy: "overlap";
-      };
+      engine: HarmonyEngineInfo & { granularity: "beat" };
       key: KeyEstimate;
       beats: BeatHarmony[];
       cadences: CadenceDetection[];
+      warnings?: HarmonyWarning[];
     };
 
 export type HarmonyAnalysisError = {
@@ -114,5 +137,12 @@ export type HarmonyAnalyzeRequest = {
     forceKey?: { tonic: string; mode: "major" | "minor" };
     maxMeasures?: number;
     ignorePercussion?: boolean;
+
+    // Added: sustain handling (already used by analyzeHarmony)
+    sustainPolicy?: "none" | "carry" | "overlap";
+
+    // Added: roman suppression controls (phase 4.2)
+    romanMinConfidence?: number; // 0..1
+    suppressLowConfidenceRoman?: boolean;
   };
 };

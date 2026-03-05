@@ -1,0 +1,8 @@
+{
+  "type": "candidates",
+  "name": "divisi_disabled",
+  "slice": { "measure": 1, "t": 0, "dur": 4, "melodyMidi": 72, "chordSymbol": "C" },
+  "keyFifths": 0,
+  "keyMode": "major",
+  "expectSingleNote": true
+}

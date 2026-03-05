@@ -1,0 +1,12 @@
+{
+  "type": "transition",
+  "name": "rhythm_balance_penalty",
+  "isStrongBeat": true,
+  "prev": { "vln1": 60, "vln2": null, "vla": null, "vc": null, "cb": 48 },
+  "next": { "vln1": 62, "vln2": null, "vla": null, "vc": null, "cb": 50 },
+  "rhythmState": {
+    "totalAttacks": 10,
+    "perVoice": { "vln1": 8, "vln2": 1, "vla": 0, "vc": 0, "cb": 1 }
+  },
+  "expectIds": ["rhythm_balance"]
+}

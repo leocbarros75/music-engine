@@ -225,18 +225,27 @@ export function applyParticipationByPhrase(score: ScoreModel, rules: Participati
 
       if (play) return m;
 
+      const restEvent: {
+        id: string;
+        t: number;
+        dur: number;
+        type: "rest";
+        isRest: true;
+        voice: number;
+        staff: number;
+      } = {
+        id: `REST_${m.number ?? mi + 1}_P${partIndex}`,
+        t: 0,
+        dur,
+        type: "rest",
+        isRest: true,
+        voice: 1,
+        staff: 1
+      };
+
       return {
         ...m,
-        events: [
-          {
-            id: `REST_${m.number ?? mi + 1}_P${partIndex}`,
-            t: 0,
-            dur,
-            type: "rest",
-            voice: 1,
-            staff: 1
-          }
-        ]
+        events: [restEvent]
       };
     });
 

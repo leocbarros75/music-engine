@@ -1,0 +1,8 @@
+{
+  "type": "transition",
+  "name": "parallel_fifths",
+  "prev": { "vln1": 72, "vln2": 67, "vla": 60, "vc": 55, "cb": 43 },
+  "next": { "vln1": 74, "vln2": 69, "vla": 62, "vc": 57, "cb": 45 },
+  "pending": { "vln1": null, "vln2": null, "vla": null, "vc": null, "cb": null },
+  "expectIds": ["parallel_perfect"]
+}

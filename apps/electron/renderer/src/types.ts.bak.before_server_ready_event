@@ -1,0 +1,16 @@
+import type { JobRequest, JobResult, LogEntry, MusicXmlFile, Settings } from "../../shared/ipcTypes";
+
+export type { JobRequest, JobResult, LogEntry, MusicXmlFile, Settings };
+
+declare global {
+  interface Window {
+    api: {
+      selectMusicXmlFile: () => Promise<MusicXmlFile | null>;
+      runGenerateJob: (payload: JobRequest) => Promise<JobResult>;
+      openFile: (path: string) => Promise<void>;
+      onLog: (cb: (entry: LogEntry) => void) => () => void;
+    };
+  }
+}
+
+export {};

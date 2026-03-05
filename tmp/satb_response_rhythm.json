@@ -1,0 +1,916 @@
+{
+  "ok": true,
+  "scoreModel": {
+    "meta": {
+      "ensemble": "satb",
+      "harmonize": {
+        "mode": "satb_from_chords_or_melody",
+        "version": "0.7.3",
+        "note": "If chords are empty, infer diatonic triads on strong beats from melody using key signature; final cadence enforces Bass root on final I at t=0.",
+        "debug": {
+          "usedInference": true,
+          "beatsPerMeasure": 4,
+          "chordEventCount": 4,
+          "chordEventSample": [
+            {
+              "measure": 1,
+              "t": 0,
+              "symbol": "C"
+            },
+            {
+              "measure": 2,
+              "t": 0,
+              "symbol": "F"
+            },
+            {
+              "measure": 3,
+              "t": 0,
+              "symbol": "G7"
+            },
+            {
+              "measure": 4,
+              "t": 0,
+              "symbol": "C"
+            }
+          ]
+        }
+      },
+      "app": {
+        "settingsUsed": {},
+        "detectedInputKeyFifths": 0,
+        "appliedTransposeSemitones": 0,
+        "exporterDivisions": 4,
+        "warnings": [
+          "[rhythm] Applied Bass rhythm cell \"4_4_whole\" (4/4: whole) on final cadence measures: 3, 4. style=\"classical\" meter=4/4."
+        ],
+        "styleUsed": "classical",
+        "cadenceMeasures": [
+          3,
+          4
+        ]
+      }
+    },
+    "parts": [
+      {
+        "part_id": "P_S",
+        "name": "Soprano",
+        "measures": [
+          {
+            "number": 1,
+            "attributes": {
+              "divisions": 1,
+              "time": {
+                "beats": 4,
+                "beat_type": 4,
+                "beatType": 4
+              },
+              "key_fifths": 0
+            },
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 65
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 65
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 69
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 65
+              }
+            ]
+          },
+          {
+            "number": 3,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 67
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 65
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 62
+              }
+            ]
+          },
+          {
+            "number": 4,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 64
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "D",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "alter": 0,
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "rest",
+                "t": 3,
+                "dur": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "P_A",
+        "name": "Alto",
+        "measures": [
+          {
+            "number": 1,
+            "attributes": {
+              "divisions": 1,
+              "time": {
+                "beats": 4,
+                "beat_type": 4,
+                "beatType": 4
+              },
+              "key_fifths": 0
+            },
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 4
+                },
+                "midi": 60
+              }
+            ]
+          },
+          {
+            "number": 3,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "D",
+                  "octave": 4
+                },
+                "midi": 62
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "midi": 59
+              }
+            ]
+          },
+          {
+            "number": 4,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "midi": 55
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "midi": 55
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "G",
+                  "octave": 3
+                },
+                "midi": 55
+              },
+              {
+                "type": "rest",
+                "t": 3,
+                "dur": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "P_T",
+        "name": "Tenor",
+        "measures": [
+          {
+            "number": 1,
+            "attributes": {
+              "divisions": 1,
+              "time": {
+                "beats": 4,
+                "beat_type": 4,
+                "beatType": 4
+              },
+              "key_fifths": 0
+            },
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "midi": 57
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "midi": 57
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "midi": 57
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "A",
+                  "octave": 3
+                },
+                "midi": 57
+              }
+            ]
+          },
+          {
+            "number": 3,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "midi": 59
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "midi": 59
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 3
+                },
+                "midi": 59
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "F",
+                  "octave": 3
+                },
+                "midi": 53
+              }
+            ]
+          },
+          {
+            "number": 4,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "E",
+                  "octave": 3
+                },
+                "midi": 52
+              },
+              {
+                "type": "rest",
+                "t": 3,
+                "dur": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "part_id": "P_B",
+        "name": "Bass",
+        "measures": [
+          {
+            "number": 1,
+            "attributes": {
+              "divisions": 1,
+              "time": {
+                "beats": 4,
+                "beat_type": 4,
+                "beatType": 4
+              },
+              "key_fifths": 0
+            },
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              }
+            ]
+          },
+          {
+            "number": 2,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              }
+            ]
+          },
+          {
+            "number": 3,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "B",
+                  "octave": 2
+                },
+                "midi": 47
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "B",
+                  "octave": 2
+                },
+                "midi": 47
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 2
+                },
+                "midi": 47
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "B",
+                  "octave": 2
+                },
+                "midi": 47
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "B",
+                  "octave": 2
+                },
+                "midi": 47
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "B",
+                  "octave": 2
+                },
+                "midi": 47
+              }
+            ]
+          },
+          {
+            "number": 4,
+            "events": [
+              {
+                "type": "note",
+                "t": 0,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 0.5,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 1,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 2,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 2.5,
+                "dur": 0.5,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              },
+              {
+                "type": "note",
+                "t": 3,
+                "dur": 1,
+                "pitch": {
+                  "step": "C",
+                  "octave": 3
+                },
+                "midi": 48
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "meta": {
+    "rhythm": {
+      "applied": true,
+      "style": "funk",
+      "appliedCadencePair": {
+        "fromMeasure": 3,
+        "toMeasure": 4
+      },
+      "appliedMeasureNumbers": [
+        3,
+        4
+      ],
+      "chosenPlans": {
+        "3": {
+          "cellId": "4_4_ee_q_ee_q",
+          "durs": [
+            0.5,
+            0.5,
+            1,
+            0.5,
+            0.5,
+            1
+          ],
+          "label": "4/4: ee q ee q"
+        },
+        "4": {
+          "cellId": "4_4_ee_q_ee_q",
+          "durs": [
+            0.5,
+            0.5,
+            1,
+            0.5,
+            0.5,
+            1
+          ],
+          "label": "4/4: ee q ee q"
+        }
+      }
+    }
+  }
+}

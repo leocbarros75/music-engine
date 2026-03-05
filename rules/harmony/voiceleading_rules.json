@@ -11,5 +11,22 @@
     "root_position": "double_root",
     "first_inversion": "double_soprano_or_root",
     "second_inversion": "double_bass"
+  },
+  "voice_leading_constraints": {
+    "voice_crossing": {
+      "allow_voice_crossing": false,
+      "max_crossing_duration_slices": 0,
+      "allowed_on_weak_beats_only": true,
+      "ensemble_hierarchy": ["violin_1", "violin_2", "viola", "cello", "double_bass"],
+      "collision_handler": {
+        "resolution_priority": [
+          "attempt_voice_swap",
+          "attempt_octave_displacement_down",
+          "recalculate_nearest_chord_tone"
+        ]
+      },
+      "octave_displacement": { "max_octaves_down": 2 },
+      "penalties": { "crossingPenalty": 2, "unresolvedCrossingHardPenalty": 20 }
+    }
   }
 }

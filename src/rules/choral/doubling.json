@@ -1,0 +1,16 @@
+{
+  "description": "Doubling guidelines for triads and seventh chords.",
+  "rootPositionTriads": {
+    "preferDoubling": ["root"],
+    "avoidDoubling": ["third"]
+  },
+  "firstInversionTriads": {
+    "allowDoubling": ["root", "fifth"],
+    "avoidDoublingThirdInBass": true
+  },
+  "dominantSeventh": {
+    "requireAllTonesInInversions": true,
+    "rootPositionMayOmitFifth": true,
+    "seventhResolvesDownward": true
+  }
+}

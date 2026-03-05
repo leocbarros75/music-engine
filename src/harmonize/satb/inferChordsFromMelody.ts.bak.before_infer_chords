@@ -1,0 +1,207 @@
+// src/harmonize/satb/inferChordsFromMelody.ts
+import type { ScoreModel } from "../../score/types";
+
+type ChordEvent = {
+  measure: number;
+  t: number;
+  symbol: string;
+};
+
+// Pitch class helpers
+function pc(midi: number): number {
+  return ((midi % 12) + 12) % 12;
+}
+
+// Convert MusicXML key signature (fifths) to tonic pitch class for MAJOR keys.
+// We are doing A/A/A: read key signature + assume major unless you tell otherwise.
+function tonicPcFromFifthsMajor(fifths: number): number {
+  // Circle-of-fifths mapping for MAJOR keys
+  // fifths: -7..+7
+  const map: Record<number, number> = {
+    "-7": 11, // Cb = B
+    "-6": 6,  // Gb
+    "-5": 1,  // Db
+    "-4": 8,  // Ab
+    "-3": 3,  // Eb
+    "-2": 10, // Bb
+    "-1": 5,  // F
+    "0": 0,   // C
+    "1": 7,   // G
+    "2": 2,   // D
+    "3": 9,   // A
+    "4": 4,   // E
+    "5": 11,  // B
+    "6": 6,   // F#
+    "7": 1    // C#
+  };
+  const k = String(fifths);
+  return map[k] ?? 0;
+}
+
+// Major scale pcs relative to tonic
+function majorScalePcs(tonicPc: number): number[] {
+  const rel = [0, 2, 4, 5, 7, 9, 11];
+  return rel.map((x) => (tonicPc + x) % 12);
+}
+
+type DiatonicTriad = {
+  degree: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  rootPc: number;
+  pcs: number[]; // triad pcs
+  symbol: string; // simple symbol like "C", "Dm", "Em", "F", "G", "Am", "Bdim"
+};
+
+// Build diatonic triads in major
+function buildDiatonicTriadsMajor(tonicPc: number): DiatonicTriad[] {
+  const scale = majorScalePcs(tonicPc);
+
+  // Degrees 1..7 roots are scale tones
+  const root = (deg: number) => scale[deg - 1]!;
+  const third = (deg: number) => scale[(deg - 1 + 2) % 7]!;
+  const fifth = (deg: number) => scale[(deg - 1 + 4) % 7]!;
+  const triadPcs = (deg: number) => [root(deg), third(deg), fifth(deg)];
+
+  // Quality in major: I, ii, iii, IV, V, vi, vii°
+  // Symbols are “best-effort” without enharmonic spelling. Works fine for your current tests.
+  const sym = (deg: number): string => {
+    if (deg === 1) return pcName(tonicPc);
+    if (deg === 2) return pcName(root(deg)) + "m";
+    if (deg === 3) return pcName(root(deg)) + "m";
+    if (deg === 4) return pcName(root(deg));
+    if (deg === 5) return pcName(root(deg));
+    if (deg === 6) return pcName(root(deg)) + "m";
+    return pcName(root(deg)) + "dim";
+  };
+
+  const out: DiatonicTriad[] = [];
+  for (let d = 1 as 1 | 2 | 3 | 4 | 5 | 6 | 7; d <= 7; d = (d + 1) as any) {
+    out.push({
+      degree: d,
+      rootPc: root(d),
+      pcs: triadPcs(d).map((x) => x % 12),
+      symbol: sym(d)
+    });
+  }
+  return out;
+}
+
+// Simple pitch-class name (sharp-biased). Good enough for now.
+function pcName(p: number): string {
+  const names = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
+  return names[((p % 12) + 12) % 12]!;
+}
+
+function getKeyFifths(score: ScoreModel): number {
+  const m0 = score.parts?.[0]?.measures?.[0];
+  const fifths = m0?.attributes?.key?.fifths;
+  if (typeof fifths === "number" && Number.isFinite(fifths)) return fifths;
+  return 0; // default C major
+}
+
+function firstMelodyMidiInMeasure(measure: any): number | null {
+  const notes = (measure?.events ?? []).filter((e: any) => e?.type === "note" && typeof e?.midi === "number");
+  if (!notes.length) return null;
+
+  // Prefer earliest beat (t small)
+  notes.sort((a: any, b: any) => Number(a.t) - Number(b.t));
+  return Number(notes[0]!.midi);
+}
+
+// Progression preference (very small, intentional starter heuristic)
+// Lower score = preferred.
+function progressionPenalty(prevDeg: number | null, nextDeg: number): number {
+  if (prevDeg === null) return 0;
+
+  // Prefer functional motion toward V and I
+  // Common: I->IV, I->V, IV->V, ii->V, V->I, vi->ii, etc.
+  const goodPairs = new Set<string>([
+    "1->4",
+    "1->5",
+    "1->6",
+    "6->2",
+    "2->5",
+    "4->5",
+    "5->1",
+    "5->6",
+    "4->1"
+  ]);
+
+  if (prevDeg === nextDeg) return 2; // staying put is okay but not ideal
+  if (goodPairs.has(`${prevDeg}->${nextDeg}`)) return 0;
+
+  return 4; // otherwise acceptable but less preferred
+}
+
+export function inferChordsFromMelody(inScore: ScoreModel): ChordEvent[] {
+  const soprPart = inScore.parts?.[0];
+  const measures = soprPart?.measures ?? [];
+  if (!measures.length) return [];
+
+  const fifths = getKeyFifths(inScore);
+  const tonic = tonicPcFromFifthsMajor(fifths);
+  const triads = buildDiatonicTriadsMajor(tonic);
+
+  const lastMeasureNumber = Number(measures[measures.length - 1]?.number ?? measures.length);
+
+  const out: ChordEvent[] = [];
+  let prevDeg: number | null = null;
+
+  for (let i = 0; i < measures.length; i++) {
+    const m = measures[i];
+    const measureNumber = Number(m?.number ?? (i + 1));
+
+    // CADENCE RULE (A/A/A): final measure I, previous measure V (prefer V7)
+    const isLast = measureNumber === lastMeasureNumber;
+    const isPenult = measureNumber === lastMeasureNumber - 1;
+
+    if (isLast) {
+      out.push({ measure: measureNumber, t: 0, symbol: triads[0]!.symbol }); // I
+      prevDeg = 1;
+      continue;
+    }
+
+    if (isPenult) {
+      // Force V7 in major cadence. In C major this becomes G7.
+      const V = triads.find((t) => t.degree === 5)!;
+      out.push({ measure: measureNumber, t: 0, symbol: V.symbol + "7" });
+      prevDeg = 5;
+      continue;
+    }
+
+    const midi = firstMelodyMidiInMeasure(m);
+    const melPc = midi === null ? null : pc(midi);
+
+    // Candidates: diatonic triads containing melody pitch class
+    const candidates = triads
+      .filter((t) => (melPc === null ? true : t.pcs.includes(melPc)))
+      // Prefer I/IV/V/vi/ii over iii/vii°
+      .sort((a, b) => {
+        const pref = (deg: number) => {
+          if (deg === 1) return 0;
+          if (deg === 5) return 1;
+          if (deg === 4) return 2;
+          if (deg === 6) return 3;
+          if (deg === 2) return 4;
+          if (deg === 3) return 6;
+          return 9; // vii°
+        };
+        return pref(a.degree) - pref(b.degree);
+      });
+
+    // Choose by progression penalty + chord preference
+    let best = candidates[0] ?? triads[0]!;
+    let bestScore = Number.POSITIVE_INFINITY;
+    for (const c of candidates.length ? candidates : triads) {
+      const score = progressionPenalty(prevDeg, c.degree) + (c.degree === 7 ? 3 : 0);
+      if (score < bestScore) {
+        bestScore = score;
+        best = c;
+      }
+    }
+
+    out.push({ measure: measureNumber, t: 0, symbol: best.symbol });
+    prevDeg = best.degree;
+  }
+
+  return out;
+}

@@ -1,0 +1,8 @@
+{
+  "type": "transition",
+  "name": "hidden_perfect_outer",
+  "isStrongBeat": true,
+  "prev": { "vln1": 53, "vln2": null, "vla": null, "vc": null, "cb": 47 },
+  "next": { "vln1": 55, "vln2": null, "vla": null, "vc": null, "cb": 48 },
+  "expectIds": ["hidden_perfect"]
+}

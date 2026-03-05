@@ -14,18 +14,21 @@ type BeatHarmony = {
   beatNumber: number;
   chord: any;
   roman: any;
+  // internal flag so sustain carry does not overwrite a suppressed roman
+  __romanSuppressed?: boolean;
 };
 
 type MeasureHarmony = {
   measureNumber: number;
   chord: any;
   roman: any;
+  __romanSuppressed?: boolean;
 };
 
 type HarmonyWarning = {
   atMeasure: number;
   atBeat?: number;
-  type: "cadential64_skipped" | "secondary_resolution";
+  type: "cadential64_skipped" | "secondary_resolution" | "low_confidence_roman_suppressed";
   message: string;
   expected?: string;
   found?: string;
@@ -236,6 +239,19 @@ function preferSharpsFromTonicName(tonic: string | null): boolean {
   return t === "G" || t === "D" || t === "A" || t === "E" || t === "B" || t === "F#" || t === "C#";
 }
 
+function preferSharpsFromKeySigOrTonic(
+  keySig: { fifths: number; mode: "major" | "minor" | null } | null,
+  tonic: string | null
+): boolean {
+  const fifths = keySig?.fifths;
+  if (typeof fifths === "number" && Number.isFinite(fifths)) {
+    if (fifths > 0) return true;
+    if (fifths < 0) return false;
+    return preferSharpsFromTonicName(tonic);
+  }
+  return preferSharpsFromTonicName(tonic);
+}
+
 /**
  * Robust key signature extraction (because parsers store it differently).
  * Scans first few measures across parts and tries multiple common paths.
@@ -249,12 +265,19 @@ function findFirstKeySig(score: any): { fifths: number; mode: "major" | "minor" 
     ["attributes", "keySig", "fifths"],
     ["attributes", "keySignature", "fifths"],
     ["attributes", "key_signature", "fifths"],
+
+    // IMPORTANT: our MusicXML parser stores <fifths> here
+    ["attributes", "key_fifths"],
+
+    ["attributes", "fifths"],
+    ["attributes", "fifthsNumber"],
     ["attributes", "key", "fifthsNumber"],
     ["attributes", "key", "fifths_value"],
-    ["attributes", "fifths"],
+
     ["key", "fifths"],
     ["keySig", "fifths"],
-    ["keySignature", "fifths"]
+    ["keySignature", "fifths"],
+    ["key_signature", "fifths"]
   ];
 
   const MODE_PATHS: string[][] = [
@@ -262,9 +285,15 @@ function findFirstKeySig(score: any): { fifths: number; mode: "major" | "minor" 
     ["attributes", "keySig", "mode"],
     ["attributes", "keySignature", "mode"],
     ["attributes", "key_signature", "mode"],
+
+    // sometimes normalized into attributes
+    ["attributes", "key_mode"],
+    ["attributes", "mode"],
+
     ["key", "mode"],
     ["keySig", "mode"],
-    ["keySignature", "mode"]
+    ["keySignature", "mode"],
+    ["key_signature", "mode"]
   ];
 
   for (const p of parts) {
@@ -350,13 +379,11 @@ function keyFromScoreModelKeySignature(
   const fifths = ks.fifths;
   const mode = ks.mode;
 
-  // If mode is known, trust it fully.
   if (mode) {
     const k = keyFromFifths(fifths, mode);
     return k ? { ...k } : null;
   }
 
-  // Mode unknown: compare relative major vs minor by histogram fit.
   const maj = keyFromFifths(fifths, "major");
   const min = keyFromFifths(fifths, "minor");
   if (!maj || !min) return maj ? { ...maj } : min ? { ...min } : null;
@@ -512,7 +539,7 @@ function buildMeasureSnapshotsFromBeats(beats: BeatHarmony[], measureCount: numb
     }
     if (!pick) pick = arr[arr.length - 1];
 
-    out.push({ measureNumber: m, chord: pick.chord, roman: pick.roman });
+    out.push({ measureNumber: m, chord: pick.chord, roman: pick.roman, __romanSuppressed: pick.__romanSuppressed });
   }
 
   return out;
@@ -652,6 +679,9 @@ function applySustainCarryToBeats(beats: BeatHarmony[], sustainPolicy: SustainPo
       continue;
     }
 
+    // Do not overwrite a roman that we intentionally suppressed.
+    if (b.__romanSuppressed) continue;
+
     if (!lastNonNC) continue;
 
     b.chord = lastNonNC.chord;
@@ -669,6 +699,88 @@ function isDominantOf(domRootPc: number, tonicRootPc: number): boolean {
 }
 
 /**
+ * Confidence helpers (Roman suppression)
+ *
+ * We use chord.detect confidence if present.
+ * Fallback rules are conservative: only mark low confidence when the chord is obviously ambiguous.
+ */
+function clamp01(x: number): number {
+  if (!Number.isFinite(x)) return 0;
+  if (x < 0) return 0;
+  if (x > 1) return 1;
+  return x;
+}
+
+function chordConfidence(chord: any): number {
+  const c1 = typeof chord?.confidence === "number" ? chord.confidence : null;
+  const c2 = typeof chord?.score === "number" ? chord.score : null;
+  const c3 = typeof chord?.matchScore === "number" ? chord.matchScore : null;
+
+  if (c1 !== null) return clamp01(c1);
+  if (c2 !== null) return clamp01(c2);
+  if (c3 !== null) return clamp01(c3);
+
+  const qSeen = String(chord?.quality ?? "").toLowerCase();
+  const rootOk = typeof chord?.rootPc === "number" && Number.isFinite(chord.rootPc);
+  const pcs = Array.isArray(chord?.pcs) ? chord.pcs : [];
+
+  // If detectChord couldn't really decide, treat as low confidence
+  if (!rootOk) return 0.2;
+  if (qSeen === "unknown") return 0.25;
+  if (pcs.length <= 1) return 0.25;
+
+  // If we have a named, rooted chord, assume reasonable confidence
+  return 0.9;
+}
+
+function makeNCRoman(notes: string[]): any {
+  return {
+    roman: "N.C.",
+    degree: null,
+    functionTag: "other",
+    notes: Array.isArray(notes) ? notes : []
+  };
+}
+
+function maybeSuppressRoman(params: {
+  chord: any;
+  roman: any;
+  notes: string[];
+  minConfidence: number;
+  enable: boolean;
+  warnings: HarmonyWarning[];
+  atMeasure: number;
+  atBeat?: number;
+}): { roman: any; suppressed: boolean } {
+  const { chord, roman, notes, minConfidence, enable, warnings, atMeasure, atBeat } = params;
+
+  if (!enable) return { roman, suppressed: false };
+
+  const r = String(roman?.roman ?? "");
+  if (!r || looksLikeNC(r)) return { roman, suppressed: false };
+
+  const conf = chordConfidence(chord);
+  if (conf >= minConfidence) return { roman, suppressed: false };
+
+  const chordName = String(chord?.name ?? "");
+  const quality = String(chord?.quality ?? "");
+  const pcs = Array.isArray(chord?.pcs) ? chord.pcs : [];
+
+  warnings.push({
+    atMeasure,
+    atBeat,
+    type: "low_confidence_roman_suppressed",
+    message: `Suppressed roman numeral due to low chord confidence (${conf.toFixed(3)} < ${minConfidence.toFixed(3)}).`,
+    expected: `confidence>=${minConfidence.toFixed(3)}`,
+    found: `confidence=${conf.toFixed(3)} roman=${r} chord=${chordName || "?"} quality=${quality || "?"} pcs=${JSON.stringify(
+      pcs
+    )}`
+  });
+
+  return { roman: makeNCRoman(notes), suppressed: true };
+}
+
+/**
  * Phase 4 key stabilizer:
  * If the ending shows a dominant -> tonic cadence (by chord roots), anchor the key to that tonic.
  * This uses chord roots + quality only, so it does not depend on roman output.
@@ -678,11 +790,12 @@ function anchorKeyFromCadenceIfNeeded(params: {
   measureCount: number;
   ignorePercussion: boolean;
   key: any;
+  keySig: { fifths: number; mode: "major" | "minor" | null } | null;
   hadKeySig: boolean;
   hadMetaKey: boolean;
   hadForceKey: boolean;
 }): any {
-  const { score, measureCount, ignorePercussion, key, hadKeySig, hadMetaKey, hadForceKey } = params;
+  const { score, measureCount, ignorePercussion, key, keySig, hadKeySig, hadMetaKey, hadForceKey } = params;
 
   if (hadForceKey) return key;
   if (hadMetaKey) return key;
@@ -724,7 +837,7 @@ function anchorKeyFromCadenceIfNeeded(params: {
   if (!(prevIsDom7 || prevIsTriad)) return key;
   if (!isDominantOf(prevRoot, lastRoot)) return key;
 
-  const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+  const preferSharps = preferSharpsFromKeySigOrTonic(keySig, key?.tonic ?? null);
   const tonicName = pcToName(lastRoot, preferSharps);
   const mode = lastQ === "maj" ? "major" : "minor";
 
@@ -737,22 +850,19 @@ function anchorKeyFromCadenceIfNeeded(params: {
 
 /**
  * Phase 0 key stabilizer for short excerpts with no key signature/meta.
- * If the final non-empty chord is a clear triad, anchor the key to that tonic.
- *
- * Updated rule:
- * - If the excerpt is short and ends on a triad that is the dominant of the opening triad,
- *   prefer the opening triad as tonic (common half-cadence behavior: I -> V).
+ * (Only runs when hadKeySig/hadMetaKey/hadForceKey are false.)
  */
 function anchorKeyToFinalTriadIfNeeded(params: {
   score: any;
   measureCount: number;
   ignorePercussion: boolean;
   key: any;
+  keySig: { fifths: number; mode: "major" | "minor" | null } | null;
   hadKeySig: boolean;
   hadMetaKey: boolean;
   hadForceKey: boolean;
 }): any {
-  const { score, measureCount, ignorePercussion, key, hadKeySig, hadMetaKey, hadForceKey } = params;
+  const { score, measureCount, ignorePercussion, key, keySig, hadKeySig, hadMetaKey, hadForceKey } = params;
   if (hadForceKey) return key;
   if (hadMetaKey) return key;
   if (hadKeySig) return key;
@@ -760,7 +870,6 @@ function anchorKeyToFinalTriadIfNeeded(params: {
   const curConf = typeof key?.confidence === "number" ? key.confidence : 0;
   if (curConf >= 0.98) return key;
 
-  // Identify last triad (scan backward)
   let lastTriadRoot: number | null = null;
   let lastTriadQuality: "maj" | "min" | null = null;
 
@@ -782,7 +891,32 @@ function anchorKeyToFinalTriadIfNeeded(params: {
 
   if (lastTriadRoot === null || lastTriadQuality === null) return key;
 
-  // Identify opening triad (scan forward)
+  // Also find the triad immediately before the last triad (for short-excerpt cadence heuristics).
+  let prevTriadRoot: number | null = null;
+  let prevTriadQuality: "maj" | "min" | null = null;
+
+  let seenLast = false;
+  for (let mi = measureCount - 1; mi >= 0; mi--) {
+    const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, mi, ignorePercussion);
+    if (!pcs || pcs.length === 0) continue;
+
+    const chord = detectChordFromPcs(pcs, true, bassPc);
+    const q = String(chord?.quality ?? "").toLowerCase();
+    const rootPc = typeof chord?.rootPc === "number" ? chord.rootPc : null;
+    if (rootPc === null) continue;
+
+    if (q !== "maj" && q !== "min") continue;
+
+    if (!seenLast) {
+      seenLast = true;
+      continue;
+    }
+
+    prevTriadRoot = rootPc;
+    prevTriadQuality = q as any;
+    break;
+  }
+
   let firstTriadRoot: number | null = null;
   let firstTriadQuality: "maj" | "min" | null = null;
 
@@ -802,16 +936,35 @@ function anchorKeyToFinalTriadIfNeeded(params: {
     break;
   }
 
-  // Half-cadence protection (short excerpts): if last triad is V of the first triad, keep the first triad as tonic
+  // Applied dominant to dominant (V/V -> V) at the end of a short excerpt.
+  // If prev triad is dominant of last triad, treat last triad as V and infer tonic a fifth below.
+  if (
+    measureCount <= 4 &&
+    prevTriadRoot !== null &&
+    prevTriadQuality !== null &&
+    lastTriadQuality === "maj" &&
+    isDominantOf(prevTriadRoot, lastTriadRoot)
+  ) {
+    const preferSharps = preferSharpsFromKeySigOrTonic(keySig, key?.tonic ?? null);
+    const inferredTonicPc = normPc(lastTriadRoot - 7); // a fifth below last
+    const tonicName = pcToName(inferredTonicPc, preferSharps);
+
+    return {
+      tonic: tonicName,
+      mode: "major",
+      confidence: Math.max(curConf, 0.99)
+    };
+  }
+
+  // Short excerpt that ends on V of the opening triad -> anchor to opening triad (half cadence).
   if (
     firstTriadRoot !== null &&
     firstTriadQuality !== null &&
     measureCount <= 4 &&
     isDominantOf(lastTriadRoot, firstTriadRoot)
   ) {
-    const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+    const preferSharps = preferSharpsFromKeySigOrTonic(keySig, key?.tonic ?? null);
     const tonicName = pcToName(firstTriadRoot, preferSharps);
-
     return {
       tonic: tonicName,
       mode: firstTriadQuality === "maj" ? "major" : "minor",
@@ -819,8 +972,7 @@ function anchorKeyToFinalTriadIfNeeded(params: {
     };
   }
 
-  // Default: anchor to final triad
-  const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+  const preferSharps = preferSharpsFromKeySigOrTonic(keySig, key?.tonic ?? null);
   const tonicName = pcToName(lastTriadRoot, preferSharps);
 
   return {
@@ -841,6 +993,13 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
     const ignorePercussion = options.ignorePercussion === true;
     const sustainPolicy = sendSustainPolicy(options.sustainPolicy);
 
+    const romanMinConfidence =
+      typeof options.romanMinConfidence === "number" && Number.isFinite(options.romanMinConfidence)
+        ? clamp01(options.romanMinConfidence)
+        : 0.55;
+
+    const suppressLowConfidenceRoman = options.suppressLowConfidenceRoman !== false;
+
     const measureCount = Math.min(getMeasureCount(score), maxMeasures);
     if (measureCount <= 0) {
       return { ok: false, error: "scoreModel has no measures in parts[0]. Harmony analysis requires measures." };
@@ -852,56 +1011,83 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
     const metaKey = score?.meta?.harmony?.key ?? score?.meta?.key ?? null;
     const preferKeyFromMeta = options.preferKeyFromMeta !== false;
 
-    let key: any = null;
-
     const hadForceKey =
       !!(options.forceKey?.tonic && (options.forceKey.mode === "major" || options.forceKey.mode === "minor"));
     const hadMetaKey = !!(preferKeyFromMeta && metaKey);
-    const sigKey = !hadForceKey && !hadMetaKey ? keyFromScoreModelKeySignature(score, hist) : null;
-    const hadKeySig = !!sigKey;
+
+    // IMPORTANT: compute keySig first and use it for hadKeySig.
+    const keySig = findFirstKeySig(score);
+    const hadKeySig = !!keySig;
+
+    let key: any = null;
+
+    // If there is an explicit key signature with mode, lock to it.
+    if (!hadForceKey && !hadMetaKey && hadKeySig && keySig?.mode) {
+      const k = keyFromFifths(keySig.fifths, keySig.mode);
+      key = k ? { ...k } : null;
+    }
 
     if (hadForceKey) {
       key = { tonic: options.forceKey.tonic, mode: options.forceKey.mode, confidence: 1 };
     } else if (hadMetaKey) {
       key = keyFromMetaOrBestGuess(metaKey, hist, true);
-    } else {
-      key = sigKey ?? keyFromMetaOrBestGuess(null, hist, true);
+    } else if (!key) {
+      // If signature exists but mode unknown, fall back to histogram fit between relative major/minor for that signature.
+      key = keyFromScoreModelKeySignature(score, hist) ?? keyFromMetaOrBestGuess(null, hist, true);
     }
 
-    // Phase 4: cadence-based anchor first
+    // Only run stabilizers if we do NOT have a real key signature/meta/force.
     key = anchorKeyFromCadenceIfNeeded({
       score,
       measureCount,
       ignorePercussion,
       key,
+      keySig,
       hadKeySig,
       hadMetaKey,
       hadForceKey
     });
 
-    // Phase 0: final triad anchor fallback (with half-cadence protection)
     key = anchorKeyToFinalTriadIfNeeded({
       score,
       measureCount,
       ignorePercussion,
       key,
+      keySig,
       hadKeySig,
       hadMetaKey,
       hadForceKey
     });
+
+    const preferSharps = preferSharpsFromKeySigOrTonic(keySig, key?.tonic ?? null);
 
     if (granularity === "measure") {
       const measures: MeasureHarmony[] = [];
 
       for (let mi = 0; mi < measureCount; mi++) {
         const { pcs, bassPc } = collectMeasurePcsAndBassPc(score, mi, ignorePercussion);
-        const chord = detectChordFromPcs(pcs, true, bassPc);
-        const notes = chordNotesToNames(chord.pcs, true);
+        const chord = detectChordFromPcs(pcs, preferSharps, bassPc);
+        const notes = chordNotesToNames(chord.pcs, preferSharps);
 
         let roman = analyzeRomanNumeral(chord, key, notes);
         roman = promoteBorrowedMixture(roman, chord, key);
 
-        measures.push({ measureNumber: mi + 1, chord, roman });
+        const maybe = maybeSuppressRoman({
+          chord,
+          roman,
+          notes,
+          minConfidence: romanMinConfidence,
+          enable: suppressLowConfidenceRoman,
+          warnings,
+          atMeasure: mi + 1
+        });
+
+        measures.push({
+          measureNumber: mi + 1,
+          chord,
+          roman: maybe.roman,
+          __romanSuppressed: maybe.suppressed
+        });
       }
 
       applyCadential64LabelingMeasurewise(measures, key, warnings);
@@ -911,7 +1097,15 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
       return {
         ok: true,
-        engine: { phase: "4.1", granularity: "measure", romanNumerals: true, tonicizations: "brief", sustainPolicy },
+        engine: {
+          phase: "4.2",
+          granularity: "measure",
+          romanNumerals: true,
+          tonicizations: "brief",
+          sustainPolicy,
+          romanMinConfidence,
+          suppressLowConfidenceRoman
+        },
         key,
         measures,
         cadences,
@@ -919,7 +1113,6 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
       };
     }
 
-    // beat mode
     const beats: BeatHarmony[] = [];
 
     for (let mi = 0; mi < measureCount; mi++) {
@@ -927,15 +1120,30 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
       for (let b = 1; b <= beatsPerMeasure; b++) {
         const { pcs, bassPc } = collectBeatPcsAndBassPc(score, mi, b, ignorePercussion);
-        const chord = detectChordFromPcs(pcs, true, bassPc);
-
-        const preferSharps = preferSharpsFromTonicName(key?.tonic ?? null);
+        const chord = detectChordFromPcs(pcs, preferSharps, bassPc);
         const notes = chordNotesToNames(chord.pcs, preferSharps);
 
         let roman = analyzeRomanNumeral(chord, key, notes);
         roman = promoteBorrowedMixture(roman, chord, key);
 
-        beats.push({ measureNumber: mi + 1, beatNumber: b, chord, roman });
+        const maybe = maybeSuppressRoman({
+          chord,
+          roman,
+          notes,
+          minConfidence: romanMinConfidence,
+          enable: suppressLowConfidenceRoman,
+          warnings,
+          atMeasure: mi + 1,
+          atBeat: b
+        });
+
+        beats.push({
+          measureNumber: mi + 1,
+          beatNumber: b,
+          chord,
+          roman: maybe.roman,
+          __romanSuppressed: maybe.suppressed
+        });
       }
     }
 
@@ -949,7 +1157,15 @@ export function analyzeHarmony(req: HarmonyAnalyzeRequest): any | HarmonyAnalysi
 
     return {
       ok: true,
-      engine: { phase: "4.1", granularity: "beat", romanNumerals: true, tonicizations: "brief", sustainPolicy },
+      engine: {
+        phase: "4.2",
+        granularity: "beat",
+        romanNumerals: true,
+        tonicizations: "brief",
+        sustainPolicy,
+        romanMinConfidence,
+        suppressLowConfidenceRoman
+      },
       key,
       beats,
       cadences,

@@ -1,0 +1,74 @@
+{
+  "version": "0.1.0",
+  "unit": "quarter",
+  "templates": [
+    {
+      "id": "classical_bass_4_4_grounded",
+      "style": "classical",
+      "meter": { "beats": 4, "beatType": 4 },
+      "unit": "quarter",
+      "role": "bass",
+      "bassMotion": "grounded",
+      "preferTags": ["grounded", "cadence"],
+      "avoidTags": ["busy"],
+      "cells": [
+        { "cellId": "4_4_half_half", "weight": 10 },
+        { "cellId": "4_4_whole", "weight": 6 },
+        { "cellId": "4_4_dottedHalf_q", "weight": 3 },
+        { "cellId": "4_4_half_q_q", "weight": 2 }
+      ]
+    },
+    {
+      "id": "pop_bass_4_4_grounded",
+      "style": "pop",
+      "meter": { "beats": 4, "beatType": 4 },
+      "unit": "quarter",
+      "role": "bass",
+      "bassMotion": "grounded",
+      "cells": [
+        { "cellId": "4_4_half_half", "weight": 10 },
+        { "cellId": "4_4_q_q_half", "weight": 4 },
+        { "cellId": "4_4_whole", "weight": 2 }
+      ]
+    },
+    {
+      "id": "rock_bass_4_4_grounded",
+      "style": "rock",
+      "meter": { "beats": 4, "beatType": 4 },
+      "unit": "quarter",
+      "role": "bass",
+      "bassMotion": "grounded",
+      "cells": [
+        { "cellId": "4_4_half_half", "weight": 10 },
+        { "cellId": "4_4_q_q_half", "weight": 6 },
+        { "cellId": "4_4_half_q_q", "weight": 3 }
+      ]
+    },
+    {
+      "id": "funk_bass_4_4_sync",
+      "style": "funk",
+      "meter": { "beats": 4, "beatType": 4 },
+      "unit": "quarter",
+      "role": "bass",
+      "bassMotion": "syncopated",
+      "cells": [
+        { "cellId": "4_4_q_2e_q_2e", "weight": 10 },
+        { "cellId": "4_4_ee_q_ee_q", "weight": 8 },
+        { "cellId": "4_4_4eighth_half", "weight": 4 }
+      ]
+    },
+    {
+      "id": "samba_bass_4_4_sync",
+      "style": "samba",
+      "meter": { "beats": 4, "beatType": 4 },
+      "unit": "quarter",
+      "role": "bass",
+      "bassMotion": "syncopated",
+      "cells": [
+        { "cellId": "4_4_q_2e_q_2e", "weight": 10 },
+        { "cellId": "4_4_4e_2q", "weight": 6 },
+        { "cellId": "4_4_2q_4e", "weight": 6 }
+      ]
+    }
+  ]
+}

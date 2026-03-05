@@ -1,5 +1,5 @@
 import { validateScoreModelPiano } from "../validators";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import type { ScoreModel, NoteEvent } from "../score/types";
 
 function deepClone<T>(x: T): T {
@@ -51,20 +51,45 @@ function getKeyFifthsFromScore(score: ScoreModel): number {
 }
 
 const FIFTHS_TO_MAJOR_TONIC: Record<string, string> = {
-  "-7": "Cb", "-6": "Gb", "-5": "Db", "-4": "Ab", "-3": "Eb", "-2": "Bb", "-1": "F",
+  "-7": "Cb",
+  "-6": "Gb",
+  "-5": "Db",
+  "-4": "Ab",
+  "-3": "Eb",
+  "-2": "Bb",
+  "-1": "F",
   "0": "C",
-  "1": "G", "2": "D", "3": "A", "4": "E", "5": "B", "6": "F#", "7": "C#"
+  "1": "G",
+  "2": "D",
+  "3": "A",
+  "4": "E",
+  "5": "B",
+  "6": "F#",
+  "7": "C#"
 };
 
 function tonicToPc(tonic: string): number {
   const map: Record<string, number> = {
-    "C": 0, "C#": 1, "Db": 1,
-    "D": 2, "D#": 3, "Eb": 3,
-    "E": 4, "Fb": 4, "E#": 5,
-    "F": 5, "F#": 6, "Gb": 6,
-    "G": 7, "G#": 8, "Ab": 8,
-    "A": 9, "A#": 10, "Bb": 10,
-    "B": 11, "Cb": 11
+    C: 0,
+    "C#": 1,
+    Db: 1,
+    D: 2,
+    "D#": 3,
+    Eb: 3,
+    E: 4,
+    Fb: 4,
+    "E#": 5,
+    F: 5,
+    "F#": 6,
+    Gb: 6,
+    G: 7,
+    "G#": 8,
+    Ab: 8,
+    A: 9,
+    "A#": 10,
+    Bb: 10,
+    B: 11,
+    Cb: 11
   };
   return map[tonic] ?? 0;
 }
@@ -74,7 +99,7 @@ const MAJOR_SCALE_OFFSETS = [0, 2, 4, 5, 7, 9, 11];
 function buildMajorScalePcsFromFifths(fifths: number): number[] {
   const tonic = FIFTHS_TO_MAJOR_TONIC[String(fifths)] ?? "C";
   const tonicPc = tonicToPc(tonic);
-  return MAJOR_SCALE_OFFSETS.map(off => (tonicPc + off) % 12);
+  return MAJOR_SCALE_OFFSETS.map((off) => (tonicPc + off) % 12);
 }
 
 function midiToPc(m: number) {
@@ -97,7 +122,10 @@ function diatonicStepMidi(midi: number, scalePcs: number[], direction: 1 | -1): 
       const cand = cur + d;
       if (isPcInScale(midiToPc(cand), scalePcs)) {
         const dist = Math.abs(d);
-        if (dist < bestDist) { bestDist = dist; best = cand; }
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = cand;
+        }
       }
     }
     cur = best;
@@ -114,7 +142,7 @@ function diatonicStepMidi(midi: number, scalePcs: number[], direction: 1 | -1): 
 function findFirstMeasureWithRHNote(score: ScoreModel) {
   for (const part of score.parts) {
     for (const m of part.measures) {
-      const rh = m.events.filter(e => e.type === "note" && e.staff === 1) as any[];
+      const rh = m.events.filter((e) => e.type === "note" && e.staff === 1) as any[];
       if (rh.length > 0) return { part, measure: m, rh };
     }
   }
@@ -191,7 +219,7 @@ function addLHSupportFromRH(score: ScoreModel) {
   const found = findFirstMeasureWithRHNote(score);
   if (!found) return false;
 
-  const { part, measure, rh } = found;
+  const { measure, rh } = found;
   const first = rh.sort((a, b) => a.t - b.t)[0];
 
   const midi = pitchToMidi(first.pitch.step, first.pitch.alter, first.pitch.octave);
@@ -267,26 +295,30 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
 
   const applied: { type: string; changed: boolean; note?: string }[] = [];
 
-  const hasEmptyLH = issues.some(i => i.type === "empty_staff_2");
+  const hasEmptyLH = issues.some((i) => i.type === "empty_staff_2");
   if (hasEmptyLH) {
     const ok = addLHSupportFromRH(score);
-    applied.push({ type: "repair_empty_staff_2", changed: ok, note: "Added simple LH support note from earliest RH note." });
+    applied.push({
+      type: "repair_empty_staff_2",
+      changed: ok,
+      note: "Added simple LH support note from earliest RH note."
+    });
   }
 
-  const hasHandCross = issues.some(i => i.type === "hand_crossing");
+  const hasHandCross = issues.some((i) => i.type === "hand_crossing");
   if (hasHandCross) {
     const ok = shiftLHDownOctave(score);
     applied.push({ type: "repair_hand_crossing", changed: ok, note: "Shifted LH down an octave." });
   }
 
-  const hasPar8 = issues.some(i => i.type === "parallel_8ves_outer_voices");
-  const hasPar5 = issues.some(i => i.type === "parallel_5ths_outer_voices");
-  const hasDirect8 = issues.some(i => i.type === "direct_8ves_outer_voices");
-  const hasDirect5 = issues.some(i => i.type === "direct_5ths_outer_voices");
+  const hasPar8 = issues.some((i) => i.type === "parallel_8ves_outer_voices");
+  const hasPar5 = issues.some((i) => i.type === "parallel_5ths_outer_voices");
+  const hasDirect8 = issues.some((i) => i.type === "direct_8ves_outer_voices");
+  const hasDirect5 = issues.some((i) => i.type === "direct_5ths_outer_voices");
 
   if (hasPar8 || hasPar5) {
-    const offending = issues.find(i =>
-      i.type === "parallel_8ves_outer_voices" || i.type === "parallel_5ths_outer_voices"
+    const offending = issues.find(
+      (i) => i.type === "parallel_8ves_outer_voices" || i.type === "parallel_5ths_outer_voices"
     );
 
     const offendingType = offending?.type ?? "parallel_outer_voices";
@@ -294,12 +326,12 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
     const t = offending?.location?.t;
 
     if (typeof measure === "number" && typeof t === "number") {
-      // Try UP first
-      const upAttempt = deepClone(score);
       const fifths = getKeyFifthsFromScore(score);
       const scalePcs = buildMajorScalePcsFromFifths(fifths);
-      
-      const upChanged = shiftSingleRHNoteAt(upAttempt, measure, t, 1, scalePcs);
+
+      // Try UP first (diatonic)
+      const upAttempt = deepClone(score);
+      const upChanged = shiftSingleRHNoteAtDiatonic(upAttempt, measure, t, 1, scalePcs);
       const upVal = validateScoreModelPiano(upAttempt);
 
       if (upChanged && upVal.ok) {
@@ -310,9 +342,9 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
           note: `Fixed ${offendingType} at measure ${measure}, onset ${t} using +1 diatonic step (fifths=${fifths}).`
         });
       } else {
-        // Try DOWN
+        // Try DOWN (diatonic)
         const downAttempt = deepClone(score);
-        const downChanged = shiftSingleRHNoteAt(downAttempt, measure, t, -1, scalePcs);
+        const downChanged = shiftSingleRHNoteAtDiatonic(downAttempt, measure, t, -1, scalePcs);
         const downVal = validateScoreModelPiano(downAttempt);
 
         if (downChanged && downVal.ok) {
@@ -324,8 +356,8 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
           });
         } else {
           // Keep the less-bad attempt (fewest errors)
-          const upErrors = upVal.issues.filter(i => i.severity === "error").length;
-          const downErrors = downVal.issues.filter(i => i.severity === "error").length;
+          const upErrors = upVal.issues.filter((i) => i.severity === "error").length;
+          const downErrors = downVal.issues.filter((i) => i.severity === "error").length;
 
           if (upChanged && upErrors <= downErrors) {
             Object.assign(score, upAttempt);
@@ -357,12 +389,11 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
         note: "Missing location (measure/t) for parallel issue; cannot do targeted repair."
       });
     }
-  }  // ===== Direct / Hidden perfect intervals repair =====
+  }
+
+  // Direct / Hidden perfect intervals repair
   if (hasDirect8 || hasDirect5) {
-    const offending = issues.find(i =>
-      i.type === "direct_8ves_outer_voices" ||
-      i.type === "direct_5ths_outer_voices"
-    );
+    const offending = issues.find((i) => i.type === "direct_8ves_outer_voices" || i.type === "direct_5ths_outer_voices");
 
     const offendingType = offending?.type ?? "direct_outer_voices";
     const measure = offending?.location?.measure;
@@ -373,13 +404,7 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
       const scalePcs = buildMajorScalePcsFromFifths(fifths);
 
       const upAttempt = deepClone(score);
-      const upChanged = shiftSingleRHNoteAtDiatonic(
-        upAttempt,
-        measure,
-        t,
-        1,
-        scalePcs
-      );
+      const upChanged = shiftSingleRHNoteAtDiatonic(upAttempt, measure, t, 1, scalePcs);
       const upVal = validateScoreModelPiano(upAttempt);
 
       if (upChanged && upVal.ok) {
@@ -391,13 +416,7 @@ export function repairScoreModel(scoreModel: ScoreModel, issues: Issue[]) {
         });
       } else {
         const downAttempt = deepClone(score);
-        const downChanged = shiftSingleRHNoteAtDiatonic(
-          downAttempt,
-          measure,
-          t,
-          -1,
-          scalePcs
-        );
+        const downChanged = shiftSingleRHNoteAtDiatonic(downAttempt, measure, t, -1, scalePcs);
         const downVal = validateScoreModelPiano(downAttempt);
 
         if (downChanged && downVal.ok) {

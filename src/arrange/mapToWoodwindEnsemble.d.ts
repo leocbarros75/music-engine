@@ -1,0 +1,11 @@
+import type { ScoreModel } from "../score/types";
+/**
+ * Woodwind ensemble mapping (Option 1, Concert Pitch View):
+ * Flute (C), Oboe (C), Clarinet in Bb (shows concert pitch), Bassoon (C)
+ *
+ * IMPORTANT:
+ * - Because you chose concert pitch view, we store + export concert pitches.
+ * - The exporter should NOT emit <transpose> tags for this view.
+ */
+export declare function mapPianoToWoodwindEnsembleOpen(score: ScoreModel): ScoreModel;
+//# sourceMappingURL=mapToWoodwindEnsemble.d.ts.map

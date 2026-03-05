@@ -1,0 +1,83 @@
+import type { JobDebug } from "../types";
+
+type Props = {
+  debug?: JobDebug;
+};
+
+export default function DebugPanel({ debug }: Props) {
+  if (!debug) {
+    return (
+      <div className="debug-card">
+        <h3>Debug</h3>
+        <div className="muted">No debug data yet.</div>
+      </div>
+    );
+  }
+
+  const melodyName = debug.melodyPartName || "(unknown)";
+  const melodyId = debug.melodyPartId ? ` (${debug.melodyPartId})` : "";
+  const melodyVoice = debug.melodyVoice !== null && debug.melodyVoice !== undefined ? debug.melodyVoice : "n/a";
+  const melodyNotes = debug.melodyNoteCount ?? "n/a";
+  const detectedKeyMode = debug.detectedInputKeyMode ?? "n/a";
+
+  const chordCount = debug.chordEventCount ?? 0;
+  const chordSample = debug.chordEventSample ?? [];
+  const chordSampleText = chordSample
+    .slice(0, 20)
+    .map((c) => `m${c.measure} t=${c.t}: ${c.symbol}`)
+    .join("\n");
+
+  const chordWarnings = debug.chordWarnings ?? [];
+  const chordWarningText = chordWarnings.join("\n");
+
+  const mismatches = debug.chordCheck?.mismatches ?? [];
+  const mismatchText = mismatches
+    .map((m) => `m${m.measure} chord=${m.chord} out=[${m.outputPcs.join(", ")}] expected=[${m.chordPcs.join(", ")}]`)
+    .join("\n");
+
+  return (
+    <div className="debug-card">
+      <h3>Debug</h3>
+      <div className="debug-grid">
+        <div>
+          <div className="summary-label">Melody Part</div>
+          <div>
+            {melodyName}
+            {melodyId}
+          </div>
+        </div>
+        <div>
+          <div className="summary-label">Melody Voice</div>
+          <div>{melodyVoice}</div>
+        </div>
+        <div>
+          <div className="summary-label">Melody Notes</div>
+          <div>{melodyNotes}</div>
+        </div>
+        <div>
+          <div className="summary-label">Input Key Mode</div>
+          <div>{detectedKeyMode}</div>
+        </div>
+        <div>
+          <div className="summary-label">Chord Events</div>
+          <div>{chordCount}</div>
+        </div>
+      </div>
+
+      <div className="debug-section">
+        <div className="summary-label">Chord Sample (first 20)</div>
+        <pre className="debug-pre">{chordSampleText || "(none)"}</pre>
+      </div>
+
+      <div className="debug-section">
+        <div className="summary-label">Chord Warnings</div>
+        <pre className="debug-pre">{chordWarningText || "(none)"}</pre>
+      </div>
+
+      <div className="debug-section">
+        <div className="summary-label">Chord Check Mismatches</div>
+        <pre className="debug-pre">{mismatchText || "(none)"}</pre>
+      </div>
+    </div>
+  );
+}

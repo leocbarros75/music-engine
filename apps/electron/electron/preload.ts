@@ -1,0 +1,19 @@
+import { contextBridge, ipcRenderer } from "electron";
+import type { JobRequest, LogEntry, MusicXmlFile } from "../shared/ipcTypes";
+
+contextBridge.exposeInMainWorld("api", {
+  selectMusicXmlFile: (): Promise<MusicXmlFile | null> => ipcRenderer.invoke("dialog:openMusicXml"),
+  runGenerateJob: (payload: JobRequest) => ipcRenderer.invoke("job:run", payload),
+  openFile: (path: string) => ipcRenderer.invoke("shell:openFile", path),
+  getServerStatus: () => ipcRenderer.invoke("server:getStatus"),
+  onServerReady: (cb: (baseUrl: string) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, data: { baseUrl: string }) => cb(data.baseUrl);
+    ipcRenderer.on("server:ready", listener);
+    return () => ipcRenderer.removeListener("server:ready", listener);
+  },
+  onLog: (cb: (entry: LogEntry) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, entry: LogEntry) => cb(entry);
+    ipcRenderer.on("log:entry", listener);
+    return () => ipcRenderer.removeListener("log:entry", listener);
+  }
+});

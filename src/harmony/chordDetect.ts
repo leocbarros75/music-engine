@@ -82,6 +82,30 @@ function suffixForQuality(q: ChordQuality): string {
     : "";
 }
 
+function clamp01(x: number): number {
+  if (!Number.isFinite(x)) return 0;
+  if (x < 0) return 0;
+  if (x > 1) return 1;
+  return x;
+}
+
+/**
+ * Normalize the detector score to 0..1.
+ *
+ * Score is intentionally heuristic, but roughly:
+ * - triad recognized: +3
+ * - root present: +2
+ * - seventh recognized: +1
+ * - bass==root boost: +0.35
+ * - smaller set bonus: up to +0.5 (pcs length 1..6)
+ *
+ * So typical "strong" chord snapshots land around 5..6+.
+ */
+function scoreToConfidence(score: number): number {
+  const MAX = 6.85;
+  return clamp01(score / MAX);
+}
+
 // IMPORTANT: bassPc is optional, but when present it helps resolve ambiguities,
 // especially for fully diminished seventh chords (symmetrical).
 export function detectChordFromPcs(
@@ -92,7 +116,17 @@ export function detectChordFromPcs(
   const pcs = uniqSorted(pcsIn);
   const bpc = bassPc === null || bassPc === undefined ? null : (((bassPc % 12) + 12) % 12);
 
-  if (pcs.length === 0) return { pcs, rootPc: null, bassPc: bpc, quality: "unknown", name: "N.C." };
+  if (pcs.length === 0) {
+    return {
+      pcs,
+      rootPc: null,
+      bassPc: bpc,
+      quality: "unknown",
+      name: "N.C.",
+      score: 0,
+      confidence: 0
+    };
+  }
 
   // Try each pc as potential root, score by how many chord tones it explains.
   let best: { root: number; score: number; quality: ChordQuality } | null = null;
@@ -134,5 +168,16 @@ export function detectChordFromPcs(
   const rootName = pcToName(rootPc, preferSharps);
   const suffix = suffixForQuality(quality);
 
-  return { pcs, rootPc, bassPc: bpc, quality, name: `${rootName}${suffix}` };
+  const score = typeof best?.score === "number" ? best.score : 0;
+  const confidence = scoreToConfidence(score);
+
+  return {
+    pcs,
+    rootPc,
+    bassPc: bpc,
+    quality,
+    name: `${rootName}${suffix}`,
+    score,
+    confidence
+  };
 }

@@ -1,0 +1,114 @@
+{
+  "composition_meta": {
+    "title": "Worship_Driving_Anthem",
+    "tempo_bpm": 74,
+    "time_signature": [4, 4],
+    "feel": "straight_16ths",
+    "style_preset": "hillsong_pop_rock"
+  },
+  "harmonic_constraints": {
+    "key_center": "C Major",
+    "voice_leading_rules": {
+      "parallel_fifths": "avoid",
+      "voice_crossing": "prohibited",
+      "common_tone_retention": "maximize",
+      "leap_recovery": true
+    }
+  },
+  "instrument_logic": {
+    "left_hand_lower": {
+      "role": "bass_anchor",
+      "interval_rules": {
+        "allowed_intervals": ["P1", "P5", "P8"],
+        "forbidden_intervals": ["M3", "m3", "m2", "M2"],
+        "description": "Left hand must play open 5ths or Octaves to avoid low-frequency muddiness."
+      },
+      "rhythm_pattern": {
+        "grid_resolution": "16th_note",
+        "pattern_array": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        "description": "Plays on Beat 1 and the 'and' of Beat 3 (Syncopated Push)."
+      }
+    },
+    "right_hand_upper": {
+      "role": "rhythmic_pulse",
+      "voicing_style": "add2_cluster",
+      "interval_rules": {
+        "chord_extensions": ["add9", "sus4"],
+        "voicing_stack": "closed_position",
+        "top_note_movement": "stepwise"
+      },
+      "rhythm_pattern": {
+        "grid_resolution": "8th_note",
+        "pattern_array": [1, 1, 1, 1, 1, 1, 1, 1],
+        "accent_profile": [100, 70, 85, 70, 100, 70, 85, 70],
+        "description": "Continuous 8th note pulse to drive momentum."
+      }
+    }
+  },
+  "sequence_data": [
+    {
+      "bar": 1,
+      "chord_symbol": "C",
+      "function": "I",
+      "left_hand_notes": [
+        { "note": "C2", "velocity": 95, "duration": "dotted_half" },
+        { "note": "C3", "velocity": 85, "duration": "dotted_half" }
+      ],
+      "right_hand_notes": [
+        { "notes": ["G3", "C4", "D4", "E4"], "velocity": 90, "rhythm": "pulse_8ths", "voicing_type": "add2" }
+      ]
+    },
+    {
+      "bar": 2,
+      "chord_symbol": "G/B",
+      "function": "V6",
+      "left_hand_notes": [
+        { "note": "B1", "velocity": 95, "duration": "dotted_half" },
+        { "note": "B2", "velocity": 85, "duration": "dotted_half" }
+      ],
+      "right_hand_notes": [
+        { "notes": ["G3", "B3", "D4"], "velocity": 88, "rhythm": "pulse_8ths", "voicing_type": "triad_inv_1" }
+      ],
+      "voice_leading_check": {
+        "from_previous": "C -> B (Step down)",
+        "parallel_5ths_detected": false
+      }
+    },
+    {
+      "bar": 3,
+      "chord_symbol": "Am7",
+      "function": "vi",
+      "left_hand_notes": [
+        { "note": "A1", "velocity": 100, "duration": "whole" },
+        { "note": "E2", "velocity": 80, "duration": "whole" }
+      ],
+      "right_hand_notes": [
+        { "notes": ["G3", "A3", "C4", "E4"], "velocity": 92, "rhythm": "pulse_8ths", "voicing_type": "min7_cluster" }
+      ]
+    },
+    {
+      "bar": 4,
+      "chord_symbol": "Fadd9",
+      "function": "IV",
+      "left_hand_notes": [
+        { "note": "F1", "velocity": 100, "duration": "whole" },
+        { "note": "C2", "velocity": 80, "duration": "whole" }
+      ],
+      "right_hand_notes": [
+        { "notes": ["F3", "G3", "A3", "C4"], "velocity": 95, "rhythm": "pulse_8ths", "voicing_type": "add9_cluster" }
+      ]
+    }
+  ],
+  "dynamic_modifiers": {
+    "humanization": {
+      "timing_jitter_ms": [-15, 15],
+      "velocity_randomization": [-5, 5],
+      "ghost_note_probability": 0.2
+    },
+    "section_intensity": {
+      "verse": 0.6,
+      "chorus": 1.0,
+      "bridge": 0.8
+    }
+  }
+}

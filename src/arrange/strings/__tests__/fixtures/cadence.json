@@ -1,0 +1,17 @@
+{
+  "type": "arranger",
+  "name": "cadence_v_to_i",
+  "divisions": 4,
+  "keyFifths": 0,
+  "keyMode": "major",
+  "melody": [
+    { "measure": 1, "t": 0, "dur": 4, "midi": 67 },
+    { "measure": 1, "t": 4, "dur": 4, "midi": 69 },
+    { "measure": 2, "t": 0, "dur": 8, "midi": 72 }
+  ],
+  "chords": [
+    { "measure": 1, "t": 0, "symbol": "G" },
+    { "measure": 2, "t": 0, "symbol": "C" }
+  ],
+  "expect": { "finalChord": "C" }
+}

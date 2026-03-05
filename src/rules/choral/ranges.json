@@ -1,0 +1,9 @@
+{
+  "description": "Conservative choral ranges based on Choral Arranging – Principles of Part Writing for Voices.",
+  "voices": {
+    "soprano": { "minMidi": 60, "maxMidi": 81, "softMinMidi": 62, "softMaxMidi": 79 },
+    "alto": { "minMidi": 55, "maxMidi": 74, "softMinMidi": 57, "softMaxMidi": 72 },
+    "tenor": { "minMidi": 48, "maxMidi": 69, "softMinMidi": 50, "softMaxMidi": 67 },
+    "bass": { "minMidi": 40, "maxMidi": 64, "softMinMidi": 43, "softMaxMidi": 62 }
+  }
+}

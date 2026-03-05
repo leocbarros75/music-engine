@@ -1,0 +1,104 @@
+# music-engine Repo Skill
+
+## Repo identity
+- **Repo name:** music-engine
+- **Root path:** `~/Desktop/music-engine`
+- **Language:** TypeScript (Node.js)
+- **Run style:** local CLI + local HTTP server
+- **User preference:** when editing code, return full file content (line 1 to end) and include terminal commands to create/open/run.
+
+## Critical constraints
+- Do **not** move “pipelines” into `scripts/`. Pipelines and core logic live in repo root or `src/`.
+- Prefer adding new work in clearly named modules under `src/` (example: `src/rhythm/`).
+- Prefer adding “glue” scripts under `scripts/` only for test harness / CLI entrypoints.
+- Warnings should **not** stop execution unless a hard error makes output invalid.
+
+## Server contract
+- **Entry file:** `src/server.ts`
+- **Default port:** `3001` (`process.env.PORT` can override)
+- **Health route:** `GET /health`
+- **Harmonize route:** `POST /harmonize_satb_from_chords`
+  - Accepts request like:
+    - `{ musicxml: string, chords: [], options: { keepMelodyInSoprano: true } }`
+  - If `chords` is empty, engine may infer chords from melody/key signature.
+  - Server responds: `{ ok: true, scoreModel: ScoreModel }`
+
+### Port collisions
+- If you start the server and see `EADDRINUSE`, do **not** crash the workflow.
+- Prefer reusing the running server, or choose another port via `PORT=3002` if needed.
+- In apps, always health-check first before attempting to spawn.
+
+## ScoreModel shape notes
+- In this repo, key signature is stored as:
+  - `score.parts[0].measures[0].attributes.key_fifths` (NOT `attributes.key.fifths`)
+- Time signature often stored as:
+  - `attributes.time.beats` and `attributes.time.beat_type`
+- `events` use `t` and `dur` in beat units (for current SATB/rhythm work, assume **quarter-note beat units**).
+
+## Harmonize (SATB) module
+- Current SATB harmonizer lives in:
+  - `src/harmonize/satb/harmonizeSatbFromChords.ts`
+  - chord inference lives in:
+  - `src/harmonize/satb/inferChordsFromMelody.ts`
+- Meta debug is used and should be preserved:
+  - `score.meta.harmonize.debug` may include chord samples for downstream tools.
+
+## Rhythm module conventions
+- Rhythm code lives in: `src/rhythm/`
+- Apply rhythm scripts live in: `scripts/`
+- Rhythm should:
+  - default to **classical** when style is unknown (warn + continue)
+  - be “more active” only on final cadence measures for now
+  - keep bass “more grounded” unless style is **funk** or **samba**, where larger leaps are permitted
+- Cadence detection:
+  - detect all V→I cadences, but apply only to the final cadence (warn-only reporting for others)
+
+## Logging conventions
+- Logs should match existing CLI feel:
+  - `[warn] ...`
+  - `[rhythm] ...`
+  - `[cadence] ...`
+- Warnings must not exit; they should accumulate in a `warnings[]` array when possible.
+
+## Existing scripts and outputs
+- Test files:
+  - `tests/musicxml/*.xml`
+- Temp outputs:
+  - `tmp/`
+- Useful scripts:
+  - `scripts/exportSatbResponseToMusicxml.ts`
+  - `scripts/applyRhythmToSatbResponse.ts`
+  - `scripts/runSatbTest_noChords.zsh`
+  - `scripts/runSatbTest_rhythm_noChords.zsh`
+
+## “How to run” (canonical)
+- Typecheck:
+  - `npx tsc -p tsconfig.json --noEmit`
+- Start server:
+  - `npx tsx src/server.ts`
+- Run a test harness:
+  - `./scripts/runSatbTest_noChords.zsh`
+  - `./scripts/runSatbTest_rhythm_noChords.zsh [style]`
+
+## Safe editing workflow
+When you change any file:
+1) Back up the file:
+   - `cp path/to/file path/to/file.bak.before_<short_reason>`
+2) Open in TextEdit:
+   - `open -a TextEdit path/to/file`
+3) Run typecheck:
+   - `npx tsc -p tsconfig.json --noEmit`
+4) Run the relevant script:
+   - e.g., `./scripts/runSatbTest_rhythm_noChords.zsh funk`
+
+## Do / Don’t summary
+✅ Do:
+- Add new modules in `src/` with clean names and tight scope.
+- Keep rhythm units as quarter-beat units.
+- Warn and continue when style is unknown.
+- Preserve meta debug info to support downstream cadence detection and scripts.
+
+❌ Don’t:
+- Assume `attributes.key.fifths` exists (use `key_fifths`).
+- Break server routes or rename without updating scripts/tests.
+- Halt execution on non-fatal rule violations.

@@ -103,5 +103,29 @@ export const EXPECTATIONS_BY_BASENAME: Record<string, Expectation> = {
     cadenceTypes: [{ atMeasure: 2, type: "half" }],
     cadenceEvidence: [{ atMeasure: 2, prevRoman: "I", lastRoman: "V" }],
     requireNonEmptyChordOnBeat1OfMeasures: [1, 2]
+  },
+
+  "test_c_major_secondary_triad_v_of_v.xml": {
+    id: "c_major_secondary_triad_v_of_v",
+    key: { tonic: "C", mode: "major" },
+    beatRomans: [
+      { measure: 1, beat: 1, roman: "V/V" },
+      { measure: 2, beat: 1, roman: "V" }
+    ],
+    requireNonEmptyChordOnBeat1OfMeasures: [1, 2]
+  },
+
+  "test_c_major_secondary_leadingtone_viio_of_v.xml": {
+    id: "c_major_secondary_leadingtone_viio_of_v",
+    key: { tonic: "C", mode: "major" },
+    beatRomans: [
+      // Engine prints the diminished sign as ° (not "o")
+      { measure: 1, beat: 1, roman: "vii°/V" },
+      { measure: 2, beat: 1, roman: "V" },
+      { measure: 3, beat: 1, roman: "I" }
+    ],
+    cadenceTypes: [{ atMeasure: 3, type: "authentic_imperfect" }],
+    cadenceEvidence: [{ atMeasure: 3, prevRoman: "V", lastRoman: "I" }],
+    requireNonEmptyChordOnBeat1OfMeasures: [1, 2, 3]
   }
 };
