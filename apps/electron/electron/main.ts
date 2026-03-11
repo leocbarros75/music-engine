@@ -238,9 +238,10 @@ async function runGenerateJob(payload: JobRequest): Promise<JobResult> {
       payload.settings.ensemble !== "choral" &&
       payload.settings.ensemble !== "piano" &&
       payload.settings.ensemble !== "piano_with_melody" &&
-      payload.settings.ensemble !== "string_ensemble"
+      payload.settings.ensemble !== "string_ensemble" &&
+      payload.settings.ensemble !== "woodwind_ensemble"
     ) {
-      const warning = "Selected ensemble is not supported yet. SATB, piano, and strings only for MVP.";
+      const warning = "Selected ensemble is not supported yet. SATB, piano, strings, and woodwinds only for MVP.";
       warnings.push(warning);
       log("warn", `[warn] ${warning}`);
       return { ok: false, warnings, error: warning };

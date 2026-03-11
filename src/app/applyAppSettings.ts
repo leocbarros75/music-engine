@@ -12,9 +12,11 @@ import { applyRhythmToBassFinalCadence } from "../rhythm/applyRhythmToBassFinalC
 import { analyzeTexture } from "../texture/textureAnalyzer";
 import { arrangePianoFromSatb } from "../arrange/arrangePianoFromSatb";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
+import { arrangeStringQuartetFromPianoInstrumentation } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
+import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 
 export type AppSettings = {
@@ -49,6 +51,7 @@ export type AppSettings = {
   pianoStylePreset?: string;
   pianoStylePresetPath?: string;
   useStringEnsembleArranger?: boolean;
+  instrumentation?: "auto" | "piano_copy_to_string_quartet" | "satb_to_string_quartet";
 };
 
 export type ApplySettingsResult = {
@@ -1369,7 +1372,11 @@ export function applyAppSettings(
   const wantsPiano =
     wantsPianoWithMelody || ensemble === "piano" || ensemble === "grand_piano" || ensemble === "acoustic_piano";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
+  const wantsWoodwinds = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
+  const instrumentation = settings.instrumentation ?? "auto";
+  const usePianoCopyStringQuartetInstrumentation =
+    wantsStrings && (instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
 
   const detectedKey = getKeyInfo(scoreModel);
   const detectedInputKeyFifths = detectedKey.value;
@@ -1427,6 +1434,38 @@ export function applyAppSettings(
   const tempoBpm = getTempoBpmFromSettings(scoreModel, settings);
   const omitMelodyInPiano = wantsPianoWithMelody ? false : worshipPiano || useSopranoTexture;
   const pianoEnsembleTag = wantsPianoWithMelody ? "piano_with_melody" : "piano";
+
+  if (usePianoCopyStringQuartetInstrumentation) {
+    const finalScore = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsWoodwinds) {
+    const finalScore = mapPianoToWoodwindEnsembleOpen(scoreModel, {
+      level: settings.level,
+      accompaniment,
+      textureMode,
+      chords,
+      warnings
+    });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
 
   if (usePolyphonic && accompaniment !== "polyphonic") {
     warnings.push("[texture] Polyphony requested; consider setting accompaniment to polyphonic.");

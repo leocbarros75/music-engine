@@ -6,6 +6,7 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "piano", value: "piano" },
   { label: "piano with melody (RH)", value: "piano_with_melody" },
   { label: "string ensemble", value: "string_ensemble" },
+  { label: "woodwind ensemble", value: "woodwind_ensemble" },
   { label: "brass ensemble", value: "brass_ensemble" },
   { label: "orchestra", value: "orchestra" }
 ];
@@ -53,6 +54,19 @@ const BASS_ACTIVITY_OPTIONS: Array<{ label: string; value: NonNullable<Settings[
   { label: "Less active (40%)", value: "less_active", help: "Occasional motion, mostly stable tones." },
   { label: "Active (60%)", value: "active", help: "More 8th-note motion, passing/neighbor tones." },
   { label: "High active (100%)", value: "high_active", help: "Continuous motion where possible." }
+];
+const INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
+  { label: "Auto arranger", value: "auto", help: "Use the current string arranging engine." },
+  {
+    label: "Piano -> String Quartet (Copy)",
+    value: "piano_copy_to_string_quartet",
+    help: "Copy piano voices directly: RH top->Violin I, RH inner->Violin II, LH top->Viola, LH bottom->Cello."
+  },
+  {
+    label: "SATB -> String Quartet (Legacy)",
+    value: "satb_to_string_quartet",
+    help: "Legacy alias of the copy instrumentation mode."
+  }
 ];
 const STRICTNESS_OPTIONS: Array<{ label: string; value: Settings["ruleStrictness"]; help: string }> = [
   { label: "Relaxed", value: "relaxed", help: "Warnings only, fewer errors." },
@@ -176,6 +190,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
     BASS_ACTIVITY_OPTIONS.find((opt) => opt.value === settings.vcActivity)?.help ?? "Choose activity level.";
   const cbActivityHelp =
     BASS_ACTIVITY_OPTIONS.find((opt) => opt.value === settings.cbActivity)?.help ?? "Choose activity level.";
+  const instrumentationHelp =
+    INSTRUMENTATION_OPTIONS.find((opt) => opt.value === settings.instrumentation)?.help ??
+    "Choose instrumentation mapping.";
   const sopranoMelodyShare = Math.max(0, Math.min(100, settings.sopranoMelodyShare ?? 30));
   const offsetsHelp =
     settings.randomizeOffsets === false
@@ -226,8 +243,28 @@ export default function SettingsForm({ settings, onChange }: Props) {
         {settings.ensemble !== "choral" &&
           settings.ensemble !== "piano" &&
           settings.ensemble !== "piano_with_melody" &&
-          settings.ensemble !== "string_ensemble" && <div className="pill warn">Coming soon (SATB + piano supported)</div>}
+          settings.ensemble !== "string_ensemble" &&
+          settings.ensemble !== "woodwind_ensemble" && <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds supported)</div>}
       </div>
+
+      {settings.ensemble === "string_ensemble" && (
+        <div className="field">
+          <label>Instrumentation</label>
+          <select
+            value={settings.instrumentation ?? "auto"}
+            onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
+          >
+            {INSTRUMENTATION_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="key-preview">
+            <span className="slider-help">{instrumentationHelp}</span>
+          </div>
+        </div>
+      )}
 
       <div className="field">
         <label>Key Signature</label>

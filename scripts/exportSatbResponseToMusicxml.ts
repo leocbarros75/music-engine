@@ -31,7 +31,26 @@ function main(): void {
   const hasGrandStaff = Array.isArray(scoreModel?.parts)
     ? scoreModel.parts.some((p: any) => Number(p?.staves ?? 1) === 2)
     : false;
-  const useGeneralExporter = ensemble === "piano" || hasPianoPart || hasGrandStaff;
+  const hasWoodwindPart = Array.isArray(scoreModel?.parts)
+    ? scoreModel.parts.some((p: any) => {
+        const s = `${String(p?.instrument ?? "")} ${String(p?.name ?? "")}`.toLowerCase();
+        return (
+          s.includes("flute") ||
+          s.includes("oboe") ||
+          s.includes("clarinet") ||
+          s.includes("bassoon") ||
+          s.includes("woodwind")
+        );
+      })
+    : false;
+  const useGeneralExporter =
+    ensemble === "piano" ||
+    ensemble === "piano_with_melody" ||
+    ensemble === "woodwind_ensemble" ||
+    ensemble === "woodwinds" ||
+    hasPianoPart ||
+    hasGrandStaff ||
+    hasWoodwindPart;
 
   const xml = useGeneralExporter
     ? exportScoreModelToMusicXML(scoreModel)

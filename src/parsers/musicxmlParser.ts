@@ -15,6 +15,9 @@ type NoteEvent =
       midi: number;
       voice?: number;
       staff?: number;
+      tieStart?: boolean;
+      tieStop?: boolean;
+      chord?: boolean;
     }
   | {
       type: "rest";
@@ -74,6 +77,38 @@ function elementsByTagName(root: Document | Element, tag: string): Element[] {
 function firstChild(el: Element, tag: string): Element | null {
   const xs = elementsByTagName(el, tag);
   return xs.length ? xs[0] : null;
+}
+
+function parseNoteTieFlags(noteEl: Element): { tieStart: boolean; tieStop: boolean } {
+  let tieStart = false;
+  let tieStop = false;
+
+  const childNodes = noteEl.childNodes;
+  for (let i = 0; i < childNodes.length; i++) {
+    const node = childNodes.item(i);
+    if (!node || node.nodeType !== 1) continue;
+    const el = node as Element;
+    if (localNameOf(el) !== "tie") continue;
+    const type = String(el.getAttribute("type") ?? "").toLowerCase();
+    if (type === "start") tieStart = true;
+    if (type === "stop") tieStop = true;
+  }
+
+  const notationsEl = firstChild(noteEl, "notations");
+  if (notationsEl) {
+    const nChildren = notationsEl.childNodes;
+    for (let i = 0; i < nChildren.length; i++) {
+      const node = nChildren.item(i);
+      if (!node || node.nodeType !== 1) continue;
+      const el = node as Element;
+      if (localNameOf(el) !== "tied") continue;
+      const type = String(el.getAttribute("type") ?? "").toLowerCase();
+      if (type === "start") tieStart = true;
+      if (type === "stop") tieStop = true;
+    }
+  }
+
+  return { tieStart, tieStop };
 }
 
 function stepToPc(step: string): number {
@@ -278,6 +313,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
 
         if (tag === "note") {
           const isChordTone = !!firstChild(el, "chord");
+          const tieFlags = parseNoteTieFlags(el);
 
           const restEl = firstChild(el, "rest");
           const durEl = firstChild(el, "duration");
@@ -321,7 +357,19 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
               const pitch: Pitch = { step, alter, octave };
               const midi = pitchToMidi(pitch);
 
-              events.push({ type: "note", t: noteT, dur, pitch, midi, voice, staff, source_t: rawT } as any);
+              events.push({
+                type: "note",
+                t: noteT,
+                dur,
+                pitch,
+                midi,
+                voice,
+                staff,
+                source_t: rawT,
+                chord: isChordTone ? true : undefined,
+                tieStart: tieFlags.tieStart ? true : undefined,
+                tieStop: tieFlags.tieStop ? true : undefined
+              } as any);
             } else {
               events.push({ type: "rest", t: noteT, dur, voice, staff, source_t: rawT } as any);
             }

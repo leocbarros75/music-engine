@@ -3,6 +3,7 @@ export type EnsembleOption =
   | "piano"
   | "piano_with_melody"
   | "string_ensemble"
+  | "woodwind_ensemble"
   | "brass_ensemble"
   | "orchestra";
 export type StyleOption = "classical" | "worship" | "latino" | "pop" | "rock" | "funk" | "samba";
@@ -19,6 +20,7 @@ export type TextureMode =
 export type PolyphonicProfile = "baroque" | "classical" | "romantic" | "modern";
 export type ModernMode = "modernTonal" | "modal" | "atonal";
 export type BassActivity = "grounded" | "less_active" | "active" | "high_active";
+export type InstrumentationOption = "auto" | "piano_copy_to_string_quartet" | "satb_to_string_quartet";
 
 export type Settings = {
   title: string;
@@ -42,6 +44,7 @@ export type Settings = {
   vlaActivity?: BassActivity;
   vcActivity?: BassActivity;
   cbActivity?: BassActivity;
+  instrumentation?: InstrumentationOption;
   sopranoMelodyShare?: number;
   randomizeOffsets?: boolean;
   keySignatureMode?: "original" | "manual";

@@ -1,10 +1,10 @@
 {
   "settings": {
-    "title": "Come",
-    "ensemble": "piano",
+    "title": "hark",
+    "ensemble": "woodwind_ensemble",
     "keySignature": "original",
     "timeSignature": "original",
-    "tempo": 89,
+    "tempo": 120,
     "style": "classical",
     "level": "advanced",
     "accompaniment": "homophonic",
@@ -12,15 +12,16 @@
     "textureMode": "homophony_melody_accompaniment",
     "styleProfile": "classical",
     "modernMode": "modernTonal",
-    "bassActivity": "high_active",
-    "tenorActivity": "high_active",
-    "altoActivity": "high_active",
-    "sopranoActivity": "active",
+    "bassActivity": "less_active",
+    "tenorActivity": "less_active",
+    "altoActivity": "less_active",
+    "sopranoActivity": "less_active",
     "vln1Activity": "grounded",
-    "vln2Activity": "high_active",
-    "vlaActivity": "high_active",
-    "vcActivity": "high_active",
-    "cbActivity": "high_active",
+    "vln2Activity": "less_active",
+    "vlaActivity": "less_active",
+    "vcActivity": "less_active",
+    "cbActivity": "less_active",
+    "instrumentation": "auto",
     "sopranoMelodyShare": 30,
     "randomizeOffsets": true,
     "keySignatureMode": "original",
@@ -28,7 +29,7 @@
     "timeSignatureMode": "original"
   },
   "prompt": "",
-  "filePath": "/Users/leobarros/Downloads/com christian.musicxml",
+  "filePath": "/Users/leobarros/Downloads/Flows from Holy Holy Holy Test/Holy Holy Holy Test - 01_Voice - 01 Flow 1.musicxml",
   "serverBaseUrl": "http://localhost:3001",
-  "timestamp": "2026-03-02T22:03:49.475Z"
+  "timestamp": "2026-03-10T20:34:27.805Z"
 }

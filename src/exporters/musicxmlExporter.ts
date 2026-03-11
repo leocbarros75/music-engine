@@ -815,14 +815,24 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
               const expectedAlter = keySignatureAlter(wp.step, fifthsToWrite);
               const accidental =
                 alterVal === expectedAlter ? null : accidentalFromAlterForDisplay(alterVal);
+              const tieStart = evAny.tieStart === true;
+              const tieStop = evAny.tieStop === true;
               out += `<note>`;
               if (gi > 0 || evAny.chord === true) out += `<chord/>`;
               out += `<pitch><step>${xmlEscape(wp.step)}</step>`;
               if (typeof wp.alter === "number" && wp.alter !== 0) out += `<alter>${wp.alter}</alter>`;
               out += `<octave>${wp.octave}</octave></pitch>`;
+              if (tieStart) out += `<tie type="start"/>`;
+              if (tieStop) out += `<tie type="stop"/>`;
               out += `<duration>${dur}</duration><voice>${voice}</voice>`;
               if (type) out += `<type>${type}</type>`;
               if (accidental) out += `<accidental>${accidental}</accidental>`;
+              if (tieStart || tieStop) {
+                out += `<notations>`;
+                if (tieStart) out += `<tied type="start"/>`;
+                if (tieStop) out += `<tied type="stop"/>`;
+                out += `</notations>`;
+              }
               out += `<staff>${staff}</staff></note>`;
               continue;
             }

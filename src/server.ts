@@ -538,6 +538,12 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       anyRaw.cbActivity === "high_active"
         ? (anyRaw.cbActivity as AppSettings["cbActivity"])
         : undefined,
+    instrumentation:
+      anyRaw.instrumentation === "auto" ||
+      anyRaw.instrumentation === "piano_copy_to_string_quartet" ||
+      anyRaw.instrumentation === "satb_to_string_quartet"
+        ? (anyRaw.instrumentation as AppSettings["instrumentation"])
+        : undefined,
     sopranoMelodyShare:
       typeof anyRaw.sopranoMelodyShare === "number" && Number.isFinite(anyRaw.sopranoMelodyShare)
         ? anyRaw.sopranoMelodyShare
@@ -694,7 +700,11 @@ const server = http.createServer(async (req, res) => {
       const wantsStrings =
         String(settings.ensemble ?? "").toLowerCase() === "string_ensemble" ||
         String(settings.ensemble ?? "").toLowerCase() === "strings";
-      if (wantsStrings && !musicxml && filePath) {
+      const wantsWoodwinds =
+        String(settings.ensemble ?? "").toLowerCase() === "woodwind_ensemble" ||
+        String(settings.ensemble ?? "").toLowerCase() === "woodwinds";
+      const wantsDirectSourceArrangement = wantsStrings || wantsWoodwinds;
+      if (wantsDirectSourceArrangement && !musicxml && filePath) {
         try {
           musicxml = fs.readFileSync(filePath, "utf8");
         } catch {
@@ -721,7 +731,7 @@ const server = http.createServer(async (req, res) => {
       }
 
       let score: any = null;
-      if (wantsStrings && musicxml) {
+      if (wantsDirectSourceArrangement && musicxml) {
         score = parseMusicXMLToScoreModel(musicxml);
       } else {
         if (scoreModel) score = scoreModel;
@@ -760,7 +770,7 @@ const server = http.createServer(async (req, res) => {
             : "none";
 
       let normalized: any;
-      if (wantsStrings) {
+      if (wantsDirectSourceArrangement) {
         normalized = score;
       } else {
         // Support BOTH harmonizer call styles:
@@ -804,9 +814,10 @@ const server = http.createServer(async (req, res) => {
         ensembleRaw === "grand_piano" ||
         ensembleRaw === "acoustic_piano";
       const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings";
+      const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds";
       const chordDebug = buildChordDebug(scoreModelOut, chordsForApp as any, inputChordWarnings, { pianoMode: isPiano });
       let ruleCheck = { rulesVersion: "choral-v1", violations: [], warnings: [] as string[] };
-      if (!isPiano && !isStrings) {
+      if (!isPiano && !isStrings && !isWoodwinds) {
         try {
           ruleCheck = checkChoralRules(scoreModelOut, chordsForApp as any, {
             strictness: settings.ruleStrictness,

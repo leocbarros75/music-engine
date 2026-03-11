@@ -28,6 +28,7 @@ const DEFAULT_SETTINGS: Settings = {
   vlaActivity: "less_active",
   vcActivity: "less_active",
   cbActivity: "less_active",
+  instrumentation: "auto",
   sopranoMelodyShare: 30,
   randomizeOffsets: true
 };
@@ -46,7 +47,8 @@ export default function App() {
     settings.ensemble === "choral" ||
     settings.ensemble === "piano" ||
     settings.ensemble === "piano_with_melody" ||
-    settings.ensemble === "string_ensemble";
+    settings.ensemble === "string_ensemble" ||
+    settings.ensemble === "woodwind_ensemble";
   const canRun = !!file && ensembleReady && serverReady && !isRunning;
 
   function addWarning(value: string) {
@@ -113,6 +115,7 @@ export default function App() {
       vlaActivity: settings.vlaActivity,
       vcActivity: settings.vcActivity,
       cbActivity: settings.cbActivity,
+      instrumentation: settings.instrumentation,
       sopranoMelodyShare: settings.sopranoMelodyShare,
       randomizeOffsets: settings.randomizeOffsets,
       ruleStrictness: settings.ruleStrictness,
@@ -135,7 +138,7 @@ export default function App() {
       return;
     }
     if (!ensembleReady) {
-      addWarning("Only choral (SATB) and piano ensembles are supported in this MVP.");
+      addWarning("Supported ensembles: choral (SATB), piano, strings, and woodwinds.");
       return;
     }
 
@@ -311,7 +314,7 @@ export default function App() {
               {isRunning ? "Running..." : "Generate Arrangement"}
             </button>
             {!serverReady && <div className="muted">Waiting for server...</div>}
-            {!ensembleReady && <div className="muted">Only SATB and piano are supported in this MVP.</div>}
+            {!ensembleReady && <div className="muted">Supported ensembles: SATB, piano, strings, and woodwinds.</div>}
           </div>
 
           <div className="result-card">
