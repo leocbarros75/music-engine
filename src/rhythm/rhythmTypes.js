@@ -1,3 +1,3 @@
 "use strict";
-// src/harmony/types.ts
+// src/rhythm/rhythmTypes.ts
 Object.defineProperty(exports, "__esModule", { value: true });

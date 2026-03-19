@@ -1,15 +1,19 @@
-import { tonicNameToPc, pcToName } from "./pitch";
-import { tonicPcFromKey } from "./keyEstimate";
-const MAJOR_DEGREE_PCS = [0, 2, 4, 5, 7, 9, 11];
-const MINOR_HARMONIC_DEGREE_PCS = [0, 2, 3, 5, 7, 8, 11];
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.analyzeRomanNumeral = analyzeRomanNumeral;
+exports.chordNotesToNames = chordNotesToNames;
+var pitch_1 = require("./pitch");
+var keyEstimate_1 = require("./keyEstimate");
+var MAJOR_DEGREE_PCS = [0, 2, 4, 5, 7, 9, 11];
+var MINOR_HARMONIC_DEGREE_PCS = [0, 2, 3, 5, 7, 8, 11];
 function mod12(n) {
     return ((n % 12) + 12) % 12;
 }
 function degreeFromPcInKey(pc, key) {
-    const tonicPc = tonicPcFromKey(key);
-    const rel = mod12(pc - tonicPc);
-    const scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
-    const idx = scale.indexOf(rel);
+    var tonicPc = (0, keyEstimate_1.tonicPcFromKey)(key);
+    var rel = mod12(pc - tonicPc);
+    var scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
+    var idx = scale.indexOf(rel);
     if (idx < 0)
         return null;
     return idx + 1;
@@ -24,7 +28,7 @@ function romanBaseFromDegree(deg) {
                             deg === 7 ? "VII" : "I");
 }
 function romanFromDegree(deg, quality) {
-    const base = romanBaseFromDegree(deg);
+    var base = romanBaseFromDegree(deg);
     if (quality === "min")
         return base.toLowerCase();
     if (quality === "dim")
@@ -50,51 +54,31 @@ function functionTagFromDegree(deg) {
         return "dominant";
     return "other";
 }
-function detectSecondaryDominant(chordRootPc, key) {
-    const tonicPc = tonicNameToPc(key.tonic);
-    const scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
-    for (let i = 0; i < 7; i++) {
-        const targetDeg = i + 1;
-        if (targetDeg === 1)
-            continue;
-        const targetPc = mod12(tonicPc + scale[i]);
-        const vOfTarget = mod12(targetPc + 7);
-        if (vOfTarget === mod12(chordRootPc)) {
-            const targetRoman = targetDeg === 2 ? "ii" :
-                targetDeg === 3 ? "iii" :
-                    targetDeg === 4 ? "IV" :
-                        targetDeg === 5 ? "V" :
-                            targetDeg === 6 ? "vi" :
-                                "vii°";
-            return { roman: `V/${targetRoman}`, secondaryOf: targetRoman };
-        }
-    }
-    return null;
-}
 function isSeventhChordQuality(q) {
     return q === "dom7" || q === "maj7" || q === "min7" || q === "hdim7" || q === "dim7";
 }
 function inversionFigure(chord) {
-    const root = chord.rootPc;
-    const bass = chord.bassPc;
+    var _a;
+    var root = chord.rootPc;
+    var bass = chord.bassPc;
     if (root === null)
         return "";
     if (bass === null)
         return "";
-    const pcs = chord.pcs ?? [];
-    const r = mod12(root);
-    const third = pcs.includes(mod12(r + 4)) ? mod12(r + 4) :
+    var pcs = (_a = chord.pcs) !== null && _a !== void 0 ? _a : [];
+    var r = mod12(root);
+    var third = pcs.includes(mod12(r + 4)) ? mod12(r + 4) :
         pcs.includes(mod12(r + 3)) ? mod12(r + 3) :
             null;
-    const fifth = pcs.includes(mod12(r + 7)) ? mod12(r + 7) :
+    var fifth = pcs.includes(mod12(r + 7)) ? mod12(r + 7) :
         pcs.includes(mod12(r + 6)) ? mod12(r + 6) :
             pcs.includes(mod12(r + 8)) ? mod12(r + 8) :
                 null;
-    const seventh = pcs.includes(mod12(r + 10)) ? mod12(r + 10) :
+    var seventh = pcs.includes(mod12(r + 10)) ? mod12(r + 10) :
         pcs.includes(mod12(r + 11)) ? mod12(r + 11) :
             pcs.includes(mod12(r + 9)) ? mod12(r + 9) :
                 null;
-    const is7 = isSeventhChordQuality(chord.quality);
+    var is7 = isSeventhChordQuality(chord.quality);
     if (!is7) {
         if (bass === r)
             return "";
@@ -117,75 +101,146 @@ function inversionFigure(chord) {
 function applyInversionToRoman(roman, figure) {
     if (!figure)
         return roman;
-    const slash = roman.indexOf("/");
+    var slash = roman.indexOf("/");
     if (slash >= 0) {
-        const left = roman.slice(0, slash);
-        const right = roman.slice(slash);
+        var left = roman.slice(0, slash);
+        var right = roman.slice(slash);
         if (/\d$/.test(left))
             return roman;
-        return `${left}${figure}${right}`;
+        return "".concat(left).concat(figure).concat(right);
     }
     if (/\d$/.test(roman))
         return roman;
-    return `${roman}${figure}`;
+    return "".concat(roman).concat(figure);
 }
 function borrowedMixtureRomanIfAny(chord, key) {
-    const mode = String(key?.mode ?? "").toLowerCase();
+    var _a, _b;
+    var mode = String((_a = key === null || key === void 0 ? void 0 : key.mode) !== null && _a !== void 0 ? _a : "").toLowerCase();
     if (mode !== "major")
         return null;
-    const root = chord?.rootPc;
+    var root = chord === null || chord === void 0 ? void 0 : chord.rootPc;
     if (typeof root !== "number")
         return null;
-    const tonicPc = tonicNameToPc(key.tonic);
-    const rel = mod12(root - tonicPc);
-    const q = String(chord?.quality ?? "").toLowerCase();
+    var tonicPc = (0, pitch_1.tonicNameToPc)(key.tonic);
+    var rel = mod12(root - tonicPc);
+    var q = String((_b = chord === null || chord === void 0 ? void 0 : chord.quality) !== null && _b !== void 0 ? _b : "").toLowerCase();
     // Common borrowed chords in major:
-    // bIII (rel=3) major triad
-    // bVI  (rel=8) major triad
-    // bVII (rel=10) major triad
     if (q === "maj" && rel === 3)
         return { roman: "bIII", degree: 3, functionTag: "tonic" };
     if (q === "maj" && rel === 8)
         return { roman: "bVI", degree: 6, functionTag: "predominant" };
     if (q === "maj" && rel === 10)
         return { roman: "bVII", degree: 7, functionTag: "predominant" };
-    // Borrowed iv is already handled diatonically (degree 4) when root is diatonic (IV) and quality is min.
     return null;
 }
-export function analyzeRomanNumeral(chord, key, notes) {
-    if (!chord || chord.rootPc === null) {
-        return { roman: "N.C.", degree: null, functionTag: "other", notes };
+function targetRomanFromDegree(targetDeg) {
+    return (targetDeg === 2 ? "ii" :
+        targetDeg === 3 ? "iii" :
+            targetDeg === 4 ? "IV" :
+                targetDeg === 5 ? "V" :
+                    targetDeg === 6 ? "vi" :
+                        "vii°");
+}
+function diatonicPcSetForKey(key) {
+    var tonicPc = (0, pitch_1.tonicNameToPc)(key.tonic);
+    var scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
+    var s = new Set();
+    for (var _i = 0, scale_1 = scale; _i < scale_1.length; _i++) {
+        var rel = scale_1[_i];
+        s.add(mod12(tonicPc + rel));
     }
-    const deg = degreeFromPcInKey(chord.rootPc, key);
-    const functionTag = functionTagFromDegree(deg);
-    // 1) Secondary dominants: only for dominant-7 quality
-    if (chord.quality === "dom7") {
-        const sec = detectSecondaryDominant(chord.rootPc, key);
+    return s;
+}
+function chordHasChromaticTone(chord, key) {
+    var pcs = Array.isArray(chord === null || chord === void 0 ? void 0 : chord.pcs) ? chord.pcs : [];
+    var diatonic = diatonicPcSetForKey(key);
+    for (var _i = 0, pcs_1 = pcs; _i < pcs_1.length; _i++) {
+        var pc = pcs_1[_i];
+        var p = mod12(pc);
+        if (!diatonic.has(p))
+            return true;
+    }
+    return false;
+}
+/**
+ * Secondary function detection (Phase 4.3, conservative)
+ *
+ * Detect:
+ * - V/target as dom7 always (strong evidence)
+ * - V/target as MAJOR TRIAD only when the chord contains chromatic tones outside the key scale
+ * - vii°/target as dim / ø7 / °7 (these are typically chromatic anyway)
+ *
+ * Returns the roman string and "secondaryOf" = the target roman (expected resolution).
+ */
+function detectSecondaryFunction(chord, key) {
+    var _a;
+    var rootPc = chord === null || chord === void 0 ? void 0 : chord.rootPc;
+    if (typeof rootPc !== "number")
+        return null;
+    var q = String((_a = chord === null || chord === void 0 ? void 0 : chord.quality) !== null && _a !== void 0 ? _a : "").toLowerCase();
+    var tonicPc = (0, pitch_1.tonicNameToPc)(key.tonic);
+    var scale = key.mode === "minor" ? MINOR_HARMONIC_DEGREE_PCS : MAJOR_DEGREE_PCS;
+    var hasChromatic = chordHasChromaticTone(chord, key);
+    for (var i = 0; i < 7; i++) {
+        var targetDeg = i + 1;
+        if (targetDeg === 1)
+            continue;
+        var targetPc = mod12(tonicPc + scale[i]);
+        var vOfTarget = mod12(targetPc + 7);
+        var ltOfTarget = mod12(targetPc - 1);
+        var targetRoman = targetRomanFromDegree(targetDeg);
+        // V/target as dom7 (allow even if chord tones happen to be diatonic)
+        if (q === "dom7" && mod12(rootPc) === vOfTarget) {
+            return { roman: "V/".concat(targetRoman), secondaryOf: targetRoman };
+        }
+        // V/target as major triad ONLY with chromatic evidence
+        if (q === "maj" && hasChromatic && mod12(rootPc) === vOfTarget) {
+            return { roman: "V/".concat(targetRoman), secondaryOf: targetRoman };
+        }
+        // vii°/target as dim / ø7 / °7
+        if ((q === "dim" || q === "hdim7" || q === "dim7") && mod12(rootPc) === ltOfTarget) {
+            var base = q === "hdim7" ? "viiø7" :
+                q === "dim7" ? "vii°7" :
+                    "vii°";
+            return { roman: "".concat(base, "/").concat(targetRoman), secondaryOf: targetRoman };
+        }
+    }
+    return null;
+}
+function analyzeRomanNumeral(chord, key, notes) {
+    if (!chord || chord.rootPc === null) {
+        return { roman: "N.C.", degree: null, functionTag: "other", notes: notes };
+    }
+    var deg = degreeFromPcInKey(chord.rootPc, key);
+    var functionTag = functionTagFromDegree(deg);
+    // 1) Secondary function chords (Phase 4.3, conservative)
+    {
+        var sec = detectSecondaryFunction(chord, key);
         if (sec) {
-            const fig = inversionFigure(chord);
-            const roman = applyInversionToRoman(sec.roman, fig);
+            var fig_1 = inversionFigure(chord);
+            var roman_1 = applyInversionToRoman(sec.roman, fig_1);
             return {
-                roman,
+                roman: roman_1,
                 degree: deg,
                 functionTag: "dominant",
                 secondaryOf: sec.secondaryOf,
-                notes
+                notes: notes
             };
         }
     }
     // 2) Borrowed mixture in major when degree is non-diatonic (deg=null)
     if (deg === null) {
-        const mix = borrowedMixtureRomanIfAny(chord, key);
+        var mix = borrowedMixtureRomanIfAny(chord, key);
         if (mix) {
-            const fig = inversionFigure(chord);
-            const roman = applyInversionToRoman(mix.roman, fig);
-            return { roman, degree: mix.degree, functionTag: mix.functionTag, notes };
+            var fig_2 = inversionFigure(chord);
+            var roman_2 = applyInversionToRoman(mix.roman, fig_2);
+            return { roman: roman_2, degree: mix.degree, functionTag: mix.functionTag, notes: notes };
         }
     }
     // 3) Diatonic roman + inversion figure, else chord name
-    let roman = deg ? romanFromDegree(deg, chord.quality) : chord.name;
-    const fig = inversionFigure(chord);
-    const is7 = isSeventhChordQuality(chord.quality);
+    var roman = deg ? romanFromDegree(deg, chord.quality) : chord.name;
+    var fig = inversionFigure(chord);
+    var is7 = isSeventhChordQuality(chord.quality);
     if (is7) {
         if (fig === "65" || fig === "43" || fig === "42") {
             roman = roman.replace(/7$/, "");
@@ -196,9 +251,9 @@ export function analyzeRomanNumeral(chord, key, notes) {
         if (fig === "6" || fig === "64")
             roman = applyInversionToRoman(roman, fig);
     }
-    return { roman, degree: deg, functionTag, notes };
+    return { roman: roman, degree: deg, functionTag: functionTag, notes: notes };
 }
-export function chordNotesToNames(pcs, preferSharps = true) {
-    return (pcs ?? []).map((pc) => pcToName(pc, preferSharps));
+function chordNotesToNames(pcs, preferSharps) {
+    if (preferSharps === void 0) { preferSharps = true; }
+    return (pcs !== null && pcs !== void 0 ? pcs : []).map(function (pc) { return (0, pitch_1.pcToName)(pc, preferSharps); });
 }
-//# sourceMappingURL=roman.js.map

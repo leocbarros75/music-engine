@@ -1,43 +1,48 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.detectCadences = detectCadences;
 function up(s) {
-    return String(s ?? "").toUpperCase().trim();
+    return String(s !== null && s !== void 0 ? s : "").toUpperCase().trim();
 }
 function isVishRoman(roman) {
-    const r = up(roman);
+    var r = up(roman);
     // Includes V, V7, V/V, etc, and vii° as dominant-function
     return r.startsWith("V") || r.includes("V/") || r.startsWith("VII");
 }
 function isIshRoman(roman) {
-    const r = String(roman ?? "").trim();
+    var r = String(roman !== null && roman !== void 0 ? roman : "").trim();
     return r === "I" || r === "i";
 }
 function isIVishRoman(roman) {
-    const r = String(roman ?? "").trim();
+    var r = String(roman !== null && roman !== void 0 ? roman : "").trim();
     // Treat borrowed backdoor chords as plagal-ish:
     // bVII -> I is a common "backdoor" cadence in major.
     return r === "IV" || r === "iv" || r === "bVII";
 }
 function isVIishRoman(roman) {
-    const r = String(roman ?? "").trim();
+    var r = String(roman !== null && roman !== void 0 ? roman : "").trim();
     return r === "VI" || r === "vi";
 }
 function looksLikeV7(prev) {
-    const prevRoman = up(prev?.roman?.roman ?? "");
-    const q = prev?.chord?.quality ?? "unknown";
+    var _a, _b, _c, _d;
+    var prevRoman = up((_b = (_a = prev === null || prev === void 0 ? void 0 : prev.roman) === null || _a === void 0 ? void 0 : _a.roman) !== null && _b !== void 0 ? _b : "");
+    var q = (_d = (_c = prev === null || prev === void 0 ? void 0 : prev.chord) === null || _c === void 0 ? void 0 : _c.quality) !== null && _d !== void 0 ? _d : "unknown";
     if (q === "dom7")
         return true;
     if (prevRoman.startsWith("V") && prevRoman.includes("7"))
         return true;
     return false;
 }
-export function detectCadences(measures) {
-    const out = [];
-    for (let i = 1; i < measures.length; i++) {
-        const prev = measures[i - 1];
-        const last = measures[i];
-        const prevR = prev?.roman?.roman ?? "N.C.";
-        const lastR = last?.roman?.roman ?? "N.C.";
-        let type = "none";
-        let conf = 0;
+function detectCadences(measures) {
+    var _a, _b, _c, _d;
+    var out = [];
+    for (var i = 1; i < measures.length; i++) {
+        var prev = measures[i - 1];
+        var last = measures[i];
+        var prevR = (_b = (_a = prev === null || prev === void 0 ? void 0 : prev.roman) === null || _a === void 0 ? void 0 : _a.roman) !== null && _b !== void 0 ? _b : "N.C.";
+        var lastR = (_d = (_c = last === null || last === void 0 ? void 0 : last.roman) === null || _c === void 0 ? void 0 : _c.roman) !== null && _d !== void 0 ? _d : "N.C.";
+        var type = "none";
+        var conf = 0;
         // Authentic cadence: V(7) -> I
         if (isVishRoman(prevR) && isIshRoman(lastR)) {
             if (looksLikeV7(prev)) {
@@ -67,7 +72,7 @@ export function detectCadences(measures) {
         if (type !== "none") {
             out.push({
                 atMeasure: last.measureNumber,
-                type,
+                type: type,
                 confidence: conf,
                 evidence: { prevRoman: prevR, lastRoman: lastR }
             });
@@ -75,4 +80,3 @@ export function detectCadences(measures) {
     }
     return out;
 }
-//# sourceMappingURL=cadence.js.map

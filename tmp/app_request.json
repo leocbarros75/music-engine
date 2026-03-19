@@ -6,16 +6,16 @@
     "timeSignature": "original",
     "tempo": 120,
     "style": "classical",
-    "level": "advanced",
-    "accompaniment": "homophonic",
+    "level": "intermediate",
+    "accompaniment": "polyphonic",
     "ruleStrictness": "standard",
-    "textureMode": "homophony_melody_accompaniment",
+    "textureMode": "polyphony",
     "styleProfile": "classical",
     "modernMode": "modernTonal",
-    "bassActivity": "less_active",
-    "tenorActivity": "less_active",
-    "altoActivity": "less_active",
-    "sopranoActivity": "less_active",
+    "bassActivity": "high_active",
+    "tenorActivity": "high_active",
+    "altoActivity": "high_active",
+    "sopranoActivity": "high_active",
     "vln1Activity": "grounded",
     "vln2Activity": "less_active",
     "vlaActivity": "less_active",
@@ -29,7 +29,7 @@
     "timeSignatureMode": "original"
   },
   "prompt": "",
-  "filePath": "/Users/leobarros/Downloads/Flows from Holy Holy Holy Test/Holy Holy Holy Test - 01_Voice - 01 Flow 1.musicxml",
+  "filePath": "/Users/leobarros/Downloads/Flows from hark test/hark test - 01_Soprano - 01 Hark the herold.musicxml",
   "serverBaseUrl": "http://localhost:3001",
-  "timestamp": "2026-03-10T20:34:27.805Z"
+  "timestamp": "2026-03-17T19:52:36.384Z"
 }

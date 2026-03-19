@@ -1,14 +1,37 @@
+"use strict";
 // src/instruments/instrumentCatalog.ts
-const base = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-export function pitchToMidi(p) {
-    const step = p.step.toUpperCase();
-    const semis = (base[step] ?? 0) + (p.alter ?? 0);
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InstrumentCatalog = void 0;
+exports.pitchToMidi = pitchToMidi;
+exports.midiToPitch = midiToPitch;
+exports.shiftOctavesIntoRange = shiftOctavesIntoRange;
+exports.getInstrumentSpec = getInstrumentSpec;
+exports.clampMidiToInstrumentRange = clampMidiToInstrumentRange;
+exports.clampPitchToInstrumentRange = clampPitchToInstrumentRange;
+exports.enforceInstrumentRangesOnScore = enforceInstrumentRangesOnScore;
+var base = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+function pitchToMidi(p) {
+    var _a, _b;
+    var step = p.step.toUpperCase();
+    var semis = ((_a = base[step]) !== null && _a !== void 0 ? _a : 0) + ((_b = p.alter) !== null && _b !== void 0 ? _b : 0);
     return (p.octave + 1) * 12 + semis;
 }
-export function midiToPitch(m) {
-    const pc = ((m % 12) + 12) % 12;
-    const octave = Math.floor(m / 12) - 1;
-    const map = [
+function midiToPitch(m) {
+    var _a;
+    var pc = ((m % 12) + 12) % 12;
+    var octave = Math.floor(m / 12) - 1;
+    var map = [
         { step: "C" },
         { step: "C", alter: 1 },
         { step: "D" },
@@ -22,11 +45,11 @@ export function midiToPitch(m) {
         { step: "A", alter: 1 },
         { step: "B" }
     ];
-    const sp = map[pc] ?? { step: "C" };
-    return { step: sp.step, alter: sp.alter, octave };
+    var sp = (_a = map[pc]) !== null && _a !== void 0 ? _a : { step: "C" };
+    return { step: sp.step, alter: sp.alter, octave: octave };
 }
-export function shiftOctavesIntoRange(midi, lo, hi) {
-    let m = midi;
+function shiftOctavesIntoRange(midi, lo, hi) {
+    var m = midi;
     while (m < lo)
         m += 12;
     while (m > hi)
@@ -37,7 +60,7 @@ export function shiftOctavesIntoRange(midi, lo, hi) {
         m = hi;
     return m;
 }
-export const InstrumentCatalog = {
+exports.InstrumentCatalog = {
     piano: {
         id: "piano",
         name: "Piano",
@@ -82,6 +105,15 @@ export const InstrumentCatalog = {
         midi_high: 84, // C6
         preferred_low: 43, // G2
         preferred_high: 64 // E4
+    },
+    double_bass: {
+        id: "double_bass",
+        name: "Double Bass",
+        clef: "bass",
+        midi_low: 28, // E1
+        midi_high: 67, // G4
+        preferred_low: 31, // G1
+        preferred_high: 55 // G3
     },
     // ---- Woodwinds (concert pitch) ----
     flute: {
@@ -223,7 +255,7 @@ export const InstrumentCatalog = {
     }
 };
 function normalizeInstrumentId(raw) {
-    const s = (raw ?? "").trim().toLowerCase();
+    var s = (raw !== null && raw !== void 0 ? raw : "").trim().toLowerCase();
     // common part ids from your exporters/mappers
     if (s === "v1" || s === "violin1" || s === "violin_i" || s === "violin i")
         return "violin_1";
@@ -233,6 +265,8 @@ function normalizeInstrumentId(raw) {
         return "viola";
     if (s === "vc" || s === "vlc")
         return "cello";
+    if (s === "db" || s === "doublebass" || s === "double_bass" || s === "contrabass")
+        return "double_bass";
     // winds/brass aliases (just in case)
     if (s === "tpt1")
         return "trumpet_bb_1";
@@ -246,31 +280,31 @@ function normalizeInstrumentId(raw) {
         return "tuba_c";
     return s;
 }
-export function getInstrumentSpec(instrument) {
-    const id = normalizeInstrumentId(instrument ?? "");
-    const spec = InstrumentCatalog[id];
-    return spec ?? null;
+function getInstrumentSpec(instrument) {
+    var id = normalizeInstrumentId(instrument !== null && instrument !== void 0 ? instrument : "");
+    var spec = exports.InstrumentCatalog[id];
+    return spec !== null && spec !== void 0 ? spec : null;
 }
-export function clampMidiToInstrumentRange(midi, spec) {
-    const absLo = spec.midi_low;
-    const absHi = spec.midi_high;
-    const prefLo = typeof spec.preferred_low === "number" ? spec.preferred_low : null;
-    const prefHi = typeof spec.preferred_high === "number" ? spec.preferred_high : null;
+function clampMidiToInstrumentRange(midi, spec) {
+    var absLo = spec.midi_low;
+    var absHi = spec.midi_high;
+    var prefLo = typeof spec.preferred_low === "number" ? spec.preferred_low : null;
+    var prefHi = typeof spec.preferred_high === "number" ? spec.preferred_high : null;
     // try preferred first
     if (prefLo !== null && prefHi !== null) {
-        const mPref = shiftOctavesIntoRange(midi, prefLo, prefHi);
+        var mPref = shiftOctavesIntoRange(midi, prefLo, prefHi);
         if (mPref >= absLo && mPref <= absHi)
             return mPref;
     }
     // fallback to absolute
     return shiftOctavesIntoRange(midi, absLo, absHi);
 }
-export function clampPitchToInstrumentRange(p, instrument) {
-    const spec = getInstrumentSpec(instrument);
+function clampPitchToInstrumentRange(p, instrument) {
+    var spec = getInstrumentSpec(instrument);
     if (!spec)
         return p;
-    const m = pitchToMidi(p);
-    const m2 = clampMidiToInstrumentRange(m, spec);
+    var m = pitchToMidi(p);
+    var m2 = clampMidiToInstrumentRange(m, spec);
     return midiToPitch(m2);
 }
 /**
@@ -278,29 +312,31 @@ export function clampPitchToInstrumentRange(p, instrument) {
  * - leaves rests + unpitched alone
  * - clamps by shifting octaves into preferred, then absolute
  */
-export function enforceInstrumentRangesOnScore(score) {
+function enforceInstrumentRangesOnScore(score) {
     if (!score || !Array.isArray(score.parts))
         return score;
-    const parts = score.parts.map((part) => {
-        const instrument = part?.instrument;
-        const spec = getInstrumentSpec(instrument);
+    var parts = score.parts.map(function (part) {
+        var _a;
+        var instrument = part === null || part === void 0 ? void 0 : part.instrument;
+        var spec = getInstrumentSpec(instrument);
         if (!spec)
             return part;
-        const measures = (part.measures ?? []).map((m) => {
-            const events = (m.events ?? []).map((ev) => {
-                if (ev?.type !== "note" || !ev?.pitch?.step)
+        var measures = ((_a = part.measures) !== null && _a !== void 0 ? _a : []).map(function (m) {
+            var _a;
+            var events = ((_a = m.events) !== null && _a !== void 0 ? _a : []).map(function (ev) {
+                var _a;
+                if ((ev === null || ev === void 0 ? void 0 : ev.type) !== "note" || !((_a = ev === null || ev === void 0 ? void 0 : ev.pitch) === null || _a === void 0 ? void 0 : _a.step))
                     return ev;
-                const p = ev.pitch;
-                const m0 = pitchToMidi(p);
-                const m1 = clampMidiToInstrumentRange(m0, spec);
+                var p = ev.pitch;
+                var m0 = pitchToMidi(p);
+                var m1 = clampMidiToInstrumentRange(m0, spec);
                 if (m1 === m0)
                     return ev;
-                return { ...ev, pitch: midiToPitch(m1) };
+                return __assign(__assign({}, ev), { pitch: midiToPitch(m1) });
             });
-            return { ...m, events };
+            return __assign(__assign({}, m), { events: events });
         });
-        return { ...part, measures };
+        return __assign(__assign({}, part), { measures: measures });
     });
-    return { ...score, parts };
+    return __assign(__assign({}, score), { parts: parts });
 }
-//# sourceMappingURL=instrumentCatalog.js.map

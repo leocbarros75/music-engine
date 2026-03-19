@@ -1,3 +1,3 @@
 "use strict";
-// src/harmony/types.ts
+// src/harmonize/satb/harmonizeTypes.ts
 Object.defineProperty(exports, "__esModule", { value: true });

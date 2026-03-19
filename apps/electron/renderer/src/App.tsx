@@ -125,6 +125,7 @@ export default function App() {
   }, [settings, file, prompt]);
   const showPolyphonicSummary = jobSummary.textureMode === "polyphony" || jobSummary.accompaniment === "polyphonic";
   const showChordalSummary = jobSummary.accompaniment === "chordal";
+  const showWoodwindPolyphonicSummary = showPolyphonicSummary && settings.ensemble === "woodwind_ensemble";
 
   async function pickFile() {
     const selection = await window.api.selectMusicXmlFile();
@@ -274,7 +275,19 @@ export default function App() {
                 <div>{jobSummary.modernMode || "modernTonal"}</div>
               </div>
             )}
-            {showPolyphonicSummary && (
+            {showWoodwindPolyphonicSummary && (
+              <div>
+                <div className="summary-label">Woodwind Polyphonic Activity</div>
+                <div>
+                  Bassoon: {jobSummary.bassActivity || "less_active"} · Clarinet:{" "}
+                  {jobSummary.tenorActivity || jobSummary.bassActivity || "less_active"} · Oboe:{" "}
+                  {jobSummary.altoActivity || jobSummary.bassActivity || "less_active"} · Flute:{" "}
+                  {jobSummary.sopranoActivity || jobSummary.bassActivity || "less_active"} · Offsets:{" "}
+                  {jobSummary.randomizeOffsets === false ? "Off" : "On"}
+                </div>
+              </div>
+            )}
+            {showPolyphonicSummary && !showWoodwindPolyphonicSummary && (
               <div>
                 <div className="summary-label">Polyphonic Activity</div>
                 <div>

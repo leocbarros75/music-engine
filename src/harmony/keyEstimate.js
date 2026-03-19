@@ -1,66 +1,76 @@
-import { tonicNameToPc, pcToName } from "./pitch";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.estimateKeyFromPcHistogram = estimateKeyFromPcHistogram;
+exports.keyFromMetaOrBestGuess = keyFromMetaOrBestGuess;
+exports.tonicPcFromKey = tonicPcFromKey;
+var pitch_1 = require("./pitch");
 // Small key estimator using pitch class histogram and major/minor templates.
-const MAJOR_TEMPLATE = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
-const MINOR_TEMPLATE = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
+var MAJOR_TEMPLATE = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
+var MINOR_TEMPLATE = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
 function dot(a, b) {
-    let s = 0;
-    for (let i = 0; i < 12; i++)
-        s += (a[i] ?? 0) * (b[i] ?? 0);
+    var _a, _b;
+    var s = 0;
+    for (var i = 0; i < 12; i++)
+        s += ((_a = a[i]) !== null && _a !== void 0 ? _a : 0) * ((_b = b[i]) !== null && _b !== void 0 ? _b : 0);
     return s;
 }
 function norm(a) {
-    let s = 0;
-    for (let i = 0; i < 12; i++)
-        s += (a[i] ?? 0) * (a[i] ?? 0);
+    var _a, _b;
+    var s = 0;
+    for (var i = 0; i < 12; i++)
+        s += ((_a = a[i]) !== null && _a !== void 0 ? _a : 0) * ((_b = a[i]) !== null && _b !== void 0 ? _b : 0);
     return Math.sqrt(s);
 }
 function rotate(arr, shift) {
-    const out = new Array(12).fill(0);
-    for (let i = 0; i < 12; i++)
-        out[(i + shift + 12) % 12] = arr[i] ?? 0;
+    var _a;
+    var out = new Array(12).fill(0);
+    for (var i = 0; i < 12; i++)
+        out[(i + shift + 12) % 12] = (_a = arr[i]) !== null && _a !== void 0 ? _a : 0;
     return out;
 }
 function cosineSim(a, b) {
-    const na = norm(a);
-    const nb = norm(b);
+    var na = norm(a);
+    var nb = norm(b);
     if (na <= 0 || nb <= 0)
         return 0;
     return dot(a, b) / (na * nb);
 }
-export function estimateKeyFromPcHistogram(hist, preferSharps = true) {
-    const h = (hist ?? []).slice(0, 12);
+function estimateKeyFromPcHistogram(hist, preferSharps) {
+    if (preferSharps === void 0) { preferSharps = true; }
+    var h = (hist !== null && hist !== void 0 ? hist : []).slice(0, 12);
     while (h.length < 12)
         h.push(0);
-    let best = { pc: 0, mode: "major", sim: -1 };
-    for (let tonicPc = 0; tonicPc < 12; tonicPc++) {
-        const maj = cosineSim(h, rotate(MAJOR_TEMPLATE, tonicPc));
+    var best = { pc: 0, mode: "major", sim: -1 };
+    for (var tonicPc = 0; tonicPc < 12; tonicPc++) {
+        var maj = cosineSim(h, rotate(MAJOR_TEMPLATE, tonicPc));
         if (maj > best.sim)
             best = { pc: tonicPc, mode: "major", sim: maj };
-        const min = cosineSim(h, rotate(MINOR_TEMPLATE, tonicPc));
+        var min = cosineSim(h, rotate(MINOR_TEMPLATE, tonicPc));
         if (min > best.sim)
             best = { pc: tonicPc, mode: "minor", sim: min };
     }
-    const confidence = Math.max(0, Math.min(1, (best.sim + 1) / 2));
-    return { tonic: pcToName(best.pc, preferSharps), mode: best.mode, confidence };
+    var confidence = Math.max(0, Math.min(1, (best.sim + 1) / 2));
+    return { tonic: (0, pitch_1.pcToName)(best.pc, preferSharps), mode: best.mode, confidence: confidence };
 }
-export function keyFromMetaOrBestGuess(metaKey, hist, preferSharps = true) {
+function keyFromMetaOrBestGuess(metaKey, hist, preferSharps) {
+    var _a;
+    if (preferSharps === void 0) { preferSharps = true; }
     if (metaKey) {
         if (typeof metaKey === "string") {
-            const s = metaKey.toLowerCase();
-            const tonic = metaKey.trim().split(/\s+/)[0] ?? "C";
-            const mode = s.includes("minor") ? "minor" : s.includes("major") ? "major" : "unknown";
+            var s = metaKey.toLowerCase();
+            var tonic = (_a = metaKey.trim().split(/\s+/)[0]) !== null && _a !== void 0 ? _a : "C";
+            var mode = s.includes("minor") ? "minor" : s.includes("major") ? "major" : "unknown";
             if (mode === "major" || mode === "minor")
-                return { tonic, mode, confidence: 0.95 };
+                return { tonic: tonic, mode: mode, confidence: 0.95 };
         }
         if (typeof metaKey === "object" && typeof metaKey.tonic === "string") {
-            const mode = metaKey.mode === "minor" ? "minor" : metaKey.mode === "major" ? "major" : "unknown";
+            var mode = metaKey.mode === "minor" ? "minor" : metaKey.mode === "major" ? "major" : "unknown";
             if (mode === "major" || mode === "minor")
-                return { tonic: metaKey.tonic, mode, confidence: 0.95 };
+                return { tonic: metaKey.tonic, mode: mode, confidence: 0.95 };
         }
     }
     return estimateKeyFromPcHistogram(hist, preferSharps);
 }
-export function tonicPcFromKey(key) {
-    return tonicNameToPc(key.tonic);
+function tonicPcFromKey(key) {
+    return (0, pitch_1.tonicNameToPc)(key.tonic);
 }
-//# sourceMappingURL=keyEstimate.js.map

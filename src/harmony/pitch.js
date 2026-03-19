@@ -1,29 +1,39 @@
-const BASE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-export function pitchToMidi(p) {
-    const step = (p.step ?? "C").toUpperCase();
-    const semis = (BASE[step] ?? 0) + (p.alter ?? 0);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.pitchToMidi = pitchToMidi;
+exports.midiToPc = midiToPc;
+exports.pcToName = pcToName;
+exports.normalizeTonicName = normalizeTonicName;
+exports.tonicNameToPc = tonicNameToPc;
+var BASE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+function pitchToMidi(p) {
+    var _a, _b, _c;
+    var step = ((_a = p.step) !== null && _a !== void 0 ? _a : "C").toUpperCase();
+    var semis = ((_b = BASE[step]) !== null && _b !== void 0 ? _b : 0) + ((_c = p.alter) !== null && _c !== void 0 ? _c : 0);
     return (p.octave + 1) * 12 + semis;
 }
-export function midiToPc(m) {
-    const pc = ((m % 12) + 12) % 12;
+function midiToPc(m) {
+    var pc = ((m % 12) + 12) % 12;
     return pc;
 }
-export function pcToName(pc, preferSharps = true) {
-    const sharp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-    const flat = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-    const i = ((pc % 12) + 12) % 12;
+function pcToName(pc, preferSharps) {
+    if (preferSharps === void 0) { preferSharps = true; }
+    var sharp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    var flat = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+    var i = ((pc % 12) + 12) % 12;
     return preferSharps ? sharp[i] : flat[i];
 }
-export function normalizeTonicName(s) {
-    const t = (s ?? "").trim();
+function normalizeTonicName(s) {
+    var t = (s !== null && s !== void 0 ? s : "").trim();
     if (!t)
         return "C";
-    const u = t[0].toUpperCase() + t.slice(1);
+    var u = t[0].toUpperCase() + t.slice(1);
     return u.replace("♯", "#").replace("♭", "b");
 }
-export function tonicNameToPc(tonic) {
-    const t = normalizeTonicName(tonic);
-    const map = {
+function tonicNameToPc(tonic) {
+    var _a;
+    var t = normalizeTonicName(tonic);
+    var map = {
         C: 0,
         "C#": 1,
         Db: 1,
@@ -42,6 +52,5 @@ export function tonicNameToPc(tonic) {
         Bb: 10,
         B: 11
     };
-    return map[t] ?? 0;
+    return (_a = map[t]) !== null && _a !== void 0 ? _a : 0;
 }
-//# sourceMappingURL=pitch.js.map

@@ -200,10 +200,13 @@ export default function SettingsForm({ settings, onChange }: Props) {
       : "Offsets enabled: subtle syncopation and staggered entries.";
   const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
   const isStrings = settings.ensemble === "string_ensemble";
+  const isWoodwinds = settings.ensemble === "woodwind_ensemble";
   const showPolyphonicControls = settings.accompaniment === "polyphonic" || settings.textureMode === "polyphony";
   const showChordalActivity = settings.accompaniment === "chordal" && isPiano && settings.level === "beginner";
-  const showSopranoActivity = isPiano;
+  const showPianoSopranoActivity = isPiano;
   const showStringPolyphonic = isStrings && showPolyphonicControls;
+  const showWoodwindPolyphonic = isWoodwinds && showPolyphonicControls;
+  const showGenericPolyphonicVoices = showPolyphonicControls && !showStringPolyphonic && !showWoodwindPolyphonic;
   const accompanimentOptions = isPiano
     ? ACCOMP_OPTIONS
     : ACCOMP_OPTIONS.filter((opt) => opt !== "chordal");
@@ -417,7 +420,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
         </div>
       )}
 
-      {(showPolyphonicControls || showChordalActivity) && (
+      {((showPolyphonicControls && !showWoodwindPolyphonic) || showChordalActivity) && (
         <div className="field">
           <label>{showChordalActivity && !showPolyphonicControls ? "Chordal Activity (Left Hand)" : "Polyphonic Activity (Bass)"}</label>
           <select
@@ -437,7 +440,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
         </div>
       )}
 
-      {showPolyphonicControls && (
+      {showGenericPolyphonicVoices && (
         <div className="field">
           <label>Polyphonic Activity (Tenor)</label>
           <select
@@ -460,7 +463,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
         </div>
       )}
 
-      {showPolyphonicControls && (
+      {showGenericPolyphonicVoices && (
         <div className="field">
           <label>Polyphonic Activity (Alto)</label>
           <select
@@ -483,7 +486,94 @@ export default function SettingsForm({ settings, onChange }: Props) {
         </div>
       )}
 
-      {showSopranoActivity && (
+      {showWoodwindPolyphonic && (
+        <div className="field">
+          <label>Woodwind Polyphonic Activity (Bassoon)</label>
+          <select
+            value={settings.bassActivity ?? "less_active"}
+            onChange={(e) => update("bassActivity", e.target.value as Settings["bassActivity"])}
+          >
+            {BASS_ACTIVITY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="key-preview">
+            Selected: <span className="key-badge">{titleize(settings.bassActivity ?? "less_active")}</span>
+            <span className="slider-help">{bassActivityHelp}</span>
+          </div>
+        </div>
+      )}
+
+      {showWoodwindPolyphonic && (
+        <div className="field">
+          <label>Woodwind Polyphonic Activity (Clarinet)</label>
+          <select
+            value={settings.tenorActivity ?? settings.bassActivity ?? "less_active"}
+            onChange={(e) => update("tenorActivity", e.target.value as Settings["bassActivity"])}
+          >
+            {BASS_ACTIVITY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="key-preview">
+            Selected:{" "}
+            <span className="key-badge">
+              {titleize(settings.tenorActivity ?? settings.bassActivity ?? "less_active")}
+            </span>
+            <span className="slider-help">{tenorActivityHelp}</span>
+          </div>
+        </div>
+      )}
+
+      {showWoodwindPolyphonic && (
+        <div className="field">
+          <label>Woodwind Polyphonic Activity (Oboe)</label>
+          <select
+            value={settings.altoActivity ?? settings.bassActivity ?? "less_active"}
+            onChange={(e) => update("altoActivity", e.target.value as Settings["bassActivity"])}
+          >
+            {BASS_ACTIVITY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="key-preview">
+            Selected:{" "}
+            <span className="key-badge">
+              {titleize(settings.altoActivity ?? settings.bassActivity ?? "less_active")}
+            </span>
+            <span className="slider-help">{altoActivityHelp}</span>
+          </div>
+        </div>
+      )}
+
+      {showWoodwindPolyphonic && (
+        <div className="field">
+          <label>Woodwind Polyphonic Activity (Flute)</label>
+          <select
+            value={settings.sopranoActivity ?? "less_active"}
+            onChange={(e) => update("sopranoActivity", e.target.value as Settings["bassActivity"])}
+          >
+            {BASS_ACTIVITY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="key-preview">
+            Selected:{" "}
+            <span className="key-badge">{titleize(settings.sopranoActivity ?? "less_active")}</span>
+            <span className="slider-help">{sopranoActivityHelp}</span>
+          </div>
+        </div>
+      )}
+
+      {showPianoSopranoActivity && (
         <div className="field">
           <label>Soprano Activity (RH Top)</label>
           <select
@@ -604,7 +694,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
         </div>
       )}
 
-      {showSopranoActivity && (
+      {showPianoSopranoActivity && (
         <div className="field">
           <label>Soprano Melody Share (RH Top)</label>
           <input

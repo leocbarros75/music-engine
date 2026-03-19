@@ -9,6 +9,10 @@ export type WoodwindMapOptions = {
         symbol: string;
     }>;
     warnings?: string[];
+    fluteActivity?: "grounded" | "less_active" | "active" | "high_active";
+    oboeActivity?: "grounded" | "less_active" | "active" | "high_active";
+    clarinetActivity?: "grounded" | "less_active" | "active" | "high_active";
+    bassoonActivity?: "grounded" | "less_active" | "active" | "high_active";
 };
 /**
  * Woodwind ensemble mapping (Option 1, Concert Pitch View):

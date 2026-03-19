@@ -1454,7 +1454,11 @@ export function applyAppSettings(
       accompaniment,
       textureMode,
       chords,
-      warnings
+      warnings,
+      fluteActivity: settings.sopranoActivity ?? "less_active",
+      oboeActivity: settings.altoActivity ?? "less_active",
+      clarinetActivity: settings.tenorActivity ?? "less_active",
+      bassoonActivity: settings.bassActivity ?? "less_active"
     });
     attachTextureAnalysis(finalScore, warnings);
     return {
