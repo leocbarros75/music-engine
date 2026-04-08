@@ -160,12 +160,15 @@ function polyphonicProfile(
   | "intermediate_less_active"
   | "intermediate_active"
   | "intermediate_high_active"
+  | "advanced_less_active"
+  | "advanced_active"
+  | "advanced_high_active"
   | null {
   const level = String(options.level ?? "").toLowerCase();
   const accompaniment = String(options.accompaniment ?? "").toLowerCase();
   const textureMode = String(options.textureMode ?? "").toLowerCase();
   const isPolyphonic = accompaniment === "polyphonic" || textureMode === "polyphony";
-  if (!isPolyphonic || (level !== "beginner" && level !== "intermediate")) return null;
+  if (!isPolyphonic || (level !== "beginner" && level !== "intermediate" && level !== "advanced")) return null;
 
   const fluteActivity = options.fluteActivity ?? "less_active";
   const oboeActivity = options.oboeActivity ?? "less_active";
@@ -178,6 +181,7 @@ function polyphonicProfile(
     clarinetActivity === "less_active" &&
     bassoonActivity === "less_active"
   ) {
+    if (level === "advanced") return "advanced_less_active";
     return level === "intermediate" ? "intermediate_less_active" : "beginner_less_active";
   }
   if (
@@ -188,6 +192,7 @@ function polyphonicProfile(
   ) {
     if (level === "beginner") return "beginner_active";
     if (level === "intermediate") return "intermediate_high_active";
+    if (level === "advanced") return "advanced_high_active";
   }
   if (
     fluteActivity === "active" ||
@@ -197,6 +202,7 @@ function polyphonicProfile(
   ) {
     if (level === "beginner") return "beginner_active";
     if (level === "intermediate") return "intermediate_active";
+    if (level === "advanced") return "advanced_active";
   }
   return null;
 }
@@ -319,6 +325,128 @@ function buildIntermediateOboeActivePattern(measureLen: number, measureNumber: n
   }
   const pickIndex = Math.floor(patternRatio(measureNumber, 0, 733) * fitting.length) % fitting.length;
   return fitting[pickIndex] ?? fitting[0]!;
+}
+
+function buildAdvancedBassoonPattern(measureLen: number, measureNumber: number): number[] {
+  const cellBank: number[][] = [
+    [0.5, 0.5],
+    [0.5, 0.25, 0.25],
+    [1.5, 0.5],
+    [1]
+  ];
+  const out: number[] = [];
+  let remaining = measureLen;
+  let slotIndex = 0;
+
+  while (remaining > 0.01) {
+    const fitting = cellBank.filter((cell) => cell.reduce((sum, dur) => sum + dur, 0) <= remaining + 1e-9);
+    if (!fitting.length) {
+      out.push(remaining);
+      break;
+    }
+    const pickIndex = Math.floor(patternRatio(measureNumber, slotIndex, 887) * fitting.length) % fitting.length;
+    const chosen = fitting[pickIndex] ?? fitting[0]!;
+    for (const dur of chosen) out.push(dur);
+    remaining -= chosen.reduce((sum, dur) => sum + dur, 0);
+    slotIndex += 1;
+  }
+
+  return out.filter((dur) => dur > 0.01);
+}
+
+function buildRestedEighthThreeSlots(measureLen: number): Array<{ t: number; dur: number }> {
+  const slots: Array<{ t: number; dur: number }> = [];
+  for (let cellStart = 0; cellStart < measureLen - 1e-6; cellStart += 2) {
+    for (const offset of [0.5, 1, 1.5]) {
+      const t = cellStart + offset;
+      if (t >= measureLen - 1e-6) continue;
+      slots.push({ t, dur: Math.min(0.5, measureLen - t) });
+    }
+  }
+  return slots;
+}
+
+function buildAdvancedColorCellSlots(measureLen: number, measureNumber: number, salt = 0): Array<{ t: number; dur: number }> {
+  const baseOrder = ["dot8_16", "e_16_16", "e_e", "q"] as const;
+  const order = [...baseOrder];
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(patternRatio(measureNumber, i, salt) * (i + 1));
+    const tmp = order[i]!;
+    order[i] = order[j]!;
+    order[j] = tmp;
+  }
+
+  const slots: Array<{ t: number; dur: number }> = [];
+  let cellIdx = 0;
+  for (let beat = 0; beat < measureLen - 1e-6; beat += 1) {
+    const cell = order[cellIdx % order.length]!;
+    const cellSlots =
+      cell === "dot8_16"
+        ? [
+            { t: beat, dur: 0.75 },
+            { t: beat + 0.75, dur: 0.25 }
+          ]
+        : cell === "e_16_16"
+          ? [
+              { t: beat, dur: 0.5 },
+              { t: beat + 0.5, dur: 0.25 },
+              { t: beat + 0.75, dur: 0.25 }
+            ]
+          : cell === "e_e"
+            ? [
+                { t: beat, dur: 0.5 },
+                { t: beat + 0.5, dur: 0.5 }
+              ]
+            : [{ t: beat, dur: 1 }];
+    for (const slot of cellSlots) {
+      if (slot.t < measureLen - 1e-6) {
+        slots.push({ t: slot.t, dur: Math.min(slot.dur, measureLen - slot.t) });
+      }
+    }
+    cellIdx += 1;
+  }
+  return slots;
+}
+
+function buildAdvancedHighColorCellSlots(measureLen: number, measureNumber: number, salt = 0): Array<{ t: number; dur: number }> {
+  const baseOrder = ["four16", "two8", "dotq8"] as const;
+  const order = [...baseOrder];
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(patternRatio(measureNumber, i, salt) * (i + 1));
+    const tmp = order[i]!;
+    order[i] = order[j]!;
+    order[j] = tmp;
+  }
+
+  const slots: Array<{ t: number; dur: number }> = [];
+  let cellIdx = 0;
+  for (let beat = 0; beat < measureLen - 1e-6; beat += 1) {
+    const cell = order[cellIdx % order.length]!;
+    const cellSlots =
+      cell === "four16"
+        ? [
+            { t: beat, dur: 0.25 },
+            { t: beat + 0.25, dur: 0.25 },
+            { t: beat + 0.5, dur: 0.25 },
+            { t: beat + 0.75, dur: 0.25 }
+          ]
+        : cell === "two8"
+          ? [
+              { t: beat, dur: 0.5 },
+              { t: beat + 0.5, dur: 0.5 }
+            ]
+          : [
+              { t: beat, dur: 1.5 },
+              { t: beat + 1.5, dur: 0.5 }
+            ];
+    for (const slot of cellSlots) {
+      if (slot.t < measureLen - 1e-6) {
+        slots.push({ t: slot.t, dur: Math.min(slot.dur, measureLen - slot.t) });
+      }
+    }
+    cellIdx += cell === "dotq8" ? 2 : 1;
+  }
+  return slots;
 }
 
 function pickChordToneSequence(chord: { pcs?: number[]; rootPc?: number }, length = 4): number[] {
@@ -501,6 +629,7 @@ function mapBeginnerPolyphonicLessActive(score: ScoreModel, options: WoodwindMap
   if (!srcPart) return score;
   const level = String(options.level ?? "").toLowerCase();
   const isIntermediate = level === "intermediate";
+  const isAdvanced = level === "advanced";
 
   const fl = makePart("FL", "Flute", "flute", 1);
   const ob = makePart("OB", "Oboe", "oboe", 1);
@@ -527,10 +656,10 @@ function mapBeginnerPolyphonicLessActive(score: ScoreModel, options: WoodwindMap
   }
   for (const list of chordsByMeasure.values()) list.sort((a, b) => a.t - b.t);
 
-  const rFL = isIntermediate ? { midi_low: 60, midi_high: 91 } : { midi_low: 60, midi_high: 79 };
-  const rOB = isIntermediate ? { midi_low: 60, midi_high: 87 } : { midi_low: 62, midi_high: 87 };
-  const rCL = isIntermediate ? { midi_low: 52, midi_high: 91 } : { midi_low: 52, midi_high: 84 };
-  const rBN = isIntermediate ? { midi_low: 34, midi_high: 67 } : { midi_low: 29, midi_high: 55 };
+  const rFL = isAdvanced ? { midi_low: 59, midi_high: 98 } : isIntermediate ? { midi_low: 60, midi_high: 91 } : { midi_low: 60, midi_high: 79 };
+  const rOB = isAdvanced ? { midi_low: 58, midi_high: 93 } : isIntermediate ? { midi_low: 60, midi_high: 87 } : { midi_low: 62, midi_high: 87 };
+  const rCL = isAdvanced ? { midi_low: 52, midi_high: 96 } : isIntermediate ? { midi_low: 52, midi_high: 91 } : { midi_low: 52, midi_high: 84 };
+  const rBN = isAdvanced ? { midi_low: 35, midi_high: 76 } : isIntermediate ? { midi_low: 34, midi_high: 67 } : { midi_low: 29, midi_high: 55 };
 
   let seq = 0;
   let prevOb = 69;
@@ -720,21 +849,94 @@ function mapBeginnerPolyphonicLessActive(score: ScoreModel, options: WoodwindMap
     }
 
     const bnEvents: Array<{ t: number; dur: number; midi: number }> = [];
-    let t = 0;
-    for (const dur of buildQuarterHalfPattern(measureLen, mNum, beatUnit)) {
-      const h = harmonyAt(t);
-      const preferDir = oppositeDirection(melodyDirAt(t));
-      const bnMidi = pickCandidateNear(prevBn, [h.bassPc], rBN.midi_low, rBN.midi_high, preferDir, {
-        center: 41
-      });
-      bnEvents.push({ t, dur, midi: bnMidi });
-      addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
-      prevBn = bnMidi;
-      t += dur;
+    if (isAdvanced) {
+      const bassPattern = buildAdvancedBassoonPattern(measureLen, mNum);
+      let bassT = 0;
+      for (const rawDur of bassPattern) {
+        const t = bassT;
+        const dur = Math.min(rawDur, measureLen - t);
+        if (dur <= 0.01) break;
+        const h = harmonyAt(t);
+        const preferDir = oppositeDirection(melodyDirAt(t));
+        const bnMidi = pickCandidateNear(prevBn, [h.bassPc], rBN.midi_low, rBN.midi_high, preferDir, {
+          center: 45
+        });
+        bnEvents.push({ t, dur, midi: bnMidi });
+        addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
+        prevBn = bnMidi;
+        bassT += dur;
+      }
+    } else {
+      let t = 0;
+      for (const dur of buildQuarterHalfPattern(measureLen, mNum, beatUnit)) {
+        const h = harmonyAt(t);
+        const preferDir = oppositeDirection(melodyDirAt(t));
+        const bnMidi = pickCandidateNear(prevBn, [h.bassPc], rBN.midi_low, rBN.midi_high, preferDir, {
+          center: 41
+        });
+        bnEvents.push({ t, dur, midi: bnMidi });
+        addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
+        prevBn = bnMidi;
+        t += dur;
+      }
     }
 
     const clEvents: Array<{ t: number; dur: number; midi: number }> = [];
-    for (let i = 0; i < bnEvents.length; i++) {
+    if (isAdvanced) {
+      for (const slot of buildRestedEighthThreeSlots(measureLen)) {
+        const t = slot.t;
+        const dur = slot.dur;
+        const h = harmonyAt(t);
+        const fluteNow = activeMidiAt(melody, t);
+        const bassNow = activeMidiAt(bnEvents, t);
+        const bassFloor = maxMidiDuring(bnEvents, t, dur);
+        const strictUpper = typeof fluteNow === "number" ? fluteNow - 8 : undefined;
+        const relaxedUpper = typeof fluteNow === "number" ? fluteNow - 1 : undefined;
+        const covered = new Set<number>();
+        for (const pc of [pcOfMidi(fluteNow), pcOfMidi(bassNow)]) {
+          if (typeof pc === "number" && h.chordCore.includes(pc)) covered.add(pc);
+        }
+        const missing = h.chordCore.filter((pc) => !covered.has(pc));
+        const colors = pickThirdAndFifth(h);
+        const colorMissing = colors.filter((pc) => missing.includes(pc));
+        const priority = uniquePcs([
+          ...colorMissing,
+          ...colors,
+          ...(colorMissing.length ? [] : [h.rootPc]),
+          ...h.pcs.filter((pc) => pc !== pcOfMidi(bassNow))
+        ]);
+        const lower = typeof bassFloor === "number" ? bassFloor + 1 : typeof bassNow === "number" ? bassNow + 1 : undefined;
+        let activeUpper = strictUpper;
+        let candidatePool = candidateMidisForPcs(priority.length ? priority : h.pcs, rCL.midi_low, rCL.midi_high, {
+          lower,
+          upper: activeUpper
+        });
+        if (!candidatePool.length) {
+          activeUpper = relaxedUpper;
+          candidatePool = candidateMidisForPcs(priority.length ? priority : h.pcs, rCL.midi_low, rCL.midi_high, {
+            lower,
+            upper: activeUpper
+          });
+        }
+        if (!candidatePool.length) continue;
+        const clMidi = pickCandidateNear(
+          prevCl,
+          priority.length ? priority : h.pcs,
+          rCL.midi_low,
+          rCL.midi_high,
+          oppositeDirection(melodyDirAt(t)),
+          {
+            lower,
+            upper: activeUpper,
+            center: typeof fluteNow === "number" && typeof bassNow === "number" ? (fluteNow + bassNow) / 2 : 62,
+            avoidPc: missing.length ? [] : typeof bassNow === "number" ? [pcOfMidi(bassNow) ?? -1] : []
+          }
+        );
+        clEvents.push({ t, dur, midi: clMidi });
+        prevCl = clMidi;
+      }
+    } else {
+      for (let i = 0; i < bnEvents.length; i++) {
       const bnEv = bnEvents[i]!;
       const nextBn = bnEvents[i + 1];
       const slots =
@@ -809,13 +1011,77 @@ function mapBeginnerPolyphonicLessActive(score: ScoreModel, options: WoodwindMap
       }
 
       if (Math.abs(bnEv.dur - beatUnit) < 1e-6 && nextBn && Math.abs(nextBn.dur - beatUnit) < 1e-6) i += 1;
+      }
     }
     for (const ev of clEvents) {
       addNote(shells[2], ev.t, ev.dur, midiToPitch(ev.midi), 1, "CL", ++seq);
     }
 
     const obEvents: Array<{ t: number; dur: number; midi: number }> = [];
-    for (let beat = 0; beat < measureLen - 1e-6; beat += beatUnit) {
+    if (isAdvanced) {
+      for (const slot of buildRestedEighthThreeSlots(measureLen)) {
+        const h = harmonyAt(slot.t);
+        const fluteNow = activeMidiAt(melody, slot.t);
+        const clarinetNow = activeMidiAt(clEvents, slot.t);
+        const bassNow = activeMidiAt(bnEvents, slot.t);
+        const fluteCeiling = minMidiDuring(melody, slot.t, slot.dur);
+        const clarinetFloor = maxMidiDuring(clEvents, slot.t, slot.dur);
+        const covered = new Set<number>();
+        for (const pc of [pcOfMidi(fluteNow), pcOfMidi(clarinetNow), pcOfMidi(bassNow)]) {
+          if (typeof pc === "number" && h.chordCore.includes(pc)) covered.add(pc);
+        }
+        const missing = h.chordCore.filter((pc) => !covered.has(pc));
+        const colors = pickThirdAndFifth(h);
+        const colorMissing = colors.filter((pc) => missing.includes(pc));
+        const priority = colorMissing.length
+          ? uniquePcs([...colorMissing, ...colors, ...h.pcs.filter((pc) => pc !== pcOfMidi(clarinetNow))])
+          : uniquePcs([h.rootPc, ...colors, ...h.pcs.filter((pc) => pc !== pcOfMidi(clarinetNow))]);
+        const lower =
+          typeof clarinetFloor === "number"
+            ? clarinetFloor + 1
+            : typeof clarinetNow === "number"
+              ? clarinetNow + 1
+              : typeof bassNow === "number"
+                ? bassNow + 1
+                : undefined;
+        const upper =
+          typeof fluteCeiling === "number" ? fluteCeiling - 1 : typeof fluteNow === "number" ? fluteNow - 1 : undefined;
+        let candidatePool = candidateMidisForPcs(priority.length ? priority : h.pcs, rOB.midi_low, rOB.midi_high, {
+          lower,
+          upper
+        });
+        if (!candidatePool.length) {
+          candidatePool = candidateMidisForPcs(h.pcs, rOB.midi_low, rOB.midi_high, {
+            lower,
+            upper
+          });
+        }
+        if (!candidatePool.length) continue;
+        const obMidi = pickCandidateNear(
+          prevOb,
+          priority.length ? priority : h.pcs,
+          rOB.midi_low,
+          rOB.midi_high,
+          oppositeDirection(melodyDirAt(slot.t)),
+          {
+            lower,
+            upper,
+            center:
+              typeof fluteCeiling === "number" && typeof clarinetFloor === "number"
+                ? (fluteCeiling + clarinetFloor) / 2
+                : typeof fluteNow === "number" && typeof clarinetNow === "number"
+                  ? (fluteNow + clarinetNow) / 2
+                  : typeof fluteNow === "number"
+                    ? fluteNow - 5
+                    : 72,
+            avoidPc: missing.length ? [] : typeof clarinetNow === "number" ? [pcOfMidi(clarinetNow) ?? -1] : []
+          }
+        );
+        obEvents.push({ t: slot.t, dur: slot.dur, midi: obMidi });
+        prevOb = obMidi;
+      }
+    } else {
+      for (let beat = 0; beat < measureLen - 1e-6; beat += beatUnit) {
       const slot = { t: beat, dur: Math.min(beatUnit, measureLen - beat) };
       const h = harmonyAt(slot.t);
       const fluteNow = activeMidiAt(melody, slot.t);
@@ -875,6 +1141,7 @@ function mapBeginnerPolyphonicLessActive(score: ScoreModel, options: WoodwindMap
       );
       obEvents.push({ t: slot.t, dur: slot.dur, midi: obMidi });
       prevOb = obMidi;
+      }
     }
     for (const ev of obEvents) {
       addNote(shells[1], ev.t, ev.dur, midiToPitch(ev.midi), 1, "OB", ++seq);
@@ -883,14 +1150,18 @@ function mapBeginnerPolyphonicLessActive(score: ScoreModel, options: WoodwindMap
 
   warn(
     options.warnings,
-    isIntermediate
+    isAdvanced
+      ? "[woodwinds] Advanced polyphonic (40%): Flute melody, Bassoon Alberti bass, Clarinet fills 3rd/5th, Oboe fills root/5th, strict no crossing."
+      : isIntermediate
       ? "[woodwinds] Intermediate polyphonic (40%): Flute melody, Bassoon quarter/half bass, Clarinet contrary to Bassoon, Oboe contrary to Flute, strict no crossing."
       : "[woodwinds] Beginner polyphonic (40%): Flute melody, Bassoon quarter/half bass, Clarinet contrary to Bassoon, Oboe contrary to Flute, strict no crossing."
   );
   if (!chords.length) {
     warn(
       options.warnings,
-      isIntermediate
+      isAdvanced
+        ? "[woodwinds] Advanced polyphonic used source harmony fallback because no chord symbols were found."
+        : isIntermediate
         ? "[woodwinds] Intermediate polyphonic used source harmony fallback because no chord symbols were found."
         : "[woodwinds] Beginner polyphonic used source harmony fallback because no chord symbols were found."
     );
@@ -909,6 +1180,7 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
   if (!srcPart) return score;
   const level = String(options.level ?? "").toLowerCase();
   const isIntermediate = level === "intermediate";
+  const isAdvanced = level === "advanced";
 
   const fl = makePart("FL", "Flute", "flute", 1);
   const ob = makePart("OB", "Oboe", "oboe", 1);
@@ -935,15 +1207,18 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
   }
   for (const list of chordsByMeasure.values()) list.sort((a, b) => a.t - b.t);
 
-  const rFL = isIntermediate ? { midi_low: 60, midi_high: 91 } : { midi_low: 60, midi_high: 79 };
-  const rOB = isIntermediate ? { midi_low: 60, midi_high: 87 } : { midi_low: 62, midi_high: 87 };
-  const rCL = isIntermediate ? { midi_low: 52, midi_high: 91 } : { midi_low: 52, midi_high: 84 };
-  const rBN = isIntermediate ? { midi_low: 34, midi_high: 67 } : { midi_low: 29, midi_high: 55 };
+  const rFL = isAdvanced ? { midi_low: 59, midi_high: 98 } : isIntermediate ? { midi_low: 60, midi_high: 91 } : { midi_low: 60, midi_high: 79 };
+  const rOB = isAdvanced ? { midi_low: 58, midi_high: 93 } : isIntermediate ? { midi_low: 60, midi_high: 87 } : { midi_low: 62, midi_high: 87 };
+  const rCL = isAdvanced ? { midi_low: 52, midi_high: 96 } : isIntermediate ? { midi_low: 52, midi_high: 91 } : { midi_low: 52, midi_high: 84 };
+  const rBN = isAdvanced ? { midi_low: 35, midi_high: 76 } : isIntermediate ? { midi_low: 34, midi_high: 67 } : { midi_low: 29, midi_high: 55 };
   const bassoonActivity = options.bassoonActivity ?? "less_active";
   const oboeActivity = options.oboeActivity ?? "less_active";
   const clarinetActivity = options.clarinetActivity ?? "less_active";
   const isIntermediateHighActive =
     isIntermediate &&
+    [options.fluteActivity, bassoonActivity, oboeActivity, clarinetActivity].some((activity) => activity === "high_active");
+  const isAdvancedHighActive =
+    isAdvanced &&
     [options.fluteActivity, bassoonActivity, oboeActivity, clarinetActivity].some((activity) => activity === "high_active");
 
   let seq = 0;
@@ -1028,7 +1303,7 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
       for (const slot of melody) {
         const h = harmonyAt(slot.t);
         const bassPriority =
-          bassoonActivity === "high_active"
+          bassoonActivity === "high_active" || isAdvanced
             ? [h.bassPc]
             : [h.bassPc, ...pickRootAndFifth(h)];
         const bnMidi = pickCandidateNear(
@@ -1138,36 +1413,69 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
 
     const bnEvents: Array<{ t: number; dur: number; midi: number }> = [];
     if (bassoonActivity === "high_active") {
-      const bassDurations = [0.5, 1, 2];
-      let bassT = 0;
-      let bassSlotIndex = 0;
-      while (bassT < measureLen - 1e-6) {
-        const fittingDurations = bassDurations.filter((value) => value <= measureLen - bassT + 1e-9);
-        const pickIndex =
-          Math.floor(patternRatio(mNum, bassSlotIndex, 419) * Math.max(1, fittingDurations.length)) %
-          Math.max(1, fittingDurations.length);
-        const dur = fittingDurations[pickIndex] ?? fittingDurations[0] ?? (measureLen - bassT);
-        const t = bassT;
-        const h = harmonyAt(t);
-        const bnMidi = pickCandidateNear(prevBn, [h.bassPc], rBN.midi_low, rBN.midi_high, oppositeDirection(melodyDirAt(t)), {
-          center: 41
-        });
-        bnEvents.push({ t, dur, midi: bnMidi });
-        addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
-        prevBn = bnMidi;
-        bassT += dur;
-        bassSlotIndex += 1;
+      if (isAdvanced) {
+        for (let t = 0; t < measureLen - 1e-6; t += 0.5) {
+          const dur = Math.min(0.5, measureLen - t);
+          const h = harmonyAt(t);
+          const rootAndFifth = pickRootAndFifth(h);
+          const targetPc = rootAndFifth[Math.round(t / 0.5) % Math.max(1, rootAndFifth.length)] ?? h.rootPc;
+          const bnMidi = pickCandidateNear(
+            prevBn,
+            [targetPc],
+            rBN.midi_low,
+            rBN.midi_high,
+            oppositeDirection(melodyDirAt(t)),
+            { center: 43 }
+          );
+          bnEvents.push({ t, dur, midi: bnMidi });
+          addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
+          prevBn = bnMidi;
+        }
+      } else {
+        const bassDurations = [0.5, 1, 2];
+        let bassT = 0;
+        let bassSlotIndex = 0;
+        while (bassT < measureLen - 1e-6) {
+          const fittingDurations = bassDurations.filter((value) => value <= measureLen - bassT + 1e-9);
+          const pickIndex =
+            Math.floor(patternRatio(mNum, bassSlotIndex, 419) * Math.max(1, fittingDurations.length)) %
+            Math.max(1, fittingDurations.length);
+          const dur = fittingDurations[pickIndex] ?? fittingDurations[0] ?? (measureLen - bassT);
+          const t = bassT;
+          const h = harmonyAt(t);
+          const bnMidi = pickCandidateNear(prevBn, [h.bassPc], rBN.midi_low, rBN.midi_high, oppositeDirection(melodyDirAt(t)), {
+            center: 41
+          });
+          bnEvents.push({ t, dur, midi: bnMidi });
+          addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
+          prevBn = bnMidi;
+          bassT += dur;
+          bassSlotIndex += 1;
+        }
       }
     } else if (bassoonActivity === "active") {
-      for (const ev of melody) {
-        const h = harmonyAt(ev.t);
-        const bassChoices = uniquePcs([h.bassPc, ...pickRootAndFifth(h)]);
-        const bnMidi = pickCandidateNear(prevBn, bassChoices, rBN.midi_low, rBN.midi_high, oppositeDirection(melodyDirAt(ev.t)), {
-          center: 41
-        });
-        bnEvents.push({ t: ev.t, dur: ev.dur, midi: bnMidi });
-        addNote(shells[3], ev.t, ev.dur, midiToPitch(bnMidi), 1, "BN", ++seq);
-        prevBn = bnMidi;
+      if (isAdvanced) {
+        for (let t = 0; t < measureLen - 1e-6; t += 0.5) {
+          const dur = Math.min(0.5, measureLen - t);
+          const h = harmonyAt(t);
+          const bnMidi = pickCandidateNear(prevBn, [h.bassPc], rBN.midi_low, rBN.midi_high, oppositeDirection(melodyDirAt(t)), {
+            center: 43
+          });
+          bnEvents.push({ t, dur, midi: bnMidi });
+          addNote(shells[3], t, dur, midiToPitch(bnMidi), 1, "BN", ++seq);
+          prevBn = bnMidi;
+        }
+      } else {
+        for (const ev of melody) {
+          const h = harmonyAt(ev.t);
+          const bassChoices = uniquePcs([h.bassPc, ...pickRootAndFifth(h)]);
+          const bnMidi = pickCandidateNear(prevBn, bassChoices, rBN.midi_low, rBN.midi_high, oppositeDirection(melodyDirAt(ev.t)), {
+            center: 41
+          });
+          bnEvents.push({ t: ev.t, dur: ev.dur, midi: bnMidi });
+          addNote(shells[3], ev.t, ev.dur, midiToPitch(bnMidi), 1, "BN", ++seq);
+          prevBn = bnMidi;
+        }
       }
     } else {
       let bassT = 0;
@@ -1185,12 +1493,23 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
 
     const obEvents: Array<{ t: number; dur: number; midi: number }> = [];
     if (oboeActivity === "high_active") {
-      const obPattern = buildShuffledRhythmCells(measureLen, mNum, 211);
-      let obT = 0;
-      for (const rawDur of obPattern) {
-        const t = obT;
-        const dur = Math.min(rawDur, measureLen - t);
-        if (dur <= 0.01) break;
+      const oboeSlots = isAdvanced
+        ? melody.map((ev) => ({ t: ev.t, dur: ev.dur }))
+        : (() => {
+            const obPattern = buildShuffledRhythmCells(measureLen, mNum, 211);
+            const slots: Array<{ t: number; dur: number }> = [];
+            let obT = 0;
+            for (const rawDur of obPattern) {
+              const dur = Math.min(rawDur, measureLen - obT);
+              if (dur <= 0.01) break;
+              slots.push({ t: obT, dur });
+              obT += dur;
+            }
+            return slots;
+          })();
+      for (const slot of oboeSlots) {
+        const t = slot.t;
+        const dur = slot.dur;
         const h = harmonyAt(t);
         const fluteNow = activeMidiAt(melody, t);
         const bassNow = activeMidiAt(bnEvents, t);
@@ -1202,9 +1521,21 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
           if (typeof pc === "number" && h.chordCore.includes(pc)) covered.add(pc);
         }
         const missing = h.chordCore.filter((pc) => !covered.has(pc));
-        const priority = missing.length
-          ? uniquePcs([...missing, ...pickThirdAndFifth(h), ...h.pcs])
-          : uniquePcs([h.rootPc, ...pickThirdAndFifth(h), ...h.pcs]);
+        const priority = isAdvanced
+          ? missing.length
+            ? uniquePcs([...missing, ...pickThirdAndFifth(h), ...h.pcs])
+            : uniquePcs([h.rootPc, ...pickThirdAndFifth(h), ...h.pcs])
+          : missing.length
+            ? uniquePcs([
+                ...(isAdvanced && typeof h.thirdPc === "number" ? [h.thirdPc] : missing),
+                ...pickThirdAndFifth(h),
+                ...h.pcs
+              ])
+            : uniquePcs([
+                ...(isAdvanced && typeof h.thirdPc === "number" ? [h.thirdPc] : [h.rootPc]),
+                ...pickThirdAndFifth(h),
+                ...h.pcs
+              ]);
         let pool = candidateMidisForPcs(priority.length ? priority : h.pcs, rOB.midi_low, rOB.midi_high, {
           lower,
           upper
@@ -1238,10 +1569,11 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
         obEvents.push({ t, dur, midi: obMidi });
         addNote(shells[1], t, dur, midiToPitch(obMidi), 1, "OB", ++seq);
         prevOb = obMidi;
-        obT += dur;
       }
     } else if (oboeActivity === "active") {
-      const oboeSlots = isIntermediate
+      const oboeSlots = isAdvanced
+        ? melody.map((ev) => ({ t: ev.t, dur: ev.dur }))
+        : isIntermediate
         ? (() => {
             const pattern = buildIntermediateOboeActivePattern(measureLen, mNum);
             const slots: Array<{ t: number; dur: number }> = [];
@@ -1268,7 +1600,11 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
           if (typeof pc === "number" && h.chordCore.includes(pc)) covered.add(pc);
         }
         const missing = h.chordCore.filter((pc) => !covered.has(pc));
-        const priority = uniquePcs([...missing, ...colors, ...h.pcs]);
+        const priority = isAdvanced
+          ? typeof h.thirdPc === "number"
+            ? [h.thirdPc]
+            : uniquePcs([...colors, ...h.pcs])
+          : uniquePcs([...missing, ...colors, ...h.pcs]);
         let pool = candidateMidisForPcs(priority.length ? priority : h.pcs, rOB.midi_low, rOB.midi_high, {
           lower,
           upper
@@ -1338,12 +1674,29 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
 
     const clEvents: Array<{ t: number; dur: number; midi: number }> = [];
     if (clarinetActivity === "high_active") {
-      const clPattern = buildShuffledRhythmCells(measureLen, mNum, 307);
-      let clT = 0;
-      for (const rawDur of clPattern) {
-        const t = clT;
-        const dur = Math.min(rawDur, measureLen - t);
-        if (dur <= 0.01) break;
+      const clarinetSlots = isAdvanced
+        ? (() => {
+            const slots: Array<{ t: number; dur: number }> = [];
+            for (let t = 0; t < measureLen - 1e-6; t += 1) {
+              slots.push({ t, dur: Math.min(1, measureLen - t) });
+            }
+            return slots;
+          })()
+        : (() => {
+            const clPattern = buildShuffledRhythmCells(measureLen, mNum, 307);
+            const slots: Array<{ t: number; dur: number }> = [];
+            let clT = 0;
+            for (const rawDur of clPattern) {
+              const dur = Math.min(rawDur, measureLen - clT);
+              if (dur <= 0.01) break;
+              slots.push({ t: clT, dur });
+              clT += dur;
+            }
+            return slots;
+          })();
+      for (const slot of clarinetSlots) {
+        const t = slot.t;
+        const dur = slot.dur;
         const h = harmonyAt(t);
         const seqPcs = pickChordToneSequence(h, 4);
         const idx = Math.round(t) % Math.max(1, seqPcs.length);
@@ -1365,23 +1718,38 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
           if (typeof pc === "number" && h.chordCore.includes(pc)) covered.add(pc);
         }
         const missing = h.chordCore.filter((pc) => !covered.has(pc));
+        const arpeggioPcs = pickChordToneSequence(h, 4);
+        const arpeggioTargetPc =
+          arpeggioPcs.length && isAdvanced
+            ? arpeggioPcs[Math.floor(t) % arpeggioPcs.length]!
+            : targetPc;
         const priority = missing.length
-          ? uniquePcs([...missing, targetPc, ...pickThirdAndFifth(h), ...h.pcs])
-          : uniquePcs([h.rootPc, targetPc, ...pickThirdAndFifth(h), ...h.pcs]);
-        let pool = candidateMidisForPcs(priority.length ? priority : [targetPc], rCL.midi_low, rCL.midi_high, { lower, upper });
+          ? uniquePcs([
+              ...(isAdvanced ? pickThirdAndFifth(h).filter((pc) => missing.includes(pc)) : missing),
+              arpeggioTargetPc,
+              ...pickThirdAndFifth(h),
+              ...h.pcs
+            ])
+          : uniquePcs([
+              ...(isAdvanced ? [h.rootPc] : [h.rootPc]),
+              arpeggioTargetPc,
+              ...pickThirdAndFifth(h),
+              ...h.pcs
+            ]);
+        let pool = candidateMidisForPcs(priority.length ? priority : [arpeggioTargetPc], rCL.midi_low, rCL.midi_high, {
+          lower,
+          upper
+        });
         if (!pool.length) {
           pool = candidateMidisForPcs(uniquePcs([h.rootPc, ...(seqPcs.length ? seqPcs : h.pcs)]), rCL.midi_low, rCL.midi_high, {
             lower,
             upper
           });
         }
-        if (!pool.length) {
-          clT += dur;
-          continue;
-        }
+        if (!pool.length) continue;
         const clMidi = pickCandidateNear(
           prevCl,
-          priority.length ? priority : [targetPc, ...(seqPcs.length ? seqPcs : h.pcs)],
+          priority.length ? priority : [arpeggioTargetPc, ...(seqPcs.length ? seqPcs : h.pcs)],
           rCL.midi_low,
           rCL.midi_high,
           oppositeDirection(melodyDirAt(t)),
@@ -1399,13 +1767,22 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
         clEvents.push({ t, dur, midi: clMidi });
         addNote(shells[2], t, dur, midiToPitch(clMidi), 1, "CL", ++seq);
         prevCl = clMidi;
-        clT += dur;
       }
     } else if (clarinetActivity === "active") {
-      const r = measureRatio(mNum, 611);
-      const stepDur = r < 0.1 ? 0.5 : r < 0.4 ? 2 : 1;
-      for (let t = 0; t < measureLen - 1e-6; t += stepDur) {
-        const dur = Math.min(stepDur, measureLen - t);
+      const clarinetSlots = isAdvanced
+        ? buildRestedEighthThreeSlots(measureLen)
+        : (() => {
+            const r = measureRatio(mNum, 611);
+            const stepDur = r < 0.1 ? 0.5 : r < 0.4 ? 2 : 1;
+            const slots: Array<{ t: number; dur: number }> = [];
+            for (let t = 0; t < measureLen - 1e-6; t += stepDur) {
+              slots.push({ t, dur: Math.min(stepDur, measureLen - t) });
+            }
+            return slots;
+          })();
+      for (const slot of clarinetSlots) {
+        const t = slot.t;
+        const dur = slot.dur;
         const h = harmonyAt(t);
         const fluteNow = activeMidiAt(melody, t);
         const bassNow = activeMidiAt(bnEvents, t);
@@ -1417,7 +1794,20 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
           if (typeof pc === "number" && h.chordCore.includes(pc)) covered.add(pc);
         }
         const missing = h.chordCore.filter((pc) => !covered.has(pc));
-        const priority = uniquePcs([...missing, ...pickThirdAndFifth(h), ...h.pcs.filter((pc) => pc !== pcOfMidi(bassNow))]);
+        const colors = pickThirdAndFifth(h);
+        const priority = isAdvanced
+          ? (() => {
+              const rootPc = h.rootPc;
+              const fifthPc = typeof h.fifthPc === "number" ? h.fifthPc : null;
+              const rootFifth = uniquePcs(
+                [fifthPc ?? undefined, rootPc ?? undefined].filter((pc): pc is number => typeof pc === "number")
+              );
+              const rootFifthMissing = rootFifth.filter((pc) => missing.includes(pc));
+              return rootFifthMissing.length
+                ? uniquePcs([...rootFifthMissing, ...rootFifth, ...h.pcs.filter((pc) => pc !== pcOfMidi(bassNow))])
+                : uniquePcs([...rootFifth, ...h.pcs.filter((pc) => pc !== pcOfMidi(bassNow))]);
+            })()
+          : uniquePcs([...missing, ...colors, ...h.pcs.filter((pc) => pc !== pcOfMidi(bassNow))]);
         const lower = typeof bassFloor === "number" ? bassFloor + 1 : typeof bassNow === "number" ? bassNow + 1 : undefined;
         const upper =
           typeof oboeCeiling === "number"
@@ -1524,7 +1914,11 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
 
   warn(
     options.warnings,
-    isIntermediate
+    isAdvanced
+      ? isAdvancedHighActive
+        ? "[woodwinds] Advanced polyphonic (100%): string-inspired high activity, Bassoon roots/fifths in 8ths, Clarinet quarter-note arpeggios, Oboe melody-rhythm contrary harmonic fill."
+        : "[woodwinds] Advanced polyphonic (60%): Flute melody, Bassoon 8ths on chord bass, Clarinet shuffled color cells, Oboe shuffled gap-fill cells, strict no crossing."
+      : isIntermediate
       ? isIntermediateHighActive
         ? "[woodwinds] Intermediate polyphonic (100%): string-inspired high activity, independent lines, strict no crossing."
         : "[woodwinds] Intermediate polyphonic active profile: per-instrument activity respected, strict no crossing."
@@ -1533,7 +1927,9 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
   if (!chords.length) {
     warn(
       options.warnings,
-      isIntermediate
+      isAdvanced
+        ? "[woodwinds] Advanced polyphonic used source harmony fallback because no chord symbols were found."
+        : isIntermediate
         ? "[woodwinds] Intermediate polyphonic used source harmony fallback because no chord symbols were found."
         : "[woodwinds] Beginner polyphonic used source harmony fallback because no chord symbols were found."
     );
@@ -1930,13 +2326,19 @@ function mapLegacyOpen(score: ScoreModel): ScoreModel {
  * Flute (C), Oboe (C), Clarinet in Bb (shows concert pitch), Bassoon (C)
  */
 export function mapPianoToWoodwindEnsembleOpen(score: ScoreModel, options: WoodwindMapOptions = {}): ScoreModel {
-  if (polyphonicProfile(options) === "beginner_less_active" || polyphonicProfile(options) === "intermediate_less_active") {
+  if (
+    polyphonicProfile(options) === "beginner_less_active" ||
+    polyphonicProfile(options) === "intermediate_less_active" ||
+    polyphonicProfile(options) === "advanced_less_active"
+  ) {
     return mapBeginnerPolyphonicLessActive(score, options);
   }
   if (
     polyphonicProfile(options) === "beginner_active" ||
     polyphonicProfile(options) === "intermediate_active" ||
-    polyphonicProfile(options) === "intermediate_high_active"
+    polyphonicProfile(options) === "intermediate_high_active" ||
+    polyphonicProfile(options) === "advanced_active" ||
+    polyphonicProfile(options) === "advanced_high_active"
   ) {
     return mapBeginnerPolyphonicActive(score, options);
   }

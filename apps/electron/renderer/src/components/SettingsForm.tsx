@@ -55,7 +55,7 @@ const BASS_ACTIVITY_OPTIONS: Array<{ label: string; value: NonNullable<Settings[
   { label: "Active (60%)", value: "active", help: "More 8th-note motion, passing/neighbor tones." },
   { label: "High active (100%)", value: "high_active", help: "Continuous motion where possible." }
 ];
-const INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
+const STRING_INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
   { label: "Auto arranger", value: "auto", help: "Use the current string arranging engine." },
   {
     label: "Piano -> String Quartet (Copy)",
@@ -65,6 +65,19 @@ const INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Setting
   {
     label: "SATB -> String Quartet (Legacy)",
     value: "satb_to_string_quartet",
+    help: "Legacy alias of the copy instrumentation mode."
+  }
+];
+const WOODWIND_INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
+  { label: "Auto arranger", value: "auto", help: "Use the current woodwind arranging engine." },
+  {
+    label: "Piano -> Woodwind Quartet (Copy)",
+    value: "piano_copy_to_woodwind_quartet",
+    help: "Copy piano voices directly: RH top->Flute, RH inner->Oboe, LH top->Clarinet, LH bottom->Bassoon."
+  },
+  {
+    label: "SATB -> Woodwind Quartet (Legacy)",
+    value: "satb_to_woodwind_quartet",
     help: "Legacy alias of the copy instrumentation mode."
   }
 ];
@@ -144,6 +157,15 @@ export default function SettingsForm({ settings, onChange }: Props) {
     if (nextEnsemble !== "piano" && nextEnsemble !== "piano_with_melody" && next.accompaniment === "chordal") {
       next.accompaniment = "homophonic";
     }
+    const validInstrumentation =
+      nextEnsemble === "string_ensemble"
+        ? new Set(STRING_INSTRUMENTATION_OPTIONS.map((opt) => opt.value))
+        : nextEnsemble === "woodwind_ensemble"
+          ? new Set(WOODWIND_INSTRUMENTATION_OPTIONS.map((opt) => opt.value))
+          : new Set(["auto"]);
+    if (!validInstrumentation.has(next.instrumentation ?? "auto")) {
+      next.instrumentation = "auto";
+    }
     onChange(next);
   }
 
@@ -190,17 +212,19 @@ export default function SettingsForm({ settings, onChange }: Props) {
     BASS_ACTIVITY_OPTIONS.find((opt) => opt.value === settings.vcActivity)?.help ?? "Choose activity level.";
   const cbActivityHelp =
     BASS_ACTIVITY_OPTIONS.find((opt) => opt.value === settings.cbActivity)?.help ?? "Choose activity level.";
+  const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
+  const isStrings = settings.ensemble === "string_ensemble";
+  const isWoodwinds = settings.ensemble === "woodwind_ensemble";
   const instrumentationHelp =
-    INSTRUMENTATION_OPTIONS.find((opt) => opt.value === settings.instrumentation)?.help ??
+    (isStrings ? STRING_INSTRUMENTATION_OPTIONS : isWoodwinds ? WOODWIND_INSTRUMENTATION_OPTIONS : []).find(
+      (opt) => opt.value === settings.instrumentation
+    )?.help ??
     "Choose instrumentation mapping.";
   const sopranoMelodyShare = Math.max(0, Math.min(100, settings.sopranoMelodyShare ?? 30));
   const offsetsHelp =
     settings.randomizeOffsets === false
       ? "Offsets disabled: rhythms align to downbeats."
       : "Offsets enabled: subtle syncopation and staggered entries.";
-  const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
-  const isStrings = settings.ensemble === "string_ensemble";
-  const isWoodwinds = settings.ensemble === "woodwind_ensemble";
   const showPolyphonicControls = settings.accompaniment === "polyphonic" || settings.textureMode === "polyphony";
   const showChordalActivity = settings.accompaniment === "chordal" && isPiano && settings.level === "beginner";
   const showPianoSopranoActivity = isPiano;
@@ -250,14 +274,14 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "woodwind_ensemble" && <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds supported)</div>}
       </div>
 
-      {settings.ensemble === "string_ensemble" && (
+      {(settings.ensemble === "string_ensemble" || settings.ensemble === "woodwind_ensemble") && (
         <div className="field">
           <label>Instrumentation</label>
           <select
             value={settings.instrumentation ?? "auto"}
             onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
           >
-            {INSTRUMENTATION_OPTIONS.map((opt) => (
+            {(settings.ensemble === "string_ensemble" ? STRING_INSTRUMENTATION_OPTIONS : WOODWIND_INSTRUMENTATION_OPTIONS).map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

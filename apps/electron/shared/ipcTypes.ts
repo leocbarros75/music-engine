@@ -20,7 +20,12 @@ export type TextureMode =
 export type PolyphonicProfile = "baroque" | "classical" | "romantic" | "modern";
 export type ModernMode = "modernTonal" | "modal" | "atonal";
 export type BassActivity = "grounded" | "less_active" | "active" | "high_active";
-export type InstrumentationOption = "auto" | "piano_copy_to_string_quartet" | "satb_to_string_quartet";
+export type InstrumentationOption =
+  | "auto"
+  | "piano_copy_to_string_quartet"
+  | "satb_to_string_quartet"
+  | "piano_copy_to_woodwind_quartet"
+  | "satb_to_woodwind_quartet";
 
 export type Settings = {
   title: string;

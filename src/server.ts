@@ -541,7 +541,9 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     instrumentation:
       anyRaw.instrumentation === "auto" ||
       anyRaw.instrumentation === "piano_copy_to_string_quartet" ||
-      anyRaw.instrumentation === "satb_to_string_quartet"
+      anyRaw.instrumentation === "satb_to_string_quartet" ||
+      anyRaw.instrumentation === "piano_copy_to_woodwind_quartet" ||
+      anyRaw.instrumentation === "satb_to_woodwind_quartet"
         ? (anyRaw.instrumentation as AppSettings["instrumentation"])
         : undefined,
     sopranoMelodyShare:

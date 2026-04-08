@@ -13,6 +13,7 @@ import { analyzeTexture } from "../texture/textureAnalyzer";
 import { arrangePianoFromSatb } from "../arrange/arrangePianoFromSatb";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
+import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -51,7 +52,12 @@ export type AppSettings = {
   pianoStylePreset?: string;
   pianoStylePresetPath?: string;
   useStringEnsembleArranger?: boolean;
-  instrumentation?: "auto" | "piano_copy_to_string_quartet" | "satb_to_string_quartet";
+  instrumentation?:
+    | "auto"
+    | "piano_copy_to_string_quartet"
+    | "satb_to_string_quartet"
+    | "piano_copy_to_woodwind_quartet"
+    | "satb_to_woodwind_quartet";
 };
 
 export type ApplySettingsResult = {
@@ -1377,6 +1383,9 @@ export function applyAppSettings(
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
     wantsStrings && (instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
+  const usePianoCopyWoodwindQuartetInstrumentation =
+    wantsWoodwinds &&
+    (instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
 
   const detectedKey = getKeyInfo(scoreModel);
   const detectedInputKeyFifths = detectedKey.value;
@@ -1437,6 +1446,19 @@ export function applyAppSettings(
 
   if (usePianoCopyStringQuartetInstrumentation) {
     const finalScore = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (usePianoCopyWoodwindQuartetInstrumentation) {
+    const finalScore = arrangeWoodwindQuartetFromPianoInstrumentation(scoreModel, { warnings });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
