@@ -18,6 +18,7 @@ import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
 import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble";
+import { mapPianoToBrassEnsembleOpen } from "../arrange/mapToBrassEnsemble";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 
 export type AppSettings = {
@@ -1379,6 +1380,7 @@ export function applyAppSettings(
     wantsPianoWithMelody || ensemble === "piano" || ensemble === "grand_piano" || ensemble === "acoustic_piano";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
   const wantsWoodwinds = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
+  const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
@@ -1481,6 +1483,25 @@ export function applyAppSettings(
       oboeActivity: settings.altoActivity ?? "less_active",
       clarinetActivity: settings.tenorActivity ?? "less_active",
       bassoonActivity: settings.bassActivity ?? "less_active"
+    });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsBrass) {
+    const finalScore = mapPianoToBrassEnsembleOpen(scoreModel, {
+      level: settings.level,
+      accompaniment,
+      textureMode,
+      chords,
+      warnings
     });
     attachTextureAnalysis(finalScore, warnings);
     return {

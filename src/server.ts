@@ -705,7 +705,10 @@ const server = http.createServer(async (req, res) => {
       const wantsWoodwinds =
         String(settings.ensemble ?? "").toLowerCase() === "woodwind_ensemble" ||
         String(settings.ensemble ?? "").toLowerCase() === "woodwinds";
-      const wantsDirectSourceArrangement = wantsStrings || wantsWoodwinds;
+      const wantsBrass =
+        String(settings.ensemble ?? "").toLowerCase() === "brass_ensemble" ||
+        String(settings.ensemble ?? "").toLowerCase() === "brass";
+      const wantsDirectSourceArrangement = wantsStrings || wantsWoodwinds || wantsBrass;
       if (wantsDirectSourceArrangement && !musicxml && filePath) {
         try {
           musicxml = fs.readFileSync(filePath, "utf8");
@@ -817,9 +820,10 @@ const server = http.createServer(async (req, res) => {
         ensembleRaw === "acoustic_piano";
       const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings";
       const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds";
+      const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass";
       const chordDebug = buildChordDebug(scoreModelOut, chordsForApp as any, inputChordWarnings, { pianoMode: isPiano });
       let ruleCheck = { rulesVersion: "choral-v1", violations: [], warnings: [] as string[] };
-      if (!isPiano && !isStrings && !isWoodwinds) {
+      if (!isPiano && !isStrings && !isWoodwinds && !isBrass) {
         try {
           ruleCheck = checkChoralRules(scoreModelOut, chordsForApp as any, {
             strictness: settings.ruleStrictness,

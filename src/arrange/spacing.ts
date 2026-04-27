@@ -76,6 +76,7 @@ function sortTopToBottom(voices: SpacingVoice[]): SpacingVoice[] {
     trumpet_bb_2: 60,
     horn_f: 70,
     trombone: 80,
+    bass_trombone: 85,
     tuba_c: 90,
 
     // Percussion

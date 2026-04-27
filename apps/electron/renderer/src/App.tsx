@@ -48,7 +48,8 @@ export default function App() {
     settings.ensemble === "piano" ||
     settings.ensemble === "piano_with_melody" ||
     settings.ensemble === "string_ensemble" ||
-    settings.ensemble === "woodwind_ensemble";
+    settings.ensemble === "woodwind_ensemble" ||
+    settings.ensemble === "brass_ensemble";
   const canRun = !!file && ensembleReady && serverReady && !isRunning;
 
   function addWarning(value: string) {

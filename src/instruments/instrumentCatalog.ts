@@ -17,6 +17,7 @@ export type InstrumentId =
   | "trumpet_bb_2"
   | "horn_f"
   | "trombone"
+  | "bass_trombone"
   | "tuba_c"
   | "timpani"
   | "glockenspiel"
@@ -175,18 +176,18 @@ export const InstrumentCatalog: Record<InstrumentId, InstrumentSpec> = {
     id: "trumpet_bb_1",
     name: "Trumpet 1 (Bb, concert view)",
     clef: "treble",
-    midi_low: 54, // F#3 (absolute edge)
-    midi_high: 86, // D6
-    preferred_low: 58, // Bb3
-    preferred_high: 82 // Bb5
+    midi_low: 50, // D3
+    midi_high: 89, // F6
+    preferred_low: 54, // F#3
+    preferred_high: 79 // G5
   },
   trumpet_bb_2: {
     id: "trumpet_bb_2",
     name: "Trumpet 2 (Bb, concert view)",
     clef: "treble",
-    midi_low: 54,
+    midi_low: 50, // D3
     midi_high: 84, // C6
-    preferred_low: 58,
+    preferred_low: 54, // F#3
     preferred_high: 79 // G5
   },
   horn_f: {
@@ -202,10 +203,19 @@ export const InstrumentCatalog: Record<InstrumentId, InstrumentSpec> = {
     id: "trombone",
     name: "Trombone",
     clef: "bass",
-    midi_low: 40, // E2
+    midi_low: 34, // Bb1
     midi_high: 70, // Bb4
-    preferred_low: 46, // Bb2
+    preferred_low: 38, // D2
     preferred_high: 65 // F4
+  },
+  bass_trombone: {
+    id: "bass_trombone",
+    name: "Bass Trombone",
+    clef: "bass",
+    midi_low: 29, // F1
+    midi_high: 65, // F4
+    preferred_low: 31, // G1
+    preferred_high: 62 // D4
   },
   tuba_c: {
     id: "tuba_c",
@@ -213,7 +223,7 @@ export const InstrumentCatalog: Record<InstrumentId, InstrumentSpec> = {
     clef: "bass",
     midi_low: 26, // D1
     midi_high: 65, // F4
-    preferred_low: 34, // Bb1
+    preferred_low: 31, // G1
     preferred_high: 58 // Bb3
   },
 
@@ -285,10 +295,13 @@ function normalizeInstrumentId(raw: string): string {
   if (s === "db" || s === "doublebass" || s === "double_bass" || s === "contrabass") return "double_bass";
 
   // winds/brass aliases (just in case)
+  if (s === "trumpet") return "trumpet_bb_1";
   if (s === "tpt1") return "trumpet_bb_1";
   if (s === "tpt2") return "trumpet_bb_2";
+  if (s === "horn") return "horn_f";
   if (s === "hn") return "horn_f";
   if (s === "tbn") return "trombone";
+  if (s === "bass trombone" || s === "bass_trombone" || s === "btbn") return "bass_trombone";
   if (s === "tuba") return "tuba_c";
 
   return s;

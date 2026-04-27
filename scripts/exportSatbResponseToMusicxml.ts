@@ -43,14 +43,29 @@ function main(): void {
         );
       })
     : false;
+  const hasBrassPart = Array.isArray(scoreModel?.parts)
+    ? scoreModel.parts.some((p: any) => {
+        const s = `${String(p?.instrument ?? "")} ${String(p?.name ?? "")}`.toLowerCase();
+        return (
+          s.includes("trumpet") ||
+          s.includes("horn") ||
+          s.includes("trombone") ||
+          s.includes("tuba") ||
+          s.includes("brass")
+        );
+      })
+    : false;
   const useGeneralExporter =
     ensemble === "piano" ||
     ensemble === "piano_with_melody" ||
     ensemble === "woodwind_ensemble" ||
     ensemble === "woodwinds" ||
+    ensemble === "brass_ensemble" ||
+    ensemble === "brass" ||
     hasPianoPart ||
     hasGrandStaff ||
-    hasWoodwindPart;
+    hasWoodwindPart ||
+    hasBrassPart;
 
   const xml = useGeneralExporter
     ? exportScoreModelToMusicXML(scoreModel)

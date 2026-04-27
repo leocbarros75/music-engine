@@ -21,6 +21,7 @@ const WRITTEN_TO_CONCERT: Record<string, number> = {
 
   // Non-transposing
   trombone: 0,
+  bass_trombone: 0,
   tuba: 0,
   tuba_c: 0,
 

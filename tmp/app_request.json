@@ -1,12 +1,12 @@
 {
   "settings": {
-    "title": "you are my king",
-    "ensemble": "woodwind_ensemble",
+    "title": "hark",
+    "ensemble": "brass_ensemble",
     "keySignature": "original",
     "timeSignature": "original",
     "tempo": 120,
     "style": "classical",
-    "level": "intermediate",
+    "level": "advanced",
     "accompaniment": "homophonic",
     "ruleStrictness": "standard",
     "textureMode": "homophony_melody_accompaniment",
@@ -21,7 +21,7 @@
     "vlaActivity": "less_active",
     "vcActivity": "less_active",
     "cbActivity": "less_active",
-    "instrumentation": "piano_copy_to_woodwind_quartet",
+    "instrumentation": "auto",
     "sopranoMelodyShare": 30,
     "randomizeOffsets": true,
     "keySignatureMode": "original",
@@ -29,7 +29,7 @@
     "timeSignatureMode": "original"
   },
   "prompt": "",
-  "filePath": "/Users/leobarros/Downloads/you are my king.musicxml",
+  "filePath": "/Users/leobarros/Downloads/Flows from hark test/hark test - 01_Soprano - 01 Hark the herold.musicxml",
   "serverBaseUrl": "http://localhost:3001",
-  "timestamp": "2026-04-08T17:55:38.413Z"
+  "timestamp": "2026-04-08T21:57:12.169Z"
 }
