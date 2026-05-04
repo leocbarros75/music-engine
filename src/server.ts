@@ -639,6 +639,40 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // ── Static file serving for GET requests (production web app) ────────────
+    if (req.method === "GET") {
+      const publicDir = path.join(process.cwd(), "public");
+      if (fs.existsSync(publicDir)) {
+        const ext = path.extname(url);
+        const MIME: Record<string, string> = {
+          ".html": "text/html",
+          ".js": "application/javascript",
+          ".css": "text/css",
+          ".svg": "image/svg+xml",
+          ".png": "image/png",
+          ".ico": "image/x-icon",
+          ".woff2": "font/woff2",
+          ".woff": "font/woff",
+        };
+        const filePath = ext
+          ? path.join(publicDir, url)
+          : path.join(publicDir, "index.html");
+        if (fs.existsSync(filePath)) {
+          const mime = MIME[ext] ?? "application/octet-stream";
+          res.writeHead(200, { "Content-Type": mime });
+          fs.createReadStream(filePath).pipe(res);
+          return;
+        }
+        // SPA fallback — serve index.html for any unknown path
+        const indexPath = path.join(publicDir, "index.html");
+        if (fs.existsSync(indexPath)) {
+          res.writeHead(200, { "Content-Type": "text/html" });
+          fs.createReadStream(indexPath).pipe(res);
+          return;
+        }
+      }
+    }
+
     if (req.method !== "POST") {
       sendJson(res, 405, { ok: false, error: "Method not allowed" });
       return;
@@ -1149,39 +1183,6 @@ const server = http.createServer(async (req, res) => {
         meta:       result.meta
       });
       return;
-    }
-
-    // ── Static file serving for production (built web app in ./public) ──────
-    const publicDir = path.join(process.cwd(), "public");
-    if (fs.existsSync(publicDir)) {
-      // Serve index.html for the root and any non-API path (SPA fallback)
-      const ext = path.extname(url);
-      const MIME: Record<string, string> = {
-        ".html": "text/html",
-        ".js": "application/javascript",
-        ".css": "text/css",
-        ".svg": "image/svg+xml",
-        ".png": "image/png",
-        ".ico": "image/x-icon",
-        ".woff2": "font/woff2",
-        ".woff": "font/woff",
-      };
-      const filePath = ext
-        ? path.join(publicDir, url)
-        : path.join(publicDir, "index.html");
-      if (fs.existsSync(filePath)) {
-        const mime = MIME[ext] ?? "application/octet-stream";
-        res.writeHead(200, { "Content-Type": mime });
-        fs.createReadStream(filePath).pipe(res);
-        return;
-      }
-      // SPA fallback
-      const indexPath = path.join(publicDir, "index.html");
-      if (fs.existsSync(indexPath)) {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        fs.createReadStream(indexPath).pipe(res);
-        return;
-      }
     }
 
     sendJson(res, 404, { ok: false, error: `Unknown route: ${url}` });
