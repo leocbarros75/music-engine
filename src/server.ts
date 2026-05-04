@@ -658,7 +658,7 @@ const server = http.createServer(async (req, res) => {
           ? path.join(publicDir, url)
           : path.join(publicDir, "index.html");
         if (fs.existsSync(filePath)) {
-          const mime = MIME[ext] ?? "application/octet-stream";
+          const mime = ext ? (MIME[ext] ?? "application/octet-stream") : "text/html";
           res.writeHead(200, { "Content-Type": mime });
           fs.createReadStream(filePath).pipe(res);
           return;
