@@ -170,11 +170,80 @@ function resolvePresetPath(presetNameOrPath: string, warnings: string[]): string
   return resolved;
 }
 
+// ── Built-in piano style presets ────────────────────────────────────────────
+// Pattern arrays are 8-element binary arrays for 4/4 time (one element = one 8th note).
+// Each 1 triggers a chord-pad hit; 0 is silence.
+//
+// Usage: pass pianoStylePreset: "boom_chick" (etc.) from Settings.
+// When a built-in preset is active, worship-chord-pad mode is automatically
+// enabled so the pattern is applied to the right-hand voicings.
+//
+const BUILTIN_PIANO_PRESETS: Record<string, PianoStylePreset> = {
+  // ── Classical / baroque ──────────────────────────────────────────────────
+  // Each beat gets a chord (quarter-note pulse)
+  block_chords: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 1, 0, 0, 0] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 1, 0, 0, 0] } }
+    }
+  },
+  // ── Pop / ballad ─────────────────────────────────────────────────────────
+  // Half-note chords — slow and open
+  ballad: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 1, 0, 0, 0] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 0, 0, 0, 0] } }
+    }
+  },
+  // Bass on beats 1 & 3, chord stabs on beats 2 & 4 (country / pop)
+  boom_chick: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [0, 0, 0, 0, 1, 0, 0, 0] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 0, 0, 0, 0] } }
+    }
+  },
+  // ── Worship / gospel ─────────────────────────────────────────────────────
+  // Continuous 8th-note pulse — driving worship feel
+  gospel_pulse: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [1, 0, 1, 0, 1, 0, 1, 0] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 1, 0, 0, 0] } }
+    }
+  },
+  // Syncopated gospel: anticipates beats 2 and 4
+  gospel_sync: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [1, 0, 0, 1, 0, 0, 1, 0] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 1, 0, 0, 0] } }
+    }
+  },
+  // ── Jazz / Latin ─────────────────────────────────────────────────────────
+  // Comp on the "and" of beats 2 and 4 (jazz comp feel)
+  jazz_comp: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [0, 0, 0, 1, 0, 0, 0, 1] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 1, 0, 0, 0] } }
+    }
+  },
+  // Bossa-nova: anticipates beat 3 (long, short, long feel)
+  bossa_nova: {
+    instrument_logic: {
+      right_hand_upper: { rhythm_pattern: { pattern_array: [1, 0, 0, 1, 0, 1, 0, 0] } },
+      left_hand_lower:  { rhythm_pattern: { pattern_array: [1, 0, 0, 0, 0, 0, 0, 0] } }
+    }
+  }
+};
+
 function loadPianoStylePreset(
   presetNameOrPath: string | undefined,
   warnings: string[]
 ): PianoStylePreset | null {
   if (!presetNameOrPath) return null;
+
+  // Check built-in presets first (case-insensitive)
+  const builtin = BUILTIN_PIANO_PRESETS[presetNameOrPath.toLowerCase().replace(/[-\s]/g, "_")];
+  if (builtin) return builtin;
+
   const resolved = resolvePresetPath(presetNameOrPath, warnings);
   if (!resolved) return null;
   try {
@@ -1936,7 +2005,7 @@ function buildRhTopVoiceEvents(params: {
     const chordPcs = parsed?.pcs ?? [];
     const group = Math.floor((measureNumber - 1) / 8);
     const seedBase = group * 10000 + Math.round(start * 1000);
-    const durations = activity === "grounded" ? [segDur] : buildActiveDurations(segDur, activity, seedBase);
+    const durations = (activity as string) === "grounded" ? [segDur] : buildActiveDurations(segDur, activity, seedBase);
     let cursor = start;
 
     for (let iEv = 0; iEv < durations.length; iEv++) {
@@ -2714,7 +2783,7 @@ export function arrangePianoFromSatb(score: ScoreModel, options?: ArrangePianoOp
         measureBeats,
         melodyEvents: sEvents,
         bottomEvents: rhBottomEvents,
-        activity: sopranoActivity === "grounded" ? "less_active" : (sopranoActivity as ActivityLevel),
+        activity: (sopranoActivity as string) === "grounded" ? "less_active" : (sopranoActivity as ActivityLevel),
         scalePcs,
         melodyShare: sopranoMelodyShare,
         range: worshipTopRange,

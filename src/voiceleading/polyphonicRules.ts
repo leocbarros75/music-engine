@@ -328,8 +328,9 @@ export function scorePolyphonicVoicing(input: PolyphonicScoreInput): PolyphonicS
 
   const spacingSA = next.S - next.A;
   const spacingAT = next.A - next.T;
-  if (spacingSA > 12) add(penalties.spacing * (spacingSA - 12) * 0.5, "spacing-SA");
-  if (spacingAT > 12) add(penalties.spacing * (spacingAT - 12) * 0.5, "spacing-AT");
+  // Raised multipliers: spacing violations in upper voices are strongly penalised.
+  if (spacingSA > 12) add(penalties.spacing * (spacingSA - 12) * 0.85, "spacing-SA");
+  if (spacingAT > 12) add(penalties.spacing * (spacingAT - 12) * 0.65, "spacing-AT");
   const minLowSpacing = next.B < 48 ? 10 : 5;
   const spacingTB = next.T - next.B;
   if (spacingTB < minLowSpacing) {
@@ -425,9 +426,12 @@ export function scorePolyphonicVoicing(input: PolyphonicScoreInput): PolyphonicS
       add(penalties.similarMotionAll * 0.35, "similar-motion-BT");
     }
 
-    if (dS !== 0 && dB !== 0 && dS !== dB) {
-      score -= 1.5;
-    }
+    // Reward contrary motion — all voice-pair combinations.
+    // Outer voices (S/B) contribute most; inner pairs contribute less.
+    if (dS !== 0 && dB !== 0 && dS !== dB) score -= 2.5;  // S vs B — outer voices
+    if (dA !== 0 && dT !== 0 && dA !== dT) score -= 1.2;  // A vs T — inner voices
+    if (dS !== 0 && dA !== 0 && dS !== dA) score -= 0.8;  // S vs A
+    if (dB !== 0 && dT !== 0 && dB !== dT) score -= 0.8;  // B vs T
 
     const voices: Array<[keyof VoiceState, keyof VoiceRanges]> = [
       ["S", "S"],

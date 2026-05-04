@@ -172,8 +172,9 @@ function scoreTriple(params: {
   const at = alto - tenor;
   const sa = sopr - alto;
   if (tb > 19) score += (tb - 19) * 0.5;
-  if (at > 12) score += (at - 12) * 0.5;
-  if (sa > 12) score += (sa - 12) * 0.4;
+  // SA and AT spacing: penalty weight raised so violations are strongly discouraged.
+  if (at > 12) score += (at - 12) * 0.65;
+  if (sa > 12) score += (sa - 12) * 0.65;
 
   if (tb > 0) score += intervalPenalty(tb, TENOR_BASS_ALLOWED_INTERVALS, 3.5);
   if (at >= 0) score += intervalPenalty(at, ALTO_TENOR_ALLOWED_INTERVALS, 3.0);
@@ -232,6 +233,9 @@ function pickBestTriple(params: {
       for (const alto of altoCands) {
         if (enforceOrdering) {
           if (!orderingOk({ bass, tenor, alto, soprano: sopr, allowUnisonD4 })) continue;
+          // Primary pass: enforce 1-octave maximum between adjacent upper voices.
+          // The fallback (enforceOrdering: false) relaxes this when no valid triple exists.
+          if (sopr - alto > 12 || alto - tenor > 12) continue;
         } else {
           if (alto >= sopr) continue;
         }

@@ -229,6 +229,19 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
   const scorePartwise = elementsByTagName(doc, "score-partwise")[0] ?? null;
   if (!scorePartwise) return { parts: [] };
 
+  // Extract title: prefer <work-title>, fall back to <movement-title>, then <credit-words>
+  let scoreTitle = "";
+  const workEl = elementsByTagName(scorePartwise, "work")[0] ?? null;
+  if (workEl) scoreTitle = textOf(firstChild(workEl as Element, "work-title"));
+  if (!scoreTitle) {
+    const mvEl = elementsByTagName(scorePartwise, "movement-title")[0] ?? null;
+    if (mvEl) scoreTitle = textOf(mvEl as Element);
+  }
+  if (!scoreTitle) {
+    const credEls = elementsByTagName(scorePartwise, "credit-words");
+    if (credEls.length) scoreTitle = textOf(credEls[0] as Element);
+  }
+
   const partList = elementsByTagName(scorePartwise, "part-list")[0] ?? null;
 
   const partNames = new Map<string, string>();
@@ -481,6 +494,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
 
   const m0 = parts[0]?.measures?.[0];
   const meta: any = {
+    title: scoreTitle || undefined,
     inputKeyFifths: m0?.attributes?.key_fifths,
     inputKeyMode: m0?.attributes?.key_mode,
     inputTime: m0?.attributes?.time,

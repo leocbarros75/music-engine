@@ -1547,7 +1547,6 @@ function mapBeginnerPolyphonicActive(score: ScoreModel, options: WoodwindMapOpti
           });
         }
         if (!pool.length) {
-          obT += dur;
           continue;
         }
         const obMidi = pickCandidateNear(

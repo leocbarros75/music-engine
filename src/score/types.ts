@@ -10,6 +10,8 @@ export type NoteEvent =
       voice: number;
       staff: number;
       isRest?: false;
+      midi?: number;   // cached MIDI value (optional, computed on demand)
+      [key: string]: unknown; // allow extended properties (lockPitch, role, etc.)
     }
   | {
       id: string;
@@ -19,6 +21,8 @@ export type NoteEvent =
       voice: number;
       staff: number;
       isRest: true;
+      midi?: number;
+      [key: string]: unknown;
     };
 
 export type Measure = {

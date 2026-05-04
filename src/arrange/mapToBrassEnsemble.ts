@@ -19,9 +19,11 @@ function addNote(
   t: number,
   dur: number,
   pitch: { step: string; alter?: number; octave: number },
-  voice: number
+  voice: number,
+  idPrefix = "EV",
+  seq = 0
 ) {
-  const id = `EV_${measure.number}_${t}_${voice}_${Math.random().toString(16).slice(2, 10)}`;
+  const id = `${idPrefix}_${measure.number}_${t}_${voice}_${seq}`;
   measure.events.push({ id, t, dur, type: "note", pitch, voice, staff: 1 });
 }
 

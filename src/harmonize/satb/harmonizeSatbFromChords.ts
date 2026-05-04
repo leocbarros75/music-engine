@@ -1,6 +1,6 @@
 // src/harmonize/satb/harmonizeSatbFromChords.ts
 import type { ScoreModel } from "../../score/types";
-import { midiToPitch } from "../../instruments/instrumentCatalog";
+import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import { inferChordsFromMelody } from "./inferChordsFromMelody";
 import { repairVoicingForBeat } from "./repairVoicing";
 import {
@@ -507,7 +507,7 @@ function getSopranoSource(score: ScoreModel): { partIndex: number; part: any } |
     for (const m of part?.measures ?? []) {
       for (const e of m?.events ?? []) {
         if (!e || e.type !== "note") continue;
-        const midi = eventMidi(e);
+        const midi = typeof e.midi === "number" ? e.midi : e.pitch ? pitchToMidi(e.pitch) : null;
         if (typeof midi === "number") midis.push(midi);
       }
     }
@@ -1098,6 +1098,11 @@ export function harmonizeSatbFromChords(
       let soprMidi: number | null = null;
       const sEv = (mS.events ?? []).find((e: any) => e?.type === "note" && Number(e.t) === t);
       if (sEv?.midi !== undefined) soprMidi = Number(sEv.midi);
+      // Hard-clamp soprano to its defined range so inner voices can never be asked
+      // to sit above or violate it (e.g. B5/Bb5 from chord-only input exceed A5=81).
+      if (soprMidi !== null) {
+        soprMidi = clampInt(soprMidi, RANGES.Soprano.min, RANGES.Soprano.max);
+      }
 
       if (soprMidi === null) {
         addRestEvent(mA, t, 1);

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: music-engine
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    plan: free          # upgrade to starter/standard for always-on
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+    autoDeploy: true

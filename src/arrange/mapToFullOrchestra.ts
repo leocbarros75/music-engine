@@ -22,6 +22,58 @@ function isNote(ev: any): boolean {
   return ev && ev.type === "note" && ev.pitch && typeof ev.pitch.step === "string" && typeof ev.pitch.octave === "number";
 }
 
+/**
+ * Minimum note-duration floor (in ScoreModel divisions, 4 = 1 quarter note) per instrument.
+ * Brass instruments should sustain half notes; inner woodwinds: quarter notes;
+ * timpani: one hit per measure (whole note = 16 divs in 4/4).
+ * Strings and flute carry the melody/texture unchanged (return 0 → no floor).
+ */
+function minDurForInstrument(instrument: string): number {
+  switch (instrument) {
+    case "trumpet_bb_1":
+    case "trumpet_bb_2":
+    case "horn_f":
+    case "trombone":
+    case "tuba_c":
+      return 8;   // half note (4 divs/beat × 2)
+    case "oboe":
+    case "clarinet_bb":
+    case "bassoon":
+      return 4;   // quarter note
+    case "timpani":
+      return 16;  // downbeat hit only (whole note)
+    default:
+      return 0;   // violin, viola, cello, flute — no floor
+  }
+}
+
+/**
+ * Drop notes whose onset is within `minDur` divisions of the previous kept note
+ * and extend each kept note's duration to at least `minDur`.
+ * This ensures brass/woodwind inner parts don't end up with unplayable fast passages.
+ */
+function simplifyToMinDuration(events: ScoreEvent[], minDur: number): ScoreEvent[] {
+  if (!minDur) return events;
+  const notes  = (events ?? []).filter(isNote).sort((a, b) => (a.t ?? 0) - (b.t ?? 0));
+  const others = (events ?? []).filter((e) => !isNote(e));
+  if (!notes.length) return others;
+
+  const kept: ScoreEvent[] = [];
+  let lastKeptT = -Infinity;
+
+  for (const ev of notes) {
+    const t = ev.t ?? 0;
+    if (t - lastKeptT >= minDur) {
+      kept.push({ ...ev, dur: Math.max(ev.dur ?? minDur, minDur) });
+      lastKeptT = t;
+    }
+    // Notes closer than minDur to the last kept note are silently dropped —
+    // they would be impractical to play at any reasonable tempo.
+  }
+
+  return kept;
+}
+
 function groupEventsByTime(events: ScoreEvent[]): Map<number, ScoreEvent[]> {
   const m = new Map<number, ScoreEvent[]>();
   for (const ev of events ?? []) {
@@ -73,7 +125,9 @@ function mapMeasureEvents(
     }
   }
 
-  return out;
+  // Apply playability floor: brass need half-note minima, inner woodwinds quarter-note, etc.
+  const minDur = minDurForInstrument(instrumentId);
+  return simplifyToMinDuration(out, minDur);
 }
 
 function getFirstPart(score: ScoreModel): any | null {

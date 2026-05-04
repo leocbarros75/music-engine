@@ -10,7 +10,9 @@
     "test:harmony:beat": "bash tests/harmony/runHarmonyTests.sh beat",
     "test:harmony:measure": "bash tests/harmony/runHarmonyTests.sh measure",
     "app": "npm --prefix apps/electron run dev",
-    "app:install": "npm --prefix apps/electron install"
+    "app:install": "npm --prefix apps/electron install",
+    "web": "npm --prefix apps/web run dev",
+    "web:install": "npm --prefix apps/web install"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.8.11",

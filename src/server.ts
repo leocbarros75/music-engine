@@ -3,6 +3,7 @@ import http from "node:http";
 import process from "node:process";
 import type net from "node:net";
 import fs from "node:fs";
+import path from "node:path";
 import { parseMusicXMLToScoreModel } from "./parsers/musicxmlParser";
 
 // v2 harmony
@@ -20,12 +21,36 @@ import type { HarmonizeSatbFromChordsRequest } from "./harmonize/satb/harmonizeT
 import { applyAppSettings, type AppSettings } from "./app/applyAppSettings";
 import { checkChoralRules } from "./rules/choral/checkChoralRules";
 
-// NOTE: arrange pipeline temporarily disabled because the referenced module path does not exist
-// import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
+import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
+import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
+import { exportSatbScoreModelToMusicXML } from "./exporters/satbMusicxmlExporter";
+import { chordTextToMusicxml } from "./utils/chordTextToMusicxml";
 
 type Json = Record<string, unknown>;
 
 type ChordEvent = { measure: number; t: number; symbol: string };
+
+// ── MusicXML validation ────────────────────────────────────────────────────
+function validateMusicXml(xml: string): { ok: true } | { ok: false; error: string } {
+  if (!xml || typeof xml !== "string") return { ok: false, error: "No MusicXML content provided." };
+  const trimmed = xml.trimStart();
+  if (!trimmed.startsWith("<?xml") && !trimmed.startsWith("<score")) {
+    return { ok: false, error: "File does not appear to be an XML document." };
+  }
+  if (!/<score-partwise|<score-timewise/i.test(xml)) {
+    return {
+      ok: false,
+      error: "File is not a valid MusicXML document — missing <score-partwise> or <score-timewise> root element."
+    };
+  }
+  if (!/<part[\s>]/i.test(xml)) {
+    return { ok: false, error: "MusicXML file contains no parts. Please upload a score with at least one instrument." };
+  }
+  if (!/<measure[\s>]/i.test(xml)) {
+    return { ok: false, error: "MusicXML file contains no measures. The score appears to be empty." };
+  }
+  return { ok: true };
+}
 
 function chordPcsFromSymbolLoose(symbol: string): number[] | null {
   const raw = String(symbol || "").trim();
@@ -557,6 +582,34 @@ function normalizeAppSettings(raw: unknown): AppSettings {
   };
 }
 
+// ── Simple in-memory rate limiter ────────────────────────────────────────────
+// Heavy arrangement endpoints: max 12 requests per IP per 60 seconds.
+// Lightweight (health, static assets) are not counted.
+const RATE_WINDOW_MS   = 60_000;
+const RATE_MAX_HEAVY   = 12;
+const HEAVY_ENDPOINTS  = new Set(["/generate", "/generate_from_chords", "/arrange_musicxml"]);
+const rateBuckets      = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string, url: string): boolean {
+  if (!HEAVY_ENDPOINTS.has(url)) return true; // not a heavy endpoint, always allow
+  const now  = Date.now();
+  let bucket = rateBuckets.get(ip);
+  if (!bucket || now > bucket.resetAt) {
+    bucket = { count: 0, resetAt: now + RATE_WINDOW_MS };
+    rateBuckets.set(ip, bucket);
+  }
+  bucket.count++;
+  return bucket.count <= RATE_MAX_HEAVY;
+}
+
+// Prune stale buckets every minute so the map doesn't grow unboundedly
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, b] of rateBuckets) {
+    if (now > b.resetAt) rateBuckets.delete(ip);
+  }
+}, RATE_WINDOW_MS);
+
 const server = http.createServer(async (req, res) => {
   try {
     if (req.method === "OPTIONS") {
@@ -570,6 +623,15 @@ const server = http.createServer(async (req, res) => {
     }
 
     const url = req.url ?? "/";
+    const ip  = (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim()
+                ?? (req.socket as net.Socket).remoteAddress
+                ?? "unknown";
+
+    if (!checkRateLimit(ip, url)) {
+      res.writeHead(429, { "Content-Type": "application/json", "Retry-After": "60" });
+      res.end(JSON.stringify({ ok: false, error: "Too many requests. Please wait a minute and try again." }));
+      return;
+    }
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
@@ -886,14 +948,240 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // --- arrange pipeline (temporarily disabled) ---
-    if (url === "/arrange_musicxml") {
-      sendJson(res, 501, {
-        ok: false,
-        error:
-          "Route /arrange_musicxml is temporarily disabled because pipelineMusicxmlToArrangedMusicxml is not wired to a valid file path."
+    // ----------------------------
+    // List parts from a MusicXML score
+    // ----------------------------
+    if (url === "/list_parts") {
+      const musicxml = typeof body.musicxml === "string" ? body.musicxml : null;
+      if (!musicxml) {
+        sendJson(res, 400, { ok: false, error: "Provide 'musicxml' as a string in the request body." });
+        return;
+      }
+      const xmlValidation = validateMusicXml(musicxml);
+      if (!xmlValidation.ok) {
+        sendJson(res, 400, { ok: false, error: (xmlValidation as { ok: false; error: string }).error });
+        return;
+      }
+
+      let score: any;
+      try {
+        score = parseMusicXMLToScoreModel(musicxml);
+      } catch (e: any) {
+        sendJson(res, 400, { ok: false, error: `Failed to parse MusicXML: ${e?.message ?? String(e)}` });
+        return;
+      }
+
+      const parts = (score.parts ?? []).map((p: any) => {
+        const notes = (p.measures ?? []).reduce((sum: number, m: any) => {
+          return sum + (m.events ?? []).filter((e: any) => e.type === "note").length;
+        }, 0);
+        return {
+          id:         String(p.part_id ?? ""),
+          name:       String(p.name ?? ""),
+          instrument: String(p.instrument ?? p.name ?? ""),
+          staves:     Number(p.staves ?? 1),
+          measures:   (p.measures ?? []).length,
+          noteCount:  notes
+        };
+      });
+
+      sendJson(res, 200, {
+        ok: true,
+        title: score.meta?.title ?? "",
+        ensemble: score.meta?.ensemble ?? "",
+        partCount: parts.length,
+        parts
       });
       return;
+    }
+
+    // ----------------------------
+    // Extract specific parts from a MusicXML score
+    // ----------------------------
+    if (url === "/extract_part") {
+      const musicxml = typeof body.musicxml === "string" ? body.musicxml : null;
+      const partIds  = asArray(body.partIds)?.map(String) ?? [];
+      if (!musicxml) {
+        sendJson(res, 400, { ok: false, error: "Provide 'musicxml' as a string in the request body." });
+        return;
+      }
+      if (!partIds.length) {
+        sendJson(res, 400, { ok: false, error: "Provide 'partIds' as a non-empty array of part id strings." });
+        return;
+      }
+
+      let score: any;
+      try {
+        score = parseMusicXMLToScoreModel(musicxml);
+      } catch (e: any) {
+        sendJson(res, 400, { ok: false, error: `Failed to parse MusicXML: ${e?.message ?? String(e)}` });
+        return;
+      }
+
+      const filtered = (score.parts ?? []).filter((p: any) => partIds.includes(String(p.part_id ?? "")));
+      if (!filtered.length) {
+        sendJson(res, 400, {
+          ok: false,
+          error: `None of the requested partIds found. Available: ${(score.parts ?? []).map((p: any) => p.part_id).join(", ")}`
+        });
+        return;
+      }
+
+      const filteredScore = { ...score, parts: filtered };
+
+      // Choose exporter: use general exporter if any part has grand staff or piano
+      const hasPiano = filtered.some((p: any) => {
+        const s = `${p.instrument ?? ""} ${p.name ?? ""}`.toLowerCase();
+        return s.includes("piano") || Number(p.staves) === 2;
+      });
+      const outputXml = hasPiano
+        ? exportScoreModelToMusicXML(filteredScore)
+        : exportSatbScoreModelToMusicXML(filteredScore);
+
+      sendJson(res, 200, {
+        ok: true,
+        musicxml: outputXml,
+        scoreModel: filteredScore,
+        extractedParts: filtered.map((p: any) => ({ id: p.part_id, name: p.name, instrument: p.instrument }))
+      });
+      return;
+    }
+
+    // --- full arrange pipeline ---
+    if (url === "/arrange_musicxml" || url === "/generate") {
+      const musicxml = typeof body.musicxml === "string" ? body.musicxml : null;
+      if (!musicxml) {
+        sendJson(res, 400, { ok: false, error: "Provide 'musicxml' as a string in the request body." });
+        return;
+      }
+      const xmlValidation = validateMusicXml(musicxml);
+      if (!xmlValidation.ok) {
+        sendJson(res, 400, { ok: false, error: (xmlValidation as { ok: false; error: string }).error });
+        return;
+      }
+      const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
+      const chords   = Array.isArray(body.chords) ? body.chords : undefined;
+      const options  = isObject(body.options) ? (body.options as Record<string, unknown>) : {};
+      // Optional: filter to specific parts before arranging
+      const partIds  = asArray(body.partIds)?.map(String) ?? [];
+
+      // If partIds provided, extract those parts first
+      let workingXml = musicxml;
+      if (partIds.length) {
+        try {
+          const score: any = parseMusicXMLToScoreModel(musicxml);
+          const filtered = (score.parts ?? []).filter((p: any) => partIds.includes(String(p.part_id ?? "")));
+          if (filtered.length) {
+            const filteredScore = { ...score, parts: filtered };
+            workingXml = exportSatbScoreModelToMusicXML(filteredScore);
+          }
+        } catch {
+          // fall through — use original xml
+        }
+      }
+
+      const result = pipelineMusicxmlToArrangedMusicxml({ musicxml: workingXml, settings, chords, options });
+
+      if (!result.ok) {
+        const errResult = result as import("./pipeline/pipelineMusicxmlToArrangedMusicxml").PipelineError;
+        sendJson(res, 500, { ok: false, error: errResult.error, warnings: errResult.warnings });
+        return;
+      }
+
+      sendJson(res, 200, {
+        ok: true,
+        musicxml:   result.musicxml,
+        scoreModel: result.scoreModel,
+        warnings:   result.warnings,
+        meta:       result.meta
+      });
+      return;
+    }
+
+    // ----------------------------
+    // Generate arrangement from chord progression text
+    // ----------------------------
+    if (url === "/generate_from_chords") {
+      const chordText = typeof body.chords === "string" ? body.chords.trim() : null;
+      if (!chordText) {
+        sendJson(res, 400, { ok: false, error: "Provide 'chords' as a string (e.g. \"C Am F G\")." });
+        return;
+      }
+      const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
+      const options  = isObject(body.options) ? (body.options as Record<string, unknown>) : {};
+
+      const { musicxml: generatedXml, warnings: genWarnings, chords: parsedChords } = chordTextToMusicxml(chordText, {
+        title: typeof settings.title === "string" && settings.title ? settings.title : "Chord Progression",
+        beatsPerMeasure: 4,
+      });
+
+      if (!generatedXml) {
+        sendJson(res, 400, { ok: false, error: genWarnings.join(" ") || "Could not parse chord progression." });
+        return;
+      }
+
+      // Convert to server ChordEvent format for the pipeline
+      const chordEvents = parsedChords.map((c) => ({
+        measure: c.measure,
+        t: c.beat,
+        symbol: c.symbol,
+      }));
+
+      const result = pipelineMusicxmlToArrangedMusicxml({
+        musicxml: generatedXml,
+        settings,
+        chords: chordEvents,
+        options: { ...options, keepMelodyInSoprano: true },
+      });
+
+      if (!result.ok) {
+        const errResult = result as import("./pipeline/pipelineMusicxmlToArrangedMusicxml").PipelineError;
+        const allWarnings = [...genWarnings, ...errResult.warnings];
+        sendJson(res, 500, { ok: false, error: errResult.error, warnings: allWarnings });
+        return;
+      }
+
+      sendJson(res, 200, {
+        ok: true,
+        musicxml:   result.musicxml,
+        scoreModel: result.scoreModel,
+        warnings:   [...genWarnings, ...result.warnings],
+        meta:       result.meta
+      });
+      return;
+    }
+
+    // ── Static file serving for production (built web app in ./public) ──────
+    const publicDir = path.join(process.cwd(), "public");
+    if (fs.existsSync(publicDir)) {
+      // Serve index.html for the root and any non-API path (SPA fallback)
+      const ext = path.extname(url);
+      const MIME: Record<string, string> = {
+        ".html": "text/html",
+        ".js": "application/javascript",
+        ".css": "text/css",
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".ico": "image/x-icon",
+        ".woff2": "font/woff2",
+        ".woff": "font/woff",
+      };
+      const filePath = ext
+        ? path.join(publicDir, url)
+        : path.join(publicDir, "index.html");
+      if (fs.existsSync(filePath)) {
+        const mime = MIME[ext] ?? "application/octet-stream";
+        res.writeHead(200, { "Content-Type": mime });
+        fs.createReadStream(filePath).pipe(res);
+        return;
+      }
+      // SPA fallback
+      const indexPath = path.join(publicDir, "index.html");
+      if (fs.existsSync(indexPath)) {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        fs.createReadStream(indexPath).pipe(res);
+        return;
+      }
     }
 
     sendJson(res, 404, { ok: false, error: `Unknown route: ${url}` });

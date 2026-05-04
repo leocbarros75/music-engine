@@ -34,7 +34,7 @@ export function scheduleImitation(
   const entries: MotifEntry[] = [];
   const delays = config.delayBeats?.length ? config.delayBeats : [4];
   const transposes = config.transposeSemitones?.length ? config.transposeSemitones : [7];
-  const voices = config.voices?.length ? config.voices : ["vln2"];
+  const voices = config.voices?.length ? config.voices : (["vln2"] as VoiceId[]);
   for (const voice of voices) {
     for (const delay of delays) {
       for (const transpose of transposes) {

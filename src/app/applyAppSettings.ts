@@ -1,4 +1,4 @@
-import type { ScoreModel } from "../score/types";
+import type { ScoreModel, NoteEvent } from "../score/types";
 import fs from "fs";
 import path from "path";
 import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
@@ -936,7 +936,7 @@ function applyPianoPolyphonicArpeggioBass(
   const level = (options?.level ?? "beginner") as "beginner" | "intermediate" | "advanced" | "professional";
   const isBeginner = level === "beginner";
   const range = level === "advanced" ? { min: 40, max: 52 } : { min: 40, max: 64 }; // E2..E3 or E2..E4
-  const allowArp = activity !== "grounded";
+  const allowArp = (activity as string) !== "grounded";
   if (!allowArp) {
     warnings.push("[piano] Polyphonic arpeggio skipped: activity grounded.");
     return false;
@@ -1337,14 +1337,14 @@ function enforceBassToChords(
       }
       const chord = pickChordForTime(chords, measureNumber, Number(ev.t));
       if (!chord) {
-        ev.type = "rest";
+        (ev as any).type = "rest";
         delete (ev as any).midi;
         delete (ev as any).pitch;
         continue;
       }
       const bassInfo = parseBassFromChordSymbol(chord.symbol);
       if (!bassInfo) {
-        ev.type = "rest";
+        (ev as any).type = "rest";
         delete (ev as any).midi;
         delete (ev as any).pitch;
         continue;
@@ -1538,7 +1538,7 @@ export function applyAppSettings(
           melodyHand: "right",
           omitMelodyInPiano,
           separateMelodyPart: (worshipPiano || useSopranoTexture) && !wantsPianoWithMelody,
-          worshipChordPad: wantsPianoWithMelody ? false : worshipPiano,
+          worshipChordPad: wantsPianoWithMelody ? false : (worshipPiano || !!settings.pianoStylePreset),
           pianoStylePreset: settings.pianoStylePreset,
           pianoStylePresetPath: settings.pianoStylePresetPath,
           ensembleTag: pianoEnsembleTag
@@ -1561,7 +1561,8 @@ export function applyAppSettings(
                   keyFifths: detectedInputKeyFifths,
                   keyMode: detectedMode,
                   syncopate: true,
-                  warnings
+                  warnings,
+                  tempoBpm
                 });
               }
               return stringScore;
@@ -1710,7 +1711,8 @@ export function applyAppSettings(
                 preserveVln1Melody: true,
                 enforceChordRootBass: true,
                 level: settings.level,
-                warnings
+                warnings,
+                tempoBpm
               });
               const vln1Part = (stringScore.parts ?? []).find(
                 (p: any) => String(p?.name ?? "").toLowerCase().includes("violin i")

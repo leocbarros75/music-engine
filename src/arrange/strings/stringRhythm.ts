@@ -22,6 +22,7 @@ type ApplyOptions = {
   maxMidi?: number;
   preserveVln1Melody?: boolean;
   enforceChordRootBass?: boolean;
+  tempoBpm?: number;
 };
 
 type NoteEvent = {
@@ -170,6 +171,10 @@ function applyToPart(
     keyMode?: "major" | "minor";
     syncopate?: boolean;
     allowNonChordTones?: boolean;
+    minSubdivision?: number;
+    minMidi?: number;
+    maxMidi?: number;
+    [key: string]: unknown;
   } = {}
 ): void {
   const ratio = activityRatio(activity);
@@ -180,7 +185,18 @@ function applyToPart(
   const keyMode = options.keyMode ?? "major";
   const scale = buildScalePcs(keyFifths, keyMode);
   const allowNonChordTones = options.allowNonChordTones !== false;
-  const minSubdivision = typeof options.minSubdivision === "number" ? options.minSubdivision : 0;
+  // Auto-apply minimum subdivision based on tempo: fast tempos use longer minimum notes
+  const tempoFloor = typeof options.tempoBpm === "number" && options.tempoBpm > 0
+    ? options.tempoBpm > 132
+      ? 4   // ≥132 bpm: minimum quarter note — no 8ths
+      : options.tempoBpm > 96
+        ? 2 // 97-132 bpm: minimum 8th note
+        : 0
+    : 0;
+  const minSubdivision = Math.max(
+    typeof options.minSubdivision === "number" ? options.minSubdivision : 0,
+    tempoFloor
+  );
   const minMidi = typeof options.minMidi === "number" ? options.minMidi : null;
   const maxMidi = typeof options.maxMidi === "number" ? options.maxMidi : null;
   const clampRange = (m: number | null): number | null => {
@@ -1369,7 +1385,8 @@ export function applyStringPolyphonicRhythm(
     for (const m of vc.measures ?? []) {
       const cbMeasure = (cb.measures ?? []).find((mm: any) => Number(mm?.number) === Number(m?.number));
       if (!cbMeasure) continue;
-      cbMeasure.events = (m.events ?? []).map((ev: NoteEvent) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (cbMeasure as any).events = (m.events ?? []).map((ev: NoteEvent) => {
         if (ev.type !== "note") return { ...ev };
         const chord = chordAt(options.chordEvents ?? [], Number(m?.number) || 1, ev.t);
         const bassPc = typeof chord?.bassPc === "number" ? chord.bassPc : chord?.rootPc ?? chord?.pcs?.[0];
