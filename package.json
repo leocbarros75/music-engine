@@ -1,7 +1,6 @@
 {
   "name": "music-engine",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx watch src/server.ts",

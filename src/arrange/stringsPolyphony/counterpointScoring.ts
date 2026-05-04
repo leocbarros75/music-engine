@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import type {
   CounterpointRules,
   Direction,
@@ -12,9 +11,6 @@ import type {
   Voicing
 } from "./types";
 import { initRhythmState, updateRhythmState } from "./rhythmStratification";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const VOICES: VoiceId[] = ["vln1", "vln2", "vla", "vc", "cb"];
 
