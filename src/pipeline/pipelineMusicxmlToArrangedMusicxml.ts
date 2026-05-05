@@ -83,6 +83,11 @@ export function pipelineMusicxmlToArrangedMusicxml(
             ? "inferred"
             : "none";
 
+    // eslint-disable-next-line no-console
+    console.log(
+      `[pipeline] chordSource=${chordSource} | fromFile=${chordsFromFile.length} | provided=${providedChords.length} | inferred=${inferredIfEmpty.length} | final=${finalChords.length}`
+    );
+
     // 3. Map settings to harmonizer options
     const harmOpts: Record<string, unknown> = { ...options, keepMelodyInSoprano: true };
     const accompanimentLower = String(

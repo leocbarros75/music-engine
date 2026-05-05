@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { pitchToMidi } from "../../instruments/instrumentCatalog";
 import { parseChordSymbol } from "../../harmonize/satb/chordSymbol";
 
@@ -39,24 +37,27 @@ type ChoralRules = {
   };
 };
 
-const RULES_DIR = path.join(__dirname);
-
-let cachedRules: ChoralRules | null = null;
-
-function readJson<T>(name: string): T {
-  const filePath = path.join(RULES_DIR, name);
-  const raw = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(raw) as T;
-}
+// Rule data inlined — no file-system access needed at runtime (works on Render etc.)
+const BUILT_IN_RULES: ChoralRules = {
+  ranges: {
+    voices: {
+      soprano: { minMidi: 60, maxMidi: 81, softMinMidi: 62, softMaxMidi: 79 },
+      alto:    { minMidi: 55, maxMidi: 74, softMinMidi: 57, softMaxMidi: 72 },
+      tenor:   { minMidi: 48, maxMidi: 69, softMinMidi: 50, softMaxMidi: 67 },
+      bass:    { minMidi: 40, maxMidi: 64, softMinMidi: 43, softMaxMidi: 62 }
+    }
+  },
+  spacing: {
+    adjacentMaxSemitones: { SA: 12, AT: 12, TB: 19 },
+    allowOpenVoicing: true
+  },
+  forbiddenIntervals: {
+    parallelPerfect: { intervalClasses: [0, 7] }
+  }
+};
 
 function loadRules(): ChoralRules {
-  if (cachedRules) return cachedRules;
-  cachedRules = {
-    ranges: readJson("ranges.json"),
-    spacing: readJson("spacing.json"),
-    forbiddenIntervals: readJson("forbiddenIntervals.json")
-  };
-  return cachedRules;
+  return BUILT_IN_RULES;
 }
 
 const VOICE_ORDER = ["soprano", "alto", "tenor", "bass"] as const;

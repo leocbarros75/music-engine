@@ -1106,7 +1106,19 @@ export function harmonizeSatbFromChords(
       let bassPitchSpelling = lockBassToPref ? parsed.bassSpelling ?? parsed.rootSpelling : null;
 
       let soprMidi: number | null = null;
-      const sEv = (mS.events ?? []).find((e: any) => e?.type === "note" && Number(e.t) === t);
+      // First try a note that starts exactly at beat t; if none, accept a note
+      // that is still sounding at beat t (e.g. a dotted note spanning this beat).
+      const sEvExact = (mS.events ?? []).find(
+        (e: any) => e?.type === "note" && Number(e.t) === t
+      );
+      const sEv =
+        sEvExact ??
+        (mS.events ?? []).find(
+          (e: any) =>
+            e?.type === "note" &&
+            Number(e.t) < t + 1e-6 &&
+            t < Number(e.t) + Number(e.dur) - 1e-6
+        );
       if (sEv?.midi !== undefined) soprMidi = Number(sEv.midi);
       // Hard-clamp soprano to its defined range so inner voices can never be asked
       // to sit above or violate it (e.g. B5/Bb5 from chord-only input exceed A5=81).
