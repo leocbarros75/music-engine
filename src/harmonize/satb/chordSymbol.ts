@@ -39,8 +39,11 @@ export function parseChordSymbol(symbolRaw: string): ParsedChord | null {
   const s = (symbolRaw ?? "").trim();
   if (!s) return null;
 
+  // Strip slash-bass suffix BEFORE quality detection (e.g. "G7/B" → parse "G7")
+  const mainPart = s.includes("/") ? (s.split("/")[0] ?? s).trim() : s;
+
   // Root: letter + optional accidental
-  const m = s.match(/^([A-Ga-g])([#b]?)(.*)$/);
+  const m = mainPart.match(/^([A-Ga-g])([#b]?)(.*)$/);
   if (!m) return null;
 
   const letter = m[1]!.toUpperCase();

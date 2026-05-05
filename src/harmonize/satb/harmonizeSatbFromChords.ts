@@ -1322,6 +1322,15 @@ export function harmonizeSatbFromChords(
               pen += 15;
           }
 
+          // Classical doubling: in inversion, penalise doubling the bass (inversion) note
+          if (hasSlashBass && bassMidi !== null && pc(candT) === pc(bassMidi)) {
+            pen += 18;
+          }
+          // Root position: lightly prefer tenor to double the root
+          if (!hasSlashBass && pc(candT) === rootPc && pc(soprMidi!) !== rootPc) {
+            pen -= 5;
+          }
+
           return pen;
         };
 
@@ -1423,6 +1432,15 @@ export function harmonizeSatbFromChords(
               })
             )
               pen += 12;
+          }
+
+          // Classical doubling: in inversion, penalise doubling the bass (inversion) note
+          if (hasSlashBass && bassMidi !== null && pc(candA) === pc(bassMidi)) {
+            pen += 18;
+          }
+          // Root position: prefer alto to double root only when tenor hasn't already
+          if (!hasSlashBass && pc(candA) === rootPc && pc(soprMidi!) !== rootPc && (tenorMidi === null || pc(tenorMidi) !== rootPc)) {
+            pen -= 5;
           }
 
           return pen;
