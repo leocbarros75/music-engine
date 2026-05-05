@@ -589,8 +589,18 @@ type PendingLeap = {
 };
 
 function pickChordForBeat(chordMap: Map<string, ChordEvent>, measureNumber: number, t: number): ChordEvent | null {
-  // Prefer exact match at this beat, else fall back to beat 0 for the measure.
-  return chordMap.get(`${measureNumber}:${t}`) ?? chordMap.get(`${measureNumber}:0`) ?? null;
+  // Find the last chord whose beat is <= t (so mid-measure chord changes work correctly).
+  // Build a sorted list of all chords in this measure.
+  const inMeasure: ChordEvent[] = [];
+  chordMap.forEach((ev) => { if (Number(ev.measure) === measureNumber) inMeasure.push(ev); });
+  if (!inMeasure.length) return null;
+  inMeasure.sort((a, b) => Number(a.t) - Number(b.t));
+  let best: ChordEvent | null = null;
+  for (const ev of inMeasure) {
+    if (Number(ev.t) <= t + 1e-6) best = ev;
+    else break;
+  }
+  return best ?? inMeasure[0] ?? null;
 }
 
 function nextBeatPosition(params: {
