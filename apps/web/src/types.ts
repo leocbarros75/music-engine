@@ -11,7 +11,7 @@ export type Settings = {
   keySignature: string;
   timeSignature: string;
   tempo: number;
-  style: "classical" | "worship" | "latino" | "pop" | "rock" | "funk" | "samba";
+  style: "classical" | "worship" | "latino" | "pop" | "rock" | "funk" | "samba" | "baroque" | "romantic";
   level: "beginner" | "intermediate" | "advanced" | "professional";
   accompaniment: "homophonic" | "chordal" | "polyphonic" | "alberti_bass" | "heterophonic";
   ruleStrictness: "relaxed" | "standard" | "strict";
