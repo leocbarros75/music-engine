@@ -92,9 +92,28 @@ export function addPassingTones(scoreModel: ScoreModel): ScoreModel {
             ptCandidate += direction;
           }
 
-          // Only insert if ptCandidate is diatonic and truly between curr and next
-          if (
+          // Chromatic fallback: if no diatonic step is available (or the
+          // diatonic step overshoots), use the chromatic semitone step
+          // nearest to the midpoint between curr and next. This allows
+          // D natural in E major (e.g., C#→E via D♮ as chromatic PT).
+          const diatonicFound =
             scalePcs.has(pc(ptCandidate)) &&
+            Math.abs(ptCandidate - currMidi) < gap &&
+            Math.abs(ptCandidate - nextMidi) < gap;
+
+          if (!diatonicFound) {
+            // Try the chromatic note one step away from curr
+            const chromatic = currMidi + direction;
+            if (
+              Math.abs(chromatic - currMidi) < gap &&
+              Math.abs(chromatic - nextMidi) < gap
+            ) {
+              ptCandidate = chromatic;
+            }
+          }
+
+          // Only insert if ptCandidate is truly between curr and next
+          if (
             Math.abs(ptCandidate - currMidi) < gap &&
             Math.abs(ptCandidate - nextMidi) < gap
           ) {

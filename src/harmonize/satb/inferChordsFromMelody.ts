@@ -373,22 +373,51 @@ function buildChordLibrary(tonicPc: number, mode: string): ChordTemplate[] {
       priority: 1
     });
 
-    // Secondary dominant V/V: major triad + dom7 on scale[1] (degree 2 root)
+    // Secondary dominant V/V: bare major triad on scale[1] (degree II, raised 3rd)
+    // e.g. in C major: D major (D, F#, A); in E major: F# major (F#, A#, C#)
     const vofvRoot = scale[1]!;
+    const vofvThird = (vofvRoot + 4) % 12;  // raised 3rd (chromatic)
+    const vofvFifth = (vofvRoot + 7) % 12;
+    templates.push({
+      symbol: pcName(vofvRoot),           // triad only — no 7th suffix
+      rootPc: vofvRoot,
+      pcs: [vofvRoot, vofvThird, vofvFifth],
+      priority: 7
+    });
+    // V/V with dominant 7th as well
     templates.push({
       symbol: pcName(vofvRoot) + "7",
       rootPc: vofvRoot,
-      pcs: [vofvRoot, (vofvRoot + 4) % 12, (vofvRoot + 7) % 12, (vofvRoot + 10) % 12],
-      priority: 7
+      pcs: [vofvRoot, vofvThird, vofvFifth, (vofvRoot + 10) % 12],
+      priority: 8
     });
 
-    // Secondary dominant V/ii: major triad + dom7 on scale[5] (degree 6 root)
+    // Secondary dominant V/ii: bare major triad on scale[5] (raised 3rd)
+    // e.g. in C major: A major (A, C#, E); in E major: C# major (C#, E#, G#)
     const vofiiRoot = scale[5]!;
+    const vofiiThird = (vofiiRoot + 4) % 12;
+    const vofiiFifth = (vofiiRoot + 7) % 12;
+    templates.push({
+      symbol: pcName(vofiiRoot),
+      rootPc: vofiiRoot,
+      pcs: [vofiiRoot, vofiiThird, vofiiFifth],
+      priority: 8
+    });
     templates.push({
       symbol: pcName(vofiiRoot) + "7",
       rootPc: vofiiRoot,
-      pcs: [vofiiRoot, (vofiiRoot + 4) % 12, (vofiiRoot + 7) % 12, (vofiiRoot + 10) % 12],
-      priority: 7
+      pcs: [vofiiRoot, vofiiThird, vofiiFifth, (vofiiRoot + 10) % 12],
+      priority: 9
+    });
+
+    // bVII: borrowed subtonic major triad from parallel Mixolydian
+    // e.g. in C major: Bb major (Bb, D, F); in E major: D major (D, F#, A)
+    const bviiRoot = (tonicPc + 10) % 12;
+    templates.push({
+      symbol: pcName(bviiRoot),
+      rootPc: bviiRoot,
+      pcs: [bviiRoot, (bviiRoot + 4) % 12, (bviiRoot + 7) % 12],
+      priority: 9
     });
   }
 
