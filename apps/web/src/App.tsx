@@ -300,17 +300,20 @@ export default function App() {
                 <p>
                   Enter chords separated by spaces. Use <code>|</code> for bar lines.
                   <br />
-                  <span className="chord-example">e.g. <code>C Am F G | Em Am Dm G7 | C</code></span>
+                  <span className="chord-example">e.g. <code>Dm7 G7 Cmaj7 | Em7b5 A7b9 Dm7 | Cmaj9</code></span>
                 </p>
                 <textarea
                   className="chord-textarea"
-                  placeholder={"C Am F G | Em Am Dm G7 | C F G C"}
+                  placeholder={"Dm7 G7 Cmaj7 | Em7b5 A7b9 Dm7 | Cmaj9"}
                   value={chordText}
                   onChange={(e) => setChordText(e.target.value)}
                   rows={3}
                 />
                 <div className="chord-hint">
-                  Supports: major (C), minor (Am), dominant (G7), half-dim (Bm7b5), slash chords (G/B)
+                  <strong>Triads:</strong> C · Cm · Cdim · Caug · Csus2 · Csus4
+                  &nbsp;·&nbsp; <strong>7ths:</strong> Cmaj7 · C7 · Cm7 · Cm7b5 · Cdim7 · C7sus4
+                  &nbsp;·&nbsp; <strong>Extensions:</strong> Cmaj9 · C9 · C11 · C13 · C7#11 · C7b9 · Cm9 · Cm11
+                  &nbsp;·&nbsp; <strong>Slash:</strong> G/B · Cm7/Eb
                 </div>
               </div>
             )}
