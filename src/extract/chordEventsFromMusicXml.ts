@@ -64,13 +64,29 @@ function chordSuffixFromKind(kind: string, warnings: string[]): string {
   if (k === "dominant" || k === "major-minor") return "7";
   if (k === "major-seventh") return "maj7";
   if (k === "minor-seventh") return "m7";
+  if (k === "minor-major-seventh") return "mMaj7";
+  if (k === "dominant-ninth" || k === "major-ninth") return "9";
+  if (k === "major-ninth") return "maj9";         // MusicXML "major-ninth" = maj9
+  if (k === "dominant-11th") return "11";
+  if (k === "major-11th") return "maj11";
+  if (k === "dominant-13th") return "13";
+  if (k === "major-13th") return "maj13";
+  if (k === "minor-ninth") return "m9";
+  if (k === "minor-11th") return "m11";
+  if (k === "minor-13th") return "m13";
   if (k === "diminished") return "dim";
   if (k === "diminished-seventh") return "dim7";
-  if (k === "half-diminished") return "ø7";
+  if (k === "half-diminished") return "m7b5";    // prefer "m7b5" over "ø7" for readability
   if (k === "augmented") return "aug";
   if (k === "augmented-seventh") return "aug7";
   if (k === "suspended-fourth") return "sus4";
   if (k === "suspended-second") return "sus2";
+  if (k === "major-sixth" || k === "major sixth") return "6";
+  if (k === "minor-sixth" || k === "minor sixth") return "m6";
+  if (k === "neapolitan" || k === "italian" || k === "french" || k === "german") {
+    warnings.push(`[chord] Augmented-sixth kind "${kind}" not directly supported; treating as dominant 7th.`);
+    return "7";
+  }
   warnings.push(`[chord] Unsupported harmony kind "${kind}". Defaulting to major triad.`);
   return "";
 }
