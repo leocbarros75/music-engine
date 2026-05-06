@@ -24,6 +24,7 @@ import { checkChoralRules } from "./rules/choral/checkChoralRules";
 import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "./exporters/satbMusicxmlExporter";
+import { extractChordEventsFromMusicXml } from "./extract/chordEventsFromMusicXml";
 import { chordTextToMusicxml } from "./utils/chordTextToMusicxml";
 
 type Json = Record<string, unknown>;
@@ -1099,9 +1100,20 @@ const server = http.createServer(async (req, res) => {
       // Optional: filter to specific parts before arranging
       const partIds  = asArray(body.partIds)?.map(String) ?? [];
 
-      // If partIds provided, extract those parts first
+      // If partIds provided, extract those parts first.
+      // IMPORTANT: Re-exporting to MusicXML strips <harmony> tags, so we must extract
+      // chord events from the ORIGINAL XML before re-exporting and pass them explicitly.
       let workingXml = musicxml;
+      let chordsFromPartFilter: ChordEvent[] | undefined;
       if (partIds.length) {
+        // Extract chord events from original before re-export strips <harmony> tags
+        try {
+          const { chords: origChords } = extractChordEventsFromMusicXml(musicxml);
+          if (origChords.length) chordsFromPartFilter = origChords;
+        } catch {
+          // ignore — pipeline will fall back to inference
+        }
+
         try {
           const score: any = parseMusicXMLToScoreModel(musicxml);
           const filtered = (score.parts ?? []).filter((p: any) => partIds.includes(String(p.part_id ?? "")));
@@ -1114,7 +1126,10 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
-      const result = pipelineMusicxmlToArrangedMusicxml({ musicxml: workingXml, settings, chords, options });
+      // Merge: explicit body chords take priority, then chords rescued from original XML
+      const resolvedChords = chords ?? chordsFromPartFilter;
+
+      const result = pipelineMusicxmlToArrangedMusicxml({ musicxml: workingXml, settings, chords: resolvedChords, options });
 
       if (!result.ok) {
         const errResult = result as import("./pipeline/pipelineMusicxmlToArrangedMusicxml").PipelineError;
