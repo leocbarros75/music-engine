@@ -4,6 +4,7 @@ import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import { inferChordsFromMelody, inferChordsFromAllVoices } from "./inferChordsFromMelody";
 import { repairVoicingForBeat } from "./repairVoicing";
 import { addPassingTones, addCadentialSuspension } from "./addPassingTones";
+import { parseChordSymbol as parseChordSymbolExt } from "./chordSymbol";
 import {
   orderingOk,
   repairVoicingForCrossingAndOverlap,
@@ -241,68 +242,47 @@ function parseRootTokenWithSpelling(tok: string): { pc: number; spelling: PitchS
 }
 
 function chordPcsFromSymbol(symbol: string): ParsedChord | null {
-  const s = symbol.trim();
+  // Delegate to the unified external parser (full jazz vocabulary, omission logic,
+  // colorPcs for alteration tones).
+  const ext = parseChordSymbolExt(symbol);
+  if (!ext) return null;
 
-  // Slash bass: "C/E"
-  let main = s;
-  let slashBass: string | null = null;
-  if (s.includes("/")) {
-    const parts = s.split("/");
-    main = (parts[0] ?? "").trim();
-    slashBass = (parts[1] ?? "").trim();
-  }
+  const rootPc = ext.rootPc;
+  // Use voicingPcs: perfect-5th omitted for 11th/13th chords per jazz convention
+  const pcs = ext.voicingPcs;
 
-  const m = main.match(/^([A-Ga-g][#b]?)(.*)$/);
-  if (!m) return null;
-
-  const rootTok = m[1]!;
-  const qualTok = (m[2] ?? "").trim().toLowerCase();
-
-  const rootInfo = parseRootTokenWithSpelling(rootTok);
-  if (!rootInfo) return null;
-  const rootPc = rootInfo.pc;
-  const rootSpelling = rootInfo.spelling;
-
-  const isMinorTriad =
-    qualTok === "m" ||
-    qualTok === "min" ||
-    qualTok.startsWith("m7") ||
-    qualTok.startsWith("min7");
-
-  const isMaj7 = qualTok === "maj7" || qualTok === "ma7";
-  const isMin7 = qualTok === "m7" || qualTok === "min7";
-  const isDom7 = qualTok === "7" || (qualTok.endsWith("7") && !isMaj7 && !isMin7);
-
-  const third = isMinorTriad ? 3 : 4;
-  const fifth = 7;
-
-  const pcs: number[] = [rootPc, (rootPc + third) % 12, (rootPc + fifth) % 12];
+  // Detect 7th presence from the pcs (works for maj7, dom7, min7, dim7, m7b5)
+  const maj7Pc  = (rootPc + 11) % 12;
+  const min7Pc  = (rootPc + 10) % 12;
+  const dim7Pc  = (rootPc + 9)  % 12;
 
   let hasSeventh = false;
   let seventhPc: number | null = null;
 
-  if (isMaj7) {
-    hasSeventh = true;
-    seventhPc = (rootPc + 11) % 12;
-    pcs.push(seventhPc);
-  } else if (isDom7 || isMin7) {
-    hasSeventh = true;
-    seventhPc = (rootPc + 10) % 12;
-    pcs.push(seventhPc);
+  if (pcs.includes(maj7Pc)) {
+    hasSeventh = true; seventhPc = maj7Pc;
+  } else if (pcs.includes(min7Pc)) {
+    hasSeventh = true; seventhPc = min7Pc;
+  } else if (pcs.includes(dim7Pc)) {
+    // Only count dim7 as "the seventh" if there's no min7Pc above
+    hasSeventh = true; seventhPc = dim7Pc;
   }
 
-  const bassInfo = slashBass ? parseRootTokenWithSpelling(slashBass) : null;
-  const bassPcPref = bassInfo ? bassInfo.pc : null;
-  const bassSpelling = bassInfo ? bassInfo.spelling : null;
+  // Parse root + bass spellings for MusicXML export
+  const mainTok = symbol.includes("/") ? (symbol.split("/")[0] ?? "").trim() : symbol.trim();
+  const bassTok  = symbol.includes("/") ? (symbol.split("/")[1] ?? "").trim() : null;
+  const rootMatch = mainTok.match(/^([A-Ga-g][#b]?)/);
+  const rootInfo  = rootMatch ? parseRootTokenWithSpelling(rootMatch[1]!) : null;
+  const bassInfo  = bassTok   ? parseRootTokenWithSpelling(bassTok)        : null;
 
   return {
     rootPc,
-    pcs: Array.from(new Set(pcs)),
-    bassPcPref,
-    rootSpelling,
-    bassSpelling,
+    pcs,
+    bassPcPref:   ext.bassPc,
+    rootSpelling: rootInfo?.spelling ?? null,
+    bassSpelling: bassInfo?.spelling ?? null,
     hasSeventh,
-    seventhPc
+    seventhPc,
   };
 }
 
