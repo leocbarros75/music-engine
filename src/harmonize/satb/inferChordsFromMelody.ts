@@ -1,6 +1,29 @@
 // src/harmonize/satb/inferChordsFromMelody.ts
 import type { ScoreModel } from "../../score/types";
 
+// Convert MusicXML key signature (fifths) to tonic pitch class for MINOR keys.
+function tonicPcFromFifthsMinor(fifths: number): number {
+  const map: Record<number, number> = {
+    "-7": 8,
+    "-6": 3,
+    "-5": 10,
+    "-4": 5,
+    "-3": 0,
+    "-2": 7,
+    "-1": 2,
+    "0": 9,
+    "1": 4,
+    "2": 11,
+    "3": 6,
+    "4": 1,
+    "5": 8,
+    "6": 3,
+    "7": 10
+  };
+  const k = String(fifths);
+  return map[k] ?? 9;
+}
+
 type ChordEvent = {
   measure: number;
   t: number;
@@ -250,6 +273,222 @@ export function inferChordsFromMelody(inScore: ScoreModel): ChordEvent[] {
 
     out.push({ measure: measureNumber, t: 0, symbol: best.symbol });
     prevDeg = best.degree;
+  }
+
+  return out;
+}
+
+// ─── Chord template used by inferChordsFromAllVoices ─────────────────────────
+
+type ChordTemplate = {
+  symbol: string;
+  rootPc: number;
+  pcs: number[];
+  priority: number; // lower = more preferred
+};
+
+function buildChordLibrary(tonicPc: number, mode: string): ChordTemplate[] {
+  const templates: ChordTemplate[] = [];
+
+  if (mode === "minor") {
+    // Natural minor scale: [0,2,3,5,7,8,10]
+    const naturalIntervals = [0, 2, 3, 5, 7, 8, 10];
+    const scale = naturalIntervals.map((i) => (tonicPc + i) % 12);
+
+    // Degree qualities for natural minor: [m,dim,M,m,M,M,M]
+    const triadIntervals: Array<[number, number]> = [
+      [3, 7],   // i  - minor
+      [3, 6],   // ii° - diminished
+      [4, 7],   // III - major
+      [3, 7],   // iv  - minor
+      [4, 7],   // V   - major (harmonic minor raises 7)
+      [4, 7],   // VI  - major
+      [4, 7],   // VII - major
+    ];
+    const suffixes = ["m", "dim", "", "m", "", "", ""];
+    const priorities = [0, 4, 5, 2, 1, 3, 6];
+
+    for (let d = 0; d < 7; d++) {
+      const rootPc = scale[d]!;
+      const thirdPc = (rootPc + triadIntervals[d]![0]) % 12;
+      const fifthPc = (rootPc + triadIntervals[d]![1]) % 12;
+      const pcs = [rootPc, thirdPc, fifthPc];
+      const symbol = pcName(rootPc) + suffixes[d];
+      templates.push({ symbol, rootPc, pcs, priority: priorities[d]! });
+    }
+
+    // Harmonic minor: dominant V is always major (degree 5, raise leading tone)
+    const domRoot = (tonicPc + 7) % 12;
+    const domThird = (domRoot + 4) % 12;
+    const domFifth = (domRoot + 7) % 12;
+    const domSeventh = (domRoot + 10) % 12;
+
+    // Override V with harmonic-minor version (major triad on dom)
+    // Already included as degree 4 (index 4) but ensure we also have the dom7
+    const dom7Symbol = pcName(domRoot) + "7";
+    templates.push({
+      symbol: dom7Symbol,
+      rootPc: domRoot,
+      pcs: [domRoot, domThird, domFifth, domSeventh],
+      priority: 1
+    });
+
+  } else {
+    // Major scale: [0,2,4,5,7,9,11]
+    const majorIntervals = [0, 2, 4, 5, 7, 9, 11];
+    const scale = majorIntervals.map((i) => (tonicPc + i) % 12);
+
+    // Diatonic triads: [M,m,m,M,M,m,dim]
+    const triadIntervals: Array<[number, number]> = [
+      [4, 7],   // I   - major
+      [3, 7],   // ii  - minor
+      [3, 7],   // iii - minor
+      [4, 7],   // IV  - major
+      [4, 7],   // V   - major
+      [3, 7],   // vi  - minor
+      [3, 6],   // vii° - diminished
+    ];
+    const suffixes = ["", "m", "m", "", "", "m", "dim"];
+    const priorities = [0, 4, 5, 2, 1, 3, 6];
+
+    for (let d = 0; d < 7; d++) {
+      const rootPc = scale[d]!;
+      const thirdPc = (rootPc + triadIntervals[d]![0]) % 12;
+      const fifthPc = (rootPc + triadIntervals[d]![1]) % 12;
+      const pcs = [rootPc, thirdPc, fifthPc];
+      const symbol = pcName(rootPc) + suffixes[d];
+      templates.push({ symbol, rootPc, pcs, priority: priorities[d]! });
+    }
+
+    // Dominant seventh on degree 5
+    const domRoot = scale[4]!;
+    const domThird = (domRoot + 4) % 12;
+    const domFifth = (domRoot + 7) % 12;
+    const domSeventh = (domRoot + 10) % 12;
+    const dom7Symbol = pcName(domRoot) + "7";
+    templates.push({
+      symbol: dom7Symbol,
+      rootPc: domRoot,
+      pcs: [domRoot, domThird, domFifth, domSeventh],
+      priority: 1
+    });
+
+    // Secondary dominant V/V: major triad + dom7 on scale[1] (degree 2 root)
+    const vofvRoot = scale[1]!;
+    templates.push({
+      symbol: pcName(vofvRoot) + "7",
+      rootPc: vofvRoot,
+      pcs: [vofvRoot, (vofvRoot + 4) % 12, (vofvRoot + 7) % 12, (vofvRoot + 10) % 12],
+      priority: 7
+    });
+
+    // Secondary dominant V/ii: major triad + dom7 on scale[5] (degree 6 root)
+    const vofiiRoot = scale[5]!;
+    templates.push({
+      symbol: pcName(vofiiRoot) + "7",
+      rootPc: vofiiRoot,
+      pcs: [vofiiRoot, (vofiiRoot + 4) % 12, (vofiiRoot + 7) % 12, (vofiiRoot + 10) % 12],
+      priority: 7
+    });
+  }
+
+  return templates;
+}
+
+export function inferChordsFromAllVoices(inScore: ScoreModel): ChordEvent[] {
+  const parts = inScore.parts ?? [];
+  if (!parts.length) return inferChordsFromMelody(inScore);
+
+  const m0 = parts[0]?.measures?.[0];
+  const fifths: number = typeof m0?.attributes?.key_fifths === "number" ? m0.attributes.key_fifths : 0;
+  const mode: string = m0?.attributes?.key_mode ?? "major";
+  const divisions: number = typeof m0?.attributes?.divisions === "number" ? m0.attributes.divisions : 2;
+  const beatsPerMeasure: number = m0?.attributes?.time?.beats ?? 4;
+
+  const tonicPc = mode === "minor" ? tonicPcFromFifthsMinor(fifths) : tonicPcFromFifthsMajor(fifths);
+  const templates = buildChordLibrary(tonicPc, mode);
+
+  // Tonic and dominant symbols for forced cadence
+  const tonicSymbol = pcName(tonicPc);
+  const domRoot = (tonicPc + 7) % 12;
+  const dom7Symbol = pcName(domRoot) + "7";
+
+  // Use the first part's measures as the measure index source
+  const measures = parts[0]?.measures ?? [];
+  if (!measures.length) return [];
+
+  const out: ChordEvent[] = [];
+
+  for (let mi = 0; mi < measures.length; mi++) {
+    const measure = measures[mi]!;
+    const measureNumber: number = measure.number ?? mi + 1;
+    const isLast = mi === measures.length - 1;
+    const isPenult = mi === measures.length - 2;
+
+    if (isLast) {
+      out.push({ measure: measureNumber, t: 0, symbol: tonicSymbol });
+      continue;
+    }
+
+    if (isPenult) {
+      out.push({ measure: measureNumber, t: 0, symbol: dom7Symbol });
+      continue;
+    }
+
+    // Divisor: t is in divisions, beat is in quarter notes
+    const divisionsPerBeat = divisions;
+
+    let prevBeatSymbol: string | null = null;
+
+    for (let beat = 0; beat < beatsPerMeasure; beat++) {
+      // Collect sounding pitch classes for this beat from ALL parts
+      const soundingPcs = new Set<number>();
+
+      for (const part of parts) {
+        const partMeasure = part.measures[mi];
+        if (!partMeasure) continue;
+
+        for (const event of partMeasure.events) {
+          if (event.type !== "note") continue;
+          if (event.isRest) continue;
+          const midi = event.midi;
+          if (typeof midi !== "number") continue;
+
+          const eventBeatStart = event.t / divisionsPerBeat;
+          const eventBeatEnd = (event.t + event.dur) / divisionsPerBeat;
+
+          if (eventBeatStart <= beat && beat < eventBeatEnd) {
+            soundingPcs.add(((midi % 12) + 12) % 12);
+          }
+        }
+      }
+
+      if (soundingPcs.size === 0) continue;
+
+      // Score each template
+      let bestTemplate = templates[0]!;
+      let bestScore = -Infinity;
+
+      for (const template of templates) {
+        const matched = template.pcs.filter((p) => soundingPcs.has(p)).length;
+        const score = matched / template.pcs.length - template.priority * 0.04;
+        if (score > bestScore) {
+          bestScore = score;
+          bestTemplate = template;
+        }
+      }
+
+      const symbol = bestTemplate.symbol;
+      if (symbol !== prevBeatSymbol) {
+        out.push({ measure: measureNumber, t: beat, symbol });
+        prevBeatSymbol = symbol;
+      }
+    }
+
+    // If nothing was pushed for this measure, push tonic as fallback
+    if (!out.length || out[out.length - 1]!.measure !== measureNumber) {
+      out.push({ measure: measureNumber, t: 0, symbol: tonicSymbol });
+    }
   }
 
   return out;

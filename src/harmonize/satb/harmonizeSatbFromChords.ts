@@ -1,8 +1,9 @@
 // src/harmonize/satb/harmonizeSatbFromChords.ts
 import type { ScoreModel } from "../../score/types";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
-import { inferChordsFromMelody } from "./inferChordsFromMelody";
+import { inferChordsFromMelody, inferChordsFromAllVoices } from "./inferChordsFromMelody";
 import { repairVoicingForBeat } from "./repairVoicing";
+import { addPassingTones, addCadentialSuspension } from "./addPassingTones";
 import {
   orderingOk,
   repairVoicingForCrossingAndOverlap,
@@ -1030,8 +1031,12 @@ export function harmonizeSatbFromChords(
   const inputChordCount = (chords ?? []).length;
   const usedInference = inputChordCount === 0;
 
-  // If chords are empty, infer them from melody.
-  const safeChords = inputChordCount ? (chords ?? []) : inferChordsFromMelody(inScore);
+  // If chords are empty, infer them from all voices (if available) or melody alone.
+  const safeChords = inputChordCount
+    ? (chords ?? [])
+    : (inScore.parts?.length ?? 0) > 1
+      ? inferChordsFromAllVoices(inScore)
+      : inferChordsFromMelody(inScore);
   const chordMap = buildChordMap(safeChords);
 
   // For final-cadence Bass enforcement: determine tonic PC (major, key_fifths)
@@ -1878,6 +1883,12 @@ export function harmonizeSatbFromChords(
     },
     parts: [outS, outA, outT, outB]
   };
+
+  if (accompanimentType !== "polyphonic") {
+    const outWithPT = addPassingTones(out as ScoreModel);
+    const outWithSus = addCadentialSuspension(outWithPT);
+    return outWithSus;
+  }
 
   return out;
 }
