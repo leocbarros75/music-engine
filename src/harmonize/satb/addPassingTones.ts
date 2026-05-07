@@ -73,12 +73,13 @@ export function addPassingTones(scoreModel: ScoreModel): ScoreModel {
         const nextT = Number(next.t);
         const currT = Number(curr.t);
 
-        // Only insert PT if:
-        // - gap is between 3 and 7 semitones (minor 3rd to perfect 5th)
-        // - current note is a quarter note (dur === divisions)
-        // - notes are adjacent (next.t === curr.t + curr.dur)
+        // ── Passing tone (gap 2–7 semitones) ────────────────────────────
+        // Insert a stepwise note between curr and next when there is a
+        // gap of a whole tone (2 st) up to a perfect fifth (7 st).
+        // Expanded from the original min of 3 st to capture whole-tone
+        // chromatic passing tones (e.g. D♮ between C# and E).
         if (
-          gap >= 3 &&
+          gap >= 2 &&
           gap <= 7 &&
           currDur === divisions &&
           nextT === currT + currDur
@@ -136,6 +137,52 @@ export function addPassingTones(scoreModel: ScoreModel): ScoreModel {
             };
             newEvents.push(ptNote);
           }
+        }
+
+        // ── Neighbor tone / auxiliary note (gap = 0: same pitch repeating) ──
+        // Lesson from BWV 848: the fugue uses the "pivot figure" where one
+        // pitch repeatedly returns to itself while the other voice moves.
+        // When the same note appears on two consecutive quarter-note beats,
+        // insert a diatonic step away (upper or lower neighbor) on the weak
+        // half of the beat and resolve back.  Only on inner voices (alto,
+        // tenor) — bass is excluded via partIdx check above.
+        if (
+          gap === 0 &&
+          currDur === divisions &&
+          nextT === currT + currDur
+        ) {
+          const halfDur = Math.floor(divisions / 2);
+          if (halfDur < 1) continue;
+
+          // Prefer the upper diatonic neighbor, fall back to lower, then
+          // chromatic upper (avoids consecutive dissonances with bass).
+          const upperDia = scalePcs.has(pc(currMidi + 2))
+            ? currMidi + 2
+            : scalePcs.has(pc(currMidi + 1))
+            ? currMidi + 1
+            : null;
+          const lowerDia = scalePcs.has(pc(currMidi - 2))
+            ? currMidi - 2
+            : scalePcs.has(pc(currMidi - 1))
+            ? currMidi - 1
+            : null;
+
+          const ntCandidate = upperDia ?? lowerDia;
+          if (ntCandidate === null) continue;
+
+          // Shorten curr to halfDur, insert neighbor, next note acts as return
+          const lastIdx = newEvents.length - 1;
+          newEvents[lastIdx] = { ...curr, dur: halfDur };
+
+          const ntNote: NoteEvent = {
+            ...curr,
+            id: curr.id + "_nt",
+            t: currT + halfDur,
+            dur: halfDur,
+            midi: ntCandidate,
+            pitch: midiToPitch(ntCandidate),
+          };
+          newEvents.push(ntNote);
         }
       }
 

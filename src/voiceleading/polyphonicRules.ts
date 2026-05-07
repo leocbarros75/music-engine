@@ -433,6 +433,33 @@ export function scorePolyphonicVoicing(input: PolyphonicScoreInput): PolyphonicS
     if (dS !== 0 && dA !== 0 && dS !== dA) score -= 0.8;  // S vs A
     if (dB !== 0 && dT !== 0 && dB !== dT) score -= 0.8;  // B vs T
 
+    // ── Lesson from BWV 848 (Bach, Fugue in C# major) ─────────────────────
+    // The fugue demonstrates that outer voices moving in parallel COMPOUND
+    // THIRDS (10ths = mod-12 interval of 3 or 4) is the primary and preferred
+    // motion type in baroque style. Unlike parallel 5ths/8ths, parallel 10ths
+    // produce a rich, full-bodied texture and must be rewarded, not penalised
+    // as generic "similar motion".
+    const outerPcNext = pc(next.S - next.B);
+    const outerPcPrev = pc(prev.S - prev.B);
+    const outerParallel = dS !== 0 && dB !== 0 && dS === dB;  // same direction
+    if (outerParallel && (outerPcNext === 3 || outerPcNext === 4)) {
+      score -= 3.5;  // parallel 10ths — strongly preferred
+      if (outerPcPrev === 3 || outerPcPrev === 4) {
+        score -= 1.5;  // continuing a chain of 10ths — extra reward
+      }
+    }
+
+    // Reward oblique outer-voice motion: one voice sustains while the other
+    // moves. BWV 848 mm. 9–16 hold G#5 in soprano while the bass develops
+    // the melodic answer — a structural independence device.
+    if ((dS !== 0 && dB === 0) || (dS === 0 && dB !== 0)) score -= 1.8;
+
+    // Prefer stepwise bass motion (≤ whole-tone = 2 semitones): the fugue bass
+    // traces a completely stepwise arch (C#→D#→E#→F#→E#→D#→C#). Small reward
+    // to nudge the bass toward conjunct motion over large leaps.
+    const bassInterval = Math.abs(next.B - prev.B);
+    if (bassInterval <= 2 && bassInterval > 0) score -= 1.5;
+
     const voices: Array<[keyof VoiceState, keyof VoiceRanges]> = [
       ["S", "S"],
       ["A", "A"],
