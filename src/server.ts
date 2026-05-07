@@ -4,6 +4,11 @@ import process from "node:process";
 import type net from "node:net";
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
+// pdf-parse is CJS; use createRequire so it works under both tsx (ESM loader) and tsc (CJS output).
+// Calling require() (not dynamic import) ensures module.parent is set, avoiding pdf-parse's debug mode.
+const _cjsRequire = createRequire(path.resolve("package.json"));
+const pdfParse: (buf: Buffer) => Promise<{ text: string; numpages: number }> = _cjsRequire("pdf-parse");
 import { parseMusicXMLToScoreModel } from "./parsers/musicxmlParser";
 
 // v2 harmony
@@ -459,6 +464,61 @@ function normalizeHarmonizeReturn(x: any): any {
   // - scoreModel directly
   if (x && typeof x === "object" && "scoreModel" in x) return (x as any).scoreModel;
   return x;
+}
+
+/**
+ * Given raw text extracted from a PDF chord chart, detects chord symbol lines
+ * (lines where most tokens are valid chord symbols) and returns them joined
+ * with " | " bar separators as a single chord string ready for the engine.
+ *
+ * Returns null if no chords are found.
+ */
+/**
+ * Strict regex for a chord symbol token.
+ * Covers: root (A-G + optional #/b), optional quality suffix (m/min/maj/dim/aug/sus2/sus4/
+ * ø/°/M/△), optional extension digits (7/9/11/13), optional alteration (#/b + digit),
+ * and optional slash bass note (/[A-G][#b]?).
+ *
+ * Deliberately rejects plain English words that happen to start with A-G.
+ */
+const CHORD_TOKEN_RE =
+  /^[A-G][#b]?(m(?:aj|in|M)?|dim|aug|sus[24]?|[øØ°△ΔM^])?(\d{1,2}([#b]\d{1,2})?)?(\s*\/\s*[A-G][#b]?)?$/;
+
+function isStrictChordToken(token: string): boolean {
+  // Must start with uppercase A-G and be short (longest realistic: Cmaj13/Gb = 9 chars)
+  if (!/^[A-G]/.test(token) || token.length > 12) return false;
+  return CHORD_TOKEN_RE.test(token) && parseChordSymbol(token) !== null;
+}
+
+function extractChordsFromPdfText(text: string): string | null {
+  const lines = text.split(/\r?\n/);
+  const chordLines: string[] = [];
+
+  for (const line of lines) {
+    // Strip leading/trailing whitespace and common non-chord punctuation
+    const cleaned = line.replace(/[|:,;.!?(){}\[\]"']/g, " ").trim();
+    if (!cleaned) continue;
+
+    // Tokenize by whitespace
+    const tokens = cleaned.split(/\s+/).filter(t => t.length > 0);
+    if (tokens.length === 0) continue;
+
+    // Count how many tokens are strict chord symbols
+    const validChords = tokens.filter(isStrictChordToken);
+    const ratio = validChords.length / tokens.length;
+
+    // A chord line: at least 2 chords (or 1 if the line has ≤ 2 tokens),
+    // and ≥ 60% of tokens are chords
+    const minChords = tokens.length <= 2 ? 1 : 2;
+    if (validChords.length >= minChords && ratio >= 0.6) {
+      chordLines.push(validChords.join(" "));
+    }
+  }
+
+  if (chordLines.length === 0) return null;
+
+  // Join chord lines with " | " so each line becomes a "measure group"
+  return chordLines.join(" | ");
 }
 
 function normalizeAppSettings(raw: unknown): AppSettings {
@@ -1197,6 +1257,41 @@ const server = http.createServer(async (req, res) => {
         warnings:   [...genWarnings, ...result.warnings],
         meta:       result.meta
       });
+      return;
+    }
+
+    // ── Parse PDF chord sheet ─────────────────────────────────────────────
+    if (url === "/parse_pdf") {
+      const pdfBase64 = typeof body.pdfBase64 === "string" ? body.pdfBase64 : null;
+      if (!pdfBase64) {
+        sendJson(res, 400, { ok: false, error: "Provide 'pdfBase64' as a base64-encoded PDF string." });
+        return;
+      }
+
+      let pdfBuffer: Buffer;
+      try {
+        pdfBuffer = Buffer.from(pdfBase64, "base64");
+      } catch {
+        sendJson(res, 400, { ok: false, error: "Invalid base64 data." });
+        return;
+      }
+
+      let rawText: string;
+      try {
+        const parsed = await pdfParse(pdfBuffer);
+        rawText = parsed.text;
+      } catch (err: any) {
+        sendJson(res, 400, { ok: false, error: `Could not parse PDF: ${err?.message ?? "unknown error"}` });
+        return;
+      }
+
+      const chords = extractChordsFromPdfText(rawText);
+      if (!chords) {
+        sendJson(res, 200, { ok: false, error: "No chord symbols found in the PDF. Make sure it contains a text-based chord chart (not a scanned image)." });
+        return;
+      }
+
+      sendJson(res, 200, { ok: true, chords });
       return;
     }
 

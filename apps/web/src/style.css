@@ -88,6 +88,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .chord-textarea:focus { outline: none; border-color: var(--accent); }
 .chord-example { font-size: 11px; color: var(--muted); }
 .chord-hint { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.pdf-import-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 /* ─── Action panel ─── */
 .action-panel { display: flex; flex-direction: column; gap: 14px; }

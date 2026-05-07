@@ -70,7 +70,9 @@ export default function App() {
   const [jobResult, setJobResult] = useState<JobResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   const ensembleReady =
     settings.ensemble === "choral" ||
@@ -145,6 +147,49 @@ export default function App() {
       setWarnings([err?.message ?? "Network error"]);
     } finally {
       setIsExtracting(false);
+    }
+  }
+
+  // ── Parse PDF chord sheet ─────────────────────────────────────────────────
+  async function handlePdfChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      setWarnings(["Please select a PDF file."]);
+      return;
+    }
+
+    setIsParsing(true);
+    setWarnings([]);
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+      const res = await fetch("/parse_pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pdfBase64: base64 }),
+      });
+      const json = await res.json();
+
+      if (!json.ok) {
+        setWarnings([json.error ?? "Could not extract chords from PDF."]);
+        return;
+      }
+
+      setChordText(json.chords);
+      // Auto-fill title from PDF filename
+      if (!settings.title) {
+        const name = file.name.replace(/\.pdf$/i, "").replace(/[-_]/g, " ");
+        setSettings(prev => prev.title ? prev : { ...prev, title: name });
+      }
+    } catch (err: any) {
+      setWarnings([err?.message ?? "Network error"]);
+    } finally {
+      setIsParsing(false);
     }
   }
 
@@ -302,12 +347,35 @@ export default function App() {
                   <br />
                   <span className="chord-example">e.g. <code>Dm7 G7 Cmaj7 | Em7b5 A7b9 Dm7 | Cmaj9</code></span>
                 </p>
+
+                {/* PDF import */}
+                <div className="pdf-import-row">
+                  <input
+                    ref={pdfInputRef}
+                    type="file"
+                    accept=".pdf"
+                    style={{ display: "none" }}
+                    onChange={handlePdfChange}
+                  />
+                  <button
+                    className="ghost"
+                    onClick={() => pdfInputRef.current?.click()}
+                    disabled={isParsing}
+                    title="Import chords from a PDF chord chart"
+                  >
+                    {isParsing ? "Reading PDF…" : "📄 Import from PDF"}
+                  </button>
+                  <span className="muted" style={{ fontSize: "11px" }}>
+                    Accepts text-based chord charts (Real Book, lead sheets, etc.)
+                  </span>
+                </div>
+
                 <textarea
                   className="chord-textarea"
                   placeholder={"Dm7 G7 Cmaj7 | Em7b5 A7b9 Dm7 | Cmaj9"}
                   value={chordText}
                   onChange={(e) => setChordText(e.target.value)}
-                  rows={3}
+                  rows={4}
                 />
                 <div className="chord-hint">
                   <strong>Triads:</strong> C · Cm · Cdim · Caug · Csus2 · Csus4
