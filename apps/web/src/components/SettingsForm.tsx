@@ -226,14 +226,11 @@ export default function SettingsForm({ settings, onChange }: Props) {
       ? "Offsets disabled: rhythms align to downbeats."
       : "Offsets enabled: subtle syncopation and staggered entries.";
   const showPolyphonicControls = settings.accompaniment === "polyphonic" || settings.textureMode === "polyphony";
-  const showChordalActivity = settings.accompaniment === "chordal" && isPiano && settings.level === "beginner";
-  const showPianoSopranoActivity = isPiano;
   const showStringPolyphonic = isStrings && showPolyphonicControls;
   const showWoodwindPolyphonic = isWoodwinds && showPolyphonicControls;
   const showGenericPolyphonicVoices = showPolyphonicControls && !showStringPolyphonic && !showWoodwindPolyphonic;
-  const accompanimentOptions = isPiano
-    ? ACCOMP_OPTIONS
-    : ACCOMP_OPTIONS.filter((opt) => opt !== "chordal");
+  // Non-piano branch: chordal is piano-only so always filter it out
+  const accompanimentOptions = ACCOMP_OPTIONS.filter((opt) => opt !== "chordal");
 
   useEffect(() => {
     if (settings.ensemble !== "piano" && settings.ensemble !== "piano_with_melody" && settings.accompaniment === "chordal") {
@@ -288,6 +285,33 @@ export default function SettingsForm({ settings, onChange }: Props) {
     onChange(next);
   }
   // ───────────────────────────────────────────────────────────────────────────
+
+  // ── Piano simplified controls ────────────────────────────────────────────
+  const pianoMode = (
+    settings.textureMode === "homophony_melody_accompaniment" ? "accompaniment" : "choral"
+  ) as "choral" | "accompaniment";
+
+  const pianoAccomp = (
+    settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic"
+  ) as "homophonic" | "polyphonic";
+
+  function updatePianoMode(mode: "choral" | "accompaniment") {
+    const next = { ...settings };
+    next.textureMode =
+      mode === "accompaniment" ? "homophony_melody_accompaniment" : "homophony_homorhythmic";
+    next.styleProfile = "classical";
+    next.level = "intermediate";
+    next.ruleStrictness = "standard";
+    onChange(next);
+  }
+
+  function updatePianoAccomp(accomp: "homophonic" | "polyphonic") {
+    const next = { ...settings };
+    next.accompaniment = accomp;
+    if (accomp === "polyphonic") next.styleProfile = next.styleProfile ?? "classical";
+    onChange(next);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <div className="settings-form">
@@ -393,9 +417,90 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           </div>
         </>
+      ) : isPiano ? (
+        /* ════════════════════════════════════════════════════════════════════
+           PIANO — simplified panel: Key · Time · Tempo · Style · Accompaniment
+           ════════════════════════════════════════════════════════════════════ */
+        <>
+          <div className="field">
+            <label>Key Signature</label>
+            <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>
+              <option value="original">Original (from file)</option>
+              <optgroup label="Major">
+                {KEY_OPTIONS_MAJOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Minor">
+                {KEY_OPTIONS_MINOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+            </select>
+            <div className="key-preview">
+              Selected: <span className="key-badge">{keyPreview}</span>
+            </div>
+          </div>
+
+          <div className="field">
+            <label>Time Signature</label>
+            <select value={settings.timeSignature} onChange={(e) => update("timeSignature", e.target.value)}>
+              {TIME_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="field">
+            <label>Tempo (BPM)</label>
+            <input
+              type="number"
+              min={30}
+              max={240}
+              value={settings.tempo}
+              onChange={(e) => update("tempo", Number(e.target.value))}
+            />
+          </div>
+
+          <div className="field">
+            <label>Style</label>
+            <select
+              value={pianoMode}
+              onChange={(e) => updatePianoMode(e.target.value as "choral" | "accompaniment")}
+            >
+              <option value="choral">Choral</option>
+              <option value="accompaniment">Accompaniment</option>
+            </select>
+            <div className="key-preview">
+              <span className="slider-help">
+                {pianoMode === "choral"
+                  ? "Four voices move together in block chords — SATB texture adapted for piano."
+                  : "Melody leads in the right hand with harmonic support in the left hand."}
+              </span>
+            </div>
+          </div>
+
+          <div className="field">
+            <label>Accompaniment</label>
+            <select
+              value={pianoAccomp}
+              onChange={(e) => updatePianoAccomp(e.target.value as "homophonic" | "polyphonic")}
+            >
+              <option value="homophonic">Homophonic</option>
+              <option value="polyphonic">Polyphonic</option>
+            </select>
+            <div className="key-preview">
+              <span className="slider-help">
+                {pianoAccomp === "polyphonic"
+                  ? "Independent melodic lines with shared harmony (counterpoint)."
+                  : "Voices share the same rhythm with vertical harmony (block chords)."}
+              </span>
+            </div>
+          </div>
+        </>
       ) : (
         /* ════════════════════════════════════════════════════════════════════
-           ALL OTHER ENSEMBLES — full settings panel
+           ALL OTHER ENSEMBLES — full settings panel (strings · woodwinds · brass)
            ════════════════════════════════════════════════════════════════════ */
         <>
           {(settings.ensemble === "string_ensemble" || settings.ensemble === "woodwind_ensemble") && (
@@ -500,37 +605,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
               Selected: <span className="key-badge">{titleize(settings.accompaniment)}</span>
               <span className="slider-help">{accompanimentHelp}</span>
             </div>
-            {!isPiano && <div className="pill warn">Chordal accompaniment is available for piano only.</div>}
-            {isPiano && settings.accompaniment === "chordal" && settings.level !== "beginner" && (
-              <div className="pill warn">Chordal accompaniment is beginner-only and will fall back to homophonic.</div>
-            )}
           </div>
-
-          {isPiano && (
-            <div className="field">
-              <label>Piano Rhythm Style</label>
-              <select
-                value={settings.pianoStylePreset ?? ""}
-                onChange={(e) => update("pianoStylePreset", e.target.value || undefined)}
-              >
-                <option value="">Default (SATB voices)</option>
-                <option value="block_chords">Block chords (quarter pulse)</option>
-                <option value="ballad">Ballad (half-note chords)</option>
-                <option value="boom_chick">Boom-chick (bass + off-beat chords)</option>
-                <option value="gospel_pulse">Gospel pulse (8th-note drive)</option>
-                <option value="gospel_sync">Gospel syncopated</option>
-                <option value="jazz_comp">Jazz comp (off-beat comping)</option>
-                <option value="bossa_nova">Bossa nova</option>
-              </select>
-              <div className="key-preview">
-                <span className="slider-help">
-                  {settings.pianoStylePreset
-                    ? "Right-hand will use this rhythmic pattern."
-                    : "Standard voice-leading copy from SATB."}
-                </span>
-              </div>
-            </div>
-          )}
 
           <div className="field">
             <label>Texture Mode</label>
@@ -590,9 +665,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {((showPolyphonicControls && !showWoodwindPolyphonic) || showChordalActivity) && (
+          {showPolyphonicControls && !showWoodwindPolyphonic && (
             <div className="field">
-              <label>{showChordalActivity && !showPolyphonicControls ? "Chordal Activity (Left Hand)" : "Polyphonic Activity (Bass)"}</label>
+              <label>Polyphonic Activity (Bass)</label>
               <select
                 value={settings.bassActivity ?? "grounded"}
                 onChange={(e) => update("bassActivity", e.target.value as Settings["bassActivity"])}
@@ -743,27 +818,6 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {showPianoSopranoActivity && (
-            <div className="field">
-              <label>Soprano Activity (RH Top)</label>
-              <select
-                value={settings.sopranoActivity ?? "less_active"}
-                onChange={(e) => update("sopranoActivity", e.target.value as Settings["bassActivity"])}
-              >
-                {BASS_ACTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="key-preview">
-                Selected:{" "}
-                <span className="key-badge">{titleize(settings.sopranoActivity ?? "less_active")}</span>
-                <span className="slider-help">{sopranoActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
           {showStringPolyphonic && (
             <div className="field">
               <label>String Polyphonic Activity (Violin I)</label>
@@ -860,31 +914,6 @@ export default function SettingsForm({ settings, onChange }: Props) {
               <div className="slider-meta">
                 Selected: <span className="key-badge">{titleize(settings.cbActivity ?? "less_active")}</span>
                 <span className="slider-help">{cbActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
-          {showPianoSopranoActivity && (
-            <div className="field">
-              <label>Soprano Melody Share (RH Top)</label>
-              <input
-                className="range-input"
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                value={sopranoMelodyShare}
-                onChange={(e) => update("sopranoMelodyShare", Number(e.target.value))}
-              />
-              <div className="slider-labels">
-                <span className={sopranoMelodyShare <= 10 ? "active" : ""}>0%</span>
-                <span className={sopranoMelodyShare >= 30 && sopranoMelodyShare <= 40 ? "active" : ""}>30%</span>
-                <span className={sopranoMelodyShare >= 60 && sopranoMelodyShare <= 70 ? "active" : ""}>60%</span>
-                <span className={sopranoMelodyShare >= 90 ? "active" : ""}>100%</span>
-              </div>
-              <div className="key-preview">
-                Selected: <span className="key-badge">{sopranoMelodyShare}%</span>
-                <span className="slider-help">Share of original melody used in RH top voice.</span>
               </div>
             </div>
           )}
