@@ -113,6 +113,62 @@ function getKeyFifths(score: ScoreModel): number {
   return 0;
 }
 
+function getKeyMode(score: ScoreModel): "major" | "minor" {
+  const m0 = score.parts?.[0]?.measures?.[0];
+  const raw = String(m0?.attributes?.key_mode ?? "").toLowerCase();
+  if (raw === "minor") return "minor";
+  return "major";
+}
+
+function minorScalePcs(tonicPc: number): number[] {
+  // Natural minor: [0,2,3,5,7,8,10]
+  return [0, 2, 3, 5, 7, 8, 10].map((x) => (tonicPc + x) % 12);
+}
+
+// Build diatonic triads in minor (using harmonic minor for degree V = major dominant)
+function buildDiatonicTriadsMinor(tonicPc: number): DiatonicTriad[] {
+  const scale = minorScalePcs(tonicPc);
+
+  //            i    ii°  III  iv   V    VI   VII
+  const thirds = [3, 3,   4,   3,   4,   4,   4];  // m3 or M3
+  const fifths  = [7, 6,   7,   7,   7,   7,   7];  // P5 or d5
+  const suf     = ["m", "dim", "", "m", "", "", ""];
+
+  const out: DiatonicTriad[] = [];
+  for (let d = 1 as 1|2|3|4|5|6|7; d <= 7; d = (d + 1) as any) {
+    const r = scale[d - 1]!;
+    // Degree 5: harmonic minor raises the 7th → major third on V
+    const thirdPc = d === 5 ? (r + 4) % 12 : (r + thirds[d - 1]!) % 12;
+    const fifthPc  = (r + fifths[d - 1]!) % 12;
+    out.push({
+      degree: d,
+      rootPc: r,
+      pcs: [r, thirdPc, fifthPc],
+      symbol: pcName(r) + suf[d - 1]!
+    });
+  }
+  return out;
+}
+
+function progressionPenaltyMinor(prevDeg: number | null, nextDeg: number): number {
+  if (prevDeg === null) return 0;
+
+  // Common functional progressions in minor
+  const goodPairs = new Set<string>([
+    "1->4", "1->5", "1->6",   // i→iv, i→V, i→VI
+    "4->5", "4->1",            // iv→V, iv→i (plagal)
+    "5->1", "5->6",            // V→i, V→VI (deceptive)
+    "6->2", "6->5",            // VI→ii°, VI→V
+    "2->5",                    // ii°→V
+    "3->6", "3->7",            // III→VI, III→VII
+    "7->3",                    // VII→III
+  ]);
+
+  if (prevDeg === nextDeg) return 2;
+  if (goodPairs.has(`${prevDeg}->${nextDeg}`)) return 0;
+  return 4;
+}
+
 function averageMidiForPart(part: any): number | null {
   const vals: number[] = [];
   for (const m of part?.measures ?? []) {
@@ -215,8 +271,18 @@ export function inferChordsFromMelody(inScore: ScoreModel): ChordEvent[] {
   if (!measures.length) return [];
 
   const fifths = getKeyFifths(inScore);
-  const tonic = tonicPcFromFifthsMajor(fifths);
-  const triads = buildDiatonicTriadsMajor(tonic);
+  const mode   = getKeyMode(inScore);
+  const tonic  = mode === "minor"
+    ? tonicPcFromFifthsMinor(fifths)
+    : tonicPcFromFifthsMajor(fifths);
+  const triads = mode === "minor"
+    ? buildDiatonicTriadsMinor(tonic)
+    : buildDiatonicTriadsMajor(tonic);
+
+  // Choose the mode-appropriate progression penalty function
+  const progressionPen = mode === "minor"
+    ? progressionPenaltyMinor
+    : progressionPenalty;
 
   const lastMeasureNumber = Number(measures[measures.length - 1]?.number ?? measures.length);
 
@@ -231,13 +297,14 @@ export function inferChordsFromMelody(inScore: ScoreModel): ChordEvent[] {
     const isPenult = measureNumber === lastMeasureNumber - 1;
 
     if (isLast) {
-      out.push({ measure: measureNumber, t: 0, symbol: triads[0]!.symbol }); // I
+      out.push({ measure: measureNumber, t: 0, symbol: triads[0]!.symbol }); // I / i
       prevDeg = 1;
       continue;
     }
 
     if (isPenult) {
       const V = triads.find((t) => t.degree === 5)!;
+      // In minor, V is already the harmonic-minor major chord; append "7" for V7
       out.push({ measure: measureNumber, t: 0, symbol: V.symbol + "7" });
       prevDeg = 5;
       continue;
@@ -264,7 +331,7 @@ export function inferChordsFromMelody(inScore: ScoreModel): ChordEvent[] {
     let best = candidates[0] ?? triads[0]!;
     let bestScore = Number.POSITIVE_INFINITY;
     for (const c of candidates.length ? candidates : triads) {
-      const score = progressionPenalty(prevDeg, c.degree) + (c.degree === 7 ? 3 : 0);
+      const score = progressionPen(prevDeg, c.degree) + (c.degree === 7 ? 3 : 0);
       if (score < bestScore) {
         bestScore = score;
         best = c;

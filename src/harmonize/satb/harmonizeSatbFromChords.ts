@@ -676,7 +676,8 @@ function collectChordMidis(pcs: number[], range: Range): number[] {
   return Array.from(new Set(out)).sort((a, b) => a - b);
 }
 
-const TENOR_BASS_ALLOWED_INTERVALS = [7, 8, 9, 10, 11, 12];
+// No upper limit on tenor-bass spacing: BWV 578 analysis shows Bach uses
+// 17–36 semitones in 4-voice chorale writing. Only minimum is enforced.
 const ALTO_TENOR_ALLOWED_INTERVALS = [0, 1, 2, 3, 4, 5];
 
 function intervalPenalty(interval: number, allowed: number[], weight: number): number {
@@ -733,7 +734,10 @@ function refineInnerVoices(params: {
 
       const tb = t - bassMidi;
       const at = a - t;
-      if (tb > 0) score += intervalPenalty(tb, TENOR_BASS_ALLOWED_INTERVALS, 4);
+      // BWV 578 analysis: Bach uses 17–36 semitones between tenor and bass —
+      // any upper limit is wrong. Only enforce the minimum to avoid muddiness.
+      const minTbSpacing = bassMidi < 48 ? 10 : 5;
+      if (tb < minTbSpacing) score += 4 * Math.max(0, minTbSpacing - tb);
       if (at >= 0) score += intervalPenalty(at, ALTO_TENOR_ALLOWED_INTERVALS, 3.5);
 
       if (t >= a) {
@@ -1327,6 +1331,16 @@ export function harmonizeSatbFromChords(
           if (!hasSlashBass && pc(candT) === rootPc && pc(soprMidi!) !== rootPc) {
             pen -= 5;
           }
+          // Never double the leading tone (the 3rd of the V chord) —
+          // in both major and minor the V chord is major, so its 3rd =
+          // (domRoot + 4) % 12 = (tonicPc + 11) % 12 = leading tone.
+          {
+            const domRootPc = (tonicPc + 7) % 12;
+            if (pc(rootPc) === domRootPc) {
+              const leadingTonePc = (domRootPc + 4) % 12;
+              if (pc(candT) === leadingTonePc) pen += 30;
+            }
+          }
 
           return pen;
         };
@@ -1438,6 +1452,14 @@ export function harmonizeSatbFromChords(
           // Root position: prefer alto to double root only when tenor hasn't already
           if (!hasSlashBass && pc(candA) === rootPc && pc(soprMidi!) !== rootPc && (tenorMidi === null || pc(tenorMidi) !== rootPc)) {
             pen -= 5;
+          }
+          // Never double the leading tone (the 3rd of the V chord)
+          {
+            const domRootPc = (tonicPc + 7) % 12;
+            if (pc(rootPc) === domRootPc) {
+              const leadingTonePc = (domRootPc + 4) % 12;
+              if (pc(candA) === leadingTonePc) pen += 30;
+            }
           }
 
           return pen;

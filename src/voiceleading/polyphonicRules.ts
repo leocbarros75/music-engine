@@ -417,14 +417,39 @@ export function scorePolyphonicVoicing(input: PolyphonicScoreInput): PolyphonicS
       add(penalties.similarMotionAll, "similar-motion-all");
     }
 
+    // Similar motion between inner pairs: penalise generically UNLESS the
+    // voices are moving in parallel imperfect consonances (3rds, 6ths).
+    // Parallel 3rds/6ths between S/A, S/T, and A/B are PRIMARY textures in
+    // tonal counterpoint and should be rewarded, not penalised.
     if (dS !== 0 && dA !== 0 && dS === dA) {
-      add(penalties.similarMotionAll * 0.5, "similar-motion-SA");
+      const saPcNext = pc(next.S - next.A);
+      if (isImperfectConsonance(saPcNext)) {
+        score -= 2.0;   // parallel 3rds / 6ths S↔A — desirable texture
+      } else {
+        add(penalties.similarMotionAll * 0.5, "similar-motion-SA");
+      }
     }
     if (dS !== 0 && dT !== 0 && dS === dT) {
-      add(penalties.similarMotionAll * 0.5, "similar-motion-ST");
+      const stPcNext = pc(next.S - next.T);
+      if (isImperfectConsonance(stPcNext)) {
+        score -= 1.5;   // parallel 3rds / 6ths S↔T
+      } else {
+        add(penalties.similarMotionAll * 0.5, "similar-motion-ST");
+      }
+    }
+    if (dA !== 0 && dB !== 0 && dA === dB) {
+      const abPcNext = pc(next.A - next.B);
+      if (isImperfectConsonance(abPcNext)) {
+        score -= 1.2;   // parallel 3rds / 6ths A↔B
+      } else {
+        add(penalties.similarMotionAll * 0.35, "similar-motion-AB");
+      }
     }
     if (dB !== 0 && dT !== 0 && dB === dT) {
-      add(penalties.similarMotionAll * 0.35, "similar-motion-BT");
+      const btPcNext = pc(next.T - next.B);
+      if (!isImperfectConsonance(btPcNext)) {
+        add(penalties.similarMotionAll * 0.35, "similar-motion-BT");
+      }
     }
 
     // Reward contrary motion — all voice-pair combinations.
