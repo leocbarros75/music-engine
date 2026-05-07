@@ -6,7 +6,11 @@ function pc(midi: number): number {
   return ((midi % 12) + 12) % 12;
 }
 
-// Build diatonic scale PCs from key signature
+// Build diatonic scale PCs from key signature.
+// For minor keys, include the raised 6th and 7th degrees (harmonic + melodic
+// minor) in addition to the natural minor — this is essential for chromatic
+// passing tones. BWV 578 analysis shows F# (raised 7th in G minor) and
+// E♮ (raised 6th) each appear ~12–14 times as passing/neighbour tones.
 function scalePcsFromFifths(fifths: number, mode: string): Set<number> {
   const majorTonic: Record<number, number> = {
     "-7": 11, "-6": 6, "-5": 1, "-4": 8, "-3": 3, "-2": 10, "-1": 5,
@@ -16,10 +20,15 @@ function scalePcsFromFifths(fifths: number, mode: string): Set<number> {
     "-7": 8, "-6": 3, "-5": 10, "-4": 5, "-3": 0, "-2": 7, "-1": 2,
     "0": 9, "1": 4, "2": 11, "3": 6, "4": 1, "5": 8, "6": 3, "7": 10
   };
-  const tonic =
-    mode === "minor" ? (minorTonic[fifths] ?? 9) : (majorTonic[fifths] ?? 0);
-  const intervals =
-    mode === "minor" ? [0, 2, 3, 5, 7, 8, 10] : [0, 2, 4, 5, 7, 9, 11];
+  if (mode !== "minor") {
+    const tonic = majorTonic[fifths] ?? 0;
+    return new Set([0, 2, 4, 5, 7, 9, 11].map((i) => (tonic + i) % 12));
+  }
+  const tonic = minorTonic[fifths] ?? 9;
+  // Union of natural minor (0,2,3,5,7,8,10), harmonic minor (raised 7th: 11),
+  // and ascending melodic minor (raised 6th: 9). Gives all chromatic inflections
+  // that are idiomatic in tonal minor writing.
+  const intervals = [0, 2, 3, 5, 7, 8, 9, 10, 11];
   return new Set(intervals.map((i) => (tonic + i) % 12));
 }
 

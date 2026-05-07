@@ -300,7 +300,10 @@ function chordHasPc(chord: PolyphonicChordContext | null | undefined, pcVal: num
   return chord.pcs.includes(pcVal);
 }
 
-const TENOR_BASS_ALLOWED_INTERVALS = [7, 8, 9, 10, 11, 12];
+// BWV 578 analysis: Bach uses 17–36 semitones between tenor and bass in
+// 4-voice passages — any fixed upper limit is wrong. Keep only the minimum
+// (avoid low-register muddiness) and drop the discrete interval list.
+// Alto-Tenor is genuinely close-voiced (upper register), so kept tight.
 const ALTO_TENOR_ALLOWED_INTERVALS = [0, 1, 2, 3, 4, 5];
 
 function intervalPenalty(interval: number, allowed: number[], weight: number): number {
@@ -337,10 +340,8 @@ export function scorePolyphonicVoicing(input: PolyphonicScoreInput): PolyphonicS
     add(penalties.spacing * (minLowSpacing - spacingTB) * 0.6, "spacing-TB");
   }
 
-  if (spacingTB > 0) {
-    const pen = intervalPenalty(spacingTB, TENOR_BASS_ALLOWED_INTERVALS, penalties.spacing * 1.25);
-    if (pen > 0) add(pen, "interval-TB");
-  }
+  // No upper-limit penalty for T-B: wide bass is idiomatic (BWV 578 shows
+  // 17–36st gaps are completely normal). The minimum check above is enough.
 
   if (spacingAT >= 0) {
     const pen = intervalPenalty(spacingAT, ALTO_TENOR_ALLOWED_INTERVALS, penalties.spacing * 1.1);
