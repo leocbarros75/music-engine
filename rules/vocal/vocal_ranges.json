@@ -1,42 +1,18 @@
 {
   "soprano": {
-    "comfortable": [
-      "C4",
-      "A5"
-    ],
-    "absolute": [
-      "B3",
-      "C6"
-    ]
+    "comfortable": ["C4", "E5"],
+    "absolute":    ["B3", "G5"]
   },
   "alto": {
-    "comfortable": [
-      "G3",
-      "D5"
-    ],
-    "absolute": [
-      "F3",
-      "F5"
-    ]
+    "comfortable": ["G3", "A4"],
+    "absolute":    ["F3", "C5"]
   },
   "tenor": {
-    "comfortable": [
-      "C3",
-      "G4"
-    ],
-    "absolute": [
-      "B2",
-      "C5"
-    ]
+    "comfortable": ["E3", "E4"],
+    "absolute":    ["D3", "G4"]
   },
   "bass": {
-    "comfortable": [
-      "E2",
-      "D4"
-    ],
-    "absolute": [
-      "C2",
-      "E4"
-    ]
+    "comfortable": ["E2", "A3"],
+    "absolute":    ["D2", "C4"]
   }
 }

@@ -41,10 +41,10 @@ type ChoralRules = {
 const BUILT_IN_RULES: ChoralRules = {
   ranges: {
     voices: {
-      soprano: { minMidi: 60, maxMidi: 81, softMinMidi: 62, softMaxMidi: 79 },
-      alto:    { minMidi: 55, maxMidi: 74, softMinMidi: 57, softMaxMidi: 72 },
-      tenor:   { minMidi: 48, maxMidi: 69, softMinMidi: 50, softMaxMidi: 67 },
-      bass:    { minMidi: 40, maxMidi: 64, softMinMidi: 43, softMaxMidi: 62 }
+      soprano: { minMidi: 60, maxMidi: 76, softMinMidi: 62, softMaxMidi: 74 }, // C4..E5
+      alto:    { minMidi: 55, maxMidi: 69, softMinMidi: 57, softMaxMidi: 67 }, // G3..A4
+      tenor:   { minMidi: 52, maxMidi: 64, softMinMidi: 54, softMaxMidi: 62 }, // E3..E4
+      bass:    { minMidi: 40, maxMidi: 57, softMinMidi: 42, softMaxMidi: 55 }  // E2..A3
     }
   },
   spacing: {

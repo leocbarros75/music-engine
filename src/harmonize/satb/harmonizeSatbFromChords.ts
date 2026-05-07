@@ -35,10 +35,10 @@ type Range = { min: number; max: number };
 
 // Sounding ranges (MIDI)
 const RANGES: Record<VoiceName, Range> = {
-  Soprano: { min: 60, max: 81 }, // C4..A5
-  Alto: { min: 55, max: 74 }, // G3..D5
-  Tenor: { min: 48, max: 69 }, // C3..A4 (dynamic max applied by soprano range)
-  Bass: { min: 40, max: 64 } // E2..E4
+  Soprano: { min: 60, max: 76 }, // C4..E5
+  Alto:    { min: 55, max: 69 }, // G3..A4
+  Tenor:   { min: 52, max: 64 }, // E3..E4
+  Bass:    { min: 40, max: 57 }  // E2..A3
 };
 
 function pc(midi: number): number {
