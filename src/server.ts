@@ -639,7 +639,8 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     randomizeOffsets: typeof anyRaw.randomizeOffsets === "boolean" ? anyRaw.randomizeOffsets : undefined,
     pianoStylePreset: typeof anyRaw.pianoStylePreset === "string" ? anyRaw.pianoStylePreset : undefined,
     pianoStylePresetPath: typeof anyRaw.pianoStylePresetPath === "string" ? anyRaw.pianoStylePresetPath : undefined,
-    useStringEnsembleArranger: typeof anyRaw.useStringEnsembleArranger === "boolean" ? anyRaw.useStringEnsembleArranger : undefined
+    useStringEnsembleArranger: typeof anyRaw.useStringEnsembleArranger === "boolean" ? anyRaw.useStringEnsembleArranger : undefined,
+    lhPattern: typeof anyRaw.lhPattern === "string" ? anyRaw.lhPattern : undefined,
   };
 }
 

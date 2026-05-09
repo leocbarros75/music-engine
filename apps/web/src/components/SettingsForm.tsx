@@ -81,6 +81,22 @@ const WOODWIND_INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullabl
     help: "Legacy alias of the copy instrumentation mode."
   }
 ];
+type LhPatternValue = NonNullable<Settings["lhPattern"]>;
+const LH_PATTERN_OPTIONS: Array<{ label: string; value: LhPatternValue; help: string }> = [
+  { value: "auto",               label: "Auto (by style & time signature)", help: "Engine picks the best pattern based on style and time signature." },
+  { value: "alberti",            label: "Alberti Bass",                     help: "Root–5th–3rd–5th in 8ths. Source: Mozart K.545." },
+  { value: "block_beats",        label: "Block Chords",                     help: "Root+3rd+5th chord on every beat. Source: Stevens patterns." },
+  { value: "boom_chick",         label: "Boom-Chick",                       help: "Root on beats 1+3, chord stab on 2+4. Source: Stevens / gospel." },
+  { value: "broken_ascending",   label: "Broken Ascending",                 help: "Ascending root–3rd–5th–oct arpeggio in 16ths. Source: Stevens." },
+  { value: "waltz_bass",         label: "Waltz Bass",                       help: "Root on beat 1, chord on beats 2+3. Classic 3/4 waltz." },
+  { value: "serenade_strum",     label: "Serenade Strum",                   help: "Guitar-like bass + alternating mid/high 8ths. Source: Schubert Ständchen." },
+  { value: "root_chord_stabs",   label: "Root-Chord Stabs",                 help: "Root alone on beat 1, full chord on all other beats. Source: Schubert Erlkönig." },
+  { value: "interval_oscillation", label: "Interval Oscillation",           help: "Mid and high tones alternating as 8ths (tremolo texture). Source: Schubert Erlkönig / Sonata No.18." },
+  { value: "jazz_shell",         label: "Jazz Shell",                       help: "Root+10th half-note dyad + sparse quarters. Source: Autumn Leaves." },
+  { value: "octave_bass",        label: "Octave Bass",                      help: "Root played as octave pair on every beat. Source: Lobe den Herren (hymn)." },
+  { value: "nocturne",           label: "Nocturne",                         help: "Compound-beat rolling arpeggio: bass + chord + chord per dotted quarter. Source: Chopin Op.9 No.2, Mendelssohn Op.19 No.3." },
+];
+
 const STRICTNESS_OPTIONS: Array<{ label: string; value: Settings["ruleStrictness"]; help: string }> = [
   { label: "Relaxed", value: "relaxed", help: "Warnings only, fewer errors." },
   { label: "Standard", value: "standard", help: "Balanced warnings for most cases." },
@@ -156,6 +172,17 @@ export default function SettingsForm({ settings, onChange }: Props) {
     const next = { ...settings, ensemble: nextEnsemble };
     if (nextEnsemble !== "piano" && nextEnsemble !== "piano_with_melody" && next.accompaniment === "chordal") {
       next.accompaniment = "homophonic";
+    }
+    // Keep textureMode consistent with the target ensemble:
+    //   → piano: if coming from a non-piano mode that set something incompatible, default to accompaniment
+    //   → choral: melody_accompaniment is a piano-only concept; translate back to homorhythmic
+    const pianoTextures = new Set<Settings["textureMode"]>(["homophony_melody_accompaniment", "homophony_homorhythmic"]);
+    if (nextEnsemble === "piano" || nextEnsemble === "piano_with_melody") {
+      if (!pianoTextures.has(next.textureMode)) {
+        next.textureMode = "homophony_melody_accompaniment";
+      }
+    } else if (nextEnsemble === "choral" && next.textureMode === "homophony_melody_accompaniment") {
+      next.textureMode = "homophony_homorhythmic";
     }
     const validInstrumentation =
       nextEnsemble === "string_ensemble"
@@ -479,6 +506,27 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </span>
             </div>
           </div>
+
+          {pianoMode === "accompaniment" && (() => {
+            const currentPattern = settings.lhPattern ?? "auto";
+            const patternHelp = LH_PATTERN_OPTIONS.find(o => o.value === currentPattern)?.help ?? "";
+            return (
+              <div className="field">
+                <label>LH Pattern</label>
+                <select
+                  value={currentPattern}
+                  onChange={(e) => update("lhPattern", e.target.value as LhPatternValue)}
+                >
+                  {LH_PATTERN_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <div className="key-preview">
+                  <span className="slider-help">{patternHelp}</span>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="field">
             <label>Accompaniment</label>

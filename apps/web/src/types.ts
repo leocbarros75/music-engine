@@ -42,6 +42,24 @@ export type Settings = {
   sopranoMelodyShare?: number;
   randomizeOffsets?: boolean;
   pianoStylePreset?: string;
+  /**
+   * Explicit LH accompaniment pattern override for piano accompaniment mode.
+   * When set, bypasses the auto-selection based on style + time signature.
+   * "auto" means let the engine decide.
+   */
+  lhPattern?:
+    | "auto"
+    | "alberti"
+    | "block_beats"
+    | "boom_chick"
+    | "broken_ascending"
+    | "waltz_bass"
+    | "serenade_strum"
+    | "root_chord_stabs"
+    | "interval_oscillation"
+    | "jazz_shell"
+    | "octave_bass"
+    | "nocturne";
 };
 
 export type JobResult = {

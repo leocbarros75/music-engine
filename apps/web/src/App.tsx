@@ -18,7 +18,7 @@ const DEFAULT_SETTINGS: Settings = {
   level: "intermediate",
   accompaniment: "homophonic",
   ruleStrictness: "standard",
-  textureMode: "homophony_melody_accompaniment",
+  textureMode: "homophony_homorhythmic",
   styleProfile: "classical",
   modernMode: "modernTonal",
   bassActivity: "less_active",

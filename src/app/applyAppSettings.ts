@@ -11,6 +11,7 @@ import {
 import { applyRhythmToBassFinalCadence } from "../rhythm/applyRhythmToBassFinalCadence";
 import { analyzeTexture } from "../texture/textureAnalyzer";
 import { arrangePianoFromSatb } from "../arrange/arrangePianoFromSatb";
+import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
@@ -52,6 +53,11 @@ export type AppSettings = {
   randomizeOffsets?: boolean;
   pianoStylePreset?: string;
   pianoStylePresetPath?: string;
+  /**
+   * Explicit LH pattern override for piano accompaniment mode.
+   * "auto" or undefined = auto-select based on style + time signature.
+   */
+  lhPattern?: string;
   useStringEnsembleArranger?: boolean;
   instrumentation?:
     | "auto"
@@ -951,8 +957,6 @@ function applyPianoPolyphonicArpeggioBass(
   const scalePcs = scalePcsFromKey(keyInfo.value, keyMode);
 
   const measures = bassPart.measures ?? [];
-  const measureNumbers = measures.map((m: any, idx: number) => Number(m?.number ?? idx + 1));
-  const lastTwo = measureNumbers.slice(-2);
 
   const newMeasures: any[] = [];
   let prevMidi = 43;
@@ -985,36 +989,6 @@ function applyPianoPolyphonicArpeggioBass(
     if (!chordEvents.length) {
       events.push({ type: "rest", t: 0, dur: measureBeats });
       newMeasures.push({ number: measureNumber, attributes: attrs, events });
-      continue;
-    }
-
-    if (lastTwo.includes(measureNumber)) {
-      const melEvents = (mMeasure?.events ?? []).filter((e: any) => e && (e.type === "note" || e.type === "rest"));
-      for (const ev of melEvents) {
-        if (!ev || typeof ev.t !== "number" || typeof ev.dur !== "number") continue;
-        const chord = pickChordForTime(chords, measureNumber, Number(ev.t));
-        if (!chord) {
-          events.push({ type: "rest", t: ev.t, dur: ev.dur });
-          continue;
-        }
-        const bassInfo = parseBassFromChordSymbol(chord.symbol);
-        if (!bassInfo) {
-          events.push({ type: "rest", t: ev.t, dur: ev.dur });
-          continue;
-        }
-        const midi = chooseBassMidiWithLeapLimit(bassInfo.pc, prevMidi, range, 43, 12);
-        events.push({
-          type: "note",
-          t: ev.t,
-          dur: ev.dur,
-          midi,
-          pitch: pitchWithSpelling(midi, bassInfo.spelling)
-        });
-        prevMidi = midi;
-      }
-
-      newMeasures.push({ number: measureNumber, attributes: attrs ? { ...attrs } : undefined, events });
-      lastChord = chordEvents[chordEvents.length - 1] ?? lastChord;
       continue;
     }
 
@@ -1513,6 +1487,107 @@ export function applyAppSettings(
       cadenceMeasures: []
     };
   }
+
+  // ── Piano Choral Hymn shortcut ────────────────────────────────────────────
+  // When the piano "Choral" style is selected (textureMode = homorhythmic),
+  // bypass all rhythm pre-processing and pattern logic.  Hand the 4 SATB
+  // parts directly to buildChoralHymnGrandStaff which maps them onto a
+  // grand staff: soprano+alto on treble, tenor+bass on bass.
+  const wantsPianoChoral = wantsPiano && useHomorhythmic;
+  if (wantsPianoChoral) {
+    const finalScore = arrangePianoFromSatb(scoreModel, {
+      warnings,
+      choralHymn: true
+    });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── Piano Melody + Accompaniment shortcut ─────────────────────────────────
+  // When the piano "Accompaniment" style is selected (textureMode = melody_accompaniment),
+  // bypass all SATB voice logic. Put melody on Staff 1 and generate a left-hand
+  // pattern on Staff 2 using the chord symbols from the harmonization.
+  //
+  // LH pattern selection:
+  //   jazz                     → jazz_shell            (root+10th half dyad + sparse quarters — Autumn Leaves)
+  //   polyphonic               → broken_ascending      (arpeggiated 16ths per beat — Stevens #11-12)
+  //   6/8 / 9/8 / 12/8        → nocturne              (compound rolling arpeggio — Chopin Op.9 No.2, Mendelssohn Op.19 No.3)
+  //   ballad                   → interval_oscillation  (tremolo mid/high 8ths — Erlkönig/Sonata18)
+  //   3/4 + worship            → octave_bass           (root octave pair every beat — LOBE DEN HERREN)
+  //   3/4 + romantic           → serenade_strum        (guitar-strum bass+mid/high 8ths — Ständchen)
+  //   3/4 other                → waltz_bass            (root on 1, chord on 2+3)
+  //   baroque / romantic 4/4   → root_chord_stabs      (root beat-1, chord blocks — Erlkönig)
+  //   worship / contemporary   → boom_chick            (root on 1+3, chord stab on 2+4 — Stevens #6-8)
+  //   classical (default)      → alberti               (K.545 style root-5th-3rd-5th)
+  const wantsPianoAccomp = wantsPiano && useMelodyAccomp;
+  if (wantsPianoAccomp) {
+    // Detect time signature for waltz / serenade routing
+    const firstAttrs = (scoreModel.parts?.[0]?.measures?.[0] as any)?.attributes;
+    const timeSigBeats     = Number(firstAttrs?.time?.beats ?? 4);
+    const timeSigBeatType  = Number(firstAttrs?.time?.beat_type ?? 4);
+    const isWaltz    = timeSigBeats === 3 && timeSigBeatType === 4;
+    const isCompound = timeSigBeatType === 8 && timeSigBeats % 3 === 0; // 6/8, 9/8, 12/8
+
+    // ── Explicit pattern override ─────────────────────────────────────────
+    // When the user has chosen a specific pattern in the UI, use it directly.
+    const VALID_LH_PATTERNS = new Set<LhPatternId>([
+      "alberti", "block_beats", "boom_chick", "broken_ascending", "waltz_bass",
+      "serenade_strum", "root_chord_stabs", "interval_oscillation",
+      "jazz_shell", "octave_bass", "nocturne",
+    ]);
+    const explicitPattern = settings.lhPattern && settings.lhPattern !== "auto"
+      ? (VALID_LH_PATTERNS.has(settings.lhPattern as LhPatternId) ? settings.lhPattern as LhPatternId : null)
+      : null;
+
+    let lhPattern: LhPatternId;
+    if (explicitPattern) {
+      lhPattern = explicitPattern;              // user-selected pattern
+    } else if (styleRaw === "jazz") {
+      lhPattern = "jazz_shell";                 // wide root+10th dyad + sparse quarters
+    } else if (usePolyphonic || accompaniment === "polyphonic") {
+      lhPattern = "broken_ascending";           // ascending arpeggio 16ths
+    } else if (isCompound) {
+      lhPattern = "nocturne";                   // compound-meter rolling arpeggio (Chopin, Mendelssohn)
+    } else if (styleRaw === "ballad") {
+      lhPattern = "interval_oscillation";       // tremolo inner-voice texture
+    } else if (isWaltz && (styleRaw === "worship" || styleRaw === "hymn")) {
+      lhPattern = "octave_bass";                // pipe-organ octave pairs (LOBE DEN HERREN)
+    } else if (isWaltz && styleRaw === "romantic") {
+      lhPattern = "serenade_strum";             // Schubert guitar strum
+    } else if (isWaltz) {
+      lhPattern = "waltz_bass";                 // classic root-1 / chord-2+3
+    } else if (styleRaw === "baroque" || styleRaw === "romantic") {
+      lhPattern = "root_chord_stabs";           // dramatic root + chord blocks
+    } else if (styleRaw === "worship" || styleRaw === "contemporary" || styleRaw === "pop") {
+      lhPattern = "boom_chick";                 // boom-chick pattern
+    } else {
+      lhPattern = "alberti";                    // classical default (K.545 style)
+    }
+
+    const finalScore = arrangePianoFromSatb(scoreModel, {
+      warnings,
+      chords,
+      lhPattern,
+    });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: [],
+    };
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   if (usePolyphonic && accompaniment !== "polyphonic") {
     warnings.push("[texture] Polyphony requested; consider setting accompaniment to polyphonic.");

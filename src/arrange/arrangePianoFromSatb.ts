@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
+import { generateLhPattern, type LhPatternId } from "./pianoAccompPatterns";
 
 type PianoLevel = "beginner" | "intermediate" | "advanced" | "professional";
 
@@ -22,6 +23,23 @@ type ArrangePianoOptions = {
   tempoBpm?: number;
   pianoStylePreset?: string;
   pianoStylePresetPath?: string;
+  /** When true, bypass all pattern/level logic and output all 4 SATB voices
+   *  directly onto a grand staff: S+A on treble (staff 1), T+B on bass (staff 2).
+   *  Intended for 4-voice choral hymn output that pianists can read and play. */
+  choralHymn?: boolean;
+  /**
+   * When set, activates the Piano Melody+Accompaniment mode:
+   *   - Staff 1 (treble, Voice 1): melody from the Soprano part as-is
+   *   - Staff 2 (bass,   Voice 4): left-hand pattern generated from chord symbols
+   *
+   * The pattern name controls the texture:
+   *   "alberti"          — K.545 style Alberti bass (classical default)
+   *   "block_beats"      — chord on every beat (contemporary)
+   *   "boom_chick"       — root on 1+3, chord stab on 2+4
+   *   "broken_ascending" — ascending arpeggio per beat in 16ths
+   *   "waltz_bass"       — root on 1, chord on 2+3 (3/4 time)
+   */
+  lhPattern?: LhPatternId;
 };
 
 type VoiceMap = {
@@ -2607,8 +2625,211 @@ function buildRhChordPadEvents(params: {
   return { events: evs, lastChord };
 }
 
+/**
+ * Piano Melody + Accompaniment formatter.
+ *
+ * Produces a two-staff grand staff where:
+ *   Staff 1 (treble, Voice 1): melody from the Soprano part, unchanged
+ *   Staff 2 (bass,   Voice 4): left-hand accompaniment pattern generated from
+ *                              chord symbols using the requested LH pattern
+ *
+ * This is the "Accompaniment" style in the Piano settings panel.
+ * No SATB voice logic, no level-gating — pure melody + pattern output.
+ */
+function buildPianoMelodyAccomp(
+  score: ScoreModel,
+  warnings: string[],
+  options: ArrangePianoOptions
+): ScoreModel {
+  const melody = findSoprano(score);
+  if (!melody) {
+    warn(warnings, "[piano:accomp] No melody (Soprano) part found; returning original score.");
+    return score;
+  }
+
+  const chordsForArrange = resolveChordsForArrange(options.chords, score);
+  if (!chordsForArrange.length) {
+    warn(warnings, "[piano:accomp] No chord data available; LH will be empty. Provide chord symbols for accompaniment patterns.");
+  }
+
+  const lhPattern = options.lhPattern ?? "alberti";
+
+  // ── Melody Part (separate staff above piano) ──────────────────────────────
+  // Melody appears on its own part so it renders as a dedicated staff above
+  // the piano grand staff — standard "melody + piano" / "lead + accompaniment" layout.
+  const melodyMeasures = cloneMeasuresTemplate(melody);
+  const melodyPart: Part = {
+    part_id: "P_MEL",
+    name: "Melody",
+    instrument: "voice",
+    staves: 1,
+    measures: melodyMeasures,
+  };
+  for (let i = 0; i < melodyMeasures.length; i++) {
+    const mNum = Number(melodyMeasures[i]?.number ?? i + 1);
+    const sEvents = melody.measures?.[i]?.events ?? [];
+    melodyMeasures[i]!.events = mapVoiceEvents({
+      srcEvents: sEvents,
+      voice: 1,
+      staff: 1,
+      measureNumber: mNum,
+      warnings,
+    });
+  }
+
+  // ── Piano Part — RH chord voicings (treble) + LH pattern (bass) ───────────
+  const pianoMeasures = cloneMeasuresTemplate(melody);
+  const pianoPart: Part = {
+    part_id: "P_PNO",
+    name: "Piano",
+    instrument: "piano",
+    staves: 2,
+    measures: pianoMeasures,
+  };
+  for (let i = 0; i < pianoMeasures.length; i++) {
+    const mNum = Number(pianoMeasures[i]?.number ?? i + 1);
+    const measureBeats = measureBeatsFromAttributes(pianoMeasures[i]?.attributes);
+    const evs: NoteEvent[] = [];
+
+    // Staff 1 (treble) — RH block chord voicings from chord symbols.
+    // Root placed in G3–G4 (55–67) for a comfortable mid-treble register.
+    // Events from generateLhPattern come out as LH voice/staff, so we remap them.
+    const rhRaw = generateLhPattern({
+      chords: chordsForArrange,
+      measureNumber: mNum,
+      measureBeats,
+      lhPattern: "block_beats",
+      bassMin: 55,  // G3 — RH chord root floor
+      bassMax: 67,  // G4 — RH chord root ceiling
+      warnings,
+    });
+    for (const ev of rhRaw) {
+      evs.push({ ...ev, voice: 1, staff: 1 });
+    }
+
+    // Staff 2 (bass) — generated LH pattern from chord symbols, Voice 4
+    const lhEvents = generateLhPattern({
+      chords: chordsForArrange,
+      measureNumber: mNum,
+      measureBeats,
+      lhPattern,
+      warnings,
+    });
+    evs.push(...lhEvents);
+
+    pianoMeasures[i]!.events = evs.sort(
+      (a, b) => Number(a.t) - Number(b.t) || Number(a.voice) - Number(b.voice)
+    );
+  }
+
+  return {
+    ...score,
+    parts: [melodyPart, pianoPart],
+    meta: {
+      ...score.meta,
+      ensemble: "piano",
+    },
+  };
+}
+
+/**
+ * Choral Hymn Grand Staff formatter.
+ *
+ * Converts a 4-part SATB ScoreModel into a single Piano Part with two staves:
+ *   - Staff 1 (treble): Soprano (voice 1) + Alto (voice 2)
+ *   - Staff 2 (bass):   Tenor   (voice 3) + Bass   (voice 4)
+ *
+ * No level-gating, no pattern logic, no rhythm variation — pure block-chord
+ * voice-leading output for pianists to read as a 4-voice hymn.
+ */
+function buildChoralHymnGrandStaff(score: ScoreModel, warnings: string[]): ScoreModel {
+  const soprano = findSoprano(score);
+  const alto = findAlto(score);
+  const tenor = findTenor(score);
+  const bass = findBass(score);
+
+  if (!soprano || !bass) {
+    warn(warnings, "[piano:choral] Missing Soprano or Bass part; returning original score.");
+    return score;
+  }
+
+  if (!alto) warn(warnings, "[piano:choral] Alto part not found; treble staff will have soprano only.");
+  if (!tenor) warn(warnings, "[piano:choral] Tenor part not found; bass staff will have bass only.");
+
+  const measures = cloneMeasuresTemplate(soprano);
+  const pianoPart: Part = {
+    part_id: "P_PNO",
+    name: "Piano",
+    instrument: "piano",
+    staves: 2,
+    measures
+  };
+
+  for (let i = 0; i < measures.length; i++) {
+    const mNum = Number(measures[i]?.number ?? i + 1);
+    const sEvents = soprano.measures?.[i]?.events ?? [];
+    const aEvents = alto?.measures?.[i]?.events ?? [];
+    const tEvents = tenor?.measures?.[i]?.events ?? [];
+    const bEvents = bass.measures?.[i]?.events ?? [];
+
+    const evs: NoteEvent[] = [];
+
+    // Soprano → voice 1, staff 1 (treble top — stems up)
+    evs.push(
+      ...mapVoiceEvents({ srcEvents: sEvents, voice: 1, staff: 1, measureNumber: mNum, warnings })
+    );
+
+    // Alto → voice 2, staff 1 (treble bottom — stems down)
+    if (aEvents.length) {
+      evs.push(
+        ...mapVoiceEvents({ srcEvents: aEvents, voice: 2, staff: 1, measureNumber: mNum, warnings })
+      );
+    }
+
+    // Tenor → voice 3, staff 2 (bass top — stems up)
+    if (tEvents.length) {
+      evs.push(
+        ...mapVoiceEvents({ srcEvents: tEvents, voice: 3, staff: 2, measureNumber: mNum, warnings })
+      );
+    }
+
+    // Bass → voice 4, staff 2 (bass bottom — stems down)
+    evs.push(
+      ...mapVoiceEvents({ srcEvents: bEvents, voice: 4, staff: 2, measureNumber: mNum, warnings })
+    );
+
+    measures[i]!.events = evs.sort(
+      (a, b) => Number(a.t) - Number(b.t) || Number(a.voice) - Number(b.voice)
+    );
+  }
+
+  return {
+    ...score,
+    parts: [pianoPart],
+    meta: {
+      ...score.meta,
+      ensemble: "piano"
+    }
+  };
+}
+
 export function arrangePianoFromSatb(score: ScoreModel, options?: ArrangePianoOptions): ScoreModel {
   const warnings = options?.warnings ?? [];
+
+  // ── Choral Hymn shortcut ─────────────────────────────────────────────────
+  // Bypass all pattern/level logic: map the 4 SATB voices directly onto a
+  // grand staff (S+A treble, T+B bass) as plain block chords.
+  if (options?.choralHymn === true) {
+    return buildChoralHymnGrandStaff(score, warnings);
+  }
+
+  // ── Melody + Accompaniment shortcut ──────────────────────────────────────
+  // Melody on Staff 1 (Voice 1) + generated LH pattern on Staff 2 (Voice 4).
+  // Bypasses all SATB voice logic and level-gating.
+  if (options?.lhPattern !== undefined) {
+    return buildPianoMelodyAccomp(score, warnings, options);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
   const level = (options?.level ?? "beginner") as PianoLevel;
   const polyphonic = options?.polyphonic === true;
   const chordsForArrange = resolveChordsForArrange(options?.chords, score);
