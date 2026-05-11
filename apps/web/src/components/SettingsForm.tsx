@@ -123,6 +123,12 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     help: "Opens with famous chromatic Adagio introduction: cello repeats C3 in staccato 8ths (pedal), upper voices enter chromatically. Wide spacing by m4: Vln I G5–Vln II B4–Vla D4–Vc B2 (span 32 st). Lowest Vc: F#2."
   },
   {
+    label: "Dvořák — String Quartet No. 10 in E♭ major Op. 51",
+    value: "dvorak_op51",
+    texture: "melody_harmony",
+    help: "Late-Romantic melody-harmony texture. Vln I leads with lyrical Slavic-inflected themes; Vln II and Vla provide close inner-voice support; Vc on characteristic bass lines."
+  },
+  {
     label: "Beethoven — String Quartet Op. 18 No. 4, 1st mvt",
     value: "beethoven_op18_no4_mvt1",
     texture: "melody_harmony",
@@ -130,10 +136,10 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
   },
   // cello_melody
   {
-    label: "Dvorak — String Quartet Op. 96 'American', 2nd mvt",
-    value: "dvorak_op96_mvt2",
+    label: "Dvořák — String Quartet No. 12 Op. 96 'American'",
+    value: "dvorak_op96_american",
     texture: "cello_melody",
-    help: "Cello sings the lyrical foreground melody on the D-string; violins provide soft background harmony."
+    help: "Cello carries rich lyrical counter-melodies throughout; characteristic pentatonic folk idiom. Cello D-string used prominently. Reference for warm cello-foreground texture."
   },
   {
     label: "Schubert — String Quintet D. 956, 2nd mvt",
