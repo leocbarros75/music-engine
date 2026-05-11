@@ -94,6 +94,59 @@ type ChordEvent = {
 
 type PitchSpelling = { step: string; alter: number };
 
+type Activity = "grounded" | "less_active" | "active" | "high_active";
+
+/**
+ * Schoenberg accompaniment density scaling (Fundamentals Ch. IX).
+ *
+ * "When the melody is ornate, the accompaniment should be neutral."
+ *
+ * Measures average melodic density of a part (note onsets / beats per measure)
+ * and, if the melody is busy (≥ 1.5 onsets/beat — mostly eighth notes or
+ * denser), steps the inner-voice *activity* down by one level so the
+ * accompaniment does not crowd the melodic line.
+ *
+ * Only applies to inner voices (Vln II, Vla, etc.), never to the melody voice
+ * itself (Vln I).  The user's explicit activity setting acts as a ceiling —
+ * we never raise activity, only lower it.
+ *
+ * @param part       - The melody (foreground) part whose density we measure
+ * @param activity   - The requested inner-voice activity level
+ * @returns The adapted activity level (may be one step lower if melody is ornate)
+ */
+function schoenbergScaleActivity(part: any, activity: Activity): Activity {
+  if (!part || !Array.isArray(part.measures)) return activity;
+
+  let totalOnsets = 0;
+  let totalBeats  = 0;
+  for (const m of part.measures) {
+    const beats = (() => {
+      const b = Number(m?.attributes?.time?.beats ?? 4);
+      const bt = Number(m?.attributes?.time?.beat_type ?? 4);
+      return b * (4 / bt);
+    })();
+    const onsets = new Set<number>();
+    for (const ev of m?.events ?? []) {
+      if (ev && ev.type === "note" && !(ev as any).isRest && typeof ev.t === "number") {
+        onsets.add(Math.round(Number(ev.t) * 1000));
+      }
+    }
+    totalOnsets += onsets.size;
+    totalBeats  += beats;
+  }
+
+  if (totalBeats <= 0) return activity;
+  const density = totalOnsets / totalBeats;
+
+  // Only scale down if the melody is ornate (avg ≥ 1.5 onsets/beat)
+  if (density < 1.5) return activity;
+
+  const ORDER: Activity[] = ["grounded", "less_active", "active", "high_active"];
+  const idx = ORDER.indexOf(activity);
+  if (idx <= 0) return activity; // already grounded — nothing to step down
+  return ORDER[idx - 1]!;
+}
+
 function pickWeighted<T>(choices: Array<{ value: T; weight: number }>, seed: number): T {
   const total = choices.reduce((sum, c) => sum + c.weight, 0);
   if (total <= 0) return choices[0]!.value;
@@ -1457,6 +1510,24 @@ export function applyAppSettings(
   }
 
   if (wantsWoodwinds) {
+    // ── Schoenberg density scaling for woodwind inner voices ─────────────────
+    // Flute carries the foreground melody. When the soprano/melody part is
+    // ornate (dense 8th-note or faster motion), scale down inner-voice activity
+    // so Oboe and Clarinet don't compete with the melodic line (Ch. IX).
+    const wwMelodyPart = (scoreModel.parts ?? []).find((p: any) => {
+      const n = String(p?.name ?? "").toLowerCase();
+      return n.includes("soprano") || n.includes("melody") || n.includes("voice");
+    }) ?? scoreModel.parts?.[0];
+    const rawOboeAct    = (settings.altoActivity  ?? "less_active") as Activity;
+    const rawClrAct     = (settings.tenorActivity ?? "less_active") as Activity;
+    const adaptedOboe   = schoenbergScaleActivity(wwMelodyPart, rawOboeAct);
+    const adaptedClr    = schoenbergScaleActivity(wwMelodyPart, rawClrAct);
+    if (adaptedOboe !== rawOboeAct || adaptedClr !== rawClrAct) {
+      warnings.push(
+        `[woodwinds] Schoenberg density scaling: ornate flute melody → ` +
+        `oboe ${rawOboeAct}→${adaptedOboe}, clarinet ${rawClrAct}→${adaptedClr}.`
+      );
+    }
     const finalScore = mapPianoToWoodwindEnsembleOpen(scoreModel, {
       level: settings.level,
       accompaniment,
@@ -1464,8 +1535,8 @@ export function applyAppSettings(
       chords,
       warnings,
       fluteActivity: settings.sopranoActivity ?? "less_active",
-      oboeActivity: settings.altoActivity ?? "less_active",
-      clarinetActivity: settings.tenorActivity ?? "less_active",
+      oboeActivity: adaptedOboe,
+      clarinetActivity: adaptedClr,
       bassoonActivity: settings.bassActivity ?? "less_active"
     });
     attachTextureAnalysis(finalScore, warnings);
@@ -1582,6 +1653,39 @@ export function applyAppSettings(
       lhPattern = "alberti";                    // classical default (K.545 style)
     }
 
+    // ── Schoenberg tempo gate (Fundamentals Ch. IX) ───────────────────────────
+    // "The accompaniment figure must be compatible with the character and tempo
+    //  of the piece." — Schoenberg
+    //
+    // Alberti and broken-ascending patterns rely on subdividing each beat into
+    // four 16th or 8th notes.  At very fast tempos (Allegro vivace, Presto ≥ 144)
+    // those subdivisions become physically impractical for pianists and aurally
+    // indistinct — they blur into a wash rather than articulating the harmony.
+    // Block-chord or boom-chick patterns remain legible at any speed.
+    //
+    // Threshold calibrated from standard repertoire:
+    //   • K.545 Allegro ≈ 126 bpm → Alberti works perfectly
+    //   • Beethoven Op.13 Allegro di molto ≈ 168 bpm → block chords in LH
+    //   • Chopin Etude Op.10 No.1 ≈ 176 bpm → arpeggios are deliberate virtuosity
+    //     (not our case here — we auto-select for general use, not etude writing)
+    // At ≥ 144 bpm we downgrade to block_beats unless the pattern is already
+    // a long-note family (boom_chick, block_beats, jazz_shell, octave_bass).
+    const FAST_TEMPO_THRESHOLD = 144;
+    const FIGURATION_PATTERNS = new Set<LhPatternId>([
+      "alberti", "broken_ascending", "interval_oscillation", "nocturne",
+    ]);
+    if (
+      !explicitPattern &&
+      tempoBpm >= FAST_TEMPO_THRESHOLD &&
+      FIGURATION_PATTERNS.has(lhPattern)
+    ) {
+      lhPattern = isWaltz ? "waltz_bass" : "block_beats";
+      warnings.push(
+        `[piano:accomp] Tempo ${tempoBpm} bpm ≥ ${FAST_TEMPO_THRESHOLD} — ` +
+        `switched to ${lhPattern} (Schoenberg: figuration patterns impractical at fast tempos).`
+      );
+    }
+
     // Auto-select RH pattern to match the LH/texture choice:
     //   polyphonic mode  → melody_inner_voice  (2-voice chiming, Worship Example 1 + Example 3)
     //   lyrical/3/4 mode → melody_fill_eighths (ascending broken-chord fill, Example 3/4)
@@ -1649,10 +1753,26 @@ export function applyAppSettings(
               warnings.push(...(stringResult.warnings ?? []));
               const stringScore = stringResult.scoreModel;
               if (usePolyphonic) {
+                // ── Schoenberg density scaling for string inner voices ──────────
+                // Measure Vln I melodic density and step down Vln II / Vla activity
+                // if the melody is ornate, so inner voices don't crowd the foreground.
+                const vln1Part = (stringScore.parts ?? []).find(
+                  (p: any) => String(p?.name ?? "").toLowerCase().includes("violin i")
+                );
+                const rawVln2Act = (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity;
+                const rawVlaAct  = (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity;
+                const adaptedVln2Act = schoenbergScaleActivity(vln1Part, rawVln2Act);
+                const adaptedVlaAct  = schoenbergScaleActivity(vln1Part, rawVlaAct);
+                if (adaptedVln2Act !== rawVln2Act || adaptedVlaAct !== rawVlaAct) {
+                  warnings.push(
+                    `[strings] Schoenberg density scaling: ornate Vln I melody → ` +
+                    `vln2 ${rawVln2Act}→${adaptedVln2Act}, vla ${rawVlaAct}→${adaptedVlaAct}.`
+                  );
+                }
                 applyStringPolyphonicRhythm(stringScore, {
                   vln1Activity: settings.vln1Activity ?? "grounded",
-                  vln2Activity: settings.vln2Activity ?? settings.altoActivity ?? "active",
-                  vlaActivity: settings.vlaActivity ?? settings.tenorActivity ?? "active",
+                  vln2Activity: adaptedVln2Act,
+                  vlaActivity:  adaptedVlaAct,
                   vcActivity: settings.vcActivity ?? settings.bassActivity ?? "less_active",
                   cbActivity: settings.cbActivity ?? settings.bassActivity ?? "less_active",
                   chordEvents: chords,
@@ -1795,10 +1915,30 @@ export function applyAppSettings(
               const levelRaw = String(settings.level ?? "").toLowerCase();
               const melodyShift = levelRaw === "intermediate" || levelRaw === "advanced" ? 12 : 0;
               const melodyEvents = extractMelodyEventsForStrings(scoreModel, melodyShift);
+              // ── Schoenberg density scaling for string inner voices ──────────
+              // Measure Vln I melodic density from the ORIGINAL score (before
+              // arrangeStringPolyphonic rewrites it) and step down Vln II / Vla
+              // activity when the melody is ornate (Schoenberg Ch. IX).
+              const vln1SrcPart = (scoreModel.parts ?? []).find(
+                (p: any) => {
+                  const n = String(p?.name ?? "").toLowerCase();
+                  return n.includes("soprano") || n.includes("violin i") || n.includes("melody");
+                }
+              );
+              const rawVln2Act2 = (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity;
+              const rawVlaAct2  = (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity;
+              const adaptedVln2Act2 = schoenbergScaleActivity(vln1SrcPart, rawVln2Act2);
+              const adaptedVlaAct2  = schoenbergScaleActivity(vln1SrcPart, rawVlaAct2);
+              if (adaptedVln2Act2 !== rawVln2Act2 || adaptedVlaAct2 !== rawVlaAct2) {
+                warnings.push(
+                  `[strings] Schoenberg density scaling: ornate melody → ` +
+                  `vln2 ${rawVln2Act2}→${adaptedVln2Act2}, vla ${rawVlaAct2}→${adaptedVlaAct2}.`
+                );
+              }
               applyStringPolyphonicRhythm(stringScore, {
                 vln1Activity: settings.vln1Activity ?? "grounded",
-                vln2Activity: settings.vln2Activity ?? settings.altoActivity ?? "active",
-                vlaActivity: settings.vlaActivity ?? settings.tenorActivity ?? "active",
+                vln2Activity: adaptedVln2Act2,
+                vlaActivity:  adaptedVlaAct2,
                 vcActivity: settings.vcActivity ?? settings.bassActivity ?? "less_active",
                 cbActivity: settings.cbActivity ?? settings.bassActivity ?? "less_active",
                 chordEvents: chords,

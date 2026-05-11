@@ -2760,13 +2760,61 @@ function buildPianoMelodyAccomp(
 
     } else {
       // ── NORMAL MEASURES: pattern generation ─────────────────────────────────
+
+      // ── Schoenberg accompaniment density adaptation (Ch. IX, p. 82–92) ──────
+      // "When the melody is ornate the accompaniment should be neutral."
+      //   — Arnold Schoenberg, Fundamentals of Musical Composition
+      //
+      // Two signals drive simplification:
+      //
+      //  1. Melody density: count distinct note-onset beats in this measure.
+      //     density = noteOnsets / measureBeats. Ratio ≥ 1.5 means the melody
+      //     occupies most eighth-note slots (e.g. a running scale passage), and
+      //     a plain block-chord accompaniment is less likely to crowd it.
+      //
+      //  2. Harmonic rhythm: if two or more chord changes occur within the
+      //     measure, the harmonic motion itself provides forward energy and the
+      //     accompaniment need not add further figuration (Schoenberg Ch. IX:
+      //     "rapid harmonic change requires a simpler accompaniment").
+      //
+      // When either signal fires, the LH falls back to block_beats and the RH
+      // falls back to block_beats (from whatever richer pattern was selected).
+      // The waltz / serenade / octave-bass family are exempt from RH-simplification
+      // because their 3/4 feel must be preserved; only the LH is simplified there.
+
+      const melodyMeasureEvents = melody.measures?.[i]?.events ?? [];
+      const onsetSet = new Set<number>();
+      for (const ev of melodyMeasureEvents) {
+        if (ev.type === "note" && !(ev as any).isRest && typeof ev.t === "number") {
+          onsetSet.add(Math.round(ev.t * 1000));
+        }
+      }
+      const melodyDensity = onsetSet.size / Math.max(measureBeats, 1);
+
+      const chordsInMeasure = chordsForArrange.filter(
+        (c) => Number(c.measure) === mNum
+      ).length;
+
+      const isOrnateMelody = melodyDensity >= 1.5;
+      const isFastHarmony  = chordsInMeasure >= 2;
+      const simplify = isOrnateMelody || isFastHarmony;
+
+      // Waltz-family patterns preserve their 3/4 metric feel even when simplifying.
+      const isWaltzFamily =
+        lhPattern === "waltz_bass" ||
+        lhPattern === "serenade_strum" ||
+        lhPattern === "octave_bass";
+
+      const activeLhPattern: LhPatternId = simplify && !isWaltzFamily ? "block_beats" : lhPattern;
+      const activeRhPattern: RhPatternId = simplify ? "block_beats" : rhPattern;
+
       // Staff 1 (treble) — RH inner-voice pattern from chord symbols.
       // generateRhPattern outputs voice 1 (and optionally voice 2) on staff 1 directly.
       const rhEvents = generateRhPattern({
         chords: chordsForArrange,
         measureNumber: mNum,
         measureBeats,
-        rhPattern,
+        rhPattern: activeRhPattern,
         trebleMin: 60, // C4
         trebleMax: 72, // C5
         warnings,
@@ -2778,7 +2826,7 @@ function buildPianoMelodyAccomp(
         chords: chordsForArrange,
         measureNumber: mNum,
         measureBeats,
-        lhPattern,
+        lhPattern: activeLhPattern,
         warnings,
       });
       evs.push(...lhEvents);
