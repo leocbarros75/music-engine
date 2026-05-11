@@ -90,7 +90,13 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     label: "Haydn — String Quartet Op. 76 No. 3 'Emperor', 2nd mvt",
     value: "haydn_op76_no3_mvt2",
     texture: "melody_harmony",
-    help: "Prototype melody + inner harmony texture. Violin I carries the hymn tune; lower voices provide clean chord support."
+    help: "Prototype melody + inner harmony texture. Vln I carries the chorale theme (G4–E5); inner voices in 3rds/6ths below; cello on root bass. Adjacent-voice spacings 4–9 st."
+  },
+  {
+    label: "Haydn — String Quartet Op. 64 No. 3, 1st mvt (Vivace assai, Bb major)",
+    value: "haydn_op64_no3_mvt1",
+    texture: "melody_harmony",
+    help: "Close-voiced opening on Bb triad (all four voices within 16 st). Vln I leads with staccato melodic line; viola provides brief F4 pedal before joining counterpoint."
   },
   {
     label: "Mozart — String Quartet K. 387, 1st mvt",
@@ -136,6 +142,12 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     value: "tchaikovsky_op48_mvt2",
     texture: "melody_pizzicato",
     help: "Mixed arco melody over pizzicato chord accompaniment. Classic melody + pizz texture reference."
+  },
+  {
+    label: "Haydn — String Quartet Op. 64 No. 5 'The Lark', 1st mvt (D major)",
+    value: "haydn_op64_no5_mvt1",
+    texture: "melody_pizzicato",
+    help: "Lower three voices play staccato ostinato (note–rest–note–rest in 8ths) for 7 bars before Vln I enters alone at A5 (MIDI 81) and soars to F#6. Cello drops to D2 for wide bass."
   },
   {
     label: "Haydn — String Quartet Op. 33 No. 2 'The Joke', 1st mvt",

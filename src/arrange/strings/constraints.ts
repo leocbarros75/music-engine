@@ -147,7 +147,15 @@ export function evaluateTransition(
     }
   }
 
-  // Violin I and II spacing: prefer within octave, hard cap ~19 semitones.
+  // ── Violin I / II spacing ─────────────────────────────────────────────────
+  // Calibrated from Haydn examples (Emperor's Hymn, Op.64 No.3, Op.64 No.5):
+  //   Emperor's Hymn m1 pickup:  Vln1 G4(67) – Vln2 B3(59) = 8 st  (m6th)
+  //   Emperor's Hymn m2 beat 1:  Vln1 B4(71) – Vln2 G4(67) = 4 st  (M3rd)
+  //   Emperor's Hymn m3 beat 1:  Vln1 A4(69) – Vln2 C4(60) = 9 st  (M6th)
+  //   Op.64 No.3 m1 beat 1:      Vln1 D5(74) – Vln2 Bb4(70)= 4 st  (M3rd)
+  // Haydn's typical range is 4–9 semitones.  A soft nudge at >10 (not >12)
+  // would be more faithful, but requires a per-profile threshold parameter.
+  // Hard cap at 19 remains correct — Haydn never exceeds ~10 in these examples.
   if (next.vln1 !== null && next.vln2 !== null) {
     const dist = next.vln1 - next.vln2;
     if (dist > 19) {
@@ -157,7 +165,10 @@ export function evaluateTransition(
     }
   }
 
-  // Gap fill: if Vln2 to Cello gap exceeds octave, prefer Viola to fill.
+  // ── Gap fill: Vln2 to Cello ───────────────────────────────────────────────
+  // Emperor's Hymn m3: Vln2 C4(60) – Vc D3(50) = 10 st; Vla F#3(54) fills → no penalty. ✓
+  // The Lark m2:       Vln2 D4(62) – Vc D2(38) = 24 st; Vla F#3(54) fills → no penalty. ✓
+  // The gap_fill logic is correct — penalty only fires when Viola does NOT fill.
   if (next.vln2 !== null && next.vc !== null) {
     const gap = next.vln2 - next.vc;
     if (gap > 12) {

@@ -88,6 +88,25 @@ export default function App() {
   const canRun = inputMode === "file" ? canRunFile : canRunChords;
 
   // ── File selection ────────────────────────────────────────────────────────
+  async function loadExample(exampleId: string) {
+    if (!exampleId) return;
+    try {
+      const res = await fetch(`/examples/${exampleId}.musicxml`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const err = validateXmlClient(text);
+      if (err) { setWarnings([err]); return; }
+      setFileName(`${exampleId}.musicxml`);
+      setMusicxmlInput(text);
+      setOutputMusicxml(null);
+      setJobResult(null);
+      setWarnings([]);
+      setSelectedPartIds([]);
+    } catch (e: any) {
+      setWarnings([`Could not load example: ${e?.message ?? String(e)}`]);
+    }
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -322,6 +341,16 @@ export default function App() {
                 <button className="primary" onClick={() => fileInputRef.current?.click()}>
                   Select MusicXML
                 </button>
+                {/* Load built-in example — shown when a string example is selected */}
+                {settings.ensemble === "string_ensemble" && settings.stringExample && (
+                  <button
+                    className="secondary"
+                    style={{ marginLeft: "0.5rem" }}
+                    onClick={() => loadExample(settings.stringExample!)}
+                  >
+                    Load Example
+                  </button>
+                )}
                 {fileName && (
                   <div className="file-meta">
                     <span className="label">Selected:</span> {fileName}
