@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
-import { generateLhPattern, type LhPatternId, generateRhPattern, type RhPatternId } from "./pianoAccompPatterns";
+import { generateLhPattern, type LhPatternId, generateRhPattern, type RhPatternId, pickChordAt, chordVoicesInRange } from "./pianoAccompPatterns";
 
 type PianoLevel = "beginner" | "intermediate" | "advanced" | "professional";
 
@@ -2702,34 +2702,87 @@ function buildPianoMelodyAccomp(
     staves: 2,
     measures: pianoMeasures,
   };
+  // Helper: build a NoteEvent for the tutti last-measure chords
+  function makeTuttiNote(midi: number, t: number, dur: number, voice: number, staff: number, id: string): NoteEvent {
+    return { type: "note", t, dur, voice, staff, pitch: midiToPitch(midi), midi, id } as NoteEvent;
+  }
+
   for (let i = 0; i < pianoMeasures.length; i++) {
     const mNum = Number(pianoMeasures[i]?.number ?? i + 1);
     const measureBeats = measureBeatsFromAttributes(pianoMeasures[i]?.attributes);
     const evs: NoteEvent[] = [];
+    const isLastMeasure = i === pianoMeasures.length - 1;
 
-    // Staff 1 (treble) — RH inner-voice pattern from chord symbols.
-    // trebleMin/Max places the chord root in C4–C5 (mid-treble register).
-    // generateRhPattern outputs voice 1 (and optionally voice 2) on staff 1 directly.
-    const rhEvents = generateRhPattern({
-      chords: chordsForArrange,
-      measureNumber: mNum,
-      measureBeats,
-      rhPattern,
-      trebleMin: 60, // C4
-      trebleMax: 72, // C5
-      warnings,
-    });
-    evs.push(...rhEvents);
+    if (isLastMeasure) {
+      // ── LAST MEASURE: tutti ─────────────────────────────────────────────────
+      // All piano voices snap to the melody rhythm:
+      //   RH (staff 1, voice 1): treble block chord on each melody note onset
+      //   LH (staff 2, voice 4): bass root on each melody note onset
+      // This creates a clean harmonic arrival at the final cadence.
+      const srcEvents = melody.measures?.[i]?.events ?? [];
 
-    // Staff 2 (bass) — generated LH pattern from chord symbols, Voice 4
-    const lhEvents = generateLhPattern({
-      chords: chordsForArrange,
-      measureNumber: mNum,
-      measureBeats,
-      lhPattern,
-      warnings,
-    });
-    evs.push(...lhEvents);
+      // Collect unique onset times from real melody notes (skip rests & chord duplicates)
+      const seenT = new Set<number>();
+      const melodyNotes = srcEvents.filter((e) => {
+        if (e.type !== "note" || e.isRest) return false;
+        const t = Number(e.t);
+        if (seenT.has(t)) return false;
+        seenT.add(t);
+        return true;
+      });
+
+      for (const melNote of melodyNotes) {
+        const t   = Number(melNote.t);
+        const dur = Number(melNote.dur);
+        const symbol = pickChordAt(chordsForArrange, mNum, t);
+        if (!symbol) continue;
+
+        // RH: treble block chord (C4–C5 range)
+        const rhV = chordVoicesInRange(symbol, 60, 72);
+        if (rhV) {
+          evs.push(makeTuttiNote(rhV.bass, t, dur, 1, 1, `tutti-rh-${mNum}-${t}-r`));
+          evs.push(makeTuttiNote(rhV.mid,  t, dur, 1, 1, `tutti-rh-${mNum}-${t}-m`));
+          evs.push(makeTuttiNote(rhV.high, t, dur, 1, 1, `tutti-rh-${mNum}-${t}-h`));
+        }
+
+        // LH: bass root (G2–A3 range)
+        const lhV = chordVoicesInRange(symbol, 43, 57);
+        if (lhV) {
+          evs.push(makeTuttiNote(lhV.bass, t, dur, 4, 2, `tutti-lh-${mNum}-${t}`));
+        }
+      }
+
+      // Fallback: if the melody measure has no notes (e.g. all rests), use block_beats
+      if (evs.length === 0) {
+        evs.push(...generateRhPattern({ chords: chordsForArrange, measureNumber: mNum, measureBeats, rhPattern: "block_beats", trebleMin: 60, trebleMax: 72, warnings }));
+        evs.push(...generateLhPattern({ chords: chordsForArrange, measureNumber: mNum, measureBeats, lhPattern: "block_beats", warnings }));
+      }
+
+    } else {
+      // ── NORMAL MEASURES: pattern generation ─────────────────────────────────
+      // Staff 1 (treble) — RH inner-voice pattern from chord symbols.
+      // generateRhPattern outputs voice 1 (and optionally voice 2) on staff 1 directly.
+      const rhEvents = generateRhPattern({
+        chords: chordsForArrange,
+        measureNumber: mNum,
+        measureBeats,
+        rhPattern,
+        trebleMin: 60, // C4
+        trebleMax: 72, // C5
+        warnings,
+      });
+      evs.push(...rhEvents);
+
+      // Staff 2 (bass) — generated LH pattern from chord symbols, Voice 4
+      const lhEvents = generateLhPattern({
+        chords: chordsForArrange,
+        measureNumber: mNum,
+        measureBeats,
+        lhPattern,
+        warnings,
+      });
+      evs.push(...lhEvents);
+    }
 
     pianoMeasures[i]!.events = evs.sort(
       (a, b) => Number(a.t) - Number(b.t) || Number(a.voice) - Number(b.voice)
