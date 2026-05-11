@@ -127,6 +127,27 @@ export function evaluateTransition(
       const scale = v === "cb" ? 1.4 : v === "vc" ? 1.2 : 1;
       penalties.push({ id: "leap", cost: profile.leapPenalty * scale, detail: v });
       if (dir !== "static") pending[v] = dir;
+      // ── Schoenberg Theory of Harmony, p. 45: "No voice shall make a leap larger than a fifth" ──
+      // Add extra cost for leaps exceeding a P5 (7 semitones). Applies to all voices.
+      const intervalSize = a !== null ? Math.abs(b - a) : 0;
+      if (intervalSize > 7) {
+        penalties.push({
+          id: "large_leap",
+          cost: profile.leapPenalty * 0.5 * scale,
+          detail: `${v}:${intervalSize}st`
+        });
+      }
+      // ── Schoenberg Theory of Harmony, p. 44: consecutive same-direction leaps ────────────────
+      // "Two consecutive leaps of a fourth or fifth in the same direction are to be avoided,
+      //  because the first and last tones form a dissonance." Especially critical in bass voices.
+      if (pendingDir && dir !== "static" && dir === pendingDir) {
+        const bassScale = (v === "cb" || v === "vc") ? 1.2 : 0.5;
+        penalties.push({
+          id: "consecutive_leap",
+          cost: profile.leapPenalty * bassScale,
+          detail: v
+        });
+      }
     } else if (prim === "skip") {
       penalties.push({ id: "skip", cost: profile.leapPenalty * 0.5, detail: v });
     } else if (prim === "half_step" || prim === "whole_step" || prim === "step") {

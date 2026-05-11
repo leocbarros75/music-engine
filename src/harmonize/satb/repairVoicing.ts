@@ -157,8 +157,10 @@ function scoreTriple(params: {
   sopr: number;
   prev: RepairInput["prev"];
   targets: RepairInput["targets"];
+  /** Schoenberg Theory of Harmony p. 36: doubling preference (root > fifth > third). */
+  rootPc?: number;
 }): number {
-  const { bass, tenor, alto, sopr, prev, targets } = params;
+  const { bass, tenor, alto, sopr, prev, targets, rootPc } = params;
   let score = 0;
   score += Math.abs(bass - targets.bassTarget) * 0.6;
   score += Math.abs(tenor - targets.tenorTarget) * 0.6;
@@ -212,6 +214,29 @@ function scoreTriple(params: {
       score += 20;
   }
 
+  // ── Schoenberg Theory of Harmony, p. 36: doubling preference ─────────────
+  // "The first to be considered [for doubling] is the root; next the fifth;
+  //  and only then, lastly, the third."
+  // Reward doubling the root; penalise doubling the third.
+  if (rootPc !== undefined) {
+    const voicePcs = [pc(bass), pc(tenor), pc(alto), pc(sopr)];
+    const counts = new Map<number, number>();
+    for (const p of voicePcs) counts.set(p, (counts.get(p) ?? 0) + 1);
+    for (const [pitchClass, count] of counts) {
+      if (count >= 2) {
+        if (pitchClass === rootPc) {
+          score -= 2.0;   // root doubling preferred
+        } else {
+          const interval = ((pitchClass - rootPc) + 12) % 12;
+          if (interval === 3 || interval === 4) {
+            score += 2.5; // third doubling least preferred
+          }
+          // fifth (interval === 7): neutral
+        }
+      }
+    }
+  }
+
   return score;
 }
 
@@ -224,8 +249,9 @@ function pickBestTriple(params: {
   targets: RepairInput["targets"];
   allowUnisonD4: boolean;
   enforceOrdering: boolean;
+  rootPc?: number;
 }): { bass: number; tenor: number; alto: number; score: number } | null {
-  const { bassCands, tenorCands, altoCands, sopr, prev, targets, allowUnisonD4, enforceOrdering } = params;
+  const { bassCands, tenorCands, altoCands, sopr, prev, targets, allowUnisonD4, enforceOrdering, rootPc } = params;
   let best: { bass: number; tenor: number; alto: number; score: number } | null = null;
 
   for (const bass of bassCands) {
@@ -239,7 +265,7 @@ function pickBestTriple(params: {
         } else {
           if (alto >= sopr) continue;
         }
-        const score = scoreTriple({ bass, tenor, alto, sopr, prev, targets });
+        const score = scoreTriple({ bass, tenor, alto, sopr, prev, targets, rootPc });
         if (!best || score < best.score) best = { bass, tenor, alto, score };
       }
     }
@@ -281,6 +307,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
   const hasSlashBass = parsedChord.bassPcPref !== null;
   const lockBassToPref = hasSlashBass || options.forceRootInBass;
   const bassPref = parsedChord.bassPcPref !== null ? parsedChord.bassPcPref : parsedChord.rootPc;
+  // Schoenberg doubling preference: pass root pc so scoreTriple can reward/penalise doublings.
+  const chordRootPc = parsedChord.rootPc;
 
   const baseBassCands = makeCandidates(chordPcs, ranges.Bass, bassPref, lockBassToPref);
   const tenorCands = makeCandidates(chordPcs, ranges.Tenor, null, false);
@@ -296,7 +324,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
     prev,
     targets,
     allowUnisonD4,
-    enforceOrdering: true
+    enforceOrdering: true,
+    rootPc: chordRootPc
   });
 
   if (!best && lockBassToPref && !hasSlashBass) {
@@ -309,7 +338,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       prev,
       targets,
       allowUnisonD4,
-      enforceOrdering: true
+      enforceOrdering: true,
+      rootPc: chordRootPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Ordering conflict, relaxed bass preference.`);
@@ -326,7 +356,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       prev,
       targets,
       allowUnisonD4,
-      enforceOrdering: true
+      enforceOrdering: true,
+      rootPc: chordRootPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Applied octave/voicing repair to satisfy ordering.`);
@@ -343,7 +374,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       prev,
       targets,
       allowUnisonD4,
-      enforceOrdering: false
+      enforceOrdering: false,
+      rootPc: chordRootPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Hard constraint collision, used closest chord tones.`);
@@ -360,7 +392,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       prev,
       targets,
       allowUnisonD4,
-      enforceOrdering: false
+      enforceOrdering: false,
+      rootPc: chordRootPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Slash bass out of range, relaxed to chord tone.`);
