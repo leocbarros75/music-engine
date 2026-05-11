@@ -1572,10 +1572,23 @@ export function applyAppSettings(
       lhPattern = "alberti";                    // classical default (K.545 style)
     }
 
+    // Auto-select RH pattern to match the LH/texture choice:
+    //   polyphonic mode  → melody_inner_voice  (2-voice chiming, Worship Example 1 + Example 3)
+    //   lyrical/3/4 mode → melody_fill_eighths (ascending broken-chord fill, Example 3/4)
+    //   homophonic       → block_beats         (block chord on every beat, default)
+    const rhPatternAuto =
+      (usePolyphonic || accompaniment === "polyphonic" || lhPattern === "broken_ascending")
+        ? "melody_inner_voice" as const
+        : (isWaltz || lhPattern === "serenade_strum" || lhPattern === "nocturne")
+          ? "melody_fill_eighths" as const
+          : "block_beats" as const;
+
     const finalScore = arrangePianoFromSatb(scoreModel, {
       warnings,
       chords,
       lhPattern,
+      rhPattern: rhPatternAuto,
+      polyphonic: usePolyphonic || accompaniment === "polyphonic",
     });
     attachTextureAnalysis(finalScore, warnings);
     return {

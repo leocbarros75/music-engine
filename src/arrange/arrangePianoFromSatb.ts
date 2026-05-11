@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
-import { generateLhPattern, type LhPatternId } from "./pianoAccompPatterns";
+import { generateLhPattern, type LhPatternId, generateRhPattern, type RhPatternId } from "./pianoAccompPatterns";
 
 type PianoLevel = "beginner" | "intermediate" | "advanced" | "professional";
 
@@ -28,18 +28,26 @@ type ArrangePianoOptions = {
    *  Intended for 4-voice choral hymn output that pianists can read and play. */
   choralHymn?: boolean;
   /**
-   * When set, activates the Piano Melody+Accompaniment mode:
-   *   - Staff 1 (treble, Voice 1): melody from the Soprano part as-is
-   *   - Staff 2 (bass,   Voice 4): left-hand pattern generated from chord symbols
-   *
-   * The pattern name controls the texture:
-   *   "alberti"          — K.545 style Alberti bass (classical default)
-   *   "block_beats"      — chord on every beat (contemporary)
+   * When set, activates the Piano Melody+Accompaniment mode.
+   * Controls the left-hand bass pattern (Staff 2, Voice 4).
+   *   "alberti"          — K.545 Alberti bass (classical default)
+   *   "block_beats"      — chord block on every beat (contemporary)
    *   "boom_chick"       — root on 1+3, chord stab on 2+4
-   *   "broken_ascending" — ascending arpeggio per beat in 16ths
-   *   "waltz_bass"       — root on 1, chord on 2+3 (3/4 time)
+   *   "broken_ascending" — ascending arpeggio in 16ths
+   *   "waltz_bass"       — root on 1, chord on 2+3 (3/4)
+   *   … and more (see LhPatternId)
    */
   lhPattern?: LhPatternId;
+  /**
+   * Controls the right-hand inner-voice pattern (Staff 1, Voices 1–2).
+   *   "block_beats"        — block chords on every beat (homophonic default)
+   *   "melody_inner_voice" — 8th-note chiming + sustained root (polyphonic default,
+   *                          source: Piano Worship Example 1 + Example 3)
+   *   "melody_fill_eighths"— ascending broken-chord 8th fill (lyrical/romantic,
+   *                          source: Example 3 / Example 4)
+   * Auto-selected when not provided: polyphonic → melody_inner_voice, else → block_beats.
+   */
+  rhPattern?: RhPatternId;
 };
 
 type VoiceMap = {
@@ -2654,6 +2662,14 @@ function buildPianoMelodyAccomp(
 
   const lhPattern = options.lhPattern ?? "alberti";
 
+  // Auto-select RH pattern based on mode:
+  //   polyphonic → melody_inner_voice (2-voice chiming, from Worship Example 1)
+  //   lyrical/3/4 → melody_fill_eighths (ascending broken-chord fill, from Example 3)
+  //   homophonic (default) → block_beats (chord on every beat)
+  const isPolyphonic = options.polyphonic === true || options.lhPattern === "broken_ascending";
+  const rhPattern: RhPatternId = options.rhPattern
+    ?? (isPolyphonic ? "melody_inner_voice" : "block_beats");
+
   // ── Melody Part (separate staff above piano) ──────────────────────────────
   // Melody appears on its own part so it renders as a dedicated staff above
   // the piano grand staff — standard "melody + piano" / "lead + accompaniment" layout.
@@ -2691,21 +2707,19 @@ function buildPianoMelodyAccomp(
     const measureBeats = measureBeatsFromAttributes(pianoMeasures[i]?.attributes);
     const evs: NoteEvent[] = [];
 
-    // Staff 1 (treble) — RH block chord voicings from chord symbols.
-    // Root placed in G3–G4 (55–67) for a comfortable mid-treble register.
-    // Events from generateLhPattern come out as LH voice/staff, so we remap them.
-    const rhRaw = generateLhPattern({
+    // Staff 1 (treble) — RH inner-voice pattern from chord symbols.
+    // trebleMin/Max places the chord root in C4–C5 (mid-treble register).
+    // generateRhPattern outputs voice 1 (and optionally voice 2) on staff 1 directly.
+    const rhEvents = generateRhPattern({
       chords: chordsForArrange,
       measureNumber: mNum,
       measureBeats,
-      lhPattern: "block_beats",
-      bassMin: 55,  // G3 — RH chord root floor
-      bassMax: 67,  // G4 — RH chord root ceiling
+      rhPattern,
+      trebleMin: 60, // C4
+      trebleMax: 72, // C5
       warnings,
     });
-    for (const ev of rhRaw) {
-      evs.push({ ...ev, voice: 1, staff: 1 });
-    }
+    evs.push(...rhEvents);
 
     // Staff 2 (bass) — generated LH pattern from chord symbols, Voice 4
     const lhEvents = generateLhPattern({

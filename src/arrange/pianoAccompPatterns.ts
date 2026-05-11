@@ -653,3 +653,188 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
       return [];
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RIGHT-HAND ACCOMPANIMENT PATTERN LIBRARY
+// Source: Piano Worship Example 1 (melody_inner_voice), Example 3 (melody_fill_eighths)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type RhPatternId =
+  /**
+   * Block chord on every beat — treble range, voice 1 staff 1.
+   * Default for homophonic accompaniment. Matches current behaviour.
+   */
+  | "block_beats"
+  /**
+   * Two-voice inner texture (Piano Worship Example 1, 4/4 + Example 3, 3/4).
+   *   Voice 1 (v1): 8th-note alternation — chord 5th(8th) + chord 3rd(8th) per beat
+   *                 Creates the characteristic "chiming" worship inner-voice line.
+   *   Voice 2 (v2): sustained root on strong beats (half notes in 4/4, quarters in 3/4)
+   *                 Provides harmonic anchor below the chiming line.
+   * Best for: polyphonic accompaniment, worship, contemporary, romantic styles.
+   */
+  | "melody_inner_voice"
+  /**
+   * Ascending broken-chord 8th fills (Example 3 / Example 4).
+   *   Voice 1 (v1): continuous 8th notes cycling root → 3rd → 5th → 3rd per 2 beats.
+   *   Smooth, flowing line that connects chords like a flowing inner register.
+   * Best for: ballad, lyrical 3/4, romantic accompaniment.
+   */
+  | "melody_fill_eighths";
+
+export type RhPatternOptions = {
+  chords: Array<{ measure: number; t: number; symbol: string }>;
+  measureNumber: number;
+  /** Total quarter-note beats in the measure */
+  measureBeats: number;
+  rhPattern: RhPatternId;
+  /** Min MIDI for the treble root. Default: 60 = C4 */
+  trebleMin?: number;
+  /** Max MIDI for the treble root. Default: 72 = C5 */
+  trebleMax?: number;
+  warnings?: string[];
+};
+
+// ─── RH pattern implementations ──────────────────────────────────────────────
+
+/**
+ * RH BLOCK BEATS — treble equivalent of the LH block_beats pattern.
+ * Root+3rd+5th chord block on every beat as quarter notes.
+ * Voice 1, Staff 1. Root placed in treble range (default C4–C5).
+ */
+function buildRhBlockBeats(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V = 1, S = 1;
+  for (let b = 0; b < Math.round(measureBeats); b++) {
+    const v = getVoices(b);
+    if (!v) continue;
+    events.push(makeNote(v.bass, b, 1, V, S, `rh-blk-${mNum}-${b}-r`));
+    events.push(makeNote(v.mid,  b, 1, V, S, `rh-blk-${mNum}-${b}-m`));
+    events.push(makeNote(v.high, b, 1, V, S, `rh-blk-${mNum}-${b}-h`));
+  }
+  return events;
+}
+
+/**
+ * RH MELODY INNER VOICE — Piano Worship Example 1 (4/4) + Example 3 (3/4).
+ *
+ * Voice 1 (v1, s1): 8th-note alternation — 5th on even 8ths, 3rd on odd 8ths.
+ *   The characteristic "chiming" inner-voice texture of worship piano accompaniment.
+ *   In 4/4: 8 eighth notes per measure → 4 high/mid pairs.
+ *   In 3/4: 6 eighth notes per measure → 3 high/mid pairs.
+ *
+ * Voice 2 (v2, s1): sustained root on strong beats.
+ *   4/4+: half notes at beats 0 and 2.
+ *   3/4:  quarter notes on each beat.
+ *   2/4:  half note for whole measure.
+ */
+function buildRhMelodyInnerVoice(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V1 = 1, V2 = 2, S = 1;
+  const noteDur = 0.5; // 8th note
+
+  // Voice 1: 8th alternation — high(5th) on even, mid(3rd) on odd
+  const totalEighths = Math.round(measureBeats / noteDur);
+  for (let i = 0; i < totalEighths; i++) {
+    const t = i * noteDur;
+    const v = getVoices(t);
+    if (!v) continue;
+    const pitch = i % 2 === 0 ? v.high : v.mid;
+    events.push(makeNote(pitch, t, noteDur, V1, S, `rh-miv1-${mNum}-${i}`));
+  }
+
+  // Voice 2: sustained root on strong beats
+  const v2Dur = measureBeats >= 4 ? 2 : measureBeats === 3 ? 1 : measureBeats;
+  for (let b = 0; b < measureBeats - 1e-6; b += v2Dur) {
+    const v = getVoices(b);
+    if (!v) continue;
+    events.push(makeNote(v.bass, b, v2Dur, V2, S, `rh-miv2-${mNum}-${b.toFixed(1)}`));
+  }
+
+  return events;
+}
+
+/**
+ * RH MELODY FILL EIGHTHS — Example 3 (3/4) + Example 4 (4/4).
+ *
+ * Voice 1 (v1, s1): continuous ascending broken-chord 8th notes.
+ *   Cycle: root → 3rd → 5th → 3rd (repeating every 4 8ths = 2 beats).
+ *   Smooth flowing inner voice that connects chord changes like a rolled arpeggio.
+ *   In 4/4: 8 eighths → 2 full cycles.
+ *   In 3/4: 6 eighths → 1.5 cycles (ends on the 5th).
+ */
+function buildRhMelodyFillEighths(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V1 = 1, S = 1;
+  const noteDur = 0.5; // 8th note
+  const totalEighths = Math.round(measureBeats / noteDur);
+
+  for (let i = 0; i < totalEighths; i++) {
+    const t = i * noteDur;
+    const v = getVoices(t);
+    if (!v) continue;
+    // Cycle: root(0) → 3rd(1) → 5th(2) → 3rd(3) → root(4) …
+    const seq = [v.bass, v.mid, v.high, v.mid] as const;
+    events.push(makeNote(seq[i % 4]!, t, noteDur, V1, S, `rh-mfe-${mNum}-${i}`));
+  }
+
+  return events;
+}
+
+// ─── RH main export ───────────────────────────────────────────────────────────
+
+/**
+ * Generate right-hand inner-voice note events for one measure.
+ *
+ * Assigns notes to Voice 1 (and optionally Voice 2) on Staff 1 (treble staff).
+ * Root placed in the treble range [trebleMin, trebleMax] (default C4–C5).
+ *
+ * Returns an empty array when no chord data is available for the measure.
+ */
+export function generateRhPattern(options: RhPatternOptions): NoteEvent[] {
+  const {
+    chords,
+    measureNumber,
+    measureBeats,
+    rhPattern,
+    trebleMin = 60, // C4
+    trebleMax = 72, // C5
+    warnings = [],
+  } = options;
+
+  function getRhVoices(t: number): ChordVoices | null {
+    const symbol = pickChordAt(chords, measureNumber, t);
+    if (!symbol) return null;
+    const v = chordVoicesInRange(symbol, trebleMin, trebleMax);
+    if (!v) {
+      warnings.push(`[rh-accomp] m${measureNumber} t=${t}: cannot parse chord "${symbol}" — skipping`);
+    }
+    return v;
+  }
+
+  if (!pickChordAt(chords, measureNumber, 0)) return [];
+
+  switch (rhPattern) {
+    case "block_beats":
+      return buildRhBlockBeats(getRhVoices, measureBeats, measureNumber);
+    case "melody_inner_voice":
+      return buildRhMelodyInnerVoice(getRhVoices, measureBeats, measureNumber);
+    case "melody_fill_eighths":
+      return buildRhMelodyFillEighths(getRhVoices, measureBeats, measureNumber);
+    default:
+      warnings.push(`[rh-accomp] Unknown RH pattern "${rhPattern as string}" — falling back to block_beats`);
+      return buildRhBlockBeats(getRhVoices, measureBeats, measureNumber);
+  }
+}
