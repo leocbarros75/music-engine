@@ -57,6 +57,13 @@ export type ProfileWeights = {
   rangePenalty: number;
   tessituraPenalty: number;
   perfectChainPenalty: number;
+  /**
+   * Piston Ch. 28: below C3 (MIDI 48), intervals smaller than a P4th (5 st)
+   * between adjacent voices muddy the bass register with clashing overtones.
+   * Penalty fires on each adjacent pair that is both below MIDI 48 and
+   * separated by fewer than 5 semitones.
+   */
+  lowRegisterSpacingPenalty: number;
 };
 
 export type CandidateState = {

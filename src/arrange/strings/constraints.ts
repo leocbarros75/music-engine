@@ -14,7 +14,9 @@ export const DEFAULT_PROFILE: ProfileWeights = {
   crossingPenalty: 4,
   rangePenalty: 6,
   tessituraPenalty: 1.5,
-  perfectChainPenalty: 1.5
+  perfectChainPenalty: 1.5,
+  // Piston Ch. 28: below C3 avoid intervals < P4th between adjacent voices
+  lowRegisterSpacingPenalty: 2.5
 };
 
 export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
@@ -68,6 +70,8 @@ export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
   // close spacing in upper voices.  All voices move in lockstep (chordal);
   // very high penalties for crossing, parallel perfects, and range violations
   // to enforce clean Fux-style block chord texture.
+  // Piston Ch. 28 low-register spacing is especially critical here —
+  // block chords demand the widest bass intervals for harmonic clarity.
   homophonic_block: {
     ...DEFAULT_PROFILE,
     stepPreference: 1.8,
@@ -78,7 +82,8 @@ export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
     hiddenPerfectPenalty: 8,
     rangePenalty: 9,
     tessituraPenalty: 2.5,
-    perfectChainPenalty: 2.0
+    perfectChainPenalty: 2.0,
+    lowRegisterSpacingPenalty: 5.0   // Piston: wide bass spacing is defining feature
   }
 };
 
@@ -165,6 +170,29 @@ export function evaluateTransition(
       penalties.push({ id: "vln2_spacing_hard", cost: profile.crossingPenalty * 1.5, detail: String(dist) });
     } else if (dist > 12) {
       penalties.push({ id: "vln2_spacing_soft", cost: profile.crossingPenalty * 0.5, detail: String(dist) });
+    }
+  }
+
+  // ── Piston low-register spacing (Ch. 28, p. 448) ─────────────────────────
+  // "Below 4-foot C [MIDI 48 = C3], intervals smaller than a fifth or fourth
+  // are generally avoided if clarity is desired." — Walter Piston, Orchestration
+  // Fires when two adjacent voices are BOTH below C3 and their interval < P4th.
+  // Primary cases: vla↔vc and vc↔cb in low positions.
+  const PISTON_LOW_C3 = 48; // C3
+  const PISTON_MIN_INTERVAL = 5; // P4th = 5 semitones
+  for (let i = 0; i < order.length - 1; i++) {
+    const hi = next[order[i]];
+    const lo = next[order[i + 1]];
+    if (hi === null || lo === null) continue;
+    if (lo < PISTON_LOW_C3 && hi < PISTON_LOW_C3) {
+      const interval = hi - lo;
+      if (interval > 0 && interval < PISTON_MIN_INTERVAL) {
+        penalties.push({
+          id: "low_register_close",
+          cost: profile.lowRegisterSpacingPenalty,
+          detail: `${order[i]}-${order[i + 1]}:${interval}st`
+        });
+      }
     }
   }
 
