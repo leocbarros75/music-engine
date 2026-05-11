@@ -18,10 +18,68 @@ export const DEFAULT_PROFILE: ProfileWeights = {
 };
 
 export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
-  hymn_support: { ...DEFAULT_PROFILE, stepPreference: 1.4, leapPenalty: 5.5, dissonancePenalty: 4 },
-  countermelody: { ...DEFAULT_PROFILE, stepPreference: 1.2, leapPenalty: 4.5, dissonancePenalty: 3 },
+  hymn_support:   { ...DEFAULT_PROFILE, stepPreference: 1.4, leapPenalty: 5.5, dissonancePenalty: 4 },
+  countermelody:  { ...DEFAULT_PROFILE, stepPreference: 1.2, leapPenalty: 4.5, dissonancePenalty: 3 },
   cinematic_pads: { ...DEFAULT_PROFILE, stepPreference: 1.0, leapPenalty: 3.5, dissonancePenalty: 2.5 },
-  dance_baroque: { ...DEFAULT_PROFILE, stepPreference: 1.3, leapPenalty: 4.8, dissonancePenalty: 3.2 }
+  dance_baroque:  { ...DEFAULT_PROFILE, stepPreference: 1.3, leapPenalty: 4.8, dissonancePenalty: 3.2 },
+
+  // ── Adler-based profiles ────────────────────────────────────────────────
+  // melody_harmony: Vln I = foreground; inner voices lean stepwise; bass firm.
+  // Strong dissonance/crossing penalties enforce clean SATB-like block texture.
+  melody_harmony: {
+    ...DEFAULT_PROFILE,
+    stepPreference: 1.6,
+    leapPenalty: 6.0,
+    dissonancePenalty: 4.5,
+    crossingPenalty: 5.5,
+    parallelPerfectPenalty: 14,
+    hiddenPerfectPenalty: 7,
+    rangePenalty: 7,
+    tessituraPenalty: 1.8
+  },
+
+  // melody_pizzicato: same harmonic principles as melody_harmony; slightly
+  // more rhythmic flexibility for pizzicato chord hits (lower leap penalty).
+  melody_pizzicato: {
+    ...DEFAULT_PROFILE,
+    stepPreference: 1.4,
+    leapPenalty: 5.0,
+    dissonancePenalty: 3.5,
+    crossingPenalty: 4.5,
+    parallelPerfectPenalty: 12,
+    tessituraPenalty: 1.4
+  },
+
+  // cello_melody: Vc is the singing foreground voice → smooth vc line is
+  // rewarded.  Violins stay in their preferred (upper) register as background.
+  // Lower leap penalty for upper strings allows looser arpeggiated fills.
+  cello_melody: {
+    ...DEFAULT_PROFILE,
+    stepPreference: 1.5,
+    leapPenalty: 3.8,          // violins can leap more freely (background texture)
+    dissonancePenalty: 3.0,
+    crossingPenalty: 4.0,
+    rangePenalty: 7,            // keep cello in characteristic range
+    tessituraPenalty: 2.0,
+    recoveryPenalty: 4.0        // make cello line recover leaps with steps
+  },
+
+  // homophonic_block: Adler overtone-spacing rule — wide intervals in bass,
+  // close spacing in upper voices.  All voices move in lockstep (chordal);
+  // very high penalties for crossing, parallel perfects, and range violations
+  // to enforce clean Fux-style block chord texture.
+  homophonic_block: {
+    ...DEFAULT_PROFILE,
+    stepPreference: 1.8,
+    leapPenalty: 7.0,
+    dissonancePenalty: 5.0,
+    crossingPenalty: 6.5,
+    parallelPerfectPenalty: 16,
+    hiddenPerfectPenalty: 8,
+    rangePenalty: 9,
+    tessituraPenalty: 2.5,
+    perfectChainPenalty: 2.0
+  }
 };
 
 export type ConstraintContext = {

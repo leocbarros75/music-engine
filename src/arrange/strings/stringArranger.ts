@@ -183,16 +183,16 @@ export function arrangeStringEnsemble(
   const slices = buildSlices(melodyPart, chords);
   const key = getKeyInfo(score);
 
+  const profile = options.profile ?? "melody_harmony";
   const candidatesBySlice: Voicing[][] = [];
   let prevVoicing: Voicing | null = null;
   for (const slice of slices) {
-    const candidateMap = buildCandidatesForSlice({ slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode });
+    const candidateMap = buildCandidatesForSlice({ slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode, profileId: profile });
     const voicings = buildVoicingStates(candidateMap);
     candidatesBySlice.push(voicings);
     prevVoicing = voicings[0] ?? null;
   }
 
-  const profile = options.profile ?? "hymn_support";
   const dpResult = runDp({ slices, candidatesBySlice, profileId: profile });
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);
@@ -216,12 +216,21 @@ export function arrangeStringEnsemble(
     buildPart(measuresTemplate, cb, "P_DB", "Double Bass", "double_bass")
   ];
 
+  // melody_pizzicato: Vln I arco; all others pizzicato
+  const baseArticulations: StringEnsembleArrangement["articulations"] = [{ measure: 1, t: 0, type: "legato" }];
+  const pizzicatoMeta = profile === "melody_pizzicato"
+    ? { pizzicato_voices: ["vln2", "vla", "vc", "cb"] as const }
+    : undefined;
+
   const arrangement: StringEnsembleArrangement = {
     parts: { vln1, vln2, vla, vc, cb },
-    dynamics: [{ measure: 1, value: "mf" }],
-    articulations: [{ measure: 1, t: 0, type: "legato" }],
+    dynamics: [{ measure: 1, value: profile === "cello_melody" ? "mp" : "mf" }],
+    articulations: baseArticulations,
     phrasing: [{ startMeasure: 1, endMeasure: measuresTemplate.length }],
-    debug: { transitionPenalties: dpResult.penalties }
+    debug: {
+      transitionPenalties: dpResult.penalties,
+      ...(pizzicatoMeta as any)
+    }
   };
 
   const scoreModel: ScoreModel = {

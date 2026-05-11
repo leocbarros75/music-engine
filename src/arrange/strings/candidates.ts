@@ -70,12 +70,17 @@ export function buildCandidatesForSlice(params: {
   prevVoicing: Voicing | null;
   keyFifths: number;
   keyMode: "major" | "minor";
+  profileId?: string;
 }): Record<VoiceId, number[]> {
-  const { slice, prevVoicing, keyFifths, keyMode } = params;
+  const { slice, prevVoicing, keyFifths, keyMode, profileId } = params;
   const { pcs, bassPc, rootPc } = parseChordPcs(slice.chordSymbol);
   const scale = scalePcsFromKey(keyFifths, keyMode);
   const melodyPc = typeof slice.melodyMidi === "number" ? slice.melodyMidi % 12 : null;
   const chordPcs = pcs.length ? pcs : melodyPc !== null ? inferChordPcs(melodyPc, scale) : scale;
+
+  // ── Profile-specific melody assignment ───────────────────────────────────
+  // cello_melody: Vc carries the foreground melody; Vln I plays harmony.
+  const isCelloMelody = profileId === "cello_melody";
 
   const out: Record<VoiceId, number[]> = {
     vln1: [],
@@ -85,14 +90,31 @@ export function buildCandidatesForSlice(params: {
     cb: []
   };
 
-  if (typeof slice.melodyMidi === "number") {
+  if (typeof slice.melodyMidi === "number" && !isCelloMelody) {
+    // Standard: Vln I locked to melody (one octave up when range permits)
     const vln1Range = STRING_RANGES.vln1;
     const shifted = slice.melodyMidi + 12;
     out.vln1 = [shifted >= vln1Range.absMin && shifted <= vln1Range.absMax ? shifted : slice.melodyMidi];
   }
 
+  if (typeof slice.melodyMidi === "number" && isCelloMelody) {
+    // cello_melody: Vc locked to melody, clamped into Vc range by octave
+    const vcRange = STRING_RANGES.vc;
+    let midi = slice.melodyMidi;
+    while (midi > vcRange.absMax) midi -= 12;
+    while (midi < vcRange.absMin) midi += 12;
+    // Keep in preferred range if possible
+    const inPref = midi >= vcRange.prefMin && midi <= vcRange.prefMax;
+    const shiftedDown = midi - 12;
+    if (!inPref && shiftedDown >= vcRange.absMin && shiftedDown >= vcRange.prefMin) midi = shiftedDown;
+    out.vc = [midi];
+  }
+
   for (const voice of VOICES) {
+    // Skip already-locked voices
     if (voice === "vln1" && out.vln1.length) continue;
+    if (voice === "vc" && out.vc.length) continue;
+
     const range = STRING_RANGES[voice];
     const prev = prevVoicing ? prevVoicing[voice] : null;
     const pcsForVoice =

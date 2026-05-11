@@ -55,6 +55,34 @@ const BASS_ACTIVITY_OPTIONS: Array<{ label: string; value: NonNullable<Settings[
   { label: "Active (60%)", value: "active", help: "More 8th-note motion, passing/neighbor tones." },
   { label: "High active (100%)", value: "high_active", help: "Continuous motion where possible." }
 ];
+// Adler-based string texture modes (from "The Study of Orchestration", 3rd ed.)
+const STRING_TEXTURE_OPTIONS: Array<{
+  label: string;
+  value: NonNullable<Settings["stringTexture"]>;
+  help: string;
+}> = [
+  {
+    label: "Melody + Harmony (Adler default)",
+    value: "melody_harmony",
+    help: "Violin I = foreground melody; Violin II + Viola = inner harmony; Cello = bass; D.Bass = Cello -8va. Standard SATB-like texture."
+  },
+  {
+    label: "Melody + Pizzicato",
+    value: "melody_pizzicato",
+    help: "Violin I plays the melody arco; all other strings play pizzicato chord support on the beat."
+  },
+  {
+    label: "Cello Melody",
+    value: "cello_melody",
+    help: "Cello sings in the foreground (lyrical D-string or C-string register); violins and viola provide soft background harmony."
+  },
+  {
+    label: "Homophonic Block",
+    value: "homophonic_block",
+    help: "All 5 voices move in block chords with Adler overtone spacing: wide intervals in bass, close intervals in treble."
+  }
+];
+
 const STRING_INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
   { label: "Auto arranger", value: "auto", help: "Use the current string arranging engine." },
   {
@@ -569,6 +597,29 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </div>
             </div>
           )}
+
+          {isStrings && (settings.instrumentation ?? "auto") === "auto" && (() => {
+            const currentTexture = settings.stringTexture ?? "melody_harmony";
+            const textureOpt = STRING_TEXTURE_OPTIONS.find((o) => o.value === currentTexture);
+            return (
+              <div className="field">
+                <label>String Texture</label>
+                <select
+                  value={currentTexture}
+                  onChange={(e) => update("stringTexture", e.target.value as Settings["stringTexture"])}
+                >
+                  {STRING_TEXTURE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="key-preview">
+                  <span className="slider-help">{textureOpt?.help ?? ""}</span>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="field">
             <label>Key Signature</label>

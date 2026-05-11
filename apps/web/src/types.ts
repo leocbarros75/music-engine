@@ -33,6 +33,11 @@ export type Settings = {
   vlaActivity?: "grounded" | "less_active" | "active" | "high_active";
   vcActivity?: "grounded" | "less_active" | "active" | "high_active";
   cbActivity?: "grounded" | "less_active" | "active" | "high_active";
+  /**
+   * Adler-based string texture mode.
+   * Only active when ensemble = "string_ensemble" and instrumentation = "auto".
+   */
+  stringTexture?: "melody_harmony" | "melody_pizzicato" | "cello_melody" | "homophonic_block";
   instrumentation?:
     | "auto"
     | "piano_copy_to_string_quartet"

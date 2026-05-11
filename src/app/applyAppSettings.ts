@@ -16,6 +16,7 @@ import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleF
 import { arrangeStringQuartetFromPianoInstrumentation } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
+import type { ProfileId } from "../arrange/strings/types";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
 import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble";
@@ -58,6 +59,15 @@ export type AppSettings = {
    * "auto" or undefined = auto-select based on style + time signature.
    */
   lhPattern?: string;
+  /**
+   * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
+   * and instrumentation = "auto").
+   *   "melody_harmony"   — Vln I foreground melody; Vln II + Vla inner harmony; Vc bass; Cb -8va (default)
+   *   "melody_pizzicato" — Vln I arco melody; Vln II + Vla + Vc + Cb pizzicato
+   *   "cello_melody"     — Cello foreground melody; violins soft background
+   *   "homophonic_block" — All 5 voices block chords, Adler overtone spacing
+   */
+  stringTexture?: string;
   useStringEnsembleArranger?: boolean;
   instrumentation?:
     | "auto"
@@ -1634,7 +1644,7 @@ export function applyAppSettings(
       : wantsStrings
         ? useStringEnsembleArranger
           ? (() => {
-              const profile = usePolyphonic ? "countermelody" : "hymn_support";
+              const profile = (usePolyphonic ? "countermelody" : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
               const stringResult = arrangeStringEnsemble(scoreModel, chords, { profile });
               warnings.push(...(stringResult.warnings ?? []));
               const stringScore = stringResult.scoreModel;
@@ -1775,7 +1785,7 @@ export function applyAppSettings(
     : wantsStrings
       ? useStringEnsembleArranger
         ? (() => {
-            const profile = usePolyphonic ? "countermelody" : "hymn_support";
+            const profile = (usePolyphonic ? "countermelody" : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
             const stringResult = usePolyphonic
               ? arrangeStringPolyphonic(scoreModel, chords, { level: settings.level })
               : arrangeStringEnsemble(scoreModel, chords, { profile });

@@ -35,7 +35,16 @@ export type TransitionScore = {
   pendingRecovery: PendingRecovery;
 };
 
-export type ProfileId = "hymn_support" | "countermelody" | "cinematic_pads" | "dance_baroque";
+export type ProfileId =
+  | "hymn_support"
+  | "countermelody"
+  | "cinematic_pads"
+  | "dance_baroque"
+  // ── Adler-based texture modes (from "The Study of Orchestration", 3rd ed.) ──
+  | "melody_harmony"    // Vln I = foreground melody; Vln II + Vla = inner harmony; Vc = bass; Cb = Vc -8va
+  | "melody_pizzicato"  // Vln I arco melody; Vln II + Vla + Vc + Cb pizzicato chord support
+  | "cello_melody"      // Vc = foreground melody in tenor/bass register; violins = soft background harmony
+  | "homophonic_block"; // All 5 voices in block chords with Adler overtone spacing (wide bass, close treble)
 
 export type ProfileWeights = {
   stepPreference: number;
