@@ -38,6 +38,10 @@ export type Settings = {
    * Only active when ensemble = "string_ensemble" and instrumentation = "auto".
    */
   stringTexture?: "melody_harmony" | "melody_pizzicato" | "cello_melody" | "homophonic_block";
+  /**
+   * Reference example piece loaded into the string ensemble engine.
+   */
+  stringExample?: string;
   instrumentation?:
     | "auto"
     | "piano_copy_to_string_quartet"

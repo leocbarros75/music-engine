@@ -83,6 +83,68 @@ const STRING_TEXTURE_OPTIONS: Array<{
   }
 ];
 
+// Reference examples for the string engine — pieces that calibrate each texture mode.
+const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: NonNullable<Settings["stringTexture"]>; help: string }> = [
+  // melody_harmony
+  {
+    label: "Haydn — String Quartet Op. 76 No. 3 'Emperor', 2nd mvt",
+    value: "haydn_op76_no3_mvt2",
+    texture: "melody_harmony",
+    help: "Prototype melody + inner harmony texture. Violin I carries the hymn tune; lower voices provide clean chord support."
+  },
+  {
+    label: "Mozart — String Quartet K. 387, 1st mvt",
+    value: "mozart_k387_mvt1",
+    texture: "melody_harmony",
+    help: "Classical voice-leading benchmark. Clear SATB-like spacing with idiomatic string figuration."
+  },
+  {
+    label: "Beethoven — String Quartet Op. 18 No. 4, 1st mvt",
+    value: "beethoven_op18_no4_mvt1",
+    texture: "melody_harmony",
+    help: "Early Beethoven quartet — clean four-voice writing, good crossing/spacing reference."
+  },
+  // cello_melody
+  {
+    label: "Dvorak — String Quartet Op. 96 'American', 2nd mvt",
+    value: "dvorak_op96_mvt2",
+    texture: "cello_melody",
+    help: "Cello sings the lyrical foreground melody on the D-string; violins provide soft background harmony."
+  },
+  {
+    label: "Schubert — String Quintet D. 956, 2nd mvt",
+    value: "schubert_d956_mvt2",
+    texture: "cello_melody",
+    help: "Cello 1 as soloist above Cello 2 drone. Definitive reference for cello foreground texture."
+  },
+  // homophonic_block
+  {
+    label: "Barber — Adagio for Strings Op. 11",
+    value: "barber_adagio",
+    texture: "homophonic_block",
+    help: "Maximum block-chord density with Adler overtone spacing: wide bass intervals, close treble voicing."
+  },
+  {
+    label: "Brahms — String Sextet Op. 18, 2nd mvt",
+    value: "brahms_op18_mvt2",
+    texture: "homophonic_block",
+    help: "Rich block-chord texture across 6 string voices. Wide bass spacing with close upper-voice clusters."
+  },
+  // melody_pizzicato
+  {
+    label: "Tchaikovsky — Serenade for Strings Op. 48, 2nd mvt (Waltz)",
+    value: "tchaikovsky_op48_mvt2",
+    texture: "melody_pizzicato",
+    help: "Mixed arco melody over pizzicato chord accompaniment. Classic melody + pizz texture reference."
+  },
+  {
+    label: "Haydn — String Quartet Op. 33 No. 2 'The Joke', 1st mvt",
+    value: "haydn_op33_no2_mvt1",
+    texture: "melody_pizzicato",
+    help: "Frequent arco/pizzicato contrast. Good reference for articulation-aware string writing."
+  }
+];
+
 const STRING_INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
   { label: "Auto arranger", value: "auto", help: "Use the current string arranging engine." },
   {
@@ -574,31 +636,29 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           </div>
         </>
-      ) : (
+      ) : isStrings ? (
         /* ════════════════════════════════════════════════════════════════════
-           ALL OTHER ENSEMBLES — full settings panel (strings · woodwinds · brass)
+           STRING ENSEMBLE — simplified panel
            ════════════════════════════════════════════════════════════════════ */
         <>
-          {(settings.ensemble === "string_ensemble" || settings.ensemble === "woodwind_ensemble") && (
-            <div className="field">
-              <label>Instrumentation</label>
-              <select
-                value={settings.instrumentation ?? "auto"}
-                onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
-              >
-                {(settings.ensemble === "string_ensemble" ? STRING_INSTRUMENTATION_OPTIONS : WOODWIND_INSTRUMENTATION_OPTIONS).map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="key-preview">
-                <span className="slider-help">{instrumentationHelp}</span>
-              </div>
+          {/* Instrumentation */}
+          <div className="field">
+            <label>Instrumentation</label>
+            <select
+              value={settings.instrumentation ?? "auto"}
+              onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
+            >
+              {STRING_INSTRUMENTATION_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <div className="key-preview">
+              <span className="slider-help">{instrumentationHelp}</span>
             </div>
-          )}
+          </div>
 
-          {isStrings && (settings.instrumentation ?? "auto") === "auto" && (() => {
+          {/* String Texture — only when Auto arranger is selected */}
+          {(settings.instrumentation ?? "auto") === "auto" && (() => {
             const currentTexture = settings.stringTexture ?? "melody_harmony";
             const textureOpt = STRING_TEXTURE_OPTIONS.find((o) => o.value === currentTexture);
             return (
@@ -609,9 +669,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
                   onChange={(e) => update("stringTexture", e.target.value as Settings["stringTexture"])}
                 >
                   {STRING_TEXTURE_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
                 <div className="key-preview">
@@ -620,6 +678,140 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </div>
             );
           })()}
+
+          {/* Examples — reference pieces grouped by texture mode */}
+          {(settings.instrumentation ?? "auto") === "auto" && (() => {
+            const currentTexture = settings.stringTexture ?? "melody_harmony";
+            const examplesForTexture = STRING_EXAMPLE_OPTIONS.filter((o) => o.texture === currentTexture);
+            const currentExample = settings.stringExample ?? "";
+            const exampleOpt = STRING_EXAMPLE_OPTIONS.find((o) => o.value === currentExample);
+            return (
+              <div className="field">
+                <label>Example</label>
+                <select
+                  value={currentExample}
+                  onChange={(e) => update("stringExample", e.target.value)}
+                >
+                  <option value="">— None —</option>
+                  {examplesForTexture.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                {exampleOpt && (
+                  <div className="key-preview">
+                    <span className="slider-help">{exampleOpt.help}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Key Signature */}
+          <div className="field">
+            <label>Key Signature</label>
+            <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>
+              <option value="original">Original (from file)</option>
+              <optgroup label="Major">
+                {KEY_OPTIONS_MAJOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Minor">
+                {KEY_OPTIONS_MINOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+            </select>
+            <div className="key-preview">
+              Selected: <span className="key-badge">{keyPreview}</span>
+            </div>
+          </div>
+
+          {/* Time Signature */}
+          <div className="field">
+            <label>Time Signature</label>
+            <select value={settings.timeSignature} onChange={(e) => update("timeSignature", e.target.value)}>
+              {TIME_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tempo */}
+          <div className="field">
+            <label>Tempo (BPM)</label>
+            <input
+              type="number"
+              min={30}
+              max={240}
+              value={settings.tempo}
+              onChange={(e) => update("tempo", Number(e.target.value))}
+            />
+          </div>
+
+          {/* Style */}
+          <div className="field">
+            <label>Style</label>
+            <select value={settings.style} onChange={(e) => update("style", e.target.value as Settings["style"])}>
+              {STYLE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{titleize(opt)}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Level */}
+          <div className="field">
+            <label>Level</label>
+            <select value={settings.level} onChange={(e) => updateLevel(e.target.value as Settings["level"])}>
+              {LEVEL_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{titleize(opt)}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Accompaniment — homophonic / polyphonic only */}
+          <div className="field">
+            <label>Accompaniment</label>
+            <select
+              value={settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic"}
+              onChange={(e) => update("accompaniment", e.target.value as Settings["accompaniment"])}
+            >
+              <option value="homophonic">Homophonic</option>
+              <option value="polyphonic">Polyphonic</option>
+            </select>
+            <div className="key-preview">
+              <span className="slider-help">
+                {settings.accompaniment === "polyphonic"
+                  ? "Independent melodic lines with shared harmony (counterpoint)."
+                  : "All voices move together in vertical block chords."}
+              </span>
+            </div>
+          </div>
+        </>
+
+      ) : (
+        /* ════════════════════════════════════════════════════════════════════
+           ALL OTHER ENSEMBLES — full settings panel (woodwinds · brass)
+           ════════════════════════════════════════════════════════════════════ */
+        <>
+          {settings.ensemble === "woodwind_ensemble" && (
+            <div className="field">
+              <label>Instrumentation</label>
+              <select
+                value={settings.instrumentation ?? "auto"}
+                onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
+              >
+                {WOODWIND_INSTRUMENTATION_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">{instrumentationHelp}</span>
+              </div>
+            </div>
+          )}
 
           <div className="field">
             <label>Key Signature</label>
@@ -913,106 +1105,6 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 Selected:{" "}
                 <span className="key-badge">{titleize(settings.sopranoActivity ?? "less_active")}</span>
                 <span className="slider-help">{sopranoActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
-          {showStringPolyphonic && (
-            <div className="field">
-              <label>String Polyphonic Activity (Violin I)</label>
-              <select
-                value={settings.vln1Activity ?? "grounded"}
-                onChange={(e) => update("vln1Activity", e.target.value as Settings["bassActivity"])}
-              >
-                {BASS_ACTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="slider-meta">
-                Selected: <span className="key-badge">{titleize(settings.vln1Activity ?? "grounded")}</span>
-                <span className="slider-help">{vln1ActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
-          {showStringPolyphonic && (
-            <div className="field">
-              <label>String Polyphonic Activity (Violin II)</label>
-              <select
-                value={settings.vln2Activity ?? "less_active"}
-                onChange={(e) => update("vln2Activity", e.target.value as Settings["bassActivity"])}
-              >
-                {BASS_ACTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="slider-meta">
-                Selected: <span className="key-badge">{titleize(settings.vln2Activity ?? "less_active")}</span>
-                <span className="slider-help">{vln2ActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
-          {showStringPolyphonic && (
-            <div className="field">
-              <label>String Polyphonic Activity (Viola)</label>
-              <select
-                value={settings.vlaActivity ?? "less_active"}
-                onChange={(e) => update("vlaActivity", e.target.value as Settings["bassActivity"])}
-              >
-                {BASS_ACTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="slider-meta">
-                Selected: <span className="key-badge">{titleize(settings.vlaActivity ?? "less_active")}</span>
-                <span className="slider-help">{vlaActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
-          {showStringPolyphonic && (
-            <div className="field">
-              <label>String Polyphonic Activity (Cello)</label>
-              <select
-                value={settings.vcActivity ?? "less_active"}
-                onChange={(e) => update("vcActivity", e.target.value as Settings["bassActivity"])}
-              >
-                {BASS_ACTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="slider-meta">
-                Selected: <span className="key-badge">{titleize(settings.vcActivity ?? "less_active")}</span>
-                <span className="slider-help">{vcActivityHelp}</span>
-              </div>
-            </div>
-          )}
-
-          {showStringPolyphonic && (
-            <div className="field">
-              <label>String Polyphonic Activity (Double Bass)</label>
-              <select
-                value={settings.cbActivity ?? "less_active"}
-                onChange={(e) => update("cbActivity", e.target.value as Settings["bassActivity"])}
-              >
-                {BASS_ACTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div className="slider-meta">
-                Selected: <span className="key-badge">{titleize(settings.cbActivity ?? "less_active")}</span>
-                <span className="slider-help">{cbActivityHelp}</span>
               </div>
             </div>
           )}
