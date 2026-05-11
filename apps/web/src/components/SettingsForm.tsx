@@ -99,10 +99,28 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     help: "Close-voiced opening on Bb triad (all four voices within 16 st). Vln I leads with staccato melodic line; viola provides brief F4 pedal before joining counterpoint."
   },
   {
-    label: "Mozart — String Quartet K. 387, 1st mvt",
+    label: "Mozart — String Quartet No. 14 in G major K387, 1st mvt",
     value: "mozart_k387_mvt1",
     texture: "melody_harmony",
-    help: "Classical voice-leading benchmark. Clear SATB-like spacing with idiomatic string figuration."
+    help: "Tight Vln I–II coupling in parallel 3rds (3–4 st gap). G major, Allegro vivace. Cello functional bass descending to A2. All voices active counterpoint."
+  },
+  {
+    label: "Mozart — String Quartet No. 15 in D minor K421, 1st mvt",
+    value: "mozart_k421_mvt1",
+    texture: "melody_harmony",
+    help: "Textbook inner-voice ostinato: Vln II and Viola play repeated staccato 8ths in parallel 3rds (A3/F3). Cello has slow half-note chromatic bass descent (D3–C3–Bb2–A2). Lowest Vc: D2."
+  },
+  {
+    label: "Mozart — K545 Piano Sonata arr. for String Quartet, 1st mvt",
+    value: "mozart_k545_arr_mvt1",
+    texture: "melody_harmony",
+    help: "K545 arranged for strings. Viola plays Alberti-bass ostinato (C–G–E–G eighths). Vln I and II exchange melody and run in parallel 3rds in scalar passages. Cello = sparse downbeat bass."
+  },
+  {
+    label: "Mozart — String Quartet No. 19 in C major K465 'Dissonance', 1st mvt",
+    value: "mozart_k465_mvt1",
+    texture: "homophonic_block",
+    help: "Opens with famous chromatic Adagio introduction: cello repeats C3 in staccato 8ths (pedal), upper voices enter chromatically. Wide spacing by m4: Vln I G5–Vln II B4–Vla D4–Vc B2 (span 32 st). Lowest Vc: F#2."
   },
   {
     label: "Beethoven — String Quartet Op. 18 No. 4, 1st mvt",

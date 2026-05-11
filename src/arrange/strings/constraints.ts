@@ -148,14 +148,17 @@ export function evaluateTransition(
   }
 
   // ── Violin I / II spacing ─────────────────────────────────────────────────
-  // Calibrated from Haydn examples (Emperor's Hymn, Op.64 No.3, Op.64 No.5):
-  //   Emperor's Hymn m1 pickup:  Vln1 G4(67) – Vln2 B3(59) = 8 st  (m6th)
-  //   Emperor's Hymn m2 beat 1:  Vln1 B4(71) – Vln2 G4(67) = 4 st  (M3rd)
-  //   Emperor's Hymn m3 beat 1:  Vln1 A4(69) – Vln2 C4(60) = 9 st  (M6th)
-  //   Op.64 No.3 m1 beat 1:      Vln1 D5(74) – Vln2 Bb4(70)= 4 st  (M3rd)
-  // Haydn's typical range is 4–9 semitones.  A soft nudge at >10 (not >12)
-  // would be more faithful, but requires a per-profile threshold parameter.
-  // Hard cap at 19 remains correct — Haydn never exceeds ~10 in these examples.
+  // Calibrated from real scores:
+  //   Haydn Emperor's Hymn m1 pickup:  Vln1 G4(67) – Vln2 B3(59) = 8 st  (m6th)
+  //   Haydn Emperor's Hymn m2 beat 1:  Vln1 B4(71) – Vln2 G4(67) = 4 st  (M3rd)
+  //   Haydn Emperor's Hymn m3 beat 1:  Vln1 A4(69) – Vln2 C4(60) = 9 st  (M6th)
+  //   Haydn Op.64 No.3 m1 beat 1:      Vln1 D5(74) – Vln2 Bb4(70)= 4 st  (M3rd)
+  //   Mozart K387 m1 beat 1:           Vln1 D5(74) – Vln2 B4(71) = 3 st  (m3rd)
+  //   Mozart K387 m2 beat 1:           Vln1 D5(74) – Vln2 A4(69) = 5 st  (P4th)
+  //   Mozart K421 m1 beat 1:           Vln1 D5(74) – Vln2 rest   = n/a
+  //   Mozart K465 m4 beat 1:           Vln1 G5(79) – Vln2 B4(71) = 8 st  (m6th)
+  // Classical range: 3–9 semitones typical. Soft nudge at >10 would be ideal;
+  // hard cap at 19 is never exceeded in any of these examples.
   if (next.vln1 !== null && next.vln2 !== null) {
     const dist = next.vln1 - next.vln2;
     if (dist > 19) {
