@@ -153,9 +153,12 @@ export function addPassingTones(scoreModel: ScoreModel): ScoreModel {
         // pitch repeatedly returns to itself while the other voice moves.
         // When the same note appears on two consecutive quarter-note beats,
         // insert a diatonic step away (upper or lower neighbor) on the weak
-        // half of the beat and resolve back.  Only on inner voices (alto,
-        // tenor) — bass is excluded via partIdx check above.
+        // half of the beat and resolve back.
+        // Only on inner voices (alto = 1, tenor = 2): bass provides harmonic
+        // clarity (Schoenberg, Theory of Harmony, Ch. XVII) and should not
+        // be embellished with neighbor tones that would muddy the harmonic root.
         if (
+          partIdx < 3 &&           // exclude bass (index 3)
           gap === 0 &&
           currDur === divisions &&
           nextT === currT + currDur
