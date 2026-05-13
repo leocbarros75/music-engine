@@ -159,8 +159,12 @@ function scoreTriple(params: {
   targets: RepairInput["targets"];
   /** Schoenberg Theory of Harmony p. 36: doubling preference (root > fifth > third). */
   rootPc?: number;
+  /** Rimsky-Korsakov Principles of Orchestration p. 65: bass of a 7th-chord inversion
+   *  must never be doubled in any upper part. Pass the forbidden pitch class when the
+   *  chord is an inverted 7th / diminished-7th (bassPcPref set, ≥4 distinct pcs). */
+  forbiddenDoublingPc?: number | null;
 }): number {
-  const { bass, tenor, alto, sopr, prev, targets, rootPc } = params;
+  const { bass, tenor, alto, sopr, prev, targets, rootPc, forbiddenDoublingPc } = params;
   let score = 0;
   score += Math.abs(bass - targets.bassTarget) * 0.6;
   score += Math.abs(tenor - targets.tenorTarget) * 0.6;
@@ -214,6 +218,21 @@ function scoreTriple(params: {
       score += 20;
   }
 
+  // ── Rimsky-Korsakov p. 65: consecutive octaves between upper parts ────────
+  // "Consecutive octaves between the upper parts are not permissible."
+  // Applies to the alto–tenor pair (S-B and S-T are already checked above).
+  if (prev.prevA !== null && prev.prevT !== null) {
+    if (
+      isParallelPerfect({
+        prevUpper: prev.prevA,
+        prevLower: prev.prevT,
+        nextUpper: alto,
+        nextLower: tenor
+      })
+    )
+      score += 18;
+  }
+
   // ── Schoenberg Theory of Harmony, p. 36: doubling preference ─────────────
   // "The first to be considered [for doubling] is the root; next the fifth;
   //  and only then, lastly, the third."
@@ -237,6 +256,17 @@ function scoreTriple(params: {
     }
   }
 
+  // ── Rimsky-Korsakov Principles of Orchestration p. 65 ────────────────────
+  // "The bass of an inversion of the dominant chord should never be doubled
+  //  in any of the upper parts. This applies also to other chords of the
+  //  seventh and diminished seventh."
+  // Penalty applied when tenor or alto doubles the inversion-bass pitch class.
+  if (forbiddenDoublingPc != null) {
+    const fbpc = forbiddenDoublingPc;
+    if (pc(tenor) === fbpc) score += 12.0;
+    if (pc(alto)  === fbpc) score += 12.0;
+  }
+
   return score;
 }
 
@@ -250,8 +280,9 @@ function pickBestTriple(params: {
   allowUnisonD4: boolean;
   enforceOrdering: boolean;
   rootPc?: number;
+  forbiddenDoublingPc?: number | null;
 }): { bass: number; tenor: number; alto: number; score: number } | null {
-  const { bassCands, tenorCands, altoCands, sopr, prev, targets, allowUnisonD4, enforceOrdering, rootPc } = params;
+  const { bassCands, tenorCands, altoCands, sopr, prev, targets, allowUnisonD4, enforceOrdering, rootPc, forbiddenDoublingPc } = params;
   let best: { bass: number; tenor: number; alto: number; score: number } | null = null;
 
   for (const bass of bassCands) {
@@ -265,7 +296,7 @@ function pickBestTriple(params: {
         } else {
           if (alto >= sopr) continue;
         }
-        const score = scoreTriple({ bass, tenor, alto, sopr, prev, targets, rootPc });
+        const score = scoreTriple({ bass, tenor, alto, sopr, prev, targets, rootPc, forbiddenDoublingPc });
         if (!best || score < best.score) best = { bass, tenor, alto, score };
       }
     }
@@ -309,6 +340,12 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
   const bassPref = parsedChord.bassPcPref !== null ? parsedChord.bassPcPref : parsedChord.rootPc;
   // Schoenberg doubling preference: pass root pc so scoreTriple can reward/penalise doublings.
   const chordRootPc = parsedChord.rootPc;
+  // Rimsky-Korsakov p. 65: bass of a 7th-chord inversion must never be doubled in upper parts.
+  // Condition: (a) slash-bass / inversion present, (b) chord has ≥4 distinct pcs (7th or dim7).
+  const forbiddenDoublingPc: number | null =
+    hasSlashBass && parsedChord.bassPcPref !== null && chordPcs.length >= 4
+      ? parsedChord.bassPcPref
+      : null;
 
   const baseBassCands = makeCandidates(chordPcs, ranges.Bass, bassPref, lockBassToPref);
   const tenorCands = makeCandidates(chordPcs, ranges.Tenor, null, false);
@@ -325,7 +362,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
     targets,
     allowUnisonD4,
     enforceOrdering: true,
-    rootPc: chordRootPc
+    rootPc: chordRootPc,
+    forbiddenDoublingPc
   });
 
   if (!best && lockBassToPref && !hasSlashBass) {
@@ -339,7 +377,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       targets,
       allowUnisonD4,
       enforceOrdering: true,
-      rootPc: chordRootPc
+      rootPc: chordRootPc,
+      forbiddenDoublingPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Ordering conflict, relaxed bass preference.`);
@@ -357,7 +396,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       targets,
       allowUnisonD4,
       enforceOrdering: true,
-      rootPc: chordRootPc
+      rootPc: chordRootPc,
+      forbiddenDoublingPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Applied octave/voicing repair to satisfy ordering.`);
@@ -375,7 +415,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       targets,
       allowUnisonD4,
       enforceOrdering: false,
-      rootPc: chordRootPc
+      rootPc: chordRootPc,
+      forbiddenDoublingPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Hard constraint collision, used closest chord tones.`);
@@ -393,7 +434,8 @@ export function repairVoicingForBeat(input: RepairInput): RepairResult | null {
       targets,
       allowUnisonD4,
       enforceOrdering: false,
-      rootPc: chordRootPc
+      rootPc: chordRootPc,
+      forbiddenDoublingPc
     });
     if (best) {
       warnings.push(`[satb][repair] ${label}: Slash bass out of range, relaxed to chord tone.`);
