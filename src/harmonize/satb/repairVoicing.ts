@@ -229,7 +229,7 @@ function scoreTriple(params: {
         } else {
           const interval = ((pitchClass - rootPc) + 12) % 12;
           if (interval === 3 || interval === 4) {
-            score += 2.5; // third doubling least preferred
+            score += 5.0; // third doubling least preferred (Schoenberg p. 36)
           }
           // fifth (interval === 7): neutral
         }
