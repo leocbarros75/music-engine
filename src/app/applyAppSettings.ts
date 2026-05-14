@@ -1482,7 +1482,10 @@ export function applyAppSettings(
   const useHomorhythmic = textureMode === "homophony_homorhythmic";
   const useMelodyAccomp = textureMode === "homophony_melody_accompaniment";
   const usePolyphonic = textureMode === "polyphony" || accompaniment === "polyphonic";
-  const useHomophonic = accompaniment === "homophonic" || isChordal || useHomorhythmic;
+  // Polyphonic mode takes precedence: when usePolyphonic is true, the homophonic
+  // early-return block must not fire (it would use arrangeStringEnsemble block-chord
+  // DP instead of arrangeStringPolyphonic, producing identical choral texture).
+  const useHomophonic = (accompaniment === "homophonic" || isChordal || useHomorhythmic) && !usePolyphonic;
   const wantsPianoBeginner = wantsPiano && settings.level === "beginner";
   const wantsPianoChordal = wantsPiano && isChordal;
   const chordalAllowed = wantsPianoChordal && settings.level === "beginner";

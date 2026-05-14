@@ -946,7 +946,16 @@ export default function SettingsForm({ settings, onChange }: Props) {
             <label>Texture Mode</label>
             <select
               value={settings.textureMode}
-              onChange={(e) => update("textureMode", e.target.value as Settings["textureMode"])}
+              onChange={(e) => {
+                const mode = e.target.value as Settings["textureMode"];
+                // Sync accompaniment so the server's usePolyphonic / useHomophonic
+                // flags are never both true at once (which routes strings through the
+                // block-chord DP arranger instead of the polyphonic counterpoint engine).
+                const next: Partial<Settings> = { textureMode: mode };
+                if (mode === "polyphony") next.accompaniment = "polyphonic";
+                else if (settings.accompaniment === "polyphonic") next.accompaniment = "homophonic";
+                onChange({ ...settings, ...next });
+              }}
             >
               {TEXTURE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
