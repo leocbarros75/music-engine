@@ -64,6 +64,16 @@ export type ProfileWeights = {
    * separated by fewer than 5 semitones.
    */
   lowRegisterSpacingPenalty: number;
+  /**
+   * Adler Study of Orchestration p. 135: "One usually leaves greater space
+   * between the lower than between the upper instruments, just as there are
+   * greater distances between the more sonorous lower partials than between
+   * the upper partials of the overtone series."
+   * Penalty fires for each adjacent pair whose interval is narrower than
+   * the adjacent pair immediately above it (cb↔vc ≥ vc↔vla ≥ vla↔vln2 ≥ vln2↔vln1).
+   * Only active when all five voices are sounding simultaneously.
+   */
+  overtoneSpacingPenalty: number;
 };
 
 export type CandidateState = {

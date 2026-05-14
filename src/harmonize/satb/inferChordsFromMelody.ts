@@ -242,6 +242,45 @@ function firstMelodyMidiInMeasure(measure: any, melodyVoice: number | null): num
   return Number(notes[0]!.midi);
 }
 
+// ── Hindemith Craft of Musical Composition, Ch. IV §4, p. 122: root-progression quality ─────
+// "A progression based on the interval of a fifth... is the strongest of all chord-progressions.
+//  [After fourth, third, second.]  The experience we have had with Series 2 teaches us that a
+//  chord-progression based on a root-progression of a tritone will be the least valuable of all."
+// Returns true when the pitch-class distance between two chord roots equals exactly 6 semitones.
+function rootMotionIsTritone(
+  prevDeg: number | null,
+  nextDeg: number,
+  triads: DiatonicTriad[]
+): boolean {
+  if (prevDeg === null) return false;
+  const prevTriad = triads.find((t) => t.degree === prevDeg);
+  const nextTriad = triads.find((t) => t.degree === nextDeg);
+  if (!prevTriad || !nextTriad) return false;
+  const diff = Math.abs(prevTriad.rootPc - nextTriad.rootPc);
+  // Pitch-class distance is always measured in [0, 6] (fold at 6, since tritone = 6 = its own inverse)
+  const pcDist = diff > 6 ? 12 - diff : diff;
+  return pcDist === 6;
+}
+
+// ── Piston Harmony Ch. 5, p. 48: strong vs. weak progressions ─────────────────────────────
+// "Progressions with root moving by fourth, fifth, or second are strong progressions."
+// "A progression with root moving up a third is a weak progression."
+// Returns the root interval class: "strong" (4th/5th/2nd), "weak" (3rd up), or "neutral".
+function progressionStrength(
+  fromDeg: number,
+  toDeg: number,
+  scaleLen: number = 7
+): "strong" | "weak" | "neutral" {
+  // Interval in scale steps (mod 7, 1-based degrees)
+  const interval = ((toDeg - fromDeg + scaleLen) % scaleLen) as number; // 0..6
+  // Up by 2nd (1 step) or 4th (3 steps) or 5th (4 steps): strong
+  if (interval === 1 || interval === 3 || interval === 4) return "strong";
+  // Up by 3rd (2 steps): weak
+  if (interval === 2) return "weak";
+  // Down by 3rd (5 steps up = 2 down): neutral-ish (Piston: "not definitely either")
+  return "neutral";
+}
+
 function progressionPenalty(prevDeg: number | null, nextDeg: number): number {
   if (prevDeg === null) return 0;
 
@@ -330,8 +369,55 @@ export function inferChordsFromMelody(inScore: ScoreModel): ChordEvent[] {
 
     let best = candidates[0] ?? triads[0]!;
     let bestScore = Number.POSITIVE_INFINITY;
+
+    // Relative position in the freely-chosen portion of the piece.
+    // The last 2 measures are forced (V, I), so inner measures run 0..measures.length-3.
+    const innerLen = Math.max(1, measures.length - 2);
+    const relPos = i / innerLen; // 0 = first inner measure, 1 = last inner measure
+
     for (const c of candidates.length ? candidates : triads) {
-      const score = progressionPen(prevDeg, c.degree) + (c.degree === 7 ? 3 : 0);
+      let score = progressionPen(prevDeg, c.degree) + (c.degree === 7 ? 3 : 0);
+
+      // ── Piston Harmony Ch. 12, p. 132: deceptive cadence V→VI ───────────────
+      // "By far the most frequent alternative to V-I is V-VI."
+      // "The use of a deceptive cadence near the end of a piece helps to sustain
+      //  the musical interest at the moment when the final authentic cadence is
+      //  expected."
+      // The problem: V→vi is in goodPairs (score 0) but so is V→I, and since I
+      // appears first in the sorted candidates list it always wins the tie.
+      // Fix: give vi a score bonus in the second half of inner measures so it
+      // is genuinely preferred once per phrase over the routine V→I resolution.
+      if (prevDeg === 5 && c.degree === 6 && relPos >= 0.5) {
+        score -= 1.5; // vi beats I (score 0) when the melody supports it
+      }
+
+      // ── Piston Harmony Ch. 5, p. 48: strong progressions on downbeats ───────
+      // Penalise weak progressions (root moves up a diatonic 3rd) very mildly —
+      // they sound fine but are less decisive. This nudges the algorithm toward
+      // "strong" root motion (4th/5th/2nd) more often than the algorithm's bare
+      // pref() ordering does, without forbidding weak progressions outright.
+      if (prevDeg !== null) {
+        const strength = progressionStrength(prevDeg, c.degree);
+        if (strength === "weak") score += 0.5;
+      }
+
+      // ── Hindemith Craft of Musical Composition, Ch. IV §4, p. 122: tritone root-motion ───
+      // "A chord-progression based on a root-progression of a tritone will be the least
+      //  valuable of all."  The tritone between roots (6 semitones in pitch-class space)
+      //  creates harmonic ambiguity and is ranked below even weak progressions.
+      if (rootMotionIsTritone(prevDeg, c.degree, triads)) {
+        score += 3; // equal to viidim penalty: both represent maximum harmonic instability
+      }
+
+      // ── Hindemith Craft of Musical Composition, Ch. IV §3, p. 115: opening stability ─────
+      // "The first and last of these harmonies… are the best and most satisfying."
+      // Harmonic fluctuation should begin with stable chords (Group I): degree 7 (viidim)
+      // is the most tense diatonic chord and is inappropriate as an opening harmony.
+      // Already penalised +3 above; add an extra +2 for the first two inner measures.
+      if (i <= 1 && c.degree === 7) {
+        score += 2;
+      }
+
       if (score < bestScore) {
         bestScore = score;
         best = c;

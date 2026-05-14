@@ -3,7 +3,7 @@ import type { ScoreModel } from "../../score/types";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import { inferChordsFromMelody, inferChordsFromAllVoices } from "./inferChordsFromMelody";
 import { repairVoicingForBeat } from "./repairVoicing";
-import { addPassingTones, addCadentialSuspension } from "./addPassingTones";
+import { addPassingTones, addCadentialSuspension, add76Suspension } from "./addPassingTones";
 import { parseChordSymbol as parseChordSymbolExt } from "./chordSymbol";
 import {
   orderingOk,
@@ -1342,6 +1342,17 @@ export function harmonizeSatbFromChords(
             }
           }
 
+          // C.P.E. Bach, Essay on the True Art of Playing Keyboard Instruments,
+          // Ch. V §34, p. 203: "When the bass rises or falls a second, all upper
+          // voices must move contrary to it."
+          if (bassMidi !== null && prevB !== null && prevT !== null) {
+            const bassStep = bassMidi - prevB;
+            if (Math.abs(bassStep) <= 2 && bassStep !== 0) {
+              const voiceDir = candT - prevT;
+              if ((bassStep > 0 && voiceDir > 0) || (bassStep < 0 && voiceDir < 0)) pen += 10;
+            }
+          }
+
           return pen;
         };
 
@@ -1459,6 +1470,17 @@ export function harmonizeSatbFromChords(
             if (pc(rootPc) === domRootPc) {
               const leadingTonePc = (domRootPc + 4) % 12;
               if (pc(candA) === leadingTonePc) pen += 30;
+            }
+          }
+
+          // C.P.E. Bach, Essay on the True Art of Playing Keyboard Instruments,
+          // Ch. V §34, p. 203: "When the bass rises or falls a second, all upper
+          // voices must move contrary to it."
+          if (bassMidi !== null && prevB !== null && prevA !== null) {
+            const bassStep = bassMidi - prevB;
+            if (Math.abs(bassStep) <= 2 && bassStep !== 0) {
+              const voiceDir = candA - prevA;
+              if ((bassStep > 0 && voiceDir > 0) || (bassStep < 0 && voiceDir < 0)) pen += 10;
             }
           }
 
@@ -1887,7 +1909,11 @@ export function harmonizeSatbFromChords(
   };
 
   if (accompanimentType !== "polyphonic") {
-    const outWithPT = addPassingTones(out as ScoreModel);
+    // Run 7-6 suspension detection first (before passing tones subdivide the beat structure),
+    // then add passing/neighbor tones, then apply the cadential 4-3 suspension.
+    // Order matters: add76Suspension needs the unembellished beat-by-beat harmonization.
+    const outWith76 = add76Suspension(out as ScoreModel);
+    const outWithPT = addPassingTones(outWith76);
     const outWithSus = addCadentialSuspension(outWithPT);
     return outWithSus;
   }

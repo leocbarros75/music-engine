@@ -80,37 +80,58 @@ function inferKeyFromChords(chords: ParsedChord[]): { fifths: number; mode: "maj
 /**
  * Choose the best MIDI note for the soprano melody at a given chord.
  *
- * Prefers smooth voice-leading (small leap from the previous note) and applies
- * a gentle arch-shape contour: the melody trends upward in the first half of the
- * progression and downward in the second half.
+ * Implements the wave-shape arch principle from Schoenberg,
+ * *Fundamentals of Musical Composition*, Ch. IV, p. 16:
+ * "A well-balanced melody progresses in waves, i.e. each elevation is countered by
+ *  a depression. It approaches a high point or climax through a series of intermediate
+ *  lesser high points, interrupted by recessions. Upward movements are balanced by
+ *  downward movements; large intervals are compensated for by conjunct movement in the
+ *  opposite direction. A good melody generally remains within a reasonable compass,
+ *  not straying too far from a central range."
+ *
+ * Arch peak falls at ~60% of the progression (not the midpoint), as is characteristic
+ * of well-formed classical themes. An explicit numeric arch-target is computed so the
+ * melody is pulled toward the correct register at each phase, rather than relying only
+ * on directional bias.
  *
  * @param chordPcs  All pitch classes of this chord (root, 3rd, 5th, extensions…)
  * @param prevMidi  Previous soprano MIDI note, or null for the first chord
  * @param rangeMin  Lowest allowed MIDI (60 = C4)
  * @param rangeMax  Highest allowed MIDI (81 = A5)
  * @param phase     Position in the progression: 0.0 = first chord, 1.0 = last chord
+ * @param lastLeap  Signed semitone interval of the previous melodic move (+ = up, − = down)
  */
 function chooseSopranoMidi(
   chordPcs: number[],
   prevMidi: number | null,
   rangeMin: number,
   rangeMax: number,
-  phase: number
+  phase: number,
+  lastLeap = 0
 ): number {
   // Collect all MIDI candidates within the soprano range
   const candidates: number[] = [];
-  for (const pc of chordPcs) {
+  for (const p of chordPcs) {
     for (let m = rangeMin; m <= rangeMax; m++) {
-      if (((m % 12) + 12) % 12 === pc) candidates.push(m);
+      if (((m % 12) + 12) % 12 === p) candidates.push(m);
     }
   }
   if (!candidates.length) return 72; // C5 fallback
 
+  // ── Schoenberg arch: explicit contour target, peak at ~60% ───────────────
+  // "approaches a high point through a series of intermediate lesser high points"
+  // Peak at 60% of the phrase, not 50%.  archHeight ∈ [0, 1].
+  const archHeight = phase <= 0.6 ? phase / 0.6 : (1.0 - phase) / 0.4;
+  // Open near E4 (64); peak near B4 (71) — P5 above opening.
+  // "A good melody generally remains within a reasonable compass."
+  const baseTarget = Math.max(rangeMin, Math.min(rangeMin + 4, 64));  // ~E4
+  const peakTarget = Math.min(baseTarget + 7, rangeMax - 5);          // ~B4
+  const archTarget = baseTarget + archHeight * (peakTarget - baseTarget);
+
   if (prevMidi === null) {
-    // First chord: land in the upper-middle of the register (around E5 = 76)
-    const target = 76;
+    // First chord: begin near the base target (tonic/3rd area — stable opening).
     return candidates.reduce((best, c) =>
-      Math.abs(c - target) < Math.abs(best - target) ? c : best
+      Math.abs(c - archTarget) < Math.abs(best - archTarget) ? c : best
     );
   }
 
@@ -119,16 +140,37 @@ function chooseSopranoMidi(
 
   for (const c of candidates) {
     const leap = Math.abs(c - prevMidi);
-    let score  = leap;                           // minimise leap
+    let score  = 0;
 
-    if (leap === 0)  score += 3;                 // slight penalty for exact repetition
-    if (leap > 5)    score += (leap - 5) * 2;   // steep penalty for large leaps
+    // Primary: arch proximity — pulls melody toward the arch contour target.
+    // Schoenberg p.16: climax approached systematically, receded from afterward.
+    score += Math.abs(c - archTarget) * 0.8;
 
-    // Arch contour: first half favours ascent, second half favours descent
-    if (phase < 0.45 && c < prevMidi && leap > 0) score += 2;
-    if (phase > 0.55 && c > prevMidi && leap > 0) score += 2;
+    // Secondary: smooth voice-leading (small leaps preferred).
+    if (leap === 0)  score += 3;                  // penalty for note repetition
+    if (leap > 7)    score += (leap - 7) * 2.5;  // steep penalty for leaps > P5
 
-    // Mild preference against always landing on the root (more interest on 3rd/5th)
+    // Leap compensation: after a large leap, prefer opposite-direction stepwise motion.
+    // Schoenberg p.16: "large intervals are compensated for by conjunct movement
+    // in the opposite direction."
+    if (Math.abs(lastLeap) >= 5) {
+      const leapDir = lastLeap > 0 ? 1 : -1;
+      const candDir = c > prevMidi ? 1 : c < prevMidi ? -1 : 0;
+      if (candDir === leapDir)   score += 3;   // penalise continuing the leap direction
+      if (candDir === -leapDir)  score -= 1;   // reward turning back
+    }
+
+    // C.P.E. Bach, Essay on the True Art of Playing Keyboard Instruments,
+    // Ch. V §36, p. 205: "The soprano can always take the octave or the third
+    // in the final chord, but never the fifth."
+    if (phase >= 0.95 && chordPcs.length >= 3) {
+      const fifthPc = (chordPcs[2] % 12 + 12) % 12;
+      const candPc  = (c % 12 + 12) % 12;
+      if (candPc === fifthPc) score += 8;                           // never the fifth at cadence
+      if (candPc === (chordPcs[0] % 12 + 12) % 12) score -= 2;     // octave is best
+    }
+
+    // Mild preference against root-monotony (melodic interest on 3rd/5th).
     if (chordPcs.length > 1 && ((c % 12 + 12) % 12) === chordPcs[0]) score += 0.8;
 
     if (score < bestScore) { bestScore = score; best = c; }
@@ -279,6 +321,7 @@ export function chordTextToMusicxml(
   const SOPR_MAX = 81;
   const totalChords = chords.length;
   let prevSopranoMidi: number | null = null; // tracks contour across measures
+  let prevLeap = 0;                          // signed semitone of last melodic move
 
   const measureCount = Math.max(...chords.map((c) => c.measure));
   const measureXmls: string[] = [];
@@ -310,8 +353,9 @@ export function chordTextToMusicxml(
       // global chord index for phase calculation
       const globalIdx = chords.indexOf(chord);
       const phase     = totalChords > 1 ? globalIdx / (totalChords - 1) : 0;
-      const midi      = chooseSopranoMidi(chordPcs, prevSopranoMidi, SOPR_MIN, SOPR_MAX, phase);
+      const midi      = chooseSopranoMidi(chordPcs, prevSopranoMidi, SOPR_MIN, SOPR_MAX, phase, prevLeap);
       const { step, alter, octave } = midiToNote(midi);
+      prevLeap = prevSopranoMidi !== null ? midi - prevSopranoMidi : 0;
       prevSopranoMidi = midi;
       const hXml = harmonyXml(chord.symbol);
       measureContent += noteXml(step, alter, octave, beats * DIVISIONS, beats === 4 ? "whole" : "half", true, hXml);
@@ -327,8 +371,9 @@ export function chordTextToMusicxml(
         const chordPcs = parsed?.pcs ?? [parsed?.rootPc ?? 0];
         const globalIdx = chords.indexOf(chord);
         const phase     = totalChords > 1 ? globalIdx / (totalChords - 1) : 0;
-        const midi      = chooseSopranoMidi(chordPcs, prevSopranoMidi, SOPR_MIN, SOPR_MAX, phase);
+        const midi      = chooseSopranoMidi(chordPcs, prevSopranoMidi, SOPR_MIN, SOPR_MAX, phase, prevLeap);
         const { step, alter, octave } = midiToNote(midi);
+        prevLeap = prevSopranoMidi !== null ? midi - prevSopranoMidi : 0;
         prevSopranoMidi = midi;
         const noteType = dur >= totalDivisions ? "whole" : dur >= totalDivisions / 2 ? "half" : "quarter";
         const hXml = harmonyXml(chord.symbol);

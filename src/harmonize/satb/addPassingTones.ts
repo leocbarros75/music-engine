@@ -243,7 +243,7 @@ export function addCadentialSuspension(scoreModel: ScoreModel): ScoreModel {
   const divisions = penultMeasure.attributes?.divisions ?? 2;
 
   // Find alto notes on beat 0 and beat 1 in the penultimate measure
-  const newEvents: NoteEvent[] = penultMeasure.events.map((event) => {
+  const newAltoEvents: NoteEvent[] = penultMeasure.events.map((event) => {
     if (event.type !== "note" || event.isRest) return event;
     if (typeof event.midi !== "number") return event;
 
@@ -288,12 +288,242 @@ export function addCadentialSuspension(scoreModel: ScoreModel): ScoreModel {
   const newAltoPart = {
     ...altoPart,
     measures: altoPart.measures.map((m, idx) =>
-      idx === penultIdx ? { ...m, events: newEvents } : m
+      idx === penultIdx ? { ...m, events: newAltoEvents } : m
     ),
   };
 
-  const newParts = scoreModel.parts.map((p, idx) =>
+  let newParts = scoreModel.parts.map((p, idx) =>
     idx === 1 ? newAltoPart : p
   );
+
+  // ── Aldwell & Schachter Unit 21 §12, p. 354: avoid anticipating the tone of resolution ──
+  // "In a more or less homogeneous texture (four-part choral), it is usually best to avoid
+  //  having the tone of resolution in another voice before the suspension actually resolves."
+  // The 4-3 suspension in alto resolves to thirdOfV (leading tone) on beat 1. If tenor
+  // already has thirdOfV on beat 0 (alongside the suspension), it anticipates the resolution.
+  // Move tenor from leading tone to domPc (5th of V chord) to correct this.
+  const tenorPart = scoreModel.parts[2]; // Tenor is index 2
+  if (tenorPart) {
+    const penultTenorMeasure = tenorPart.measures[penultIdx]!;
+    if (penultTenorMeasure) {
+      const tenorDivisions = penultTenorMeasure.attributes?.divisions ?? divisions;
+      let tenorModified = false;
+      const newTenorEvents: NoteEvent[] = penultTenorMeasure.events.map((event) => {
+        if (event.type !== "note" || event.isRest || typeof event.midi !== "number") return event;
+        const beatPos = Math.round(Number(event.t) / tenorDivisions);
+        if (beatPos !== 0) return event;
+        if (pc(event.midi) !== thirdOfV) return event;
+
+        // Tenor has the leading tone on beat 0 while alto has the 4-3 suspension.
+        // Replace with domPc (5th of V) — the dominant note holds perfectly here.
+        const oct = Math.floor(event.midi / 12);
+        const candidates = [
+          oct * 12 + domPc,
+          (oct - 1) * 12 + domPc,
+          (oct + 1) * 12 + domPc,
+        ].filter((m) => m >= 52 && m <= 64); // Tenor range E3–E4
+        if (!candidates.length) return event;
+        const closest = candidates.reduce((a, b) =>
+          Math.abs(a - event.midi!) <= Math.abs(b - event.midi!) ? a : b
+        );
+        if (Math.abs(closest - event.midi) <= 5) {
+          tenorModified = true;
+          return { ...event, midi: closest, pitch: midiToPitch(closest) };
+        }
+        return event;
+      });
+
+      if (tenorModified) {
+        const newTenorPart = {
+          ...tenorPart,
+          measures: tenorPart.measures.map((m, idx) =>
+            idx === penultIdx ? { ...m, events: newTenorEvents } : m
+          ),
+        };
+        newParts = newParts.map((p, idx) => idx === 2 ? newTenorPart : p);
+      }
+    }
+  }
+
   return { ...scoreModel, parts: newParts };
+}
+
+// ── Aldwell & Schachter Unit 21 §§9,12,16, pp. 352–357 ─────────────────────────
+// "The 7-6 suspension is accompanied by a 3rd and normally resolves into a 6/3
+//  chord." (§9)  "The most important suspension series contains 7-6s over a
+//  descending bass." (§16)  "Avoid having the tone of resolution in another voice
+//  before the suspension actually resolves." (§12)
+//
+// This function scans the inner voice (alto) for beats where the previous pitch
+// would form a 7th above the current bass, and the following beat resolves by
+// stepwise descent to a 6th. When all conditions are met — consonant preparation,
+// stepwise downward resolution, consonant resolution interval — the alto is held
+// on the suspension pitch (the 7th) instead of the chord tone for that beat.
+export function add76Suspension(scoreModel: ScoreModel): ScoreModel {
+  const altoPart = scoreModel.parts[1]; // Alto
+  const bassPart = scoreModel.parts[3]; // Bass
+  const soprPart = scoreModel.parts[0]; // Soprano (used for §12 anticipation warning)
+  if (!altoPart || !bassPart) return scoreModel;
+
+  const numMeasures = altoPart.measures.length;
+  if (numMeasures < 4) return scoreModel; // need room outside cadential area
+
+  // Consonant intervals (pitch-class distance from bass upward, mod 12)
+  const CONSONANT = new Set([0, 3, 4, 5, 7, 8, 9]); // P1 m3 M3 P4 P5 m6 M6
+
+  // Build a flat chronological list of (mIdx, beatPos, altoMidi, bassMidi, soprMidi)
+  type BeatEntry = {
+    mIdx: number;
+    beatPos: number;
+    divisions: number;
+    altoMidi: number;
+    bassMidi: number;
+    soprMidi: number;
+  };
+  const allBeats: BeatEntry[] = [];
+
+  for (let mIdx = 0; mIdx < numMeasures; mIdx++) {
+    const altoM = altoPart.measures[mIdx]!;
+    const bassM = bassPart.measures[mIdx]!;
+    const soprM = soprPart?.measures[mIdx];
+    const divs = altoM.attributes?.divisions ?? 1;
+
+    // Collect true beat positions from alto quarter-beat notes (skip passing tones
+    // which have non-integer t/divisions values when divisions > 1).
+    // We take the earliest note at each beat position (= the chord tone, not a PT).
+    const altoByBeat = new Map<number, NoteEvent>();
+    for (const ev of altoM.events) {
+      if (ev.type !== "note" || ev.isRest || typeof ev.midi !== "number") continue;
+      const bp = Math.round(Number(ev.t) / divs);
+      if (!altoByBeat.has(bp)) altoByBeat.set(bp, ev);
+    }
+
+    const bassByBeat = new Map<number, NoteEvent>();
+    for (const ev of bassM.events) {
+      if (ev.type !== "note" || ev.isRest || typeof ev.midi !== "number") continue;
+      const bp = Math.round(Number(ev.t) / divs);
+      if (!bassByBeat.has(bp)) bassByBeat.set(bp, ev);
+    }
+
+    const soprByBeat = new Map<number, NoteEvent>();
+    if (soprM) {
+      for (const ev of soprM.events) {
+        if ((ev as any).type !== "note" || (ev as any).isRest || typeof (ev as any).midi !== "number") continue;
+        const bp = Math.round(Number((ev as any).t) / divs);
+        if (!soprByBeat.has(bp)) soprByBeat.set(bp, ev as NoteEvent);
+      }
+    }
+
+    for (const [bp, altoEv] of Array.from(altoByBeat.entries()).sort(([a], [b]) => a - b)) {
+      // For bass, pick the sustaining note at this beat (it might be a longer note)
+      let bassEv = bassByBeat.get(bp);
+      if (!bassEv) {
+        // Find the bass note that started before bp and is still sounding
+        for (const [bbp, bev] of bassByBeat) {
+          if (bbp <= bp) bassEv = bev;
+        }
+      }
+      if (!bassEv || typeof bassEv.midi !== "number") continue;
+
+      const soprEv = soprByBeat.get(bp);
+      allBeats.push({
+        mIdx,
+        beatPos: bp,
+        divisions: divs,
+        altoMidi: Number(altoEv.midi),
+        bassMidi: Number(bassEv.midi),
+        soprMidi: soprEv && typeof (soprEv as any).midi === "number" ? Number((soprEv as any).midi) : -1,
+      });
+    }
+  }
+
+  // Map of (mIdx:beatPos) → new alto MIDI for suspension modifications
+  const modMap = new Map<string, number>();
+
+  let suspensionCount = 0;
+  const MAX_SUSPENSIONS = 3; // cap to avoid over-use
+
+  for (let i = 1; i < allBeats.length - 1; i++) {
+    const prev = allBeats[i - 1]!;
+    const curr = allBeats[i]!;
+    const next = allBeats[i + 1]!;
+
+    // Skip last 2 measures — handled by addCadentialSuspension
+    if (curr.mIdx >= numMeasures - 2) continue;
+
+    // Don't chain: if the previous beat was itself a suspension, skip
+    if (modMap.has(`${prev.mIdx}:${prev.beatPos}`)) continue;
+
+    const prevAlto = prev.altoMidi;
+    const currBass = curr.bassMidi;
+    const prevBass = prev.bassMidi;
+
+    // 1. Does prevAlto form a 7th above currBass? (minor 7th = 10 st, major 7th = 11 st)
+    const suspInterval = ((pc(prevAlto) - pc(currBass)) + 12) % 12;
+    if (suspInterval !== 10 && suspInterval !== 11) continue;
+
+    // 2. Preparation was consonant: prevAlto vs prevBass
+    const prepInterval = ((pc(prevAlto) - pc(prevBass)) + 12) % 12;
+    if (!CONSONANT.has(prepInterval)) continue;
+
+    // 3. The suspension note is different from what the engine currently placed at curr
+    if (prevAlto === curr.altoMidi) continue;
+
+    // 4. Resolution (next beat) is stepwise descent: 1 or 2 semitones down from prevAlto
+    const step = prevAlto - next.altoMidi;
+    if (step !== 1 && step !== 2) continue;
+
+    // 5. Resolution interval is consonant (next alto vs curr bass or next bass)
+    const resInterval = ((pc(next.altoMidi) - pc(currBass)) + 12) % 12;
+    if (!CONSONANT.has(resInterval)) continue;
+
+    // 6. Suspension pitch must remain within alto range (G3–A4 = MIDI 55–69)
+    if (prevAlto < 55 || prevAlto > 69) continue;
+
+    // 7. Suspension note must not exceed the soprano at curr beat
+    if (curr.soprMidi !== -1 && prevAlto >= curr.soprMidi) continue;
+
+    // All conditions satisfied — schedule this beat for modification
+    modMap.set(`${curr.mIdx}:${curr.beatPos}`, prevAlto);
+
+    // §12: warn if soprano already has the resolution pitch class
+    if (curr.soprMidi !== -1 && pc(curr.soprMidi) === pc(next.altoMidi)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[satb] 7-6 suspension at m${curr.mIdx + 1} beat ${curr.beatPos}: ` +
+        `soprano (MIDI ${curr.soprMidi}) anticipates resolution tone ` +
+        `(pc ${pc(next.altoMidi)}). Aldwell & Schachter §12, p. 354: ` +
+        `"avoid having the tone of resolution in another voice before the suspension resolves."`
+      );
+    }
+
+    if (++suspensionCount >= MAX_SUSPENSIONS) break;
+  }
+
+  if (modMap.size === 0) return scoreModel;
+
+  const newAltoPart = {
+    ...altoPart,
+    measures: altoPart.measures.map((measure, mIdx) => {
+      const hasMods = Array.from(modMap.keys()).some((k) => k.startsWith(`${mIdx}:`));
+      if (!hasMods) return measure;
+
+      const divs = measure.attributes?.divisions ?? 1;
+      const newEvents = measure.events.map((event) => {
+        if (event.type !== "note" || event.isRest || typeof event.midi !== "number") return event;
+        const bp = Math.round(Number(event.t) / divs);
+        const key = `${mIdx}:${bp}`;
+        const newMidi = modMap.get(key);
+        if (newMidi === undefined || newMidi === event.midi) return event;
+        return { ...event, midi: newMidi, pitch: midiToPitch(newMidi) };
+      });
+
+      return { ...measure, events: newEvents };
+    }),
+  };
+
+  return {
+    ...scoreModel,
+    parts: scoreModel.parts.map((p, idx) => (idx === 1 ? newAltoPart : p)),
+  };
 }
