@@ -11,13 +11,16 @@ import type {
   Voicing
 } from "./types";
 import { initRhythmState, updateRhythmState } from "./rhythmStratification";
+// Static import so the JSON is bundled by tsc and available in dist/ on Render.
+// (The old readJson(__dirname, ...) approach broke in Docker because the JSON
+//  file was never copied from src/ to dist/.)
+import defaultPolyphonyRulesJson from "./defaultPolyphonyRules.json";
 
 const VOICES: VoiceId[] = ["vln1", "vln2", "vla", "vc", "cb"];
 
 export function loadCounterpointRules(): CounterpointRules {
   const baseSpecies = readJson(path.join(process.cwd(), "rules", "counterpoint", "counterpoint_species_rules.json"));
   const baseVoiceLeading = readJson(path.join(process.cwd(), "rules", "harmony", "voiceleading_rules.json"));
-  const defaults = readJson(path.join(__dirname, "defaultPolyphonyRules.json"));
   const voiceleading = baseVoiceLeading ?? {};
   if (!voiceleading.voice_leading_constraints) voiceleading.voice_leading_constraints = {};
   if (!voiceleading.voice_leading_constraints.voice_crossing) {
@@ -36,7 +39,7 @@ export function loadCounterpointRules(): CounterpointRules {
   return {
     species: baseSpecies ?? {},
     voiceleading,
-    polyphony: (defaults?.polyphony ?? {}) as CounterpointRules["polyphony"]
+    polyphony: defaultPolyphonyRulesJson.polyphony as CounterpointRules["polyphony"]
   };
 }
 

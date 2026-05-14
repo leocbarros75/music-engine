@@ -88,6 +88,11 @@ const STRING_TEXTURE_OPTIONS: Array<{
     label: "Homophonic Block",
     value: "homophonic_block",
     help: "All 5 voices move in block chords with Adler overtone spacing: wide intervals in bass, close intervals in treble."
+  },
+  {
+    label: "Counterpoint (independent voices)",
+    value: "counterpoint",
+    help: "Each instrument has an independent melodic line with staggered entrances, motif imitation, and passing tones — like the Haydn/Mozart string quartet examples. Activates the full counterpoint engine."
   }
 ];
 
@@ -710,7 +715,20 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 <label>String Texture</label>
                 <select
                   value={currentTexture}
-                  onChange={(e) => update("stringTexture", e.target.value as Settings["stringTexture"])}
+                  onChange={(e) => {
+                    const tex = e.target.value as Settings["stringTexture"];
+                    // "Counterpoint" activates the polyphonic engine; all other
+                    // texture modes use the block-chord DP arranger.
+                    const next: Partial<Settings> = { stringTexture: tex };
+                    if (tex === "counterpoint") {
+                      next.textureMode = "polyphony";
+                      next.accompaniment = "polyphonic";
+                    } else if (settings.accompaniment === "polyphonic") {
+                      next.textureMode = "homophony_homorhythmic";
+                      next.accompaniment = "homophonic";
+                    }
+                    onChange({ ...settings, ...next });
+                  }}
                 >
                   {STRING_TEXTURE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -818,10 +836,21 @@ export default function SettingsForm({ settings, onChange }: Props) {
             <label>Accompaniment</label>
             <select
               value={settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic"}
-              onChange={(e) => update("accompaniment", e.target.value as Settings["accompaniment"])}
+              onChange={(e) => {
+                const acc = e.target.value as "homophonic" | "polyphonic";
+                const next: Partial<Settings> = { accompaniment: acc };
+                if (acc === "polyphonic") {
+                  next.textureMode = "polyphony";
+                  next.stringTexture = "counterpoint";
+                } else if (settings.stringTexture === "counterpoint") {
+                  next.stringTexture = "melody_harmony";
+                  next.textureMode = "homophony_homorhythmic";
+                }
+                onChange({ ...settings, ...next });
+              }}
             >
               <option value="homophonic">Homophonic</option>
-              <option value="polyphonic">Polyphonic</option>
+              <option value="polyphonic">Polyphonic (counterpoint)</option>
             </select>
             <div className="key-preview">
               <span className="slider-help">

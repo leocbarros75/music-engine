@@ -37,7 +37,7 @@ export type Settings = {
    * Adler-based string texture mode.
    * Only active when ensemble = "string_ensemble" and instrumentation = "auto".
    */
-  stringTexture?: "melody_harmony" | "melody_pizzicato" | "cello_melody" | "homophonic_block";
+  stringTexture?: "melody_harmony" | "melody_pizzicato" | "cello_melody" | "homophonic_block" | "counterpoint";
   /**
    * Reference example piece loaded into the string ensemble engine.
    */
