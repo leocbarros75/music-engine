@@ -25,11 +25,11 @@ const DEFAULT_SETTINGS: Settings = {
   tenorActivity: "less_active",
   altoActivity: "less_active",
   sopranoActivity: "less_active",
-  vln1Activity: "grounded",
-  vln2Activity: "less_active",
-  vlaActivity: "less_active",
-  vcActivity: "less_active",
-  cbActivity: "less_active",
+  vln1Activity: "grounded",    // melody is never subdivided
+  vln2Activity: "active",      // countermelody needs independent motion
+  vlaActivity: "active",       // inner voice needs motion for polyphony
+  vcActivity: "less_active",   // cello: bass + some motion
+  cbActivity: "grounded",      // double bass: steady harmonic anchor
   instrumentation: "auto",
   sopranoMelodyShare: 30,
   randomizeOffsets: true,

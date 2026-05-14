@@ -97,6 +97,18 @@ type PitchSpelling = { step: string; alter: number };
 type Activity = "grounded" | "less_active" | "active" | "high_active";
 
 /**
+ * For polyphonic string arrangements, inner voices (Vln II, Viola) need at
+ * least "active" activity to produce independent contrapuntal lines.  "Grounded"
+ * or "less_active" defaults produce block-chord (choral) texture instead.
+ * This helper raises the activity to `minLevel` without lowering it if the
+ * user has already chosen something higher.
+ */
+const ACTIVITY_ORDER: Activity[] = ["grounded", "less_active", "active", "high_active"];
+function promoteActivityForPolyphony(act: Activity, minLevel: Activity = "active"): Activity {
+  return ACTIVITY_ORDER.indexOf(act) < ACTIVITY_ORDER.indexOf(minLevel) ? minLevel : act;
+}
+
+/**
  * Schoenberg accompaniment density scaling (Fundamentals Ch. IX).
  *
  * "When the melody is ornate, the accompaniment should be neutral."
@@ -1759,8 +1771,14 @@ export function applyAppSettings(
                 const vln1Part = (stringScore.parts ?? []).find(
                   (p: any) => String(p?.name ?? "").toLowerCase().includes("violin i")
                 );
-                const rawVln2Act = (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity;
-                const rawVlaAct  = (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity;
+                // Promote inner voices to at least "active" for real counterpoint.
+                // Users can raise above "active" via the UI; we only floor, never lower.
+                const rawVln2Act = promoteActivityForPolyphony(
+                  (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity
+                );
+                const rawVlaAct = promoteActivityForPolyphony(
+                  (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity
+                );
                 const adaptedVln2Act = schoenbergScaleActivity(vln1Part, rawVln2Act);
                 const adaptedVlaAct  = schoenbergScaleActivity(vln1Part, rawVlaAct);
                 if (adaptedVln2Act !== rawVln2Act || adaptedVlaAct !== rawVlaAct) {
@@ -1925,8 +1943,14 @@ export function applyAppSettings(
                   return n.includes("soprano") || n.includes("violin i") || n.includes("melody");
                 }
               );
-              const rawVln2Act2 = (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity;
-              const rawVlaAct2  = (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity;
+              // Promote inner voices to at least "active" for real counterpoint.
+              // Users can raise above "active" via the UI; we only floor, never lower.
+              const rawVln2Act2 = promoteActivityForPolyphony(
+                (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity
+              );
+              const rawVlaAct2 = promoteActivityForPolyphony(
+                (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity
+              );
               const adaptedVln2Act2 = schoenbergScaleActivity(vln1SrcPart, rawVln2Act2);
               const adaptedVlaAct2  = schoenbergScaleActivity(vln1SrcPart, rawVlaAct2);
               if (adaptedVln2Act2 !== rawVln2Act2 || adaptedVlaAct2 !== rawVlaAct2) {

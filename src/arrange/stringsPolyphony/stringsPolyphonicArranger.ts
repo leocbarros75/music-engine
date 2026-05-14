@@ -172,8 +172,11 @@ function buildSlices(melodyPart: any, chords: ChordEvent[], melodyShift = 0): Sl
 
 function addRestsOnWeakBeats(candidateMap: Record<VoiceId, number[]>, slice: Slice): void {
   if (slice.isStrongBeat) return;
+  // vln1 is always the locked melody — never silenced.
+  // vln2 through cb all get a rest candidate on weak beats so the beam search
+  // can stagger entries and produce genuine counterpoint rather than block chords.
   for (const v of VOICES) {
-    if (v === "vln1" || v === "vln2") continue;
+    if (v === "vln1") continue;
     if (!candidateMap[v].includes(null as any)) {
       candidateMap[v] = [null as any, ...candidateMap[v]];
     }

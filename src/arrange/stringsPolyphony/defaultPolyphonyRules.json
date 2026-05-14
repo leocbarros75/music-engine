@@ -23,9 +23,9 @@
     },
     "rhythmicStratification": {
       "targetSubdivision": 0.5,
-      "maxVoiceDominance": 0.5,
-      "allAttackPenalty": 1.5,
-      "dominancePenalty": 2.0
+      "maxVoiceDominance": 0.30,
+      "allAttackPenalty": 4.0,
+      "dominancePenalty": 3.0
     },
     "celloSinger": {
       "bassAnchoringThreshold": 0.6,

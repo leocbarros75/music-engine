@@ -55,6 +55,14 @@ const BASS_ACTIVITY_OPTIONS: Array<{ label: string; value: NonNullable<Settings[
   { label: "Active (60%)", value: "active", help: "More 8th-note motion, passing/neighbor tones." },
   { label: "High active (100%)", value: "high_active", help: "Continuous motion where possible." }
 ];
+// Per-voice activity for string polyphony — includes "grounded" (hold note, no subdivision)
+// so Violin I and Double Bass can be locked while inner voices move independently.
+const STRING_ACTIVITY_OPTIONS: Array<{ label: string; value: string; help: string }> = [
+  { label: "Grounded (hold)", value: "grounded", help: "Hold the chord tone; no rhythmic subdivision." },
+  { label: "Less active (30%)", value: "less_active", help: "Occasional motion, mostly stable tones." },
+  { label: "Active (60%)", value: "active", help: "More 8th-note motion; passing/neighbor tones." },
+  { label: "High active (100%)", value: "high_active", help: "Continuous motion where possible." }
+];
 // Adler-based string texture modes (from "The Study of Orchestration", 3rd ed.)
 const STRING_TEXTURE_OPTIONS: Array<{
   label: string;
@@ -992,7 +1000,36 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {showPolyphonicControls && !showWoodwindPolyphonic && (
+          {/* ── String polyphony: per-voice activity ─────────────────────────── */}
+          {showStringPolyphonic && (
+            <>
+              {[
+                { label: "Violin I activity", key: "vln1Activity" as keyof Settings, def: "grounded",    help: vln1ActivityHelp },
+                { label: "Violin II activity", key: "vln2Activity" as keyof Settings, def: "active",     help: vln2ActivityHelp },
+                { label: "Viola activity",     key: "vlaActivity"  as keyof Settings, def: "active",     help: vlaActivityHelp  },
+                { label: "Cello activity",     key: "vcActivity"   as keyof Settings, def: "less_active", help: vcActivityHelp  },
+                { label: "Double Bass activity", key: "cbActivity" as keyof Settings, def: "grounded",   help: cbActivityHelp  },
+              ].map(({ label, key, def, help }) => (
+                <div className="field" key={String(key)}>
+                  <label>{label}</label>
+                  <select
+                    value={(settings[key] as string) ?? def}
+                    onChange={(e) => update(key, e.target.value as any)}
+                  >
+                    {STRING_ACTIVITY_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <div className="key-preview">
+                    Selected: <span className="key-badge">{titleize((settings[key] as string) ?? def)}</span>
+                    <span className="slider-help">{help}</span>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {showPolyphonicControls && !showWoodwindPolyphonic && !showStringPolyphonic && (
             <div className="field">
               <label>Polyphonic Activity (Bass)</label>
               <select
