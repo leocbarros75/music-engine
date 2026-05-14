@@ -141,12 +141,6 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     texture: "melody_harmony",
     help: "Late-Romantic melody-harmony texture. Vln I leads with lyrical Slavic-inflected themes; Vln II and Vla provide close inner-voice support; Vc on characteristic bass lines."
   },
-  {
-    label: "Beethoven — String Quartet Op. 18 No. 4, 1st mvt",
-    value: "beethoven_op18_no4_mvt1",
-    texture: "melody_harmony",
-    help: "Early Beethoven quartet — clean four-voice writing, good crossing/spacing reference."
-  },
   // cello_melody
   {
     label: "Dvořák — String Quartet No. 12 Op. 96 'American'",
@@ -154,43 +148,13 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     texture: "cello_melody",
     help: "Cello carries rich lyrical counter-melodies throughout; characteristic pentatonic folk idiom. Cello D-string used prominently. Reference for warm cello-foreground texture."
   },
-  {
-    label: "Schubert — String Quintet D. 956, 2nd mvt",
-    value: "schubert_d956_mvt2",
-    texture: "cello_melody",
-    help: "Cello 1 as soloist above Cello 2 drone. Definitive reference for cello foreground texture."
-  },
   // homophonic_block
-  {
-    label: "Barber — Adagio for Strings Op. 11",
-    value: "barber_adagio",
-    texture: "homophonic_block",
-    help: "Maximum block-chord density with Adler overtone spacing: wide bass intervals, close treble voicing."
-  },
-  {
-    label: "Brahms — String Sextet Op. 18, 2nd mvt",
-    value: "brahms_op18_mvt2",
-    texture: "homophonic_block",
-    help: "Rich block-chord texture across 6 string voices. Wide bass spacing with close upper-voice clusters."
-  },
   // melody_pizzicato
-  {
-    label: "Tchaikovsky — Serenade for Strings Op. 48, 2nd mvt (Waltz)",
-    value: "tchaikovsky_op48_mvt2",
-    texture: "melody_pizzicato",
-    help: "Mixed arco melody over pizzicato chord accompaniment. Classic melody + pizz texture reference."
-  },
   {
     label: "Haydn — String Quartet Op. 64 No. 5 'The Lark', 1st mvt (D major)",
     value: "haydn_op64_no5_mvt1",
     texture: "melody_pizzicato",
     help: "Lower three voices play staccato ostinato (note–rest–note–rest in 8ths) for 7 bars before Vln I enters alone at A5 (MIDI 81) and soars to F#6. Cello drops to D2 for wide bass."
-  },
-  {
-    label: "Haydn — String Quartet Op. 33 No. 2 'The Joke', 1st mvt",
-    value: "haydn_op33_no2_mvt1",
-    texture: "melody_pizzicato",
-    help: "Frequent arco/pizzicato contrast. Good reference for articulation-aware string writing."
   }
 ];
 
@@ -744,7 +708,12 @@ export default function SettingsForm({ settings, onChange }: Props) {
           {/* Examples — reference pieces grouped by texture mode */}
           {(settings.instrumentation ?? "auto") === "auto" && (() => {
             const currentTexture = settings.stringTexture ?? "melody_harmony";
-            const examplesForTexture = STRING_EXAMPLE_OPTIONS.filter((o) => o.texture === currentTexture);
+            // Counterpoint mode accepts any string quartet piece as a reference;
+            // show all examples rather than returning an empty list.
+            const examplesForTexture =
+              currentTexture === "counterpoint"
+                ? STRING_EXAMPLE_OPTIONS
+                : STRING_EXAMPLE_OPTIONS.filter((o) => o.texture === currentTexture);
             const currentExample = settings.stringExample ?? "";
             const exampleOpt = STRING_EXAMPLE_OPTIONS.find((o) => o.value === currentExample);
             return (
