@@ -141,6 +141,12 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     texture: "melody_harmony",
     help: "Late-Romantic melody-harmony texture. Vln I leads with lyrical Slavic-inflected themes; Vln II and Vla provide close inner-voice support; Vc on characteristic bass lines."
   },
+  {
+    label: "Beethoven — String Quartet No. 1 in F major Op. 18 No. 1 (complete)",
+    value: "beethoven_op18_no1",
+    texture: "melody_harmony",
+    help: "Early Beethoven quartet — all 4 movements (Allegro con brio, Adagio affettuoso, Scherzo, Allegro). 4 voices: Violin I/II, Viola, Cello. Dense independent counterpoint, motif imitation between violins, chromatic development. Source: OpenScore/CC0."
+  },
   // cello_melody
   {
     label: "Dvořák — String Quartet No. 12 Op. 96 'American'",
