@@ -1151,12 +1151,14 @@ const server = http.createServer(async (req, res) => {
 
       const filteredScore = { ...score, parts: filtered };
 
-      // Choose exporter: use general exporter if any part has grand staff or piano
-      const hasPiano = filtered.some((p: any) => {
+      // Choose exporter: use general exporter if any part has grand staff, piano,
+      // or double bass (which requires written-pitch transposition up one octave).
+      const hasPianoOrBass = filtered.some((p: any) => {
         const s = `${p.instrument ?? ""} ${p.name ?? ""}`.toLowerCase();
-        return s.includes("piano") || Number(p.staves) === 2;
+        return s.includes("piano") || Number(p.staves) === 2 ||
+          s.includes("double_bass") || s.includes("double bass") || s.includes("contrabass");
       });
-      const outputXml = hasPiano
+      const outputXml = hasPianoOrBass
         ? exportScoreModelToMusicXML(filteredScore)
         : exportSatbScoreModelToMusicXML(filteredScore);
 

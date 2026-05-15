@@ -222,9 +222,17 @@ export function pipelineMusicxmlToArrangedMusicxml(
       const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
       return s.includes("trumpet") || s.includes("horn") || s.includes("trombone") || s.includes("tuba");
     });
+    // Double bass is a transposing instrument (written one octave higher than sounding).
+    // The general exporter handles this correctly via getTransposeForInstrument;
+    // the SATB exporter does not — so route any score with a double bass through
+    // the general exporter.
+    const hasDoubleBass = scoreModelOut.parts?.some((p: any) => {
+      const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
+      return s.includes("double_bass") || s.includes("double bass") || s.includes("contrabass");
+    });
 
     const useGeneralExporter =
-      isPiano || isWoodwinds || isBrass || isOrchestra || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart;
+      isPiano || isWoodwinds || isBrass || isOrchestra || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart || hasDoubleBass;
 
     const outputXml = useGeneralExporter
       ? exportScoreModelToMusicXML(scoreModelOut)
