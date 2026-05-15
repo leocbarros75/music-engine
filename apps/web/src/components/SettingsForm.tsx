@@ -199,6 +199,25 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     value: "haydn_op64_no5_mvt1",
     texture: "melody_pizzicato",
     help: "Lower three voices play staccato ostinato (note–rest–note–rest in 8ths) for 7 bars before Vln I enters alone at A5 (MIDI 81) and soars to F#6. Cello drops to D2 for wide bass."
+  },
+  // counterpoint / full-quartet references
+  {
+    label: "Mozart — String Quartet No. 15 in D minor K421 (complete, all 4 mvts)",
+    value: "mozart_k421",
+    texture: "counterpoint",
+    help: "Complete D-minor quartet: all four movements. Classical clarity — Alberti cello, light inner voices, melody in Violin I. Source: OpenScore/CC0."
+  },
+  {
+    label: "Haydn — String Quartet Op. 64 No. 5 'The Lark' (complete, all 4 mvts)",
+    value: "haydn_lark",
+    texture: "counterpoint",
+    help: "Complete 'Lark' quartet in D major: all four movements. Characteristic Haydn: arpeggiated inner voices, surprise rests, motivic development. Source: OpenScore/CC0."
+  },
+  {
+    label: "Brahms — String Quartet No. 1 in C minor Op. 51 No. 1 (complete)",
+    value: "brahms_op51_no1",
+    texture: "counterpoint",
+    help: "Complete Brahms quartet: all four movements. Dense chromatic counterpoint, cross-rhythms (hemiolia), walking bass with passing tones. Source: OpenScore/CC0."
   }
 ];
 
@@ -825,24 +844,111 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 : STRING_EXAMPLE_OPTIONS.filter((o) => o.texture === currentTexture);
             const currentExample = settings.stringExample ?? "";
             const exampleOpt = STRING_EXAMPLE_OPTIONS.find((o) => o.value === currentExample);
+
+            // Composer override options — grouped by period matching the selected style
+            const currentPeriodStyle = (settings.style ?? "classical").toLowerCase();
+            const COMPOSER_OPTIONS: Array<{ label: string; value: string; period: string }> = [
+              { label: "Bach",      value: "bach",      period: "baroque"  },
+              { label: "Vivaldi",   value: "vivaldi",   period: "baroque"  },
+              { label: "Handel",    value: "handel",    period: "baroque"  },
+              { label: "Haydn",     value: "haydn",     period: "classical" },
+              { label: "Mozart",    value: "mozart",    period: "classical" },
+              { label: "Beethoven", value: "beethoven", period: "classical" },
+              { label: "Schubert",  value: "schubert",  period: "romantic"  },
+              { label: "Brahms",    value: "brahms",    period: "romantic"  },
+              { label: "Dvořák",    value: "dvorak",    period: "romantic"  },
+            ];
+            // Auto-detect composer from selected example
+            const EXAMPLE_TO_COMPOSER_UI: Record<string, string> = {
+              beethoven_op18_no1: "beethoven",
+              mozart_k387_mvt1: "mozart", mozart_k421_mvt1: "mozart",
+              mozart_k421: "mozart", mozart_k545_arr_mvt1: "mozart", mozart_k465_mvt1: "mozart",
+              haydn_op76_no3_mvt2: "haydn", haydn_op64_no3_mvt1: "haydn",
+              haydn_op64_no5_mvt1: "haydn", haydn_lark: "haydn",
+              dvorak_op51: "dvorak", dvorak_op96_american: "dvorak",
+              brahms_op51_no1: "brahms",
+            };
+            const detectedComposer = currentExample ? (EXAMPLE_TO_COMPOSER_UI[currentExample] ?? "") : "";
+            const currentComposer = settings.stringComposer ?? "";
+            const effectiveComposer = currentComposer && currentComposer !== "auto" ? currentComposer : detectedComposer;
+
             return (
-              <div className="field">
-                <label>Example</label>
-                <select
-                  value={currentExample}
-                  onChange={(e) => update("stringExample", e.target.value)}
-                >
-                  <option value="">— None —</option>
-                  {examplesForTexture.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-                {exampleOpt && (
-                  <div className="key-preview">
-                    <span className="slider-help">{exampleOpt.help}</span>
-                  </div>
-                )}
-              </div>
+              <>
+                <div className="field">
+                  <label>Example</label>
+                  <select
+                    value={currentExample}
+                    onChange={(e) => {
+                      update("stringExample", e.target.value);
+                      // Clear manual override when example changes so auto-detect takes over
+                      if (settings.stringComposer && settings.stringComposer !== "auto") {
+                        update("stringComposer", "auto");
+                      }
+                    }}
+                  >
+                    <option value="">— None —</option>
+                    {examplesForTexture.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  {exampleOpt && (
+                    <div className="key-preview">
+                      <span className="slider-help">{exampleOpt.help}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="field">
+                  <label>
+                    Composer Style
+                    {effectiveComposer && effectiveComposer !== currentComposer && (
+                      <span className="slider-help"> (auto-detected from example)</span>
+                    )}
+                  </label>
+                  <select
+                    value={currentComposer || "auto"}
+                    onChange={(e) => update("stringComposer", e.target.value === "auto" ? undefined : e.target.value)}
+                  >
+                    <option value="auto">
+                      {detectedComposer
+                        ? `Auto — ${COMPOSER_OPTIONS.find(c => c.value === detectedComposer)?.label ?? detectedComposer}`
+                        : "Auto (from example or period style)"}
+                    </option>
+                    <optgroup label="Baroque">
+                      {COMPOSER_OPTIONS.filter(c => c.period === "baroque").map(c => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Classical">
+                      {COMPOSER_OPTIONS.filter(c => c.period === "classical").map(c => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Romantic">
+                      {COMPOSER_OPTIONS.filter(c => c.period === "romantic").map(c => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  {effectiveComposer && (() => {
+                    const profileDescriptions: Record<string, string> = {
+                      bach:      "Contrapuntal: walking 8th bass, all voices independent (voiceIndependence=0.85).",
+                      vivaldi:   "Ostinato: repeated root bass, running 8th sequences in inner voices.",
+                      handel:    "Balanced counterpoint: walking quarter bass, moderate voice independence.",
+                      haydn:     "Classical wit: arpeggiated inner voices, surprise rests, motivic development.",
+                      mozart:    "Clarity: Alberti bass (root-5th-3rd-5th), light quarter upper voices.",
+                      beethoven: "Drama: syncopated bass, strategic rests, independent 8th-note lines.",
+                      schubert:  "Lyrical: dotted rhythms, singing inner lines, walking bass.",
+                      brahms:    "Dense: cross-rhythm hemiolia, chromatic walking bass.",
+                      dvorak:    "Folk warmth: arpeggiated cello, folkloric sequences in inner voices.",
+                    };
+                    return (
+                      <div className="key-preview">
+                        <span className="slider-help">{profileDescriptions[effectiveComposer] ?? ""}</span>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </>
             );
           })()}
 

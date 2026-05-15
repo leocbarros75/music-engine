@@ -40,8 +40,15 @@ export type Settings = {
   stringTexture?: "melody_harmony" | "melody_pizzicato" | "cello_melody" | "homophonic_block" | "counterpoint";
   /**
    * Reference example piece loaded into the string ensemble engine.
+   * Automatically maps to a composer profile (see composerProfiles.ts).
    */
   stringExample?: string;
+  /**
+   * Explicit composer override (e.g. "mozart", "beethoven", "brahms").
+   * When set, overrides the composer inferred from stringExample.
+   * "auto" or undefined = derive from example.
+   */
+  stringComposer?: string;
   instrumentation?:
     | "auto"
     | "piano_copy_to_string_quartet"

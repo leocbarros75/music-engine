@@ -18,6 +18,7 @@ import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arran
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
+import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
 import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble";
 import { mapPianoToBrassEnsembleOpen } from "../arrange/mapToBrassEnsemble";
@@ -68,6 +69,14 @@ export type AppSettings = {
    *   "homophonic_block" — All 5 voices block chords, Adler overtone spacing
    */
   stringTexture?: string;
+  /** Example file ID (e.g. "beethoven_op18_no1"). Maps to a composer profile. */
+  stringExample?: string;
+  /**
+   * Explicit composer override (e.g. "mozart", "beethoven", "brahms").
+   * When set, overrides the composer inferred from stringExample.
+   * When "auto" or undefined, the composer is derived from stringExample.
+   */
+  stringComposer?: string;
   useStringEnsembleArranger?: boolean;
   instrumentation?:
     | "auto"
@@ -1478,6 +1487,16 @@ export function applyAppSettings(
 
   const styleRaw = String(settings.style ?? "").toLowerCase();
   const styleUsed = resolveRhythmStyle(settings.style, warnings);
+
+  // Resolve composer profile key: explicit override > inferred from example > none
+  const composerKeyRaw = String(settings.stringComposer ?? "").toLowerCase();
+  const composerKeyFromExample = settings.stringExample
+    ? (getComposerFromExample(settings.stringExample) ?? "")
+    : "";
+  const composerKey = composerKeyRaw && composerKeyRaw !== "auto"
+    ? composerKeyRaw
+    : composerKeyFromExample;
+
   const accompanimentRaw = settings.accompanimentType ?? settings.accompaniment ?? "";
   const accompaniment = String(accompanimentRaw || "").toLowerCase();
   const isChordal = accompaniment === "chordal";
@@ -1805,7 +1824,8 @@ export function applyAppSettings(
                   syncopate: true,
                   warnings,
                   tempoBpm,
-                  style: styleUsed
+                  style: styleUsed,
+                  composerKey: composerKey || undefined
                 });
               }
               return stringScore;
@@ -1982,7 +2002,8 @@ export function applyAppSettings(
                 level: settings.level,
                 warnings,
                 tempoBpm,
-                style: styleUsed
+                style: styleUsed,
+                composerKey: composerKey || undefined
               });
               const vln1Part = (stringScore.parts ?? []).find(
                 (p: any) => String(p?.name ?? "").toLowerCase().includes("violin i")
