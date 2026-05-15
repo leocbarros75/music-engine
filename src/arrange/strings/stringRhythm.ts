@@ -17,6 +17,8 @@ type ApplyOptions = {
   warnings?: string[];
   allowNonChordTones?: boolean;
   level?: string;
+  /** Period style — "baroque" | "classical" | "romantic" | "modern" | "pop" etc. */
+  style?: string;
   minSubdivision?: number;
   minMidi?: number;
   maxMidi?: number;
@@ -1154,6 +1156,462 @@ function applyViolaIntermediateActivePattern(vla: any, options: ApplyOptions): v
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Period-style pattern functions
+// These are selected when options.style is "baroque", "romantic", or "modern".
+// They override the level-based dispatch for inner voices (Vln II, Vla, Vc).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Baroque Violin II — continuous steady 8th notes on chord 3rd/5th (Bach/Vivaldi ripienо). */
+function applyBaroqueVln2(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 60;
+  const maxMidi = 88;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 67;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    let t = 0;
+    while (t < mLen - 1e-6) {
+      const chord = chordAt(chordEvents, mNum, t);
+      const thirdPc = chordThirdPc(chord);
+      const fifthPc = chordFifthPc(chord);
+      const pcs =
+        thirdPc !== null
+          ? [thirdPc, ...(fifthPc !== null ? [fifthPc] : [])].filter((pc) => pc >= 0)
+          : chord?.pcs ?? [];
+      let midi = prevMidi;
+      if (pcs.length) {
+        midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+      } else {
+        midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+      }
+      next.push({
+        id: `vln2-bq-${mNum}-${t}`,
+        t,
+        dur: Math.min(0.5, mLen - t),
+        type: "note",
+        midi,
+        pitch: midiToPitch(midi),
+        voice: 1,
+        staff: 1
+      });
+      prevMidi = midi;
+      t += 0.5;
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/** Baroque Viola — alternating quarter-note chord tones (root→3rd→5th→3rd cycle). */
+function applyBaroqueVla(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 48;
+  const maxMidi = 76;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 57;
+  let seqIdx = 0;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    for (let t = 0; t < mLen - 1e-6; t += 1) {
+      const chord = chordAt(chordEvents, mNum, t);
+      const pcSeq = pickChordToneSequence(chord, 4);
+      const pc = pcSeq.length ? pcSeq[seqIdx % pcSeq.length]! : -1;
+      let midi = prevMidi;
+      if (pc >= 0) {
+        midi = shiftOctavesIntoRange(snapToPcNear(prevMidi, pc), minMidi, maxMidi);
+      } else {
+        midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+      }
+      next.push({
+        id: `vla-bq-${mNum}-${t}`,
+        t,
+        dur: Math.min(1, mLen - t),
+        type: "note",
+        midi,
+        pitch: midiToPitch(midi),
+        voice: 1,
+        staff: 1
+      });
+      prevMidi = midi;
+      seqIdx++;
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/** Baroque Cello — walking quarter-note bass: root on beat 1, arpeggiate through chord. */
+function applyBaroqueCello(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 36;
+  const maxMidi = 64;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 48;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    for (let t = 0; t < mLen - 1e-6; t += 1) {
+      const chord = chordAt(chordEvents, mNum, t);
+      const seq = pickChordToneSequence(chord, 4);
+      // Root on beat 1, then cycle through chord tones
+      const pc = t < 1e-6
+        ? (typeof chord?.rootPc === "number" ? chord.rootPc : seq[0] ?? -1)
+        : (seq[Math.round(t) % Math.max(seq.length, 1)] ?? -1);
+      let midi = prevMidi;
+      if (pc >= 0) {
+        midi = shiftOctavesIntoRange(snapToPcNear(prevMidi, pc), minMidi, maxMidi);
+      } else {
+        midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+      }
+      next.push({
+        id: `vc-bq-${mNum}-${t}`,
+        t,
+        dur: Math.min(1, mLen - t),
+        type: "note",
+        midi,
+        pitch: midiToPitch(midi),
+        voice: 1,
+        staff: 1
+      });
+      prevMidi = midi;
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+// ── Romantic ──────────────────────────────────────────────────────────────────
+
+/** Romantic Violin II — dotted-quarter + 8th cells; 25% rubato measures use half notes with expressive 8th-rest intro. */
+function applyRomanticVln2(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 60;
+  const maxMidi = 88;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 67;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    const useRubato = shouldChooseMeasure(mNum, 0.25, 501);
+    if (useRubato && mLen >= 2) {
+      // Expressive rubato: 8th rest + sustained half note (sighing phrase)
+      next.push({ id: `vln2-rom-r-${mNum}-0`, t: 0, dur: 0.5, type: "rest", voice: 1, staff: 1 });
+      let t = 0.5;
+      while (t < mLen - 1e-6) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const thirdPc = chordThirdPc(chord);
+        const pcs = thirdPc !== null ? [thirdPc] : chord?.pcs ?? [];
+        let midi = prevMidi;
+        if (pcs.length) midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        const dur = Math.min(2, mLen - t);
+        next.push({ id: `vln2-rom-h-${mNum}-${t}`, t, dur, type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+        t += dur;
+      }
+    } else {
+      // Dotted-quarter (1.5) + 8th (0.5) cells
+      let t = 0;
+      while (t < mLen - 1e-6) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const thirdPc = chordThirdPc(chord);
+        const fifthPc = chordFifthPc(chord);
+        const pcs1 = thirdPc !== null ? [thirdPc] : chord?.pcs ?? [];
+        const pcs2 = fifthPc !== null ? [fifthPc] : chord?.pcs ?? [];
+        let midi1 = prevMidi;
+        if (pcs1.length) midi1 = pickCandidateNear(prevMidi, pcs1, minMidi, maxMidi, "either");
+        else midi1 = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        const dottedDur = Math.min(1.5, mLen - t);
+        next.push({ id: `vln2-rom-d-${mNum}-${t}`, t, dur: dottedDur, type: "note", midi: midi1, pitch: midiToPitch(midi1), voice: 1, staff: 1 });
+        prevMidi = midi1;
+        t += dottedDur;
+        if (t < mLen - 1e-6 && mLen - t >= 0.5 - 1e-6) {
+          let midi2 = prevMidi;
+          if (pcs2.length) midi2 = pickCandidateNear(prevMidi, pcs2, minMidi, maxMidi, "either");
+          else midi2 = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+          const eDur = Math.min(0.5, mLen - t);
+          next.push({ id: `vln2-rom-e-${mNum}-${t}`, t, dur: eDur, type: "note", midi: midi2, pitch: midiToPitch(midi2), voice: 1, staff: 1 });
+          prevMidi = midi2;
+          t += eDur;
+        }
+      }
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/** Romantic Viola — dotted-quarter + 8th on 5th/3rd; 35% half-note sustained for breadth. */
+function applyRomanticVla(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 48;
+  const maxMidi = 76;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 57;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    if (shouldChooseMeasure(mNum, 0.35, 703)) {
+      // Sustained half-note pairs
+      for (let t = 0; t < mLen - 1e-6; t += 2) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const fifthPc = chordFifthPc(chord);
+        const pcs = fifthPc !== null ? [fifthPc] : chord?.pcs ?? [];
+        let midi = prevMidi;
+        if (pcs.length) midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        next.push({ id: `vla-rom-h-${mNum}-${t}`, t, dur: Math.min(2, mLen - t), type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+      }
+    } else {
+      // Dotted-quarter (1.5) + 8th (0.5)
+      let t = 0;
+      while (t < mLen - 1e-6) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const fifthPc = chordFifthPc(chord);
+        const pcs = fifthPc !== null ? [fifthPc] : chord?.pcs ?? [];
+        let midi = prevMidi;
+        if (pcs.length) midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        const dDur = Math.min(1.5, mLen - t);
+        next.push({ id: `vla-rom-d-${mNum}-${t}`, t, dur: dDur, type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+        t += dDur;
+        if (t < mLen - 1e-6 && mLen - t >= 0.5 - 1e-6) {
+          const chord2 = chordAt(chordEvents, mNum, t);
+          const thirdPc = chordThirdPc(chord2);
+          const pcs2 = thirdPc !== null ? [thirdPc] : chord2?.pcs ?? [];
+          let midi2 = prevMidi;
+          if (pcs2.length) midi2 = pickCandidateNear(prevMidi, pcs2, minMidi, maxMidi, "either");
+          next.push({ id: `vla-rom-e-${mNum}-${t}`, t, dur: Math.min(0.5, mLen - t), type: "note", midi: midi2, pitch: midiToPitch(midi2), voice: 1, staff: 1 });
+          prevMidi = midi2;
+          t += 0.5;
+        }
+      }
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/** Romantic Cello — 60% lyrical quarter arpeggios, 40% dotted-quarter + 8th pulses. */
+function applyRomanticCello(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 36;
+  const maxMidi = 67;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 48;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    if (shouldChooseMeasure(mNum, 0.6, 911)) {
+      // Lyrical quarter-note arpeggio
+      for (let t = 0; t < mLen - 1e-6; t += 1) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const seq = pickChordToneSequence(chord, 4);
+        const pc = seq[Math.round(t) % Math.max(seq.length, 1)] ?? -1;
+        let midi = prevMidi;
+        if (pc >= 0) midi = shiftOctavesIntoRange(snapToPcNear(prevMidi, pc), minMidi, maxMidi);
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        next.push({ id: `vc-rom-q-${mNum}-${t}`, t, dur: Math.min(1, mLen - t), type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+      }
+    } else {
+      // Dotted-quarter + 8th pulses on chord root
+      let t = 0;
+      while (t < mLen - 1e-6) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const rootPc = typeof chord?.rootPc === "number" ? chord.rootPc : (chord?.pcs?.[0] ?? -1);
+        let midi = prevMidi;
+        if (rootPc >= 0) midi = shiftOctavesIntoRange(snapToPcNear(prevMidi, rootPc), minMidi, maxMidi);
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        const dur = Math.min(1.5, mLen - t);
+        next.push({ id: `vc-rom-d-${mNum}-${t}`, t, dur, type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+        t += dur;
+        if (t < mLen - 1e-6 && mLen - t >= 0.5 - 1e-6) {
+          const chord2 = chordAt(chordEvents, mNum, t);
+          const seq2 = pickChordToneSequence(chord2, 4);
+          const pc2 = seq2[0] ?? -1;
+          let midi2 = prevMidi;
+          if (pc2 >= 0) midi2 = shiftOctavesIntoRange(snapToPcNear(prevMidi, pc2), minMidi, maxMidi);
+          next.push({ id: `vc-rom-e-${mNum}-${t}`, t, dur: Math.min(0.5, mLen - t), type: "note", midi: midi2, pitch: midiToPitch(midi2), voice: 1, staff: 1 });
+          prevMidi = midi2;
+          t += 0.5;
+        }
+      }
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+// ── Modern ────────────────────────────────────────────────────────────────────
+
+/** Modern Violin II — syncopated displacement: 8th-rest + dotted-quarter (beat shifted by an 8th). */
+function applyModernVln2(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 58;
+  const maxMidi = 88;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 67;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    let t = 0;
+    while (t < mLen - 1e-6) {
+      // 8th rest (syncopated start)
+      const restDur = Math.min(0.5, mLen - t);
+      next.push({ id: `vln2-mod-r-${mNum}-${t}`, t, dur: restDur, type: "rest", voice: 1, staff: 1 });
+      t += restDur;
+      if (t >= mLen - 1e-6) break;
+      // Dotted-quarter spanning beat — syncopated accent
+      const chord = chordAt(chordEvents, mNum, t);
+      const thirdPc = chordThirdPc(chord);
+      const pcs = thirdPc !== null ? [thirdPc] : chord?.pcs ?? [];
+      let midi = prevMidi;
+      if (pcs.length) midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+      else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+      const noteDur = Math.min(1.5, mLen - t);
+      next.push({ id: `vln2-mod-n-${mNum}-${t}`, t, dur: noteDur, type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+      prevMidi = midi;
+      t += noteDur;
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/** Modern Viola — irregular displacement: 50% of measures start with a quarter rest, then 8th-note fill. */
+function applyModernVla(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 48;
+  const maxMidi = 79;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 57;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    let t = 0;
+    // Quarter rest on odd-measure displacement
+    if (shouldChooseMeasure(mNum, 0.5, 613) && mLen > 1) {
+      next.push({ id: `vla-mod-qr-${mNum}-0`, t: 0, dur: 1, type: "rest", voice: 1, staff: 1 });
+      t = 1;
+    }
+    // 8th-note fill on chord tones
+    while (t < mLen - 1e-6) {
+      const chord = chordAt(chordEvents, mNum, t);
+      const pcs = chord?.pcs ?? [];
+      let midi = prevMidi;
+      if (pcs.length) midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+      else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+      next.push({ id: `vla-mod-${mNum}-${t}`, t, dur: Math.min(0.5, mLen - t), type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+      prevMidi = midi;
+      t += 0.5;
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/** Modern Cello — alternating: 50% syncopated (8th-rest + dotted-quarter cells), 50% displaced quarter pulse. */
+function applyModernCello(part: any, options: ApplyOptions): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 36;
+  const maxMidi = 69;
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 45;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    let t = 0;
+    if (shouldChooseMeasure(mNum, 0.5, 777)) {
+      // Syncopated: 8th-rest + dotted-quarter cells
+      while (t < mLen - 1e-6) {
+        const r1 = Math.min(0.5, mLen - t);
+        next.push({ id: `vc-mod-r-${mNum}-${t}`, t, dur: r1, type: "rest", voice: 1, staff: 1 });
+        t += r1;
+        if (t >= mLen - 1e-6) break;
+        const chord = chordAt(chordEvents, mNum, t);
+        const rootPc = typeof chord?.rootPc === "number" ? chord.rootPc : (chord?.pcs?.[0] ?? -1);
+        let midi = prevMidi;
+        if (rootPc >= 0) midi = shiftOctavesIntoRange(snapToPcNear(prevMidi, rootPc), minMidi, maxMidi);
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        const n1 = Math.min(1.5, mLen - t);
+        next.push({ id: `vc-mod-n-${mNum}-${t}`, t, dur: n1, type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+        t += n1;
+      }
+    } else {
+      // Displaced quarter pulse (chromatic neighbour approach to root)
+      for (let beat = 0; t < mLen - 1e-6; beat++) {
+        const chord = chordAt(chordEvents, mNum, t);
+        const seq = pickChordToneSequence(chord, 4);
+        const pc = seq[beat % Math.max(seq.length, 1)] ?? -1;
+        let midi = prevMidi;
+        if (pc >= 0) midi = shiftOctavesIntoRange(snapToPcNear(prevMidi, pc), minMidi, maxMidi);
+        else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        next.push({ id: `vc-mod-q-${mNum}-${t}`, t, dur: Math.min(1, mLen - t), type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        prevMidi = midi;
+        t += 1;
+      }
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function applyStringPolyphonicRhythm(
   scoreModel: ScoreModel,
   options: ApplyOptions = {}
@@ -1167,6 +1625,8 @@ export function applyStringPolyphonicRhythm(
   const vc = parts.find((p: any) => String(p?.name ?? "").toLowerCase().includes("cello"));
   const cb = parts.find((p: any) => String(p?.name ?? "").toLowerCase().includes("double bass"));
   const level = String(options.level ?? "").toLowerCase();
+  const style = String(options.style ?? "classical").toLowerCase();
+  const isPeriodStyle = style === "baroque" || style === "romantic" || style === "modern";
 
   if (vln1 && !options.preserveVln1Melody) {
     applyToPart(vln1, options.vln1Activity ?? "grounded", warnings, 7, {
@@ -1178,7 +1638,16 @@ export function applyStringPolyphonicRhythm(
   if (vln2) {
     // Full Violin II range for all levels — no level-based caps.
     const vln2Range = {};
-    if (level === "beginner" && options.vln2Activity === "high_active") {
+    if (isPeriodStyle && style === "baroque") {
+      applyBaroqueVln2(vln2, { ...options, ...vln2Range });
+      warn(warnings, "[strings] Baroque Violin II: continuous 8th notes on chord 3rd/5th.");
+    } else if (isPeriodStyle && style === "romantic") {
+      applyRomanticVln2(vln2, { ...options, ...vln2Range });
+      warn(warnings, "[strings] Romantic Violin II: dotted-quarter+8th cells, expressive rubato phrases.");
+    } else if (isPeriodStyle && style === "modern") {
+      applyModernVln2(vln2, { ...options, ...vln2Range });
+      warn(warnings, "[strings] Modern Violin II: syncopated 8th-rest+dotted-quarter displacement.");
+    } else if (level === "beginner" && options.vln2Activity === "high_active") {
       applyViolin2BeginnerHighActive(vln2, { ...options, ...vln2Range });
       warn(warnings, "[strings] Beginner Violin II: 8th+16th on chord 3rd (activity=high_active).");
     } else if (level === "beginner" && options.vln2Activity === "active") {
@@ -1230,7 +1699,16 @@ export function applyStringPolyphonicRhythm(
       // Subdivision and range caps removed — activity level drives rhythm density.
       const vlaMinSubdivision = undefined;
       const vlaRange = {};
-      if (level === "intermediate" && options.vlaActivity === "high_active") {
+      if (isPeriodStyle && style === "baroque") {
+        applyBaroqueVla(vla, { ...options, ...vlaRange });
+        warn(warnings, "[strings] Baroque Viola: quarter-note chord-tone cycle (root→3rd→5th→3rd).");
+      } else if (isPeriodStyle && style === "romantic") {
+        applyRomanticVla(vla, { ...options, ...vlaRange });
+        warn(warnings, "[strings] Romantic Viola: dotted-quarter+8th cells, 35% sustained halves.");
+      } else if (isPeriodStyle && style === "modern") {
+        applyModernVla(vla, { ...options, ...vlaRange });
+        warn(warnings, "[strings] Modern Viola: displaced 8th fill with 50% quarter-rest downbeat.");
+      } else if (level === "intermediate" && options.vlaActivity === "high_active") {
         applyViolaIntermediateHighActivePattern(vla, { ...options, ...vlaRange });
         warn(
           warnings,
@@ -1272,7 +1750,16 @@ export function applyStringPolyphonicRhythm(
     if (vc) {
       // Full cello range for all levels — no level-based caps.
       const vcRange = {};
-      if (level === "intermediate" && options.vcActivity === "high_active") {
+      if (isPeriodStyle && style === "baroque") {
+        applyBaroqueCello(vc, { ...options, ...vcRange });
+        warn(warnings, "[strings] Baroque Cello: walking quarter-note bass (root on beat 1, chord arpeggiation).");
+      } else if (isPeriodStyle && style === "romantic") {
+        applyRomanticCello(vc, { ...options, ...vcRange });
+        warn(warnings, "[strings] Romantic Cello: 60% lyrical quarter arpeggios, 40% dotted-quarter+8th pulses.");
+      } else if (isPeriodStyle && style === "modern") {
+        applyModernCello(vc, { ...options, ...vcRange });
+        warn(warnings, "[strings] Modern Cello: 50% syncopated 8th-rest+dotted-quarter, 50% displaced quarter pulse.");
+      } else if (level === "intermediate" && options.vcActivity === "high_active") {
         applyCelloIntermediateHighActivePattern(vc, { ...options, ...vcRange });
         warn(
           warnings,

@@ -1409,7 +1409,10 @@ function enforceBassToChords(
 
 function resolveRhythmStyle(styleRaw: string | undefined, warnings: string[]): string {
   const normalized = String(styleRaw || "classical").toLowerCase();
-  const supported = new Set(["classical", "pop", "rock", "funk", "samba", "worship"]);
+  const supported = new Set([
+    "classical", "baroque", "romantic", "modern",
+    "pop", "rock", "funk", "samba", "worship"
+  ]);
   if (!supported.has(normalized)) {
     warnings.push(`Style "${styleRaw}" not supported by rhythm stage. Defaulting to "classical".`);
     return "classical";
@@ -1801,7 +1804,8 @@ export function applyAppSettings(
                   keyMode: detectedMode,
                   syncopate: true,
                   warnings,
-                  tempoBpm
+                  tempoBpm,
+                  style: styleUsed
                 });
               }
               return stringScore;
@@ -1977,7 +1981,8 @@ export function applyAppSettings(
                 enforceChordRootBass: true,
                 level: settings.level,
                 warnings,
-                tempoBpm
+                tempoBpm,
+                style: styleUsed
               });
               const vln1Part = (stringScore.parts ?? []).find(
                 (p: any) => String(p?.name ?? "").toLowerCase().includes("violin i")
