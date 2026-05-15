@@ -911,10 +911,11 @@ const server = http.createServer(async (req, res) => {
       if (accompanimentLower === "polyphonic") {
         if (typeof options.styleProfile !== "string" || !options.styleProfile) {
           const style = String(settings.style ?? "").toLowerCase();
-          if (style === "baroque") options.styleProfile = "baroque";
+          if (style === "baroque")   options.styleProfile = "baroque";
           else if (style === "romantic") options.styleProfile = "romantic";
+          else if (style === "modern")   options.styleProfile = "modern";
           else if (style === "classical" || style === "worship") options.styleProfile = "classical";
-          else options.styleProfile = "modern";
+          else options.styleProfile = "classical"; // pop/funk/samba → classical voice-leading
         }
         if (String(options.styleProfile).toLowerCase() === "modern" && !options.modernMode) {
           options.modernMode = "modernTonal";

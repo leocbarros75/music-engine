@@ -11,7 +11,45 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "orchestra", value: "orchestra" }
 ];
 
-const STYLE_OPTIONS: Settings["style"][] = ["classical", "worship", "latino", "pop", "rock", "funk", "samba"];
+// Period styles — used for strings, choral, woodwind, brass, orchestra.
+// Each maps directly to a voice-leading profile in the engine.
+const PERIOD_STYLE_OPTIONS: Array<{ label: string; value: Settings["style"]; help: string }> = [
+  {
+    label: "Baroque",
+    value: "baroque",
+    help: "Strict counterpoint — Bach/Handel-style voice-leading, close spacing, no parallel 5ths/8ths (1600–1750)."
+  },
+  {
+    label: "Classical",
+    value: "classical",
+    help: "Balanced voice-leading — Haydn/Mozart clarity, phrase symmetry, moderate spacing (1750–1820)."
+  },
+  {
+    label: "Romantic",
+    value: "romantic",
+    help: "Flexible harmony — Brahms/Dvořák richness, wider spacing, chromatic colour, expressive leaps (1820–1900)."
+  },
+  {
+    label: "Modern",
+    value: "modern",
+    help: "Extended harmony — tonal, modal, or atonal sub-modes; relaxed parallel and spacing rules (1900–present)."
+  }
+];
+
+// Pop/worship/folk styles — used only for piano, where the LH pattern
+// and rhythm engine respond to genre (funk grooves, waltz bass, etc.).
+const PIANO_STYLE_OPTIONS: Array<{ label: string; value: Settings["style"]; help: string }> = [
+  { label: "Classical",  value: "classical", help: "Balanced period voice-leading adapted for piano." },
+  { label: "Baroque",    value: "baroque",   help: "Strict counterpoint — Bach/Handel texture." },
+  { label: "Romantic",   value: "romantic",  help: "Expressive harmony — Chopin/Liszt-style richness." },
+  { label: "Modern",     value: "modern",    help: "Extended harmony — tonal, modal, or atonal sub-modes." },
+  { label: "Worship",    value: "worship",   help: "Hymn-style chordal writing with devotional phrasing." },
+  { label: "Pop",        value: "pop",       help: "Contemporary pop chord patterns and rhythms." },
+  { label: "Rock",       value: "rock",      help: "Driving rock rhythms with power-chord voicings." },
+  { label: "Funk",       value: "funk",      help: "Syncopated funk grooves with 16th-note patterns." },
+  { label: "Samba",      value: "samba",     help: "Brazilian samba rhythm patterns." },
+  { label: "Latino",     value: "latino",    help: "Latin rhythmic patterns and harmonic colour." }
+];
 const LEVEL_OPTIONS: Settings["level"][] = ["beginner", "intermediate", "advanced", "professional"];
 const ACCOMP_OPTIONS: Settings["accompaniment"][] = [
   "homophonic",
@@ -381,12 +419,13 @@ export default function SettingsForm({ settings, onChange }: Props) {
   }, [settings, onChange]);
 
   // ── Choral simplified controls ──────────────────────────────────────────────
-  type ChoralStyle = "baroque" | "classical" | "romantic";
+  type ChoralStyle = "baroque" | "classical" | "romantic" | "modern";
   type ChoralAccompaniment = "homophonic" | "polyphonic";
 
   const choralStyle: ChoralStyle =
     settings.style === "baroque" ? "baroque" :
-    settings.style === "romantic" ? "romantic" : "classical";
+    settings.style === "romantic" ? "romantic" :
+    settings.style === "modern" ? "modern" : "classical";
 
   const choralAccomp: ChoralAccompaniment =
     settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic";
@@ -401,6 +440,11 @@ export default function SettingsForm({ settings, onChange }: Props) {
       next.styleProfile = "romantic";
       next.level = "intermediate";
       next.ruleStrictness = "relaxed";
+    } else if (style === "modern") {
+      next.styleProfile = "modern";
+      next.level = "professional";
+      next.ruleStrictness = "relaxed";
+      if (!next.modernMode) next.modernMode = "modernTonal";
     } else {
       next.styleProfile = "classical";
       next.level = "intermediate";
@@ -520,20 +564,35 @@ export default function SettingsForm({ settings, onChange }: Props) {
           <div className="field">
             <label>Style</label>
             <select value={choralStyle} onChange={(e) => updateChoralStyle(e.target.value as ChoralStyle)}>
-              <option value="baroque">Baroque</option>
-              <option value="classical">Classical</option>
-              <option value="romantic">Romantic</option>
+              {PERIOD_STYLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
             <div className="key-preview">
               <span className="slider-help">
-                {choralStyle === "baroque"
-                  ? "Strict counterpoint — Bach-style voice-leading with tight spacing rules."
-                  : choralStyle === "romantic"
-                  ? "Expressive harmony — more flexible voice-leading with richer chords."
-                  : "Balanced voice-leading — standard choral rules and spacing."}
+                {PERIOD_STYLE_OPTIONS.find((o) => o.value === choralStyle)?.help ?? ""}
               </span>
             </div>
           </div>
+
+          {choralStyle === "modern" && (
+            <div className="field">
+              <label>Modern Sub-mode</label>
+              <select
+                value={settings.modernMode ?? "modernTonal"}
+                onChange={(e) => update("modernMode", e.target.value as Settings["modernMode"])}
+              >
+                {MODERN_MODES.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  {MODERN_MODES.find((o) => o.value === (settings.modernMode ?? "modernTonal"))?.help ?? ""}
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="field">
             <label>Accompaniment</label>
@@ -636,6 +695,50 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </div>
             );
           })()}
+
+          <div className="field">
+            <label>Style</label>
+            <select
+              value={settings.style}
+              onChange={(e) => {
+                const s = e.target.value as Settings["style"];
+                const next: Partial<Settings> = { style: s };
+                if (s === "baroque")   { next.styleProfile = "baroque";   next.ruleStrictness = "strict"; }
+                else if (s === "romantic") { next.styleProfile = "romantic"; next.ruleStrictness = "relaxed"; }
+                else if (s === "modern")   { next.styleProfile = "modern";   next.ruleStrictness = "relaxed"; if (!settings.modernMode) next.modernMode = "modernTonal"; }
+                else                   { next.styleProfile = "classical"; next.ruleStrictness = "standard"; }
+                onChange({ ...settings, ...next });
+              }}
+            >
+              {PIANO_STYLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <div className="key-preview">
+              <span className="slider-help">
+                {PIANO_STYLE_OPTIONS.find((o) => o.value === settings.style)?.help ?? ""}
+              </span>
+            </div>
+          </div>
+
+          {settings.style === "modern" && (
+            <div className="field">
+              <label>Modern Sub-mode</label>
+              <select
+                value={settings.modernMode ?? "modernTonal"}
+                onChange={(e) => update("modernMode", e.target.value as Settings["modernMode"])}
+              >
+                {MODERN_MODES.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  {MODERN_MODES.find((o) => o.value === (settings.modernMode ?? "modernTonal"))?.help ?? ""}
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="field">
             <label>Accompaniment</label>
@@ -789,12 +892,47 @@ export default function SettingsForm({ settings, onChange }: Props) {
           {/* Style */}
           <div className="field">
             <label>Style</label>
-            <select value={settings.style} onChange={(e) => update("style", e.target.value as Settings["style"])}>
-              {STYLE_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>{titleize(opt)}</option>
+            <select
+              value={["baroque", "classical", "romantic", "modern"].includes(settings.style) ? settings.style : "classical"}
+              onChange={(e) => {
+                const s = e.target.value as Settings["style"];
+                const next: Partial<Settings> = { style: s };
+                if (s === "baroque")       { next.styleProfile = "baroque";   next.ruleStrictness = "strict";   next.level = "advanced"; }
+                else if (s === "romantic") { next.styleProfile = "romantic";  next.ruleStrictness = "relaxed";  next.level = "intermediate"; }
+                else if (s === "modern")   { next.styleProfile = "modern";    next.ruleStrictness = "relaxed";  next.level = "professional"; if (!settings.modernMode) next.modernMode = "modernTonal"; }
+                else                       { next.styleProfile = "classical"; next.ruleStrictness = "standard"; next.level = "intermediate"; }
+                onChange({ ...settings, ...next });
+              }}
+            >
+              {PERIOD_STYLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+            <div className="key-preview">
+              <span className="slider-help">
+                {PERIOD_STYLE_OPTIONS.find((o) => o.value === settings.style)?.help ?? ""}
+              </span>
+            </div>
           </div>
+
+          {settings.style === "modern" && (
+            <div className="field">
+              <label>Modern Sub-mode</label>
+              <select
+                value={settings.modernMode ?? "modernTonal"}
+                onChange={(e) => update("modernMode", e.target.value as Settings["modernMode"])}
+              >
+                {MODERN_MODES.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  {MODERN_MODES.find((o) => o.value === (settings.modernMode ?? "modernTonal"))?.help ?? ""}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Level */}
           <div className="field">
@@ -908,14 +1046,47 @@ export default function SettingsForm({ settings, onChange }: Props) {
 
           <div className="field">
             <label>Style</label>
-            <select value={settings.style} onChange={(e) => update("style", e.target.value as Settings["style"])}>
-              {STYLE_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {titleize(opt)}
-                </option>
+            <select
+              value={["baroque", "classical", "romantic", "modern"].includes(settings.style) ? settings.style : "classical"}
+              onChange={(e) => {
+                const s = e.target.value as Settings["style"];
+                const next: Partial<Settings> = { style: s };
+                if (s === "baroque")       { next.styleProfile = "baroque";   next.ruleStrictness = "strict"; }
+                else if (s === "romantic") { next.styleProfile = "romantic";  next.ruleStrictness = "relaxed"; }
+                else if (s === "modern")   { next.styleProfile = "modern";    next.ruleStrictness = "relaxed"; if (!settings.modernMode) next.modernMode = "modernTonal"; }
+                else                       { next.styleProfile = "classical"; next.ruleStrictness = "standard"; }
+                onChange({ ...settings, ...next });
+              }}
+            >
+              {PERIOD_STYLE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+            <div className="key-preview">
+              <span className="slider-help">
+                {PERIOD_STYLE_OPTIONS.find((o) => o.value === settings.style)?.help ?? ""}
+              </span>
+            </div>
           </div>
+
+          {settings.style === "modern" && (
+            <div className="field">
+              <label>Modern Sub-mode</label>
+              <select
+                value={settings.modernMode ?? "modernTonal"}
+                onChange={(e) => update("modernMode", e.target.value as Settings["modernMode"])}
+              >
+                {MODERN_MODES.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  {MODERN_MODES.find((o) => o.value === (settings.modernMode ?? "modernTonal"))?.help ?? ""}
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="field">
             <label>Level</label>
