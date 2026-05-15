@@ -294,26 +294,18 @@ export function arrangeStringPolyphonic(
   }
 
   const level = String(options.level ?? "").toLowerCase();
-  const melodyShift = level === "intermediate" || level === "advanced" ? 12 : 0;
+  // Melody shift: all levels except beginner push the melody up an octave so
+  // inner voices have space beneath it. Professional was previously excluded
+  // (bug — matched beginner's 0-shift path); now fixed.
+  const melodyShift = level !== "beginner" ? 12 : 0;
   const slices = buildSlices(melodyPart, chords, melodyShift);
   const key = getKeyInfo(score, melodyPart);
   const rules = loadCounterpointRules();
   const motif = captureMotif(slices);
   const motifEntries: MotifEntry[] = scheduleImitation(motif, rules.polyphony.imitation, slices);
-  const ranges =
-    level === "beginner"
-      ? {
-          ...STRING_RANGES,
-          vla: { ...STRING_RANGES.vla, absMin: 48, absMax: 76, prefMin: 48, prefMax: 76 }
-        }
-      : level === "intermediate"
-        ? {
-            ...STRING_RANGES,
-            vln2: { ...STRING_RANGES.vln2, absMin: 55, absMax: 88, prefMin: 55, prefMax: 88 }, // G3..E6
-            vla: { ...STRING_RANGES.vla, absMin: 48, absMax: 81, prefMin: 48, prefMax: 81 }, // C3..A5
-            vc: { ...STRING_RANGES.vc, absMin: 36, absMax: 69, prefMin: 36, prefMax: 69 } // C2..A4
-          }
-        : STRING_RANGES;
+  // All levels use the full instrument ranges. Level controls rule strictness
+  // and rhythm-pattern complexity, not how high each voice can play.
+  const ranges = STRING_RANGES;
 
   const beamWidth = 30;
   let beam: BeamState[] = [];

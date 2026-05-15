@@ -350,9 +350,8 @@ function enforceNoBassCelloOverlap(
   const cbMeasures = Array.isArray(cb?.measures) ? cb.measures : [];
   const vcMeasures = Array.isArray(vc?.measures) ? vc.measures : [];
   if (!cbMeasures.length || !vcMeasures.length) return;
-  const levelRaw = String(level ?? "").toLowerCase();
   const vcMin = 36;
-  const vcMax = levelRaw === "beginner" ? 64 : 76;
+  const vcMax = 76;
   const cbByMeasure = new Map<number, Map<number, number>>();
   for (const m of cbMeasures) {
     const map = new Map<number, number>();
@@ -422,9 +421,8 @@ function enforceNoViolaCelloOverlap(
   const vlaMeasures = Array.isArray(vla?.measures) ? vla.measures : [];
   const vcMeasures = Array.isArray(vc?.measures) ? vc.measures : [];
   if (!vlaMeasures.length || !vcMeasures.length) return;
-  const levelRaw = String(level ?? "").toLowerCase();
   const vlaMin = 48;
-  const vlaMax = levelRaw === "intermediate" ? 81 : 84;
+  const vlaMax = 84;
   const vcByMeasure = new Map<number, Map<number, number>>();
   for (const m of vcMeasures) {
     const map = new Map<number, number>();
@@ -480,9 +478,8 @@ function enforceNoVln1Vln2Unison(
   const v1Measures = Array.isArray(vln1?.measures) ? vln1.measures : [];
   const v2Measures = Array.isArray(vln2?.measures) ? vln2.measures : [];
   if (!v1Measures.length || !v2Measures.length) return;
-  const levelRaw = String(level ?? "").toLowerCase();
   const minMidi = 55;
-  const maxMidi = levelRaw === "beginner" ? 83 : 96;
+  const maxMidi = 96;
   const v1ByMeasure = new Map<number, Map<number, number>>();
   for (const m of v1Measures) {
     const map = new Map<number, number>();
@@ -1179,18 +1176,12 @@ export function applyStringPolyphonicRhythm(
     });
   }
   if (vln2) {
-    const vln2Range =
-      level === "beginner"
-        ? { minMidi: 55, maxMidi: 83 }
-        : level === "intermediate"
-          ? { minMidi: 55, maxMidi: 88 }
-          : {};
+    // Full Violin II range for all levels — no level-based caps.
+    const vln2Range = {};
     if (level === "beginner" && options.vln2Activity === "high_active") {
-      // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
       applyViolin2BeginnerHighActive(vln2, { ...options, ...vln2Range });
       warn(warnings, "[strings] Beginner Violin II: 8th+16th on chord 3rd (activity=high_active).");
     } else if (level === "beginner" && options.vln2Activity === "active") {
-      // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
       if (vln1) {
         applyViolin2BeginnerContraryToMelody(vln1, vln2, { ...options, ...vln2Range });
         warn(warnings, "[strings] Beginner Violin II: melody rhythm, contrary motion, 3rd/5th.");
@@ -1205,31 +1196,26 @@ export function applyStringPolyphonicRhythm(
         "[strings] Intermediate Violin II: dotted 8th+16th, four 16ths ascending, dotted quarter+8th."
       );
     } else if (level === "intermediate" && options.vln2Activity === "active") {
-      // LOCKED: String/Intermediate/Polyphonic (60% active). Do not change without explicit approval.
       applyViolin2IntermediateActivePattern(vln2, { ...options, ...vln2Range });
       warn(warnings, "[strings] Intermediate Violin II: 8th-rest+8th+8th+8th on chord 3rd.");
     } else if (level === "intermediate" && options.vln2Activity === "less_active" && vc) {
-      // LOCKED: String/Intermediate/Polyphonic (40% active). Do not change without explicit approval.
       applyViolin2IntermediateLessActiveContrary(vln2, vc, { ...options, ...vln2Range });
       warn(warnings, "[strings] Intermediate Violin II: 40% 8ths, 50% quarters, 10% halves on 3rd/5th, contrary to cello.");
-    } else if (level === "advanced" && options.vln2Activity === "high_active") {
-      // LOCKED: String/Advanced/Polyphonic (100% active). Do not change without explicit approval.
+    } else if ((level === "advanced" || level === "professional") && options.vln2Activity === "high_active") {
       applyViolin2AdvancedHighActive(vln2, cb, { ...options, minMidi: 55, maxMidi: 96 });
       warn(
         warnings,
-        "[strings] Advanced Violin II (100%): shuffled 4x16/2x8/dotted-quarter+8th, contrary to double bass."
+        "[strings] Advanced/Professional Violin II (100%): shuffled 4x16/2x8/dotted-quarter+8th, contrary to double bass."
       );
-    } else if (level === "advanced" && options.vln2Activity === "active") {
-      // LOCKED: String/Advanced/Polyphonic (60% active). Do not change without explicit approval.
+    } else if ((level === "advanced" || level === "professional") && options.vln2Activity === "active") {
       applyViolin2AdvancedActive(vln2, vc, { ...options, minMidi: 55, maxMidi: 96 });
       warn(
         warnings,
-        "[strings] Advanced Violin II (60%): shuffled cells, contrary to cello, harmonic-color tones."
+        "[strings] Advanced/Professional Violin II (60%): shuffled cells, contrary to cello, harmonic-color tones."
       );
-    } else if (level === "advanced" && options.vln2Activity === "less_active") {
-      // LOCKED: String/Advanced/Polyphonic (40% active). Do not change without explicit approval.
+    } else if ((level === "advanced" || level === "professional") && options.vln2Activity === "less_active") {
       applyViolin2AdvancedLessActive(vln2, { ...options, minMidi: 55, maxMidi: 96 });
-      warn(warnings, "[strings] Advanced Violin II (40%): 8ths on chord 3rd/5th.");
+      warn(warnings, "[strings] Advanced/Professional Violin II (40%): 8ths on chord 3rd/5th.");
     } else {
       applyToPart(vln2, options.vln2Activity ?? "active", warnings, 11, { ...options, ...vln2Range });
     }
@@ -1237,51 +1223,34 @@ export function applyStringPolyphonicRhythm(
   const beginnerContrary =
     level === "beginner" && options.vlaActivity === "less_active" && options.vcActivity === "less_active";
   if (beginnerContrary && vla && vc) {
-    // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
     applyBeginnerContraryMotion(vla, vc, options);
     warn(warnings, "[strings] Beginner contrary motion applied (viola+cello, quarter/half only).");
   } else {
     if (vla) {
-      const vlaMinSubdivision =
-        options.vlaActivity === "high_active"
-          ? level === "beginner"
-            ? 1
-            : level === "intermediate"
-              ? 0.5
-              : undefined
-          : undefined;
-      const vlaRange =
-        level === "beginner"
-          ? { minMidi: 48, maxMidi: 76 }
-          : level === "intermediate"
-            ? { minMidi: 48, maxMidi: 81 }
-            : {};
+      // Subdivision and range caps removed — activity level drives rhythm density.
+      const vlaMinSubdivision = undefined;
+      const vlaRange = {};
       if (level === "intermediate" && options.vlaActivity === "high_active") {
         applyViolaIntermediateHighActivePattern(vla, { ...options, ...vlaRange });
         warn(
           warnings,
           "[strings] Intermediate viola (100%): shuffled cells from Violin II + Cello vocabulary."
         );
-      } else if (level === "advanced" && options.vlaActivity === "high_active") {
-        // LOCKED: String/Advanced/Polyphonic (100% active). Do not change without explicit approval.
+      } else if ((level === "advanced" || level === "professional") && options.vlaActivity === "high_active") {
         applyViolaAdvancedHighActiveTriplets(vla, { ...options, minMidi: 48, maxMidi: 84 });
-        warn(warnings, "[strings] Advanced Viola (100%): triplet rhythm on chord 3rd applied.");
+        warn(warnings, "[strings] Advanced/Professional Viola (100%): triplet rhythm on chord 3rd applied.");
       } else if (level === "intermediate" && options.vlaActivity === "active") {
-        // LOCKED: String/Intermediate/Polyphonic (60% active). Do not change without explicit approval.
         applyViolaIntermediateActivePattern(vla, { ...options, ...vlaRange });
         warn(warnings, "[strings] Intermediate Viola: 8th-rest+8th+8th+8th on chord 5th.");
       } else if (level === "intermediate" && options.vlaActivity === "less_active" && vc) {
-        // LOCKED: String/Intermediate/Polyphonic (40% active). Do not change without explicit approval.
         applyViolaIntermediateAgainstCello(vla, vc, { ...options, ...vlaRange });
         warn(warnings, "[strings] Intermediate viola: Alberti 8ths vs cello quarters, arpeggio vs cello halves.");
-      } else if (level === "advanced" && options.vlaActivity === "active") {
-        // LOCKED: String/Advanced/Polyphonic (60% active). Do not change without explicit approval.
+      } else if ((level === "advanced" || level === "professional") && options.vlaActivity === "active") {
         applyViolaAdvancedActive(vla, { vln1, vln2, vc, cb }, { ...options, minMidi: 48, maxMidi: 84 });
-        warn(warnings, "[strings] Advanced Viola (60%): 8ths, gap-fill on weak harmony, root when complete.");
-      } else if (level === "advanced" && options.vlaActivity === "less_active" && vln2) {
-        // LOCKED: String/Advanced/Polyphonic (40% active). Do not change without explicit approval.
+        warn(warnings, "[strings] Advanced/Professional Viola (60%): 8ths, gap-fill on weak harmony, root when complete.");
+      } else if ((level === "advanced" || level === "professional") && options.vlaActivity === "less_active" && vln2) {
         applyViolaAdvancedLessActive(vla, vln2, { ...options, minMidi: 48, maxMidi: 84 });
-        warn(warnings, "[strings] Advanced Viola (40%): 8ths on chord 1st/5th to complete harmony.");
+        warn(warnings, "[strings] Advanced/Professional Viola (40%): 8ths on chord 1st/5th to complete harmony.");
       } else {
         applyToPart(vla, options.vlaActivity ?? "active", warnings, 23, {
           ...options,
@@ -1290,61 +1259,49 @@ export function applyStringPolyphonicRhythm(
         });
       }
       if (options.vlaActivity === "high_active") {
-        if (level !== "intermediate" && level !== "advanced") {
-          applyViolaArpeggio(vla, { ...options, ...vlaRange });
-          warn(warnings, "[strings] Viola arpeggio applied (activity=high_active).");
+        if (level === "beginner") {
+          applyViolaArpeggio(vla, { ...options });
+          warn(warnings, "[strings] Beginner Viola arpeggio applied (activity=high_active).");
         }
       }
       if (level === "beginner" && options.vlaActivity === "active") {
-        // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
         applyViolaBeginnerActive(vla, options);
         warn(warnings, "[strings] Beginner viola: 60% Alberti (8ths), 40% quarter arpeggio.");
       }
     }
     if (vc) {
-      const vcRange =
-        level === "beginner"
-          ? { minMidi: 36, maxMidi: 64 }
-          : level === "intermediate"
-            ? { minMidi: 36, maxMidi: 69 }
-            : {};
+      // Full cello range for all levels — no level-based caps.
+      const vcRange = {};
       if (level === "intermediate" && options.vcActivity === "high_active") {
         applyCelloIntermediateHighActivePattern(vc, { ...options, ...vcRange });
         warn(
           warnings,
           "[strings] Intermediate cello (100%): quarter, two 8ths, Alberti 16ths, dotted 8th+16th."
         );
-      } else if (level === "advanced" && options.vcActivity === "high_active") {
-        // LOCKED: String/Advanced/Polyphonic (100% active). Do not change without explicit approval.
+      } else if ((level === "advanced" || level === "professional") && options.vcActivity === "high_active") {
         applyCelloAdvancedHighActiveSyncopes(vc, { ...options, minMidi: 36, maxMidi: 76 });
-        warn(warnings, "[strings] Advanced cello (100%): syncopation on chord 1st/3rd/5th.");
+        warn(warnings, "[strings] Advanced/Professional cello (100%): syncopation on chord 1st/3rd/5th.");
       } else if (level === "intermediate" && options.vcActivity === "active") {
-        // LOCKED: String/Intermediate/Polyphonic (60% active). Do not change without explicit approval.
         applyCelloIntermediateActive(vc, { ...options, ...vcRange });
         warn(
           warnings,
           "[strings] Intermediate cello: 40% Alberti 8ths, 20% quarters, 30% syncopation, 10% neighbor tones."
         );
       } else if (level === "intermediate" && options.vcActivity === "less_active") {
-        // LOCKED: String/Intermediate/Polyphonic (40% active). Do not change without explicit approval.
         applyCelloIntermediateLessActive(vc, { ...options, ...vcRange });
         warn(warnings, "[strings] Intermediate cello: 40% half notes on 3rd, 60% quarter arpeggios.");
-      } else if (level === "advanced" && options.vcActivity === "active") {
-        // LOCKED: String/Advanced/Polyphonic (60% active). Do not change without explicit approval.
+      } else if ((level === "advanced" || level === "professional") && options.vcActivity === "active") {
         applyCelloAdvancedActivePattern(vc, { ...options, minMidi: 36, maxMidi: 76 });
-        warn(warnings, "[strings] Advanced cello (60%): dotted 8th+16th arpeggio cell applied.");
-      } else if (level === "advanced" && options.vcActivity === "less_active") {
-        // LOCKED: String/Advanced/Polyphonic (40% active). Do not change without explicit approval.
+        warn(warnings, "[strings] Advanced/Professional cello (60%): dotted 8th+16th arpeggio cell applied.");
+      } else if ((level === "advanced" || level === "professional") && options.vcActivity === "less_active") {
         applyCelloAlberti(vc, { ...options, minMidi: 36, maxMidi: 76 });
-        warn(warnings, "[strings] Advanced cello (40%): Alberti bass applied.");
+        warn(warnings, "[strings] Advanced/Professional cello (40%): Alberti bass applied.");
       } else if (level === "beginner" && options.vcActivity === "active" && vln1) {
-        // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
         applyCelloMelodyRhythmContrary(vln1, vc, { ...options, ...vcRange });
         warn(warnings, "[strings] Beginner cello follows melody rhythm with contrary motion.");
       } else {
         applyToPart(vc, options.vcActivity ?? "less_active", warnings, 37, { ...options, ...vcRange });
         if (level === "beginner" && options.vcActivity === "high_active") {
-          // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
           applyCelloAlberti(vc, { ...options, ...vcRange });
           warn(warnings, "[strings] Cello Alberti applied (beginner, activity=high_active).");
         }
@@ -1355,20 +1312,15 @@ export function applyStringPolyphonicRhythm(
     if (level === "intermediate" && options.cbActivity === "high_active") {
       applyDoubleBassIntermediateHighActive(cb, options);
       warn(warnings, "[strings] Intermediate Double Bass (100%): 8th notes on chord bass.");
-    } else if (level === "advanced" && options.cbActivity === "high_active") {
-      // LOCKED: String/Advanced/Polyphonic (100% active). Do not change without explicit approval.
+    } else if ((level === "advanced" || level === "professional") && options.cbActivity === "high_active") {
       applyDoubleBassAdvancedHighActive(cb, options);
-      warn(warnings, "[strings] Advanced Double Bass (100%): 8th+16th+16th rhythm cell.");
-    } else if (level === "advanced" && options.cbActivity === "active") {
-      // LOCKED: String/Advanced/Polyphonic (60% active). Do not change without explicit approval.
+      warn(warnings, "[strings] Advanced/Professional Double Bass (100%): 8th+16th+16th rhythm cell.");
+    } else if ((level === "advanced" || level === "professional") && options.cbActivity === "active") {
       applyDoubleBassIntermediateHighActive(cb, options);
-      warn(warnings, "[strings] Advanced Double Bass (60%): 8th notes on chord bass.");
+      warn(warnings, "[strings] Advanced/Professional Double Bass (60%): 8th notes on chord bass.");
     } else {
       applyToPart(cb, options.cbActivity ?? "less_active", warnings, 51, options);
     }
-  }
-  if (String(options.level ?? "").toLowerCase() === "intermediate" && options.cbActivity === "less_active") {
-    // LOCKED: String/Intermediate/Polyphonic (40% active). Do not change without explicit approval.
   }
 
   const beginnerCbSync =
@@ -1378,7 +1330,6 @@ export function applyStringPolyphonicRhythm(
     cb &&
     vc;
   if (beginnerCbSync) {
-    // LOCKED: String/Beginner/Polyphony rules. Do not change without explicit approval.
     let prevCbMidi = 40;
     const cbMin = 28;
     const cbMax = 60;
@@ -1402,14 +1353,12 @@ export function applyStringPolyphonicRhythm(
     warn(warnings, "[strings] Beginner: Double Bass rhythm synced to Cello; pitches follow chord bass.");
   }
   if (vln1 && (vln2 || vla || vc || cb)) {
-    const levelRaw = String(options.level ?? "").toLowerCase();
-    const vcRange = { min: 36, max: levelRaw === "beginner" ? 64 : 76 };
     alignEndingRhythmToMelody(
       vln1,
       [
         vln2 ? { part: vln2, range: { min: 55, max: 96 } } : null,
-        vla ? { part: vla, range: { min: 48, max: levelRaw === "beginner" ? 76 : 84 } } : null,
-        vc ? { part: vc, range: vcRange } : null,
+        vla ? { part: vla, range: { min: 48, max: 84 } } : null,
+        vc ? { part: vc, range: { min: 36, max: 76 } } : null,
         cb ? { part: cb, range: { min: 28, max: 60 } } : null
       ].filter(Boolean) as Array<{ part: any; range: { min: number; max: number } }>,
       options.chordEvents ?? []
@@ -1424,32 +1373,33 @@ export function applyStringPolyphonicRhythm(
     enforceNoBassCelloOverlap(cb, vc, options.chordEvents ?? [], options.level);
     warn(warnings, "[strings] Cello adjusted to avoid overlap with Double Bass.");
   }
-  if (vla && vc && String(options.level ?? "").toLowerCase() === "intermediate") {
+  // Overlap and unison enforcement runs for all levels — not gated by level.
+  if (vla && vc) {
     enforceNoViolaCelloOverlap(vla, vc, options.chordEvents ?? [], options.level);
-    warn(warnings, "[strings] Intermediate: Viola adjusted to avoid overlap with Cello.");
+    warn(warnings, "[strings] Viola adjusted to avoid overlap with Cello.");
   }
-  if (vln1 && vln2 && String(options.level ?? "").toLowerCase() === "beginner") {
+  if (vln1 && vln2) {
     enforceNoVln1Vln2Unison(vln1, vln2, options.chordEvents ?? [], options.level);
-    warn(warnings, "[strings] Beginner: Violin II adjusted to avoid unison with Violin I.");
+    warn(warnings, "[strings] Violin II adjusted to avoid unison with Violin I.");
   }
   const levelRaw = String(options.level ?? "").toLowerCase();
   if (
-    levelRaw === "advanced" &&
+    (levelRaw === "advanced" || levelRaw === "professional") &&
     (options.vln2Activity === "less_active" || options.vln2Activity === "active" || options.vln2Activity === "high_active") &&
     vln2
   ) {
-    // LOCKED/ENFORCED: String/Advanced/Polyphonic Violin II harmony gap fill (40%, 60%, 100% active).
     enforceViolin2ChordToneGapFill(
       vln2,
       { vln1, vla, vc, cb },
       options.chordEvents ?? [],
       { min: 55, max: 96 }
     );
-    warn(warnings, "[strings] Advanced Violin II: gap-fill on missing chord 3rd/5th.");
+    warn(warnings, "[strings] Advanced/Professional Violin II: gap-fill on missing chord 3rd/5th.");
   }
-  const v2Max = levelRaw === "beginner" ? 83 : levelRaw === "intermediate" ? 88 : 96;
-  const vlaMax = levelRaw === "beginner" ? 76 : levelRaw === "intermediate" ? 81 : 84;
-  const vcMaxStrict = levelRaw === "beginner" ? 64 : levelRaw === "intermediate" ? 69 : 76;
+  // Voice crossing enforcement uses full instrument ranges for all levels.
+  const v2Max = 96;
+  const vlaMax = 84;
+  const vcMaxStrict = 76;
   if (vln1 && vln2) {
     enforceNoCrossingPair(vln1, vln2, options.chordEvents ?? [], { min: 55, max: v2Max });
     warn(warnings, "[strings] Enforced no crossing (Violin I above Violin II).");
@@ -1473,9 +1423,9 @@ export function applyStringPolyphonicRhythm(
 function applyViolaArpeggio(part: any, options: ApplyOptions): void {
   const measures = Array.isArray(part?.measures) ? part.measures : [];
   const chordEvents = options.chordEvents ?? [];
-  const level = String(options.level ?? "").toLowerCase();
-  const restrictToEighths = level === "intermediate";
-  const restrictToQuarters = level === "beginner";
+  // Subdivision restrictions removed — activity level controls rhythm density.
+  const restrictToEighths = false;
+  const restrictToQuarters = false;
   const minMidi = typeof options.minMidi === "number" ? options.minMidi : null;
   const maxMidi = typeof options.maxMidi === "number" ? options.maxMidi : null;
   const clampRange = (m: number): number => {
