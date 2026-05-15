@@ -464,6 +464,151 @@ function preferredDegreesMinor(deg: number): number[] {
 }
 
 // ---------------------------------------------------------------------------
+// Galant schemata — Gjerdingen (2007) stock patterns
+// ---------------------------------------------------------------------------
+//
+// Based on Robert Gjerdingen, *Music in the Galant Style* (Oxford, 2007), as
+// surveyed in Christensen (ed.), *The Cambridge History of Western Music Theory*
+// (Cambridge, 2002), Ch. 31 (Gjerdingen, "The Psychology of Music").
+//
+// Rather than harmonizing each melody note in isolation (scale degree → chord),
+// schemata detection looks at 3-4 note *sequences* that match well-known stock
+// patterns of 18th-century tonal practice.  When a match is found, the entire
+// pattern is harmonized together using its canonical chord sequence.
+//
+// Patterns with longer degree sequences are tried first; once a note is assigned
+// to a schema it is not re-used by a shorter pattern.
+
+/**
+ * One schema definition: a scale-degree sequence and the parallel chord-degree
+ * sequence to assign when the pattern is detected in the melody.
+ * 0 in `degrees` acts as a wildcard (matches any diatonic or chromatic note).
+ */
+type SchemaPattern = {
+  name: string;
+  /** Expected scale degrees (1-7) of consecutive melody notes. */
+  degrees: number[];
+  /** Chord degrees (1-7) to assign at each position of the match. */
+  chords: number[];
+};
+
+/** Galant schemata for **major** keys. */
+const SCHEMATA_MAJOR: SchemaPattern[] = [
+  // ------------------------------------------------------------------
+  // 4-note patterns (matched first)
+  // ------------------------------------------------------------------
+  // Prinner (Gjerdingen §6): ^6-^5-^4-^3, the most ubiquitous schema.
+  // Soprano falls by step; bass mirrors ^4-^3-^2-^1.  Harmonized IV-I-ii-V.
+  { name: "Prinner",    degrees: [6, 5, 4, 3], chords: [4, 1, 2, 5] },
+  // Romanesca (Gjerdingen §7): ^1-^7-^6-^5, falling I-V-vi-iii.
+  { name: "Romanesca",  degrees: [1, 7, 6, 5], chords: [1, 5, 6, 3] },
+  // Monte (Gjerdingen §10): ascending sequence ^5-^6-^7-^1, I-ii-V-I.
+  { name: "Monte",      degrees: [5, 6, 7, 1], chords: [1, 2, 5, 1] },
+  // Fonte (Gjerdingen §9): falling ^4-^3-^2-^1, ii-V-IV-I.
+  { name: "Fonte",      degrees: [4, 3, 2, 1], chords: [2, 5, 4, 1] },
+  // Indugio (lingering pre-cadential): ^4-^2-^7-^1.
+  { name: "Indugio",    degrees: [4, 2, 7, 1], chords: [4, 2, 5, 1] },
+  // ------------------------------------------------------------------
+  // 3-note patterns
+  // ------------------------------------------------------------------
+  // Do-Re-Mi (Gjerdingen §3): ^1-^2-^3, opening I-V-I.
+  { name: "Do-Re-Mi",   degrees: [1, 2, 3],    chords: [1, 5, 1] },
+  // Sol-Fa-Mi: ^5-^4-^3, I-IV-I.
+  { name: "Sol-Fa-Mi",  degrees: [5, 4, 3],    chords: [1, 4, 1] },
+  // Mi-Re-Do (closing): ^3-^2-^1, I-V-I.
+  { name: "Mi-Re-Do",   degrees: [3, 2, 1],    chords: [1, 5, 1] },
+  // Re-Mi-Fa (upward pre-dominant): ^2-^3-^4, V-I-IV.
+  { name: "Re-Mi-Fa",   degrees: [2, 3, 4],    chords: [5, 1, 4] },
+  // ------------------------------------------------------------------
+  // 2-note patterns (matched last)
+  // ------------------------------------------------------------------
+  // Ti-Do (leading tone resolution): ^7-^1, V-I.
+  { name: "Ti-Do",      degrees: [7, 1],        chords: [5, 1] },
+  // Fa-Mi (pre-cadential): ^4-^3, IV-V or ii-V.
+  { name: "Fa-Mi",      degrees: [4, 3],        chords: [4, 5] },
+  // Re-Do (authentic close): ^2-^1, V-I.
+  { name: "Re-Do",      degrees: [2, 1],        chords: [5, 1] },
+  // Sol-La (move to vi): ^5-^6, I-vi.
+  { name: "Sol-La",     degrees: [5, 6],        chords: [1, 6] },
+];
+
+/** Galant schemata for **minor** keys. */
+const SCHEMATA_MINOR: SchemaPattern[] = [
+  // 4-note
+  { name: "Prinner",    degrees: [6, 5, 4, 3], chords: [6, 1, 4, 5] },
+  { name: "Romanesca",  degrees: [1, 7, 6, 5], chords: [1, 5, 6, 3] },
+  { name: "Monte-min",  degrees: [5, 6, 7, 1], chords: [1, 6, 5, 1] },
+  { name: "Fonte-min",  degrees: [4, 3, 2, 1], chords: [4, 1, 5, 1] },
+  // 3-note
+  { name: "Do-Re-Mi",   degrees: [1, 2, 3],    chords: [1, 5, 3] },
+  { name: "Sol-Fa-Mi",  degrees: [5, 4, 3],    chords: [1, 4, 1] },
+  { name: "Mi-Re-Do",   degrees: [3, 2, 1],    chords: [3, 5, 1] },
+  // 2-note
+  { name: "Ti-Do",      degrees: [7, 1],        chords: [5, 1] },
+  { name: "Fa-Mi",      degrees: [4, 3],        chords: [4, 5] },
+  { name: "Re-Do",      degrees: [2, 1],        chords: [5, 1] },
+];
+
+/**
+ * A map from phrase-note index to the chord degree pre-assigned by a schema.
+ * Indices not in this map fall through to the existing scale-degree logic.
+ */
+type SchemaAssignment = Map<number, number>;
+
+/**
+ * Scan `phraseNotes` for Galant schema patterns.
+ * Returns a map from note index → chord degree for every note covered by a
+ * recognised schema.  Longer patterns take priority; each note is claimed by
+ * at most one pattern.
+ */
+function detectSchemas(
+  phraseNotes: MelodyNote[],
+  scalePcs: number[],
+  mode: "major" | "minor"
+): SchemaAssignment {
+  const assignment: SchemaAssignment = new Map();
+  const used = new Set<number>();
+
+  const patterns = mode === "major" ? SCHEMATA_MAJOR : SCHEMATA_MINOR;
+
+  // Sort by pattern length (descending) so longer patterns take priority.
+  const sorted = [...patterns].sort((a, b) => b.degrees.length - a.degrees.length);
+
+  const noteDegrees = phraseNotes.map((n) => scaleDegree(pc(n.midi), scalePcs));
+
+  for (const pat of sorted) {
+    const len = pat.degrees.length;
+    for (let i = 0; i <= noteDegrees.length - len; i++) {
+      // Check whether the melody degrees at positions i…i+len-1 match the pattern.
+      let matches = true;
+      for (let k = 0; k < len; k++) {
+        const expected = pat.degrees[k]!;
+        const actual = noteDegrees[i + k]!;
+        // 0 is a wildcard; chromatic notes (actual === 0) also match any degree.
+        if (expected !== 0 && actual !== 0 && actual !== expected) {
+          matches = false;
+          break;
+        }
+      }
+      if (!matches) continue;
+
+      // Check none of these positions are already claimed by a longer pattern.
+      if (pat.degrees.some((_, k) => used.has(i + k))) continue;
+
+      // Assign and mark all positions in this match.
+      for (let k = 0; k < len; k++) {
+        assignment.set(i + k, pat.chords[k]!);
+        used.add(i + k);
+      }
+      // Do not re-match the same pattern type at an overlapping position.
+      break;
+    }
+  }
+
+  return assignment;
+}
+
+// ---------------------------------------------------------------------------
 // Progression smoothing
 // ---------------------------------------------------------------------------
 
@@ -534,6 +679,12 @@ function harmonizePhrase(
   // If this is the last phrase, force the last two notes to V7 → I
   const forcedCadenceStart = isLastPhrase ? Math.max(0, phraseNotes.length - 2) : -1;
 
+  // --- Galant schemata pre-assignment -----------------------------------
+  // Detect stock patterns (Prinner, Romanesca, Do-Re-Mi, …) in the phrase
+  // and pre-assign chord degrees for those notes.  Notes not covered by any
+  // schema fall through to the existing scale-degree logic below.
+  const schemaAssignment = detectSchemas(phraseNotes, scalePcs, mode);
+
   for (let i = 0; i < phraseNotes.length; i++) {
     const note = phraseNotes[i]!;
     const noteTime = note.measure * 1000 + note.t;
@@ -557,6 +708,22 @@ function harmonizePhrase(
     const durationSinceLastChord = noteTime - lastChordEndTime + note.dur;
     if (isWeakBeat && durationSinceLastChord < minChordDuration) {
       // Reuse current chord — no new event needed
+      continue;
+    }
+
+    // --- Schema pre-assignment (Galant schemata, Gjerdingen 2007) ----------
+    // If this note is covered by a detected schema, use the pre-assigned chord
+    // degree instead of the generic scale-degree lookup.
+    const schemaDeg = schemaAssignment.get(i);
+    if (schemaDeg !== undefined) {
+      const schemaChord = chords.find((c) => c.degree === schemaDeg) ?? chords[0]!;
+      const lastBeat = beats[beats.length - 1];
+      // Avoid emitting a duplicate adjacent chord symbol within the same measure
+      if (!lastBeat || lastBeat.deg !== schemaChord.degree || lastBeat.measure !== note.measure) {
+        beats.push({ measure: note.measure, t: note.t, deg: schemaChord.degree, symbol: schemaChord.symbol });
+        prevDeg = schemaChord.degree;
+        lastChordEndTime = noteTime + note.dur;
+      }
       continue;
     }
 

@@ -271,6 +271,7 @@ function applyStrictness(
     "crossing.AT",
     "crossing.TB",
     "parallel.perfect",
+    "hidden.perfect",
     "doubling.third.root_position",
     "doubling.third.first_inversion",
     "seventh.incomplete_root_position",
@@ -475,6 +476,51 @@ export function checkChoralRules(
               t: t2,
               voices: pair.label === "SA" ? ["soprano", "alto"] : pair.label === "AT" ? ["alto", "tenor"] : ["tenor", "bass"]
             });
+          }
+        }
+      }
+
+      // ── Hidden (direct) perfect intervals — outer voices only ──────────────
+      // Fux, *Gradus ad Parnassum* (1725), cardinal rule 1 & 3:
+      //   "Perfect consonance → Perfect consonance: contrary or oblique motion only."
+      // In practice, the "hidden fifth/octave" rule applies specifically to outer
+      // voices (Soprano + Bass) approaching a perfect interval in *similar* motion
+      // when the upper voice moves by a leap (> 1 whole tone = >2 semitones).
+      // Step motion in the soprano is the accepted exception (Aldwell & Schachter).
+      //
+      // Outer voices = soprano (upper) + bass (lower).
+      {
+        const soprM1 = s1 ? getEventMidi(s1) : null;
+        const soprM2 = s2 ? getEventMidi(s2) : null;
+        const bassM1 = b1 ? getEventMidi(b1) : null;
+        const bassM2 = b2 ? getEventMidi(b2) : null;
+
+        if (soprM1 !== null && soprM2 !== null && bassM1 !== null && bassM2 !== null) {
+          const soprDir = Math.sign(soprM2 - soprM1);
+          const bassDir = Math.sign(bassM2 - bassM1);
+
+          // Similar motion: both voices moving in the same direction (not oblique)
+          if (soprDir !== 0 && bassDir !== 0 && soprDir === bassDir) {
+            const arrivalInterval = Math.abs(soprM2 - bassM2) % 12;
+            const isPerfect = arrivalInterval === 0 || arrivalInterval === 7;
+            const soprLeaps = Math.abs(soprM2 - soprM1) > 2; // leap = more than whole tone
+
+            // Not already a parallel perfect (those are caught above)
+            const departureInterval = Math.abs(soprM1 - bassM1) % 12;
+            const depPerfect = departureInterval === 0 || departureInterval === 7;
+            const alreadyParallel = isPerfectInterval(Math.abs(soprM1 - bassM1), [0, 7]) &&
+                                    isPerfectInterval(Math.abs(soprM2 - bassM2), [0, 7]);
+
+            if (isPerfect && soprLeaps && !alreadyParallel && !depPerfect) {
+              violations.push({
+                ruleId: "hidden.perfect",
+                severity: "warn",
+                message: `Hidden ${arrivalInterval === 0 ? "octave/unison" : "fifth"}: soprano and bass approach a perfect interval in similar motion with soprano leap (Fux).`,
+                measure: measureNumber,
+                t: t2,
+                voices: ["soprano", "bass"]
+              });
+            }
           }
         }
       }
