@@ -2441,9 +2441,9 @@ function insertOrnaments(
   } = {}
 ): void {
   const density  = options.density ?? 0.25;
-  const minDur   = options.minDur  ?? 0.5;   // only ornament notes ≥ quarter note
+  const minDur   = options.minDur  ?? 0.75;  // only ornament notes ≥ dotted-8th
   const salt     = options.salt    ?? 0;
-  const ORN_DUR  = 0.125;                     // each ornament sub-note = 8th
+  const ORN_DUR  = 0.25;                     // each ornament sub-note = 16th note
   const measures = Array.isArray(part?.measures) ? part.measures : [];
 
   for (const m of measures) {

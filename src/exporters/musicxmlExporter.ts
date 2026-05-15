@@ -106,6 +106,7 @@ function durToType(divisions: number, dur: number): string | null {
   if (dur === divisions) return "quarter";
   if (dur === divisions / 2) return "eighth";
   if (dur === divisions / 4) return "16th";
+  if (dur === divisions / 8) return "32nd";
   return null;
 }
 
