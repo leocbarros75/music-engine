@@ -59,6 +59,12 @@ export type Settings = {
   randomizeOffsets?: boolean;
   pianoStylePreset?: string;
   /**
+   * When true, the engine auto-generates chord harmony from the melody using
+   * Krumhansl-Schmuckler key detection + scale-degree harmonization.
+   * No chord events need to be supplied by the user.
+   */
+  melodyOnly?: boolean;
+  /**
    * Explicit LH accompaniment pattern override for piano accompaniment mode.
    * When set, bypasses the auto-selection based on style + time signature.
    * "auto" means let the engine decide.

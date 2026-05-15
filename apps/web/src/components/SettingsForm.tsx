@@ -970,10 +970,35 @@ export default function SettingsForm({ settings, onChange }: Props) {
             );
           })()}
 
+          {/* Melody Only — auto-harmonize from melody when no chords are provided */}
+          <div className="field">
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={settings.melodyOnly === true}
+                onChange={(e) => update("melodyOnly", e.target.checked ? true : undefined)}
+                style={{ width: "16px", height: "16px", cursor: "pointer" }}
+              />
+              Melody Only Mode
+            </label>
+            <div className="key-preview">
+              <span className="slider-help">
+                {settings.melodyOnly
+                  ? "✓ Engine will detect key and generate harmony automatically from the melody."
+                  : "Upload a melody without chords — engine auto-harmonizes using Krumhansl-Schmuckler key detection + scale-degree rules."}
+              </span>
+            </div>
+          </div>
+
           {/* Key Signature */}
           <div className="field">
-            <label>Key Signature</label>
-            <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>
+            <label>Key Signature{settings.melodyOnly ? " (auto-detected when Melody Only is on)" : ""}</label>
+            <select
+              value={settings.keySignature}
+              onChange={(e) => update("keySignature", e.target.value)}
+              disabled={settings.melodyOnly === true}
+              style={settings.melodyOnly ? { opacity: 0.5 } : undefined}
+            >
               <option value="original">Original (from file)</option>
               <optgroup label="Major">
                 {KEY_OPTIONS_MAJOR.map((opt) => (

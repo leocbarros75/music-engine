@@ -21,6 +21,8 @@ import { analyzeHarmonyPerMeasure, attachHarmonyToScore } from "./_legacy/analyz
 import { harmonizeSatbFromChords } from "./harmonize/satb/harmonizeSatbFromChords";
 import { inferChordsFromMelody } from "./harmonize/satb/inferChordsFromMelody";
 import { parseChordSymbol } from "./harmonize/satb/chordSymbol";
+// Melody-only harmonizer
+import { harmonizeMelody, extractMelodyFromScore } from "./harmonize/melodic/melodyHarmonizer";
 import { pitchToMidi } from "./instruments/instrumentCatalog";
 import type { HarmonizeSatbFromChordsRequest } from "./harmonize/satb/harmonizeTypes";
 import { applyAppSettings, type AppSettings } from "./app/applyAppSettings";
@@ -924,14 +926,37 @@ const server = http.createServer(async (req, res) => {
 
       const parsedChords = Array.isArray((score as any)?.meta?.inputChords) ? (score as any).meta.inputChords : [];
       const chordsToUse = chords.length ? chords : parsedChords;
-      const inferredIfEmpty = !chordsToUse.length ? inferChordsFromMelody(score as any) : [];
+
+      // Melody-only mode: use Krumhansl-Schmuckler key detection + scale-degree harmonizer
+      // when no chords are supplied and settings.melodyOnly is enabled.
+      const isMelodyOnly = (settings as any).melodyOnly === true;
+      let melodyHarmonizationResult: ReturnType<typeof harmonizeMelody> | null = null;
+      if (!chordsToUse.length && isMelodyOnly) {
+        const melodyNotes = extractMelodyFromScore(score);
+        if (melodyNotes.length) {
+          melodyHarmonizationResult = harmonizeMelody(melodyNotes, {
+            style: String(settings.style ?? "classical"),
+          });
+          // Patch detected key into settings so the arranger uses the right key
+          if (melodyHarmonizationResult.key) {
+            (settings as any).keyFifths = melodyHarmonizationResult.key.fifths;
+            (settings as any).detectedKeyMode = melodyHarmonizationResult.key.mode;
+          }
+        }
+      }
+
+      const inferredIfEmpty = !chordsToUse.length
+        ? (melodyHarmonizationResult?.chordEvents ?? inferChordsFromMelody(score as any))
+        : [];
       const chordSource = chords.length
         ? "request"
         : parsedChords.length
           ? "musicxml_harmony"
-          : inferredIfEmpty.length
-            ? "inferred"
-            : "none";
+          : melodyHarmonizationResult
+            ? "melody_harmonized"
+            : inferredIfEmpty.length
+              ? "inferred"
+              : "none";
 
       let normalized: any;
       if (wantsDirectSourceArrangement) {
