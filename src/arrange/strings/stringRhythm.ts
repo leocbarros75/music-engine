@@ -2270,6 +2270,393 @@ function applyModernCello(part: any, options: ApplyOptions): void {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Musical decoration post-processing utilities
+// These run AFTER per-voice pattern functions to add ornaments, approach scales,
+// and cross-voice techniques (imitation, call-and-response).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build a chromatic/diatonic scale run of `nNotes` pitches stepping from
+ * `prevMidi` toward `targetMidi`. The last note is always `targetMidi`.
+ * Intermediate steps prefer diatonic scale tones; chromatic fills used when needed.
+ */
+function buildApproachRun(
+  prevMidi: number,
+  targetMidi: number,
+  nNotes: number,
+  scale: number[],
+  minMidi: number,
+  maxMidi: number
+): number[] {
+  if (nNotes <= 0) return [];
+  if (nNotes === 1) return [targetMidi];
+  const dir = targetMidi >= prevMidi ? 1 : -1;
+  const result: number[] = [];
+  let midi = prevMidi;
+  for (let i = 0; i < nNotes - 1; i++) {
+    // Prefer a whole step; use half step if whole step is off-scale
+    let candidate = midi + dir * 2;
+    const pc = ((candidate % 12) + 12) % 12;
+    if (!scale.includes(pc)) candidate = midi + dir;
+    // Don't overshoot the target
+    if (dir > 0 && candidate >= targetMidi) candidate = targetMidi - (nNotes - 1 - i);
+    if (dir < 0 && candidate <= targetMidi) candidate = targetMidi + (nNotes - 1 - i);
+    midi = shiftOctavesIntoRange(Math.round(candidate), minMidi, maxMidi);
+    result.push(midi);
+  }
+  result.push(targetMidi);
+  return result;
+}
+
+/**
+ * Post-processing: replace the last note before each chord change with a 2–4 note
+ * scale/chromatic approach run leading into the new harmony's root or third.
+ * Runs on any part after its pattern function has filled in notes.
+ * `density` (0–1) is the probability of inserting an approach at each eligible change.
+ */
+function insertApproachNotes(
+  part: any,
+  chordEvents: { measure: number; t: number; symbol: string }[],
+  scale: number[],
+  options: {
+    density?: number;
+    minMidi?: number;
+    maxMidi?: number;
+    salt?: number;
+  } = {}
+): void {
+  const density  = options.density  ?? 0.55;
+  const minMidi  = options.minMidi  ?? 36;
+  const maxMidi  = options.maxMidi  ?? 96;
+  const salt     = options.salt     ?? 0;
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  if (!measures.length || !chordEvents.length) return;
+
+  // Build a de-duplicated list of chord-change positions
+  const sorted = [...chordEvents].sort((a, b) =>
+    a.measure !== b.measure ? a.measure - b.measure : a.t - b.t
+  );
+  type ChordChange = { measure: number; t: number; pcs: number[]; rootPc: number | null };
+  const changes: ChordChange[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = sorted[i - 1]!;
+    const curr = sorted[i]!;
+    if (curr.symbol !== prev.symbol) {
+      const parsed = parseChordSymbol(curr.symbol);
+      if (parsed) {
+        changes.push({ measure: curr.measure, t: curr.t, pcs: parsed.pcs ?? [], rootPc: parsed.rootPc ?? null });
+      }
+    }
+  }
+  if (!changes.length) return;
+
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const events: NoteEvent[] = Array.isArray(m?.events) ? m.events : [];
+    if (!events.length) continue;
+
+    // Chord changes we want to approach: mid-measure changes + next-measure downbeat
+    const relevant: ChordChange[] = [
+      ...changes.filter(c => c.measure === mNum     && c.t > 1e-6),
+      ...changes.filter(c => c.measure === mNum + 1 && c.t < 1e-6),
+    ];
+    if (!relevant.length) continue;
+
+    let updatedEvents = [...events];
+
+    for (const change of relevant) {
+      const h = ((mNum * 6271 + Math.round(change.t * 1000) * 3491 + salt * 997) >>> 0) % 1000;
+      if (h / 1000 >= density) continue;
+
+      // Notes that come before the change boundary (or all notes for measure-boundary changes)
+      const isMidMeasure = change.measure === mNum;
+      const notesBefore = updatedEvents
+        .filter(e => e.type === "note" && typeof e.midi === "number")
+        .filter(e => isMidMeasure ? Number(e.t) < change.t - 1e-6 : true)
+        .sort((a, b) => Number(b.t) - Number(a.t));
+
+      if (!notesBefore.length) continue;
+      const lastNote = notesBefore[0]!;
+      if (typeof lastNote.midi !== "number") continue;
+      if (lastNote.dur < 0.25) continue; // too short to decorate
+
+      const maxSteps = Math.min(4, Math.floor(lastNote.dur / 0.25));
+      if (maxSteps < 2) continue;
+      const nNotes = maxSteps >= 4 ? 3 : 2;
+
+      // Choose target pitch: chord tone nearest to current voice position
+      const { rootPc, pcs } = change;
+      const targetPc = pcs.length
+        ? pcs
+            .map(pc => ({ pc, dist: Math.abs(snapToPcNear(lastNote.midi as number, pc) - (lastNote.midi as number)) }))
+            .sort((a, b) => a.dist - b.dist)[0]!.pc
+        : rootPc;
+      if (targetPc === null) continue;
+
+      const targetMidi = shiftOctavesIntoRange(
+        snapToPcNear(lastNote.midi as number, targetPc),
+        minMidi, maxMidi
+      );
+
+      const runMidis = buildApproachRun(lastNote.midi as number, targetMidi, nNotes, scale, minMidi, maxMidi);
+      const noteUnit = lastNote.dur / nNotes;
+      const runNotes: NoteEvent[] = runMidis.map((midi, i) => ({
+        id:    `app-${mNum}-${Math.round(lastNote.t * 1000)}-${i}`,
+        t:     lastNote.t + i * noteUnit,
+        dur:   noteUnit,
+        type:  "note" as const,
+        midi,
+        pitch: midiToPitch(midi),
+        voice: lastNote.voice,
+        staff: lastNote.staff,
+      }));
+
+      updatedEvents = [
+        ...updatedEvents.filter(e => e !== lastNote),
+        ...runNotes,
+      ];
+    }
+
+    m.events = updatedEvents.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/**
+ * Post-processing: add ornaments (mordent, pralltriller, turn) to sustained notes.
+ *
+ *  • Mordent        — note → lower-neighbor → note  (quick dip, each 8th note)
+ *  • Pralltriller   — note → upper-neighbor → note  (quick snap upward)
+ *  • Turn           — upper → note → lower → note   (on notes ≥ half beat)
+ *
+ * Neighbor tones are diatonic (scale-based); chromatic neighbors used when needed.
+ * `density` (0–1) controls how often an eligible note receives an ornament.
+ */
+function insertOrnaments(
+  part: any,
+  scale: number[],
+  options: {
+    density?: number;
+    minDur?: number;
+    salt?: number;
+  } = {}
+): void {
+  const density  = options.density ?? 0.25;
+  const minDur   = options.minDur  ?? 0.5;   // only ornament notes ≥ quarter note
+  const salt     = options.salt    ?? 0;
+  const ORN_DUR  = 0.125;                     // each ornament sub-note = 8th
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+
+  for (const m of measures) {
+    const mNum   = Number(m?.number) || 1;
+    const events: NoteEvent[] = Array.isArray(m?.events) ? m.events : [];
+    const next:   NoteEvent[] = [];
+
+    for (const ev of events) {
+      if (ev.type !== "note" || typeof ev.midi !== "number" || ev.dur < minDur) {
+        next.push(ev);
+        continue;
+      }
+      const h = ((mNum * 3927 + Math.round(ev.t * 1000) * 891 + salt * 467) >>> 0) % 1000;
+      if (h / 1000 >= density) { next.push(ev); continue; }
+
+      const midi  = ev.midi;
+      const upPC  = ((midi + 2) % 12 + 12) % 12;
+      const loPC  = ((midi - 2 + 24) % 12)  as number;
+      const upper = scale.includes(upPC) ? midi + 2 : midi + 1;
+      const lower = scale.includes(loPC) ? midi - 2 : midi - 1;
+      const base  = `${mNum}-${Math.round(ev.t * 1000)}`;
+
+      const ornType = h % 3;
+
+      if (ornType === 0) {
+        // Mordent: note → lower → note
+        const remain = ev.dur - ORN_DUR * 2;
+        if (remain < ORN_DUR) { next.push(ev); continue; }
+        next.push({ ...ev, t: ev.t,               dur: ORN_DUR, id: `orn-ma-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR,     dur: ORN_DUR, midi: lower, pitch: midiToPitch(lower), id: `orn-mb-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR * 2, dur: remain,  id: `orn-mc-${base}` });
+
+      } else if (ornType === 1) {
+        // Pralltriller: note → upper → note
+        const remain = ev.dur - ORN_DUR * 2;
+        if (remain < ORN_DUR) { next.push(ev); continue; }
+        next.push({ ...ev, t: ev.t,               dur: ORN_DUR, id: `orn-pa-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR,     dur: ORN_DUR, midi: upper, pitch: midiToPitch(upper), id: `orn-pb-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR * 2, dur: remain,  id: `orn-pc-${base}` });
+
+      } else if (ev.dur >= 1.0) {
+        // Turn: upper → note → lower → note  (only on notes ≥ quarter)
+        const remain = ev.dur - ORN_DUR * 3;
+        if (remain < ORN_DUR) { next.push(ev); continue; }
+        next.push({ ...ev, t: ev.t,               dur: ORN_DUR, midi: upper, pitch: midiToPitch(upper), id: `orn-ta-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR,     dur: ORN_DUR, id: `orn-tb-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR * 2, dur: ORN_DUR, midi: lower, pitch: midiToPitch(lower), id: `orn-tc-${base}` });
+        next.push({ ...ev, t: ev.t + ORN_DUR * 3, dur: remain,  id: `orn-td-${base}` });
+      } else {
+        next.push(ev);
+      }
+    }
+
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
+}
+
+/**
+ * Cross-voice: Bach-style melodic imitation.
+ * Extracts a short motif (first 2 beats) from odd-numbered measures of the source
+ * and injects it, offset by `delayBeats`, into the same measure of the target.
+ * Transposition defaults to a 5th below (−7 semitones) — the classical imitation interval.
+ */
+function applyImitation(
+  sourcePart: any,
+  targetPart: any,
+  options: {
+    delayBeats?: number;
+    probability?: number;
+    transposeSemitones?: number;
+    targetMinMidi?: number;
+    targetMaxMidi?: number;
+    salt?: number;
+  } = {}
+): void {
+  const delay       = options.delayBeats        ?? 2;
+  const prob        = options.probability        ?? 0.4;
+  const transpose   = options.transposeSemitones ?? -7;
+  const tgtMin      = options.targetMinMidi      ?? 48;
+  const tgtMax      = options.targetMaxMidi      ?? 84;
+  const salt        = options.salt               ?? 0;
+
+  const srcMs = Array.isArray(sourcePart?.measures) ? sourcePart.measures : [];
+  const tgtMs = Array.isArray(targetPart?.measures) ? targetPart.measures : [];
+  if (!srcMs.length || !tgtMs.length) return;
+
+  for (const srcM of srcMs) {
+    const mNum = Number(srcM?.number) || 1;
+    if (mNum % 2 !== 1) continue;    // imitate from odd measures
+
+    const h = ((mNum * 7321 + salt * 1597) >>> 0) % 1000;
+    if (h / 1000 >= prob) continue;
+
+    const srcEvents: NoteEvent[] = (Array.isArray(srcM?.events) ? srcM.events : [])
+      .filter((e: NoteEvent) => e.type === "note" && typeof e.midi === "number" && Number(e.t) < 2)
+      .sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t))
+      .slice(0, 4);
+    if (!srcEvents.length) continue;
+
+    const tgtM = tgtMs.find((m: any) => Number(m?.number) === mNum);
+    if (!tgtM) continue;
+
+    const mLen = (() => {
+      const beats    = Number(tgtM?.attributes?.time?.beats    ?? 4);
+      const beatType = Number(tgtM?.attributes?.time?.beat_type ?? 4);
+      return beats * (4 / beatType);
+    })();
+    if (delay >= mLen) continue;
+
+    // Build transposed, delayed motif
+    const motif: NoteEvent[] = srcEvents
+      .filter((e: NoteEvent) => Number(e.t) + delay < mLen - 1e-6)
+      .map((e: NoteEvent, idx: number) => {
+        const rawMidi  = (typeof e.midi === "number" ? e.midi : 60) + transpose;
+        const midi     = shiftOctavesIntoRange(rawMidi, tgtMin, tgtMax);
+        return {
+          id:    `imit-${mNum}-${idx}`,
+          t:     Number(e.t) + delay,
+          dur:   Math.min(Number(e.dur), mLen - (Number(e.t) + delay)),
+          type:  "note" as const,
+          midi,
+          pitch: midiToPitch(midi),
+          voice: 1,
+          staff: 1,
+        };
+      });
+    if (!motif.length) continue;
+
+    // Window: replace target notes during the imitation slot
+    const imitStart = delay;
+    const imitEnd   = motif.reduce((mx, n) => Math.max(mx, n.t + n.dur), imitStart);
+    const tgtEvents: NoteEvent[] = Array.isArray(tgtM?.events) ? tgtM.events : [];
+    const kept = tgtEvents.filter(
+      (e: NoteEvent) => Number(e.t) < imitStart - 1e-6 || Number(e.t) >= imitEnd - 1e-6
+    );
+    tgtM.events = [...kept, ...motif].sort(
+      (a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t)
+    );
+  }
+}
+
+/**
+ * Cross-voice: Classical call-and-response.
+ * Violin I "calls" in even-numbered measures; Violin II "responds" in the next
+ * (odd) measure by echoing the rhythmic shape a 4th or 5th lower.
+ * Used for Mozart/Haydn Classical style.
+ */
+function applyCallAndResponse(
+  vln1: any,
+  vln2: any,
+  options: {
+    probability?: number;
+    transposeSemitones?: number;
+    targetMinMidi?: number;
+    targetMaxMidi?: number;
+    salt?: number;
+  } = {}
+): void {
+  const prob      = options.probability        ?? 0.35;
+  const transpose = options.transposeSemitones ?? -5;   // 4th below
+  const tgtMin    = options.targetMinMidi      ?? 55;
+  const tgtMax    = options.targetMaxMidi      ?? 84;
+  const salt      = options.salt               ?? 0;
+
+  const v1Ms = Array.isArray(vln1?.measures) ? vln1.measures : [];
+  const v2Ms = Array.isArray(vln2?.measures) ? vln2.measures : [];
+  if (!v1Ms.length || !v2Ms.length) return;
+
+  for (const callM of v1Ms) {
+    const mNum = Number(callM?.number) || 1;
+    if (mNum % 2 !== 0) continue;   // calls from even measures
+
+    const h = ((mNum * 8191 + salt * 2053) >>> 0) % 1000;
+    if (h / 1000 >= prob) continue;
+
+    const callNotes: NoteEvent[] = (Array.isArray(callM?.events) ? callM.events : [])
+      .filter((e: NoteEvent) => e.type === "note" && typeof e.midi === "number");
+    if (!callNotes.length) continue;
+
+    const respM = v2Ms.find((m: any) => Number(m?.number) === mNum + 1);
+    if (!respM) continue;
+
+    const mLen = (() => {
+      const beats    = Number(respM?.attributes?.time?.beats    ?? 4);
+      const beatType = Number(respM?.attributes?.time?.beat_type ?? 4);
+      return beats * (4 / beatType);
+    })();
+
+    const response: NoteEvent[] = callNotes
+      .filter((e: NoteEvent) => Number(e.t) < mLen - 1e-6)
+      .map((e: NoteEvent, idx: number) => {
+        const rawMidi = (typeof e.midi === "number" ? e.midi : 60) + transpose;
+        const midi    = shiftOctavesIntoRange(rawMidi, tgtMin, tgtMax);
+        return {
+          id:    `resp-${mNum}-${idx}`,
+          t:     Number(e.t),
+          dur:   Math.min(Number(e.dur), mLen - Number(e.t)),
+          type:  "note" as const,
+          midi,
+          pitch: midiToPitch(midi),
+          voice: 1,
+          staff: 1,
+        };
+      });
+    if (!response.length) continue;
+
+    respM.events = response.sort(
+      (a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t)
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function applyStringPolyphonicRhythm(
   scoreModel: ScoreModel,
@@ -2303,7 +2690,7 @@ export function applyStringPolyphonicRhythm(
       warn(warnings, "[strings] Mozart Violin II: light quarter notes on chord 3rd — melody+accompaniment.");
     } else if (composerKey === "vivaldi") {
       applyVivaldiVln2(vln2, options);
-      warn(warnings, "[strings] Vivaldi Violin II: running 8th sequence cells.");
+      warn(warnings, "[strings] Vivaldi Violin II: 16th-note scale sequences (ascending/descending runs).");
     } else if (composerKey === "beethoven") {
       applyBeethovenVln2(vln2, options);
       warn(warnings, "[strings] Beethoven Violin II: syncopated 8th + dramatic rests.");
@@ -2312,7 +2699,7 @@ export function applyStringPolyphonicRhythm(
       warn(warnings, "[strings] Brahms Violin II: cross-rhythm hemiolia (3-beat groupings in duple).");
     } else if (composerKey === "bach") {
       applyBachVln2(vln2, options);
-      warn(warnings, "[strings] Bach Violin II: contrapuntal steady 8ths.");
+      warn(warnings, "[strings] Bach Violin II: 16th-note contrapuntal figures with chromatic passing tones.");
     } else if (style === "baroque") {
       applyBaroqueVln2(vln2, options);
       warn(warnings, "[strings] Baroque Violin II: continuous 8th notes on chord 3rd/5th.");
@@ -2393,6 +2780,79 @@ export function applyStringPolyphonicRhythm(
 
   if (profile) {
     warn(warnings, `[strings] Composer profile applied: ${profile.composer} (${profile.period}, bass=${profile.bassPattern}).`);
+  }
+
+  // ── Post-processing: approach scales, ornaments, cross-voice techniques ──────
+  const scale      = buildScalePcs(options.keyFifths ?? 0, options.keyMode ?? "major");
+  const chordEvts  = options.chordEvents ?? [];
+
+  // Approach scale density per composer/style
+  const approachDensity =
+    composerKey === "bach"      ? 0.70 :
+    composerKey === "vivaldi"   ? 0.60 :
+    composerKey === "beethoven" ? 0.45 :
+    composerKey === "brahms"    ? 0.55 :
+    composerKey === "mozart"    ? 0.60 :
+    style === "baroque"   ? 0.60 :
+    style === "romantic"  ? 0.65 :
+    style === "modern"    ? 0.35 :
+    0.45;
+
+  if (approachDensity > 0 && chordEvts.length > 1) {
+    const voiceRanges: [any, number, number, number][] = [
+      [vln2, 55, 90,  1],
+      [vla,  48, 74,  3],
+      [vc,   28, 65,  5],
+    ];
+    for (const [part, mn, mx, salt] of voiceRanges) {
+      if (part) {
+        insertApproachNotes(part, chordEvts, scale, {
+          density: approachDensity,
+          minMidi: mn, maxMidi: mx, salt,
+        });
+      }
+    }
+    warn(warnings, `[strings] Approach scales applied (density=${approachDensity}).`);
+  }
+
+  // Ornament density — skip Bach/Vivaldi (voices too fast, ornaments clash with 16ths)
+  const ornamentDensity =
+    composerKey === "bach"      ? 0    :
+    composerKey === "vivaldi"   ? 0    :
+    composerKey === "mozart"    ? 0.28 :
+    composerKey === "beethoven" ? 0.15 :
+    composerKey === "brahms"    ? 0.22 :
+    style === "romantic"  ? 0.30 :
+    style === "classical" ? 0.20 :
+    style === "baroque"   ? 0.15 :
+    0.10;
+
+  if (ornamentDensity > 0) {
+    if (vln2) insertOrnaments(vln2, scale, { density: ornamentDensity, salt: 2 });
+    if (vla)  insertOrnaments(vla,  scale, { density: ornamentDensity * 0.7, salt: 4 });
+    warn(warnings, `[strings] Ornaments applied (density=${ornamentDensity}).`);
+  }
+
+  // Cross-voice interaction
+  if (vln1 && vln2) {
+    if (composerKey === "bach" || (style === "baroque" && composerKey !== "vivaldi")) {
+      // Baroque contrapuntal imitation: motif from Vln I echoed in Vln II at the 5th below
+      applyImitation(vln1, vln2, {
+        delayBeats: 2, probability: 0.40, transposeSemitones: -7,
+        targetMinMidi: 55, targetMaxMidi: 84, salt: 7,
+      });
+      warn(warnings, "[strings] Cross-voice imitation applied (baroque).");
+    } else if (
+      composerKey === "mozart" || composerKey === "haydn" ||
+      (style === "classical" && composerKey !== "beethoven")
+    ) {
+      // Classical call-and-response: Vln I calls, Vln II responds a 4th below
+      applyCallAndResponse(vln1, vln2, {
+        probability: 0.35, transposeSemitones: -5,
+        targetMinMidi: 55, targetMaxMidi: 84, salt: 9,
+      });
+      warn(warnings, "[strings] Call-and-response applied (classical).");
+    }
   }
 
   return { scoreModel, warnings };
