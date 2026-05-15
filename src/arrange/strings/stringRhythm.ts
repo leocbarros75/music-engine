@@ -1300,43 +1300,69 @@ function applyVivaldiCello(part: any, options: ApplyOptions): void {
 }
 
 /**
- * Vivaldi Violin II — running 8th sequences: repeats the same 2-note rhythmic
- * cell (step up, chord tone) over consecutive beats, mimicking Vivaldi's
- * sequence writing in concerti.
+ * Vivaldi Violin II — 16th-note scale sequences (ascending/descending runs).
+ * Real Vivaldi stats (from vivaldi_concerto.musicxml): 35% 16ths, 35% 32nds, 21% 8ths.
+ * Characteristic: fast step-wise sequences that repeat at different pitch levels.
+ * On-beat notes snap to chord tones; off-beat notes step diatonically in sequence direction.
  */
 function applyVivaldiVln2(part: any, options: ApplyOptions): void {
   const measures = Array.isArray(part?.measures) ? part.measures : [];
   const chordEvents = options.chordEvents ?? [];
-  const minMidi = 60;
-  const maxMidi = 88;
+  const minMidi = 62; // D4
+  const maxMidi = 90; // F#6
+  const keyFifths = options.keyFifths ?? 0;
+  const keyMode = options.keyMode ?? "major";
+  const scale = buildScalePcs(keyFifths, keyMode);
   const measureLen = (m: any): number => {
     const beats = Number(m?.attributes?.time?.beats ?? 4);
     const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
     return beats * (4 / beatType);
   };
-  let prevMidi = 67;
+  let prevMidi = 69; // A4
+  let direction: 1 | -1 = 1;
   for (const m of measures) {
     const mNum = Number(m?.number) || 1;
     const next: NoteEvent[] = [];
     const mLen = measureLen(m);
+    // Boundary correction at phrase start
+    if (prevMidi >= maxMidi - 5) direction = -1;
+    if (prevMidi <= minMidi + 5) direction = 1;
     let t = 0;
     while (t < mLen - 1e-6) {
       const chord = chordAt(chordEvents, mNum, t);
       const pcs = chord?.pcs ?? [];
-      // Sequence cell: chord tone (8th) + step up (8th)
-      let midi = prevMidi;
-      if (pcs.length) midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
-      else midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
-      next.push({ id: `vln2-vv-a-${mNum}-${t}`, t, dur: Math.min(0.5, mLen - t), type: "note", midi, pitch: midiToPitch(midi), voice: 1, staff: 1 });
-      prevMidi = midi;
-      t += 0.5;
-      if (t < mLen - 1e-6) {
-        // Step neighbour (within ±2 semitones)
-        const stepMidi = shiftOctavesIntoRange(prevMidi + 2, minMidi, maxMidi);
-        next.push({ id: `vln2-vv-b-${mNum}-${t}`, t, dur: Math.min(0.5, mLen - t), type: "note", midi: stepMidi, pitch: midiToPitch(stepMidi), voice: 1, staff: 1 });
-        prevMidi = stepMidi;
-        t += 0.5;
+      const isOnBeat = Math.abs(t - Math.round(t)) < 1e-6;
+      let midi: number;
+      if (isOnBeat && pcs.length) {
+        // On beat: snap to nearest chord tone for harmonic clarity
+        midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, direction > 0 ? "up" : "down");
+      } else {
+        // Off beat: step-wise diatonic motion (Vivaldi sequence pattern)
+        const stepH = ((mNum * 7919 + Math.round(t * 1000) * 443) >>> 0) % 1000;
+        const step = direction > 0
+          ? (stepH < 650 ? 2 : 1)    // ascending: ~65% whole step, ~35% half step
+          : (stepH < 650 ? -2 : -1); // descending: ~65% whole step, ~35% half step
+        let candidate = prevMidi + step;
+        // Nudge to nearest scale tone if off-scale
+        const pc = ((candidate % 12) + 12) % 12;
+        if (!scale.includes(pc)) candidate += direction;
+        midi = shiftOctavesIntoRange(candidate, minMidi, maxMidi);
       }
+      next.push({
+        id: `vln2-viv-${mNum}-${Math.round(t * 1000)}`,
+        t,
+        dur: Math.min(0.25, mLen - t),
+        type: "note",
+        midi,
+        pitch: midiToPitch(midi),
+        voice: 1,
+        staff: 1,
+      });
+      prevMidi = midi;
+      t += 0.25;
+      // Reverse direction at register boundaries mid-measure
+      if (prevMidi >= maxMidi - 3) direction = -1;
+      else if (prevMidi <= minMidi + 3) direction = 1;
     }
     m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
   }
@@ -1699,9 +1725,94 @@ function applyBachCello(part: any, options: ApplyOptions): void {
 }
 
 /** Bach Violin II — steady 8th notes, independent contrapuntal line (parallel 3rds/6ths). */
+/**
+ * Bach Violin II — 16th-note contrapuntal running figures.
+ * Real Bach stats (from bach_chamber_bwv.musicxml): 47-52% 16ths in upper voices,
+ * rest density 0.01-0.03, voiceIndependence 0.85.
+ * Uses chord 3rds/5ths on beats, diatonic + chromatic passing tones off-beats.
+ * Phrase direction alternates every 2 measures to create arch contours.
+ */
 function applyBachVln2(part: any, options: ApplyOptions): void {
-  // Same as Baroque Vln II but uses more varied pc choices to suggest counterpoint
-  applyBaroqueVln2(part, options);
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  const chordEvents = options.chordEvents ?? [];
+  const minMidi = 60; // C4
+  const maxMidi = 88; // E6
+  const keyFifths = options.keyFifths ?? 0;
+  const keyMode = options.keyMode ?? "major";
+  const scale = buildScalePcs(keyFifths, keyMode);
+  const measureLen = (m: any): number => {
+    const beats = Number(m?.attributes?.time?.beats ?? 4);
+    const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+    return beats * (4 / beatType);
+  };
+  let prevMidi = 67; // G4
+  let localDir: 1 | -1 = 1;
+  for (const m of measures) {
+    const mNum = Number(m?.number) || 1;
+    const next: NoteEvent[] = [];
+    const mLen = measureLen(m);
+    // Alternate phrase direction every 2 measures (Bach arch contour)
+    const phraseDir: 1 | -1 = mNum % 4 < 2 ? 1 : -1;
+    localDir = phraseDir;
+    let t = 0;
+    while (t < mLen - 1e-6) {
+      const chord = chordAt(chordEvents, mNum, t);
+      const pcs = chord?.pcs ?? [];
+      const isOnBeat = Math.abs(t - Math.round(t)) < 1e-6;
+      // Mostly 16ths (0.25); ~15% chance of 8th on strong beats (Bach occasionally sustains)
+      const durH = ((mNum * 6271 + Math.round(t * 1000) * 137) >>> 0) % 1000;
+      const dur = isOnBeat && durH < 150 ? 0.5 : 0.25;
+      let midi: number;
+      if (isOnBeat && pcs.length) {
+        // On beat: chord 3rd or 5th for contrapuntal independence from cello root
+        const thirdPc = chordThirdPc(chord);
+        const fifthPc = chordFifthPc(chord);
+        const candidates = [thirdPc, fifthPc].filter((p): p is number => p !== null);
+        if (candidates.length) {
+          midi = pickCandidateNear(prevMidi, candidates, minMidi, maxMidi, "either");
+        } else if (pcs.length) {
+          midi = pickCandidateNear(prevMidi, pcs, minMidi, maxMidi, "either");
+        } else {
+          midi = shiftOctavesIntoRange(prevMidi, minMidi, maxMidi);
+        }
+        // Update local direction from harmonic voice-leading
+        localDir = midi > prevMidi ? 1 : midi < prevMidi ? -1 : localDir;
+      } else {
+        // Off beat: diatonic step or chromatic passing tone
+        const passH = ((mNum * 9901 + Math.round(t * 1000) * 311) >>> 0) % 1000;
+        if (passH < 150) {
+          // Chromatic passing tone (~15% of off-beats)
+          midi = shiftOctavesIntoRange(prevMidi + localDir, minMidi, maxMidi);
+        } else {
+          // Diatonic step (~85%)
+          const stepH = ((mNum * 4423 + Math.round(t * 1000) * 821) >>> 0) % 1000;
+          const step = localDir > 0
+            ? (stepH < 600 ? 2 : 1)
+            : (stepH < 600 ? -2 : -1);
+          let candidate = prevMidi + step;
+          const pc = ((candidate % 12) + 12) % 12;
+          if (!scale.includes(pc)) candidate += localDir;
+          midi = shiftOctavesIntoRange(candidate, minMidi, maxMidi);
+        }
+      }
+      next.push({
+        id: `vln2-bach-${mNum}-${Math.round(t * 1000)}`,
+        t,
+        dur: Math.min(dur, mLen - t),
+        type: "note",
+        midi,
+        pitch: midiToPitch(midi),
+        voice: 1,
+        staff: 1,
+      });
+      prevMidi = midi;
+      t += dur;
+      // Boundary correction
+      if (prevMidi >= maxMidi - 4) localDir = -1;
+      else if (prevMidi <= minMidi + 4) localDir = 1;
+    }
+    m.events = next.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

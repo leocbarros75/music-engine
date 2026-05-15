@@ -49,21 +49,30 @@ export const COMPOSER_PROFILES: Record<string, ComposerProfile> = {
   bach: {
     composer: "Bach",
     period: "baroque",
-    syncopationWeight: 0.10,
+    // Stats from bach_chamber_bwv.musicxml:
+    // Upper voices: 47-52% 16ths → fast contrapuntal lines
+    // Gamba bass:   95% 8ths    → walking continuo bass confirmed
+    // Rest density: 0.01-0.03   → nearly continuous motion
+    syncopationWeight: 0.08,
     bassPattern: "walking_eighth",
     voiceIndependence: 0.85,
-    restDensity: 0.08,
-    rhythmUnit: "eighth",
+    restDensity: 0.02,
+    rhythmUnit: "sixteenth",
   },
 
   vivaldi: {
     composer: "Vivaldi",
     period: "baroque",
-    syncopationWeight: 0.02,
+    // Stats from vivaldi_concerto.musicxml (first 100 measures):
+    // Upper strings: 35-54% 16ths/32nds → fast running sequences
+    // Cello offbeat: 0.29 → mostly on-beat (ostinato style confirmed)
+    // Viola/Cello rest density: 0.10-0.14
+    // Voice independence: upper strings move together; bass separate → 0.40
+    syncopationWeight: 0.05,
     bassPattern: "ostinato",
-    voiceIndependence: 0.25,
-    restDensity: 0.04,
-    rhythmUnit: "eighth",
+    voiceIndependence: 0.40,
+    restDensity: 0.10,
+    rhythmUnit: "sixteenth",
     useSequences: true,
   },
 
@@ -149,23 +158,28 @@ export const COMPOSER_PROFILES: Record<string, ComposerProfile> = {
 
 export const EXAMPLE_TO_COMPOSER: Record<string, string> = {
   // Beethoven
-  beethoven_op18_no1:   "beethoven",
+  beethoven_op18_no1:          "beethoven",
   // Mozart
-  mozart_k387_mvt1:     "mozart",
-  mozart_k421_mvt1:     "mozart",
-  mozart_k421:          "mozart",
-  mozart_k545_arr_mvt1: "mozart",
-  mozart_k465_mvt1:     "mozart",
+  mozart_k387_mvt1:            "mozart",
+  mozart_k421_mvt1:            "mozart",
+  mozart_k421:                 "mozart",
+  mozart_k545_arr_mvt1:        "mozart",
+  mozart_k465_mvt1:            "mozart",
   // Haydn
-  haydn_op76_no3_mvt2:  "haydn",
-  haydn_op64_no3_mvt1:  "haydn",
-  haydn_op64_no5_mvt1:  "haydn",
-  haydn_lark:           "haydn",
+  haydn_op76_no3_mvt2:         "haydn",
+  haydn_op64_no3_mvt1:         "haydn",
+  haydn_op64_no5_mvt1:         "haydn",
+  haydn_lark:                  "haydn",
   // Dvořák
-  dvorak_op51:          "dvorak",
-  dvorak_op96_american: "dvorak",
+  dvorak_op51:                 "dvorak",
+  dvorak_op96_american:        "dvorak",
   // Brahms
-  brahms_op51_no1:      "brahms",
+  brahms_op51_no1:             "brahms",
+  // Bach (user-provided files — calibrated from real rhythm analysis)
+  bach_chamber_bwv:            "bach",
+  bach_violin_concerto_bwv1041: "bach",
+  // Vivaldi (user-provided file — calibrated from real rhythm analysis)
+  vivaldi_concerto:            "vivaldi",
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

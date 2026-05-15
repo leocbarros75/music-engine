@@ -218,6 +218,24 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
     value: "brahms_op51_no1",
     texture: "counterpoint",
     help: "Complete Brahms quartet: all four movements. Dense chromatic counterpoint, cross-rhythms (hemiolia), walking bass with passing tones. Source: OpenScore/CC0."
+  },
+  {
+    label: "Bach — Chamber Work (Flute, 2 Violins, Viola da gamba)",
+    value: "bach_chamber_bwv",
+    texture: "counterpoint",
+    help: "Baroque 4-voice chamber texture: independent contrapuntal lines, walking bass in Viola da gamba, steady 8th-note inner voices. Maps to string quartet: Flute→Vln I, Violins→Vln II/Vla, Gamba→Cello."
+  },
+  {
+    label: "Vivaldi — String Concerto (Solo Violin + Strings)",
+    value: "vivaldi_concerto",
+    texture: "counterpoint",
+    help: "Vivaldi concerto for violin and string orchestra: Violins 1/2, Viola, Cello. Characteristic ostinato bass, running 8th-note sequences, homophonic inner voices. Maps to quartet: Solo→Vln I, Violins 1→Vln II, Viola→Vla, Cello→Vc."
+  },
+  {
+    label: "Bach — Violin Concerto No. 1 in A minor BWV 1041",
+    value: "bach_violin_concerto_bwv1041",
+    texture: "counterpoint",
+    help: "Bach's A minor violin concerto arranged for 2 voices (Recorder + Violin). Baroque melodic independence, running 8th passages, ornamental figuration. Maps Recorder→Vln I melody reference."
   }
 ];
 
