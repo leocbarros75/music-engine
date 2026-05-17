@@ -2410,17 +2410,29 @@ function insertApproachNotes(
       );
 
       const runMidis = buildApproachRun(lastNote.midi as number, targetMidi, nNotes, scale, minMidi, maxMidi);
-      const noteUnit = effectiveDur / nNotes;
-      const runNotes: NoteEvent[] = runMidis.map((midi, i) => ({
-        id:    `app-${mNum}-${Math.round(lastNote.t * 1000)}-${i}`,
-        t:     lastNote.t + i * noteUnit,
-        dur:   noteUnit,
-        type:  "note" as const,
-        midi,
-        pitch: midiToPitch(midi),
-        voice: lastNote.voice,
-        staff: lastNote.staff,
-      }));
+
+      // Snap noteUnit DOWN to the nearest standard beat value so that the
+      // exported <duration> is always a clean integer and nNotes × noteUnit
+      // never exceeds effectiveDur.  Dividing by 3 would otherwise produce
+      // irrational fractions (e.g. 4/3 → 5 divisions after rounding) that
+      // sum to more than the available measure capacity.
+      const STANDARD_BEATS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0];
+      const rawUnit = effectiveDur / nNotes;
+      let noteUnit = 0.25;
+      for (const b of STANDARD_BEATS) { if (b <= rawUnit + 1e-9) noteUnit = b; }
+      // Guard: notes must not start at or past the measure/change boundary
+      const runNotes: NoteEvent[] = runMidis
+        .map((midi, i) => ({
+          id:    `app-${mNum}-${Math.round(lastNote.t * 1000)}-${i}`,
+          t:     lastNote.t + i * noteUnit,
+          dur:   noteUnit,
+          type:  "note" as const,
+          midi,
+          pitch: midiToPitch(midi),
+          voice: lastNote.voice,
+          staff: lastNote.staff,
+        }))
+        .filter(n => n.t + noteUnit <= boundary + 1e-9);
 
       updatedEvents = [
         ...updatedEvents.filter(e => e !== lastNote),

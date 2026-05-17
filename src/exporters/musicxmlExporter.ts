@@ -722,7 +722,12 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
 
       const measureBeats = (Number(timeBeats) || 4) * (4 / (Number(timeBeatType) || 4));
       const measureDur = beatsToDivisionsDuration(measureBeats, currentDivisions);
-      const events = (m.events ?? []).slice();
+      // Discard any events that start at or past the measure boundary; they
+      // would cause the exporter's gap-fill code to emit rests extending well
+      // beyond the barline and produce invalid <duration> totals.
+      const events = (m.events ?? []).filter(
+        (ev: any) => Number.isFinite(ev?.t) && Number(ev.t) < measureBeats - 1e-9
+      );
       const byVoice = new Map<number, any[]>();
 
       for (const ev of events) {
