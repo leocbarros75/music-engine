@@ -868,6 +868,20 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
           }
           cursor = Math.max(cursor, t + groupMaxDur);
         }
+
+        // Trailing rest: fill any gap between the last note and the barline.
+        // Without this, notes whose collective duration falls short of measureBeats
+        // produce an invalid total (MusicXML players reject the file).
+        if (cursor < measureBeats - EPS) {
+          const tailBeats = measureBeats - cursor;
+          const tailDur   = beatsToDivisionsDuration(tailBeats, currentDivisions);
+          const tailType  = durToType(currentDivisions, tailDur);
+          const tailDot   = durHasDot(currentDivisions, tailDur);
+          out += `<note><rest/><duration>${tailDur}</duration><voice>${voice}</voice>`;
+          if (tailType) out += `<type>${tailType}</type>`;
+          if (tailDot)  out += `<dot/>`;
+          out += `<staff>1</staff></note>`;
+        }
       }
 
       // Final barline on the last measure of the part

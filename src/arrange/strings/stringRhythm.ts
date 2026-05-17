@@ -113,6 +113,32 @@ type NoteEvent = {
   role?: "chord" | "passing";
 };
 
+// Standard instrument ranges (absolute limits — no note should ever go outside these)
+const INSTRUMENT_RANGES: Record<string, [number, number]> = {
+  violin:  [55, 103],  // G3 – G7
+  viola:   [48, 91],   // C3 – G6
+  cello:   [36, 72],   // C2 – C6
+  bass:    [28, 67],   // E1 – G4
+};
+
+/**
+ * Clamp every note in `part` to the given MIDI range.
+ * Notes outside the range are shifted by octave until they fit.
+ * Applied as a safety net after all pattern and approach-note functions run.
+ */
+function enforceInstrumentRange(part: any, minMidi: number, maxMidi: number): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  for (const m of measures) {
+    const events: NoteEvent[] = Array.isArray(m?.events) ? m.events : [];
+    m.events = events.map(ev => {
+      if (ev.type !== "note" || typeof ev.midi !== "number") return ev;
+      const clamped = shiftOctavesIntoRange(ev.midi, minMidi, maxMidi);
+      if (clamped === ev.midi) return ev;
+      return { ...ev, midi: clamped, pitch: midiToPitch(clamped) };
+    });
+  }
+}
+
 function warn(warnings: string[], msg: string): void {
   warnings.push(msg);
   // eslint-disable-next-line no-console
@@ -2492,11 +2518,21 @@ function insertApproachNotes(
       const rawUnit = effectiveDur / nNotes;
       let noteUnit = 0.25;
       for (const b of STANDARD_BEATS) { if (b <= rawUnit + 1e-9) noteUnit = b; }
-      // Guard: notes must not start at or past the measure/change boundary
+
+      // ── Harmony priority ──────────────────────────────────────────────────
+      // Approach notes occupy only the TAIL of the original note's slot.
+      // The chord tone is preserved for the head of the duration so the
+      // harmony is always audible; the run is a brief lead-in, not a
+      // wholesale replacement of the chord note.
+      const runSpan   = nNotes * noteUnit;
+      const runStartT = boundary - runSpan;    // run starts this far before the change
+      const chordDur  = runStartT - Number(lastNote.t);  // how much of the chord tone to keep
+
+      // Guard: run notes must stay inside the measure
       const runNotes: NoteEvent[] = runMidis
         .map((midi, i) => ({
           id:    `app-${mNum}-${Math.round(lastNote.t * 1000)}-${i}`,
-          t:     lastNote.t + i * noteUnit,
+          t:     runStartT + i * noteUnit,
           dur:   noteUnit,
           type:  "note" as const,
           midi,
@@ -2504,12 +2540,23 @@ function insertApproachNotes(
           voice: lastNote.voice,
           staff: lastNote.staff,
         }))
-        .filter(n => n.t + noteUnit <= boundary + 1e-9);
+        .filter(n => n.t >= Number(lastNote.t) - 1e-9 && n.t + noteUnit <= boundary + 1e-9);
 
-      updatedEvents = [
-        ...updatedEvents.filter(e => e !== lastNote),
-        ...runNotes,
-      ];
+      if (chordDur >= 0.25 - 1e-9 && runNotes.length > 0) {
+        // Keep the chord tone, truncated — then append the approach run
+        const kept = { ...lastNote, dur: chordDur };
+        updatedEvents = [
+          ...updatedEvents.filter(e => e !== lastNote),
+          kept,
+          ...runNotes,
+        ];
+      } else if (runNotes.length > 0) {
+        // Chord tone too short to split — just do the run (fall back to old behaviour)
+        updatedEvents = [
+          ...updatedEvents.filter(e => e !== lastNote),
+          ...runNotes,
+        ];
+      }
     }
 
     m.events = updatedEvents.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
@@ -2964,7 +3011,6 @@ export function applyStringPolyphonicRhythm(
   // Cross-voice interaction
   if (vln1 && vln2) {
     if (composerKey === "bach" || (style === "baroque" && composerKey !== "vivaldi")) {
-      // Baroque contrapuntal imitation: motif from Vln I echoed in Vln II at the 5th below
       applyImitation(vln1, vln2, {
         delayBeats: 2, probability: 0.40, transposeSemitones: -7,
         targetMinMidi: 55, targetMaxMidi: 84, salt: 7,
@@ -2974,7 +3020,6 @@ export function applyStringPolyphonicRhythm(
       composerKey === "mozart" || composerKey === "haydn" ||
       (style === "classical" && composerKey !== "beethoven")
     ) {
-      // Classical call-and-response: Vln I calls, Vln II responds a 4th below
       applyCallAndResponse(vln1, vln2, {
         probability: 0.35, transposeSemitones: -5,
         targetMinMidi: 55, targetMaxMidi: 84, salt: 9,
@@ -2982,6 +3027,17 @@ export function applyStringPolyphonicRhythm(
       warn(warnings, "[strings] Call-and-response applied (classical).");
     }
   }
+
+  // ── Final instrument-range clamp ─────────────────────────────────────────
+  // Safety net: after all pattern functions and post-processing, shift any
+  // note that drifted outside the instrument's physical range back into range.
+  // This catches both hardcoded ranges in individual pattern functions and any
+  // ornament/approach notes that overshot.
+  if (vln1) enforceInstrumentRange(vln1, INSTRUMENT_RANGES.violin[0], INSTRUMENT_RANGES.violin[1]);
+  if (vln2) enforceInstrumentRange(vln2, INSTRUMENT_RANGES.violin[0], INSTRUMENT_RANGES.violin[1]);
+  if (vla)  enforceInstrumentRange(vla,  INSTRUMENT_RANGES.viola[0],  INSTRUMENT_RANGES.viola[1]);
+  if (vc)   enforceInstrumentRange(vc,   INSTRUMENT_RANGES.cello[0],  INSTRUMENT_RANGES.cello[1]);
+  if (cb)   enforceInstrumentRange(cb,   INSTRUMENT_RANGES.bass[0],   INSTRUMENT_RANGES.bass[1]);
 
   return { scoreModel, warnings };
 }
