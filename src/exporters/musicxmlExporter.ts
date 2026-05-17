@@ -101,13 +101,24 @@ function xmlEscape(s: string): string {
 
 function durToType(divisions: number, dur: number): string | null {
   if (!divisions || divisions <= 0) return null;
-  if (dur === divisions * 4) return "whole";
-  if (dur === divisions * 2) return "half";
-  if (dur === divisions) return "quarter";
-  if (dur === divisions / 2) return "eighth";
-  if (dur === divisions / 4) return "16th";
-  if (dur === divisions / 8) return "32nd";
+  const d = divisions;
+  if (dur === d * 4)     return "whole";
+  if (dur === d * 3)     return "half";     // dotted half
+  if (dur === d * 2)     return "half";
+  if (dur === d * 3 / 2) return "quarter";  // dotted quarter (e.g. dur=6 at div=4)
+  if (dur === d)         return "quarter";
+  if (dur === d * 3 / 4) return "eighth";   // dotted eighth (e.g. dur=3 at div=4)
+  if (dur === d / 2)     return "eighth";
+  if (dur === d / 4)     return "16th";
+  if (dur === d / 8)     return "32nd";
   return null;
+}
+
+/** Returns true when the duration is a dotted note value (needs a <dot/> element). */
+function durHasDot(divisions: number, dur: number): boolean {
+  if (!divisions || divisions <= 0) return false;
+  const d = divisions;
+  return dur === d * 3 || dur === d * 3 / 2 || dur === d * 3 / 4;
 }
 
 function beatsToDivisionsDuration(durBeats: number, divisions: number): number {
@@ -743,9 +754,11 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
             const gapBeats = t - cursor;
             const gapDur = beatsToDivisionsDuration(gapBeats, currentDivisions);
             const restType = durToType(currentDivisions, gapDur);
+            const restDot  = durHasDot(currentDivisions, gapDur);
             const gapStaff = isGrandStaff ? (ev0?.staff ?? 1) : 1;
             out += `<note><rest/><duration>${gapDur}</duration><voice>${voice}</voice>`;
             if (restType) out += `<type>${restType}</type>`;
+            if (restDot)  out += `<dot/>`;
             out += `<staff>${gapStaff}</staff></note>`;
             cursor = t;
           }
@@ -772,15 +785,22 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
           let groupMaxDur = 0;
           for (let gi = 0; gi < useGroup.length; gi++) {
             const evAny: any = useGroup[gi] as any;
-            const durBeats = Number.isFinite(evAny.dur) ? Number(evAny.dur) : 1;
+            // Safety clamp: a note must never extend past the end of its measure.
+            // If insertApproachNotes or another function emits an oversized duration
+            // (e.g. a sustained note whose dur spans multiple measures), cap it here
+            // so the exported <duration> value never exceeds measureBeats.
+            const rawDurBeats = Number.isFinite(evAny.dur) ? Number(evAny.dur) : 1;
+            const durBeats = Math.min(rawDurBeats, Math.max(1 / currentDivisions, measureBeats - t));
             const dur = beatsToDivisionsDuration(durBeats, currentDivisions);
             if (durBeats > groupMaxDur) groupMaxDur = durBeats;
             const staff = isGrandStaff ? (evAny.staff ?? 1) : 1;
             const type = durToType(currentDivisions, dur);
+            const dot  = durHasDot(currentDivisions, dur);
 
             if (evAny.type === "rest") {
               out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
               if (type) out += `<type>${type}</type>`;
+              if (dot)  out += `<dot/>`;
               out += `<staff>${staff}</staff></note>`;
               continue;
             }
@@ -790,6 +810,7 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
               if (!pm) {
                 out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
                 if (type) out += `<type>${type}</type>`;
+                if (dot)  out += `<dot/>`;
                 out += `<staff>${staff}</staff></note>`;
                 continue;
               }
@@ -803,6 +824,7 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
               out += `<instrument id="${xmlEscape(instXmlId)}"/>`;
               out += `<voice>${voice}</voice>`;
               if (type) out += `<type>${type}</type>`;
+              if (dot)  out += `<dot/>`;
               if (pm.notehead && pm.notehead !== "normal") out += `<notehead>${pm.notehead}</notehead>`;
               out += `<staff>${staff}</staff>`;
               out += `</note>`;
@@ -827,6 +849,7 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
               if (tieStop) out += `<tie type="stop"/>`;
               out += `<duration>${dur}</duration><voice>${voice}</voice>`;
               if (type) out += `<type>${type}</type>`;
+              if (dot)  out += `<dot/>`;
               if (accidental) out += `<accidental>${accidental}</accidental>`;
               if (tieStart || tieStop) {
                 out += `<notations>`;

@@ -2378,9 +2378,20 @@ function insertApproachNotes(
       if (!notesBefore.length) continue;
       const lastNote = notesBefore[0]!;
       if (typeof lastNote.midi !== "number") continue;
-      if (lastNote.dur < 0.25) continue; // too short to decorate
 
-      const maxSteps = Math.min(4, Math.floor(lastNote.dur / 0.25));
+      // Clamp the note's effective duration to the current measure boundary.
+      // lastNote.dur may span multiple measures (e.g. a sustained whole-note held
+      // across several bars); approach notes must stay inside this measure only.
+      const measureLen = (() => {
+        const beats    = Number(m?.attributes?.time?.beats    ?? 4);
+        const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+        return beats * (4 / beatType);
+      })();
+      const boundary    = isMidMeasure ? change.t : measureLen;
+      const effectiveDur = Math.min(lastNote.dur, boundary - Number(lastNote.t));
+      if (effectiveDur < 0.5) continue; // need at least 2 eighth-note slots
+
+      const maxSteps = Math.min(4, Math.floor(effectiveDur / 0.25));
       if (maxSteps < 2) continue;
       const nNotes = maxSteps >= 4 ? 3 : 2;
 
@@ -2399,7 +2410,7 @@ function insertApproachNotes(
       );
 
       const runMidis = buildApproachRun(lastNote.midi as number, targetMidi, nNotes, scale, minMidi, maxMidi);
-      const noteUnit = lastNote.dur / nNotes;
+      const noteUnit = effectiveDur / nNotes;
       const runNotes: NoteEvent[] = runMidis.map((midi, i) => ({
         id:    `app-${mNum}-${Math.round(lastNote.t * 1000)}-${i}`,
         t:     lastNote.t + i * noteUnit,
