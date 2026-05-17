@@ -36,6 +36,17 @@ export type AppSettings = {
   tempo?: number;
   style?: string;
   level?: "beginner" | "intermediate" | "advanced" | "professional";
+  /**
+   * Suzuki method volume number (1–8+).
+   * When provided, overrides `level` for string-ensemble outputs and maps to
+   * per-instrument range constraints, activity levels, and approach-note density
+   * following the Suzuki repertoire progression:
+   *   Vol 1   → Beginner    (1st position, whole/half/quarter only, no approach notes)
+   *   Vol 2–3 → Intermediate (8th notes, limited range, light approach notes)
+   *   Vol 4–5 → Advanced    (16th notes, moderate shifting, approach notes on)
+   *   Vol 6+  → Professional (full range and technique)
+   */
+  suzukiVolume?: number;
   accompanimentType?: string;
   accompaniment?: string;
   ruleStrictness?: "relaxed" | "standard" | "strict";
@@ -1825,7 +1836,8 @@ export function applyAppSettings(
                   warnings,
                   tempoBpm,
                   style: styleUsed,
-                  composerKey: composerKey || undefined
+                  composerKey: composerKey || undefined,
+                  suzukiVolume: typeof settings.suzukiVolume === "number" ? settings.suzukiVolume : undefined,
                 });
               }
               return stringScore;

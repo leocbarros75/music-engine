@@ -18,6 +18,15 @@ type ApplyOptions = {
   warnings?: string[];
   allowNonChordTones?: boolean;
   level?: string;
+  /**
+   * Suzuki method volume number (1–8+).
+   * Maps to player-level constraints for range, rhythm density and approach notes.
+   *   Vol 1          → Beginner      (whole/half/quarter, 1st position, no approach notes)
+   *   Vol 2–3        → Intermediate  (8th notes, limited range, light approach notes)
+   *   Vol 4–5        → Advanced      (16th notes, moderate shifting, approach notes on)
+   *   Vol 6+         → Professional  (full range, all techniques, full approach density)
+   */
+  suzukiVolume?: number;
   /** Period style — "baroque" | "classical" | "romantic" | "modern" | "pop" etc. */
   style?: string;
   /**
@@ -32,6 +41,65 @@ type ApplyOptions = {
   enforceChordRootBass?: boolean;
   tempoBpm?: number;
 };
+
+// ─── Suzuki level helpers ─────────────────────────────────────────────────────
+
+type SuzukiParams = {
+  activity: Activity;
+  minMidi: number;
+  maxMidi: number;
+  approachDensity: number;   // 0 = none, 1 = full
+  minSubdivision: number;    // in beats: 1.0=quarter, 0.5=eighth, 0.25=16th
+};
+
+/**
+ * Map a Suzuki volume number and instrument family to technical constraints.
+ * Instrument: "violin" | "viola" | "cello" | "bass"
+ */
+function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" | "bass"): SuzukiParams {
+  // ── Beginner: Volume 1 ───────────────────────────────────────────────────
+  if (volume <= 1) {
+    const ranges: Record<string, [number, number]> = {
+      violin: [55, 76],   // G3–E5  (1st position, open strings to 4th finger)
+      viola:  [48, 69],   // C3–A4  (1st position)
+      cello:  [36, 55],   // C2–G3  (1st position)
+      bass:   [28, 47],   // E1–B2  (1st position)
+    };
+    const [mn, mx] = ranges[instrument] ?? [36, 84];
+    return { activity: "grounded", minMidi: mn, maxMidi: mx, approachDensity: 0, minSubdivision: 1.0 };
+  }
+  // ── Intermediate: Volumes 2–3 ────────────────────────────────────────────
+  if (volume <= 3) {
+    const ranges: Record<string, [number, number]> = {
+      violin: [55, 81],   // G3–A5  (1st–2nd position)
+      viola:  [48, 74],   // C3–D5
+      cello:  [36, 60],   // C2–C4  (1st–2nd position)
+      bass:   [28, 50],   // E1–D3
+    };
+    const [mn, mx] = ranges[instrument] ?? [36, 84];
+    return { activity: "less_active", minMidi: mn, maxMidi: mx, approachDensity: 0.20, minSubdivision: 0.5 };
+  }
+  // ── Advanced: Volumes 4–5 ────────────────────────────────────────────────
+  if (volume <= 5) {
+    const ranges: Record<string, [number, number]> = {
+      violin: [55, 88],   // G3–E6  (1st–5th position)
+      viola:  [48, 79],   // C3–G5
+      cello:  [36, 65],   // C2–F4  (1st–4th position)
+      bass:   [28, 55],   // E1–G3
+    };
+    const [mn, mx] = ranges[instrument] ?? [36, 84];
+    return { activity: "active", minMidi: mn, maxMidi: mx, approachDensity: 0.45, minSubdivision: 0.25 };
+  }
+  // ── Professional: Volume 6+ ──────────────────────────────────────────────
+  const ranges: Record<string, [number, number]> = {
+    violin: [55, 96],
+    viola:  [48, 91],
+    cello:  [36, 72],
+    bass:   [28, 67],
+  };
+  const [mn, mx] = ranges[instrument] ?? [28, 96];
+  return { activity: "high_active", minMidi: mn, maxMidi: mx, approachDensity: 0.65, minSubdivision: 0.25 };
+}
 
 type NoteEvent = {
   id?: string;
@@ -2276,9 +2344,10 @@ function applyModernCello(part: any, options: ApplyOptions): void {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Build a chromatic/diatonic scale run of `nNotes` pitches stepping from
+ * Build a strictly diatonic scale run of `nNotes` pitches stepping from
  * `prevMidi` toward `targetMidi`. The last note is always `targetMidi`.
- * Intermediate steps prefer diatonic scale tones; chromatic fills used when needed.
+ * All intermediate steps land on scale tones only — no chromatic fills.
+ * This keeps approach passages clean and singable (Fux / voice-leading safe).
  */
 function buildApproachRun(
   prevMidi: number,
@@ -2294,17 +2363,20 @@ function buildApproachRun(
   const result: number[] = [];
   let midi = prevMidi;
   for (let i = 0; i < nNotes - 1; i++) {
-    // Prefer a whole step; use half step if whole step is off-scale
-    let candidate = midi + dir * 2;
-    const pc = ((candidate % 12) + 12) % 12;
-    if (!scale.includes(pc)) candidate = midi + dir;
-    // Don't overshoot the target
-    if (dir > 0 && candidate >= targetMidi) candidate = targetMidi - (nNotes - 1 - i);
-    if (dir < 0 && candidate <= targetMidi) candidate = targetMidi + (nNotes - 1 - i);
-    midi = shiftOctavesIntoRange(Math.round(candidate), minMidi, maxMidi);
+    // Find next diatonic scale tone by scanning semitones (max 3 = augmented 2nd in harmonic minor)
+    let next = midi + dir;
+    for (let s = 1; s <= 3; s++) {
+      const cand = midi + dir * s;
+      const pc = ((cand % 12) + 12) % 12;
+      if (scale.includes(pc)) { next = cand; break; }
+    }
+    // Cap at target — never overshoot
+    if (dir > 0 && next > targetMidi) next = targetMidi;
+    if (dir < 0 && next < targetMidi) next = targetMidi;
+    midi = shiftOctavesIntoRange(next, minMidi, maxMidi);
     result.push(midi);
   }
-  result.push(targetMidi);
+  result.push(shiftOctavesIntoRange(targetMidi, minMidi, maxMidi));
   return result;
 }
 
@@ -2697,10 +2769,31 @@ export function applyStringPolyphonicRhythm(
   const composerKey = String(options.composerKey ?? "").toLowerCase();
   const profile = composerKey ? getComposerProfile(composerKey) : null;
 
-  // ── Violin I — preserve melody if requested, otherwise activity-driven ──────
-  if (vln1 && !options.preserveVln1Melody) {
-    applyToPart(vln1, options.vln1Activity ?? "grounded", warnings, 7, {
+  // ── Suzuki level: derive per-voice activity, ranges, approach density ────────
+  // When suzukiVolume is set it overrides the caller-supplied activity levels and
+  // MIDI ranges so the output stays idiomatic for that playing level.
+  let effectiveOptions = { ...options };
+  const vol = typeof options.suzukiVolume === "number" ? options.suzukiVolume : null;
+  if (vol !== null) {
+    const spVln = suzukiParams(vol, "violin");
+    const spVla = suzukiParams(vol, "viola");
+    const spVc  = suzukiParams(vol, "cello");
+    const spCb  = suzukiParams(vol, "bass");
+    effectiveOptions = {
       ...options,
+      vln1Activity: options.vln1Activity ?? spVln.activity,
+      vln2Activity: options.vln2Activity ?? spVln.activity,
+      vlaActivity:  options.vlaActivity  ?? spVla.activity,
+      vcActivity:   options.vcActivity   ?? spVc.activity,
+      cbActivity:   options.cbActivity   ?? spCb.activity,
+    };
+    warn(warnings, `[strings] Suzuki Vol ${vol}: activity=${spVln.activity}, approachDensity=${spVln.approachDensity}, minSub=${spVln.minSubdivision}`);
+  }
+
+  // ── Violin I — preserve melody if requested, otherwise activity-driven ──────
+  if (vln1 && !effectiveOptions.preserveVln1Melody) {
+    applyToPart(vln1, effectiveOptions.vln1Activity ?? "grounded", warnings, 7, {
+      ...effectiveOptions,
       syncopate: false,
       allowNonChordTones: false
     });
@@ -2715,90 +2808,90 @@ export function applyStringPolyphonicRhythm(
       applyVivaldiVln2(vln2, options);
       warn(warnings, "[strings] Vivaldi Violin II: 16th-note scale sequences (ascending/descending runs).");
     } else if (composerKey === "beethoven") {
-      applyBeethovenVln2(vln2, options);
+      applyBeethovenVln2(vln2, effectiveOptions);
       warn(warnings, "[strings] Beethoven Violin II: syncopated 8th + dramatic rests.");
     } else if (composerKey === "brahms") {
-      applyBrahmsVln2(vln2, options);
+      applyBrahmsVln2(vln2, effectiveOptions);
       warn(warnings, "[strings] Brahms Violin II: cross-rhythm hemiolia (3-beat groupings in duple).");
     } else if (composerKey === "bach") {
-      applyBachVln2(vln2, options);
-      warn(warnings, "[strings] Bach Violin II: 16th-note contrapuntal figures with chromatic passing tones.");
+      applyBachVln2(vln2, effectiveOptions);
+      warn(warnings, "[strings] Bach Violin II: 16th-note contrapuntal figures.");
     } else if (style === "baroque") {
-      applyBaroqueVln2(vln2, options);
+      applyBaroqueVln2(vln2, effectiveOptions);
       warn(warnings, "[strings] Baroque Violin II: continuous 8th notes on chord 3rd/5th.");
     } else if (style === "romantic") {
-      applyRomanticVln2(vln2, options);
+      applyRomanticVln2(vln2, effectiveOptions);
       warn(warnings, "[strings] Romantic Violin II: dotted-quarter+8th cells, expressive rubato phrases.");
     } else if (style === "modern") {
-      applyModernVln2(vln2, options);
+      applyModernVln2(vln2, effectiveOptions);
       warn(warnings, "[strings] Modern Violin II: syncopated 8th-rest+dotted-quarter displacement.");
     } else {
-      applyToPart(vln2, options.vln2Activity ?? "active", warnings, 11, options);
+      applyToPart(vln2, effectiveOptions.vln2Activity ?? "active", warnings, 11, effectiveOptions);
     }
   }
 
   // ── Viola ────────────────────────────────────────────────────────────────────
   if (vla) {
     if (composerKey === "mozart") {
-      applyMozartVla(vla, options);
+      applyMozartVla(vla, effectiveOptions);
       warn(warnings, "[strings] Mozart Viola: sustained half notes on chord 5th.");
     } else if (composerKey === "vivaldi") {
-      applyVivaldiVla(vla, options);
+      applyVivaldiVla(vla, effectiveOptions);
       warn(warnings, "[strings] Vivaldi Viola: root/5th alternating quarters.");
     } else if (composerKey === "beethoven") {
-      applyBeethovenVla(vla, options);
+      applyBeethovenVla(vla, effectiveOptions);
       warn(warnings, "[strings] Beethoven Viola: independent 8ths with strategic quarter rests.");
     } else if (composerKey === "brahms") {
-      applyBrahmsVla(vla, options);
-      warn(warnings, "[strings] Brahms Viola: dense quarter line with chromatic passing tones.");
+      applyBrahmsVla(vla, effectiveOptions);
+      warn(warnings, "[strings] Brahms Viola: dense quarter line with diatonic passing tones.");
     } else if (style === "baroque") {
-      applyBaroqueVla(vla, options);
+      applyBaroqueVla(vla, effectiveOptions);
       warn(warnings, "[strings] Baroque Viola: quarter-note chord-tone cycle (root→3rd→5th→3rd).");
     } else if (style === "romantic") {
-      applyRomanticVla(vla, options);
+      applyRomanticVla(vla, effectiveOptions);
       warn(warnings, "[strings] Romantic Viola: dotted-quarter+8th cells, 35% sustained halves.");
     } else if (style === "modern") {
-      applyModernVla(vla, options);
+      applyModernVla(vla, effectiveOptions);
       warn(warnings, "[strings] Modern Viola: displaced 8th fill with 50% quarter-rest downbeat.");
     } else {
-      applyToPart(vla, options.vlaActivity ?? "active", warnings, 23, options);
+      applyToPart(vla, effectiveOptions.vlaActivity ?? "active", warnings, 23, effectiveOptions);
     }
   }
 
   // ── Cello ────────────────────────────────────────────────────────────────────
   if (vc) {
     if (composerKey === "mozart") {
-      applyMozartCello(vc, options);
+      applyMozartCello(vc, effectiveOptions);
       warn(warnings, "[strings] Mozart Cello: Alberti bass (root-5th-3rd-5th 8ths).");
     } else if (composerKey === "vivaldi") {
-      applyVivaldiCello(vc, options);
+      applyVivaldiCello(vc, effectiveOptions);
       warn(warnings, "[strings] Vivaldi Cello: ostinato quarter-note root (basso continuo).");
     } else if (composerKey === "beethoven") {
-      applyBeethovenCello(vc, options);
+      applyBeethovenCello(vc, effectiveOptions);
       warn(warnings, "[strings] Beethoven Cello: heavy bass with syncopated rests and octave accents.");
     } else if (composerKey === "brahms") {
-      applyBrahmsCello(vc, options);
-      warn(warnings, "[strings] Brahms Cello: walking quarters with chromatic passing tones.");
+      applyBrahmsCello(vc, effectiveOptions);
+      warn(warnings, "[strings] Brahms Cello: walking quarters with diatonic passing tones.");
     } else if (composerKey === "bach") {
-      applyBachCello(vc, options);
+      applyBachCello(vc, effectiveOptions);
       warn(warnings, "[strings] Bach Cello: walking 8th-note continuo bass.");
     } else if (style === "baroque") {
-      applyBaroqueCello(vc, options);
+      applyBaroqueCello(vc, effectiveOptions);
       warn(warnings, "[strings] Baroque Cello: walking quarter-note bass (root on beat 1).");
     } else if (style === "romantic") {
-      applyRomanticCello(vc, options);
+      applyRomanticCello(vc, effectiveOptions);
       warn(warnings, "[strings] Romantic Cello: 60% lyrical quarter arpeggios, 40% dotted-quarter+8th.");
     } else if (style === "modern") {
-      applyModernCello(vc, options);
+      applyModernCello(vc, effectiveOptions);
       warn(warnings, "[strings] Modern Cello: syncopated 8th-rest+dotted-quarter cells.");
     } else {
-      applyToPart(vc, options.vcActivity ?? "less_active", warnings, 37, options);
+      applyToPart(vc, effectiveOptions.vcActivity ?? "less_active", warnings, 37, effectiveOptions);
     }
   }
 
   // ── Double Bass — activity-driven ────────────────────────────────────────────
   if (cb) {
-    applyToPart(cb, options.cbActivity ?? "less_active", warnings, 51, options);
+    applyToPart(cb, effectiveOptions.cbActivity ?? "less_active", warnings, 51, effectiveOptions);
   }
 
   if (profile) {
@@ -2806,26 +2899,38 @@ export function applyStringPolyphonicRhythm(
   }
 
   // ── Post-processing: approach scales, ornaments, cross-voice techniques ──────
-  const scale      = buildScalePcs(options.keyFifths ?? 0, options.keyMode ?? "major");
-  const chordEvts  = options.chordEvents ?? [];
+  const scale      = buildScalePcs(effectiveOptions.keyFifths ?? 0, effectiveOptions.keyMode ?? "major");
+  const chordEvts  = effectiveOptions.chordEvents ?? [];
 
-  // Approach scale density per composer/style
-  const approachDensity =
-    composerKey === "bach"      ? 0.70 :
-    composerKey === "vivaldi"   ? 0.60 :
-    composerKey === "beethoven" ? 0.45 :
-    composerKey === "brahms"    ? 0.55 :
-    composerKey === "mozart"    ? 0.60 :
-    style === "baroque"   ? 0.60 :
-    style === "romantic"  ? 0.65 :
-    style === "modern"    ? 0.35 :
-    0.45;
+  // Approach scale density: Suzuki level overrides composer/style defaults
+  const suzukiApproachDensity = vol !== null ? suzukiParams(vol, "violin").approachDensity : null;
+  const approachDensity = suzukiApproachDensity ??
+    (composerKey === "bach"      ? 0.70 :
+     composerKey === "vivaldi"   ? 0.60 :
+     composerKey === "beethoven" ? 0.45 :
+     composerKey === "brahms"    ? 0.55 :
+     composerKey === "mozart"    ? 0.60 :
+     style === "baroque"   ? 0.60 :
+     style === "romantic"  ? 0.65 :
+     style === "modern"    ? 0.35 :
+     0.45);
+
+  // Per-voice MIDI ranges: Suzuki level overrides defaults
+  const vln2Range: [number, number] = vol !== null
+    ? [suzukiParams(vol, "violin").minMidi, suzukiParams(vol, "violin").maxMidi]
+    : [55, 90];
+  const vlaRange:  [number, number] = vol !== null
+    ? [suzukiParams(vol, "viola").minMidi,  suzukiParams(vol, "viola").maxMidi]
+    : [48, 74];
+  const vcRange:   [number, number] = vol !== null
+    ? [suzukiParams(vol, "cello").minMidi,  suzukiParams(vol, "cello").maxMidi]
+    : [28, 65];
 
   if (approachDensity > 0 && chordEvts.length > 1) {
     const voiceRanges: [any, number, number, number][] = [
-      [vln2, 55, 90,  1],
-      [vla,  48, 74,  3],
-      [vc,   28, 65,  5],
+      [vln2, vln2Range[0], vln2Range[1], 1],
+      [vla,  vlaRange[0],  vlaRange[1],  3],
+      [vc,   vcRange[0],   vcRange[1],   5],
     ];
     for (const [part, mn, mx, salt] of voiceRanges) {
       if (part) {
@@ -2835,7 +2940,7 @@ export function applyStringPolyphonicRhythm(
         });
       }
     }
-    warn(warnings, `[strings] Approach scales applied (density=${approachDensity}).`);
+    warn(warnings, `[strings] Diatonic approach scales applied (density=${approachDensity}).`);
   }
 
   // Ornament density — skip Bach/Vivaldi (voices too fast, ornaments clash with 16ths)

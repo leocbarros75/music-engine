@@ -643,6 +643,12 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     pianoStylePresetPath: typeof anyRaw.pianoStylePresetPath === "string" ? anyRaw.pianoStylePresetPath : undefined,
     useStringEnsembleArranger: typeof anyRaw.useStringEnsembleArranger === "boolean" ? anyRaw.useStringEnsembleArranger : undefined,
     lhPattern: typeof anyRaw.lhPattern === "string" ? anyRaw.lhPattern : undefined,
+    suzukiVolume:
+      typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
+        ? (anyRaw.suzukiVolume as number)
+        : typeof anyRaw.suzukiVolume === "string" && /^\d+$/.test(anyRaw.suzukiVolume)
+          ? parseInt(anyRaw.suzukiVolume, 10)
+          : undefined,
   };
 }
 
