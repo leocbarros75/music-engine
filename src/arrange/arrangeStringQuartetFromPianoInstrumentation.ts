@@ -298,38 +298,26 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     const vcm = cello.measures[mi];
     const violaOverrideByOnset = new Map<string, { ev: EventLike; midi: number }>();
 
-    // RH mapping:
-    // - top RH note -> Violin I
-    // - inner RH note (highest note below top) -> Violin II
-    // - RH unison/single-note case: Violin II may double Violin I
-    // - fallback: if RH has 3 notes and LH is absent at this onset,
-    //   Viola takes the bottom RH note.
-    // - if RH has 3 notes and LH top doubles LH bass, Viola takes bottom RH note.
-    // - if RH has 3 notes and LH top is different from LH bass, Violin II plays divisi
-    //   (inner RH + bottom RH).
+    // RH mapping (copy transcription rules):
+    // - top RH note -> Violin I (always)
+    // - inner RH note (2nd from top) -> Violin II (only when RH has 2+ simultaneous notes)
+    // - Violin II does NOT double Violin I on single-note melody passes; it rests.
+    // - Viola override: bottom RH note when RH has a full chord (3 or 4 notes)
+    //   and LH has no second voice to split to Viola. Handled in the 3- and 4-note
+    //   blocks below. For 1- or 2-note RH, Viola stays silent unless LH provides it.
     for (const key of Array.from(rhByOnset.keys()).sort()) {
       const onset = Number(key);
       const selected = selectNotesForOnset(rhByOnset.get(key) ?? []);
       if (!selected.length) continue;
       const lhSelectedAtOnset = selectNotesForOnset(lhByOnset.get(key) ?? []);
-      const hasLhOnset = lhSelectedAtOnset.length > 0;
       const top = selected[selected.length - 1]!;
       const bottom = selected[0]!;
       pushMappedNote(v1m, top, "violin_1", "v1", ++seq, { t: onset });
-      if (selected.length === 1) {
-        // RH unison/melody-only onset: allow Violin II to double Violin I.
-        pushMappedNote(v2m, top, "violin_2", "v2-unison", ++seq, { t: onset });
-      }
+      // Violin II gets an inner voice only when the RH has a chord (2+ notes).
+      // Never mirror V1 on melody-only (single-note) onsets.
       if (selected.length > 1 && selected.length !== 4) {
         const inner = selected[selected.length - 2]!;
         pushMappedNote(v2m, inner, "violin_2", "v2", ++seq, { t: onset });
-      }
-
-      if (selected.length !== 3 && !hasLhOnset) {
-        // Requested instrumentation rule:
-        // when RH is not a triad and LH has no onset note, Viola takes RH bottom note
-        // even if Violin II is already on the same pitch.
-        violaOverrideByOnset.set(key, bottom);
       }
 
       if (selected.length === 3) {
