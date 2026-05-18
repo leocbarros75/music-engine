@@ -2551,13 +2551,24 @@ function insertApproachNotes(
       // wholesale replacement of the chord note.
       const runSpan   = nNotes * noteUnit;
       const runStartT = boundary - runSpan;    // run starts this far before the change
-      const chordDur  = runStartT - Number(lastNote.t);  // how much of the chord tone to keep
+
+      // Snap chordDur DOWN to the nearest standard single-note duration.
+      // Non-standard values (e.g. 2.25 beats from runStartT=2.25) produce a
+      // <duration> with no matching <type> in MusicXML, causing import errors
+      // in notation software (Sibelius reports "Found: 19/16, Expected: 4/4").
+      const CHORD_DUR_SNAPS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0];
+      const rawChordDur = runStartT - Number(lastNote.t);
+      let chordDur = 0;
+      for (const b of CHORD_DUR_SNAPS) { if (b <= rawChordDur + 1e-9) chordDur = b; }
+      // Adjust the run start to immediately follow the kept chord tone, ensuring
+      // no gap (the run may start slightly before the chord change — imperceptible).
+      const adjustedRunStartT = Number(lastNote.t) + chordDur;
 
       // Guard: run notes must stay inside the measure
       const runNotes: NoteEvent[] = runMidis
         .map((midi, i) => ({
           id:    `app-${mNum}-${Math.round(lastNote.t * 1000)}-${i}`,
-          t:     runStartT + i * noteUnit,
+          t:     adjustedRunStartT + i * noteUnit,
           dur:   noteUnit,
           type:  "note" as const,
           midi,
@@ -3016,7 +3027,9 @@ export function applyStringPolyphonicRhythm(
   }
 
   // Ornament density — skip Bach/Vivaldi (voices too fast, ornaments clash with 16ths)
-  const ornamentDensity =
+  // Also skip for beginner Suzuki level: ornaments add note clutter beyond the student's
+  // technical range and inflate the 16th-note density above the 40% target.
+  const ornamentDensity = (vol !== null && vol <= 1) ? 0 :
     composerKey === "bach"      ? 0    :
     composerKey === "vivaldi"   ? 0    :
     composerKey === "mozart"    ? 0.28 :
@@ -3053,18 +3066,128 @@ export function applyStringPolyphonicRhythm(
     }
   }
 
+  // ── Suzuki beginner post-processing ─────────────────────────────────────
+  // Cap 16th note density to ≤40% and strip any simultaneous (chord) notes
+  // that slipped in from approach runs or pattern functions. Beginner parts
+  // should feel spacious: 8th notes dominate, 16ths are decorative (≤40%).
+  if (vol !== null && vol <= 1) {
+    for (const part of [vln2, vla, vc, cb]) {
+      if (part) {
+        dedupSameTimeNotes(part);
+        capSixteenthDensity(part, 0.40);
+      }
+    }
+  }
+
   // ── Final instrument-range clamp ─────────────────────────────────────────
-  // Safety net: after all pattern functions and post-processing, shift any
-  // note that drifted outside the instrument's physical range back into range.
-  // This catches both hardcoded ranges in individual pattern functions and any
-  // ornament/approach notes that overshot.
-  if (vln1) enforceInstrumentRange(vln1, INSTRUMENT_RANGES.violin[0], INSTRUMENT_RANGES.violin[1]);
-  if (vln2) enforceInstrumentRange(vln2, INSTRUMENT_RANGES.violin[0], INSTRUMENT_RANGES.violin[1]);
-  if (vla)  enforceInstrumentRange(vla,  INSTRUMENT_RANGES.viola[0],  INSTRUMENT_RANGES.viola[1]);
-  if (vc)   enforceInstrumentRange(vc,   INSTRUMENT_RANGES.cello[0],  INSTRUMENT_RANGES.cello[1]);
-  if (cb)   enforceInstrumentRange(cb,   INSTRUMENT_RANGES.bass[0],   INSTRUMENT_RANGES.bass[1]);
+  // When a Suzuki volume is active, honour the level-appropriate MIDI ceiling
+  // (e.g. bass beginner tops at D3=50, not the physical G4=67).  Fall back to
+  // the instrument's full physical range when no level is set.
+  const vln1RangeFinal: [number, number] = vol !== null
+    ? [suzukiParams(vol, "violin").minMidi, suzukiParams(vol, "violin").maxMidi]
+    : [INSTRUMENT_RANGES.violin[0], INSTRUMENT_RANGES.violin[1]];
+  const vln2RangeFinal: [number, number] = vol !== null
+    ? [suzukiParams(vol, "violin").minMidi, suzukiParams(vol, "violin").maxMidi]
+    : [INSTRUMENT_RANGES.violin[0], INSTRUMENT_RANGES.violin[1]];
+  const vlaRangeFinal: [number, number] = vol !== null
+    ? [suzukiParams(vol, "viola").minMidi,  suzukiParams(vol, "viola").maxMidi]
+    : [INSTRUMENT_RANGES.viola[0],  INSTRUMENT_RANGES.viola[1]];
+  const vcRangeFinal: [number, number] = vol !== null
+    ? [suzukiParams(vol, "cello").minMidi,  suzukiParams(vol, "cello").maxMidi]
+    : [INSTRUMENT_RANGES.cello[0],  INSTRUMENT_RANGES.cello[1]];
+  const cbRangeFinal: [number, number] = vol !== null
+    ? [suzukiParams(vol, "bass").minMidi,   suzukiParams(vol, "bass").maxMidi]
+    : [INSTRUMENT_RANGES.bass[0],   INSTRUMENT_RANGES.bass[1]];
+
+  if (vln1) enforceInstrumentRange(vln1, vln1RangeFinal[0], vln1RangeFinal[1]);
+  if (vln2) enforceInstrumentRange(vln2, vln2RangeFinal[0], vln2RangeFinal[1]);
+  if (vla)  enforceInstrumentRange(vla,  vlaRangeFinal[0],  vlaRangeFinal[1]);
+  if (vc)   enforceInstrumentRange(vc,   vcRangeFinal[0],   vcRangeFinal[1]);
+  if (cb)   enforceInstrumentRange(cb,   cbRangeFinal[0],   cbRangeFinal[1]);
 
   return { scoreModel, warnings };
+}
+
+// ─── Beginner post-processing helpers ────────────────────────────────────────
+
+/**
+ * Remove events that share a start time (`t`) with another note in the same
+ * measure — keeps the longer note when two notes collide.  This prevents
+ * simultaneous (chord) notes from appearing in inner voices at beginner level,
+ * which can arise when an approach-run note coincidentally lands on the same
+ * beat as the kept chord tone due to floating-point rounding.
+ */
+function dedupSameTimeNotes(part: any): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  for (const m of measures) {
+    const events: NoteEvent[] = Array.isArray(m?.events) ? m.events : [];
+    // Group by quantised beat position
+    const byT = new Map<number, NoteEvent[]>();
+    for (const ev of events) {
+      if (ev.type !== "note") continue;
+      const key = Math.round(Number(ev.t) * 10000);
+      const arr = byT.get(key) ?? [];
+      arr.push(ev);
+      byT.set(key, arr);
+    }
+    // Collect events to drop (all but the longest at each position)
+    const toDrop = new Set<NoteEvent>();
+    for (const group of byT.values()) {
+      if (group.length <= 1) continue;
+      group.sort((a, b) => b.dur - a.dur);           // longest first
+      for (let i = 1; i < group.length; i++) toDrop.add(group[i]!);
+    }
+    if (toDrop.size) {
+      m.events = events.filter((ev: NoteEvent) => !toDrop.has(ev));
+    }
+  }
+}
+
+/**
+ * Cap the fraction of 16th notes (dur < 0.26 beats) across all measures of a
+ * part to `maxFraction`.  When a measure exceeds the cap, consecutive pairs of
+ * 16th notes are merged into a single 8th note (keeping the first pitch,
+ * combining durations) until the fraction drops to ≤ maxFraction.
+ *
+ * This preserves decorative 16th passages (e.g. neighbour-tone runs) while
+ * preventing inner voices from becoming too dense for beginner players.
+ */
+function capSixteenthDensity(part: any, maxFraction: number): void {
+  const measures = Array.isArray(part?.measures) ? part.measures : [];
+  for (const m of measures) {
+    let events: NoteEvent[] = Array.isArray(m?.events) ? m.events : [];
+
+    const countSixteenths = (evs: NoteEvent[]) =>
+      evs.filter(e => e.type === "note" && e.dur < 0.26).length;
+    const totalNotes = (evs: NoteEvent[]) =>
+      evs.filter(e => e.type === "note").length;
+
+    let safety = 0;
+    while (safety++ < 200) {
+      const total = totalNotes(events);
+      if (total === 0) break;
+      if (countSixteenths(events) / total <= maxFraction) break;
+
+      // Find the first consecutive pair of 16th notes and merge them
+      let merged = false;
+      for (let i = 0; i < events.length - 1; i++) {
+        const e1 = events[i];
+        const e2 = events[i + 1];
+        if (!e1 || !e2) continue;
+        if (e1.type !== "note" || e2.type !== "note") continue;
+        if (e1.dur >= 0.26 || e2.dur >= 0.26) continue;           // not both 16ths
+        if (Math.abs(Number(e1.t) + e1.dur - Number(e2.t)) > 1e-6) continue; // not adjacent
+        // Merge: keep first pitch, sum durations (two 16ths → one 8th)
+        const mergedEv: NoteEvent = { ...e1, dur: e1.dur + e2.dur };
+        events = [...events.slice(0, i), mergedEv, ...events.slice(i + 2)];
+        merged = true;
+        break;
+      }
+      if (!merged) break;
+    }
+
+    m.events = events.sort((a: NoteEvent, b: NoteEvent) => Number(a.t) - Number(b.t));
+  }
 }
 
 function applyViolaArpeggio(part: any, options: ApplyOptions): void {
