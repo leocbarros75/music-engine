@@ -58,23 +58,33 @@ type SuzukiParams = {
  */
 function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" | "bass"): SuzukiParams {
   // ── Beginner: Volume 1 ───────────────────────────────────────────────────
+  // Ranges derived from Suzuki Vol. 1 scores (Violin, Viola, Cello, Bass).
+  // All four instruments stay in 1st position (bass: 1st + neck-block 4th pos).
+  // Violin: open G3 → 3rd finger on E string (A5); G-major scale top = G5,
+  //         tonalization explicitly reaches A5. No approach notes for beginners.
+  // Viola:  open C3 → 4th finger on A string (E5); 2-octave C-major scale.
+  // Cello:  open C2 → 4th finger on A string (E4); 2-octave C-major scale = C4,
+  //         later pieces (Happy Farmer, Minuet in C) reach E4.
+  // Bass:   open E1 → upper reach in 1st/4th position pieces = D3.
   if (volume <= 1) {
     const ranges: Record<string, [number, number]> = {
-      violin: [55, 76],   // G3–E5  (1st position, open strings to 4th finger)
-      viola:  [48, 69],   // C3–A4  (1st position)
-      cello:  [36, 55],   // C2–G3  (1st position)
-      bass:   [28, 47],   // E1–B2  (1st position)
+      violin: [55, 81],   // G3–A5  (full 1st position: open G → 3rd finger E string)
+      viola:  [48, 76],   // C3–E5  (full 1st position: open C → 4th finger A string)
+      cello:  [36, 64],   // C2–E4  (full 1st position: open C → 4th finger A string)
+      bass:   [28, 50],   // E1–D3  (1st position + neck-block 4th position)
     };
     const [mn, mx] = ranges[instrument] ?? [36, 84];
     return { activity: "grounded", minMidi: mn, maxMidi: mx, approachDensity: 0, minSubdivision: 1.0 };
   }
   // ── Intermediate: Volumes 2–3 ────────────────────────────────────────────
+  // Adds 2nd–3rd position (violin/viola/cello) and extended thumb area (cello).
+  // Sparse approach notes introduced (density 0.20), eighth-note minimum.
   if (volume <= 3) {
     const ranges: Record<string, [number, number]> = {
-      violin: [55, 81],   // G3–A5  (1st–2nd position)
-      viola:  [48, 74],   // C3–D5
-      cello:  [36, 60],   // C2–C4  (1st–2nd position)
-      bass:   [28, 50],   // E1–D3
+      violin: [55, 84],   // G3–C6  (2nd–3rd position added)
+      viola:  [48, 79],   // C3–G5  (2nd–3rd position added)
+      cello:  [36, 67],   // C2–G4  (2nd–3rd position, entry-level thumb position)
+      bass:   [28, 55],   // E1–G3  (extended position usage)
     };
     const [mn, mx] = ranges[instrument] ?? [36, 84];
     return { activity: "less_active", minMidi: mn, maxMidi: mx, approachDensity: 0.20, minSubdivision: 0.5 };
@@ -82,10 +92,10 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
   // ── Advanced: Volumes 4–5 ────────────────────────────────────────────────
   if (volume <= 5) {
     const ranges: Record<string, [number, number]> = {
-      violin: [55, 88],   // G3–E6  (1st–5th position)
-      viola:  [48, 79],   // C3–G5
-      cello:  [36, 65],   // C2–F4  (1st–4th position)
-      bass:   [28, 55],   // E1–G3
+      violin: [55, 88],   // G3–E6  (up to 5th position)
+      viola:  [48, 84],   // C3–C6  (full thumb position range)
+      cello:  [36, 72],   // C2–C5  (high thumb position)
+      bass:   [28, 60],   // E1–C4  (high positions)
     };
     const [mn, mx] = ranges[instrument] ?? [36, 84];
     return { activity: "active", minMidi: mn, maxMidi: mx, approachDensity: 0.45, minSubdivision: 0.25 };
@@ -94,7 +104,7 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
   const ranges: Record<string, [number, number]> = {
     violin: [55, 96],
     viola:  [48, 91],
-    cello:  [36, 72],
+    cello:  [36, 79],   // C2–G5  (extreme high thumb position, harmonics territory)
     bass:   [28, 67],
   };
   const [mn, mx] = ranges[instrument] ?? [28, 96];
