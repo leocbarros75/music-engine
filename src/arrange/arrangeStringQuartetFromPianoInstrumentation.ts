@@ -78,14 +78,45 @@ function clampMidiToAbsoluteRange(midi: number, instrumentId: string): number {
   return m;
 }
 
+function partHasStaff2Notes(part: PartLike): boolean {
+  // Check whether any note event in this part is on staff 2 — this identifies
+  // a grand-staff piano part even when the part name is not "Piano".
+  for (const measure of (part?.measures ?? []) as MeasureLike[]) {
+    for (const ev of (measure?.events ?? []) as EventLike[]) {
+      if (ev?.type === "note" && Number(ev?.staff) === 2) return true;
+    }
+  }
+  return false;
+}
+
 function findPianoPart(score: ScoreModel): PartLike | null {
   const parts = score.parts ?? [];
-  const byInstrument = parts.find((p: any) => String(p?.instrument ?? "").toLowerCase().includes("piano"));
+
+  // 1. Explicit instrument field (set by some parsers)
+  const byInstrument = parts.find((p: any) =>
+    String(p?.instrument ?? "").toLowerCase().includes("piano") ||
+    String(p?.instrument ?? "").toLowerCase().includes("keyboard") ||
+    String(p?.instrument ?? "").toLowerCase().includes("keys")
+  );
   if (byInstrument) return byInstrument;
-  const byName = parts.find((p: any) => String(p?.name ?? "").toLowerCase().includes("piano"));
+
+  // 2. Part name contains a keyboard keyword
+  const pianoKeywords = ["piano", "pno", "keyboard", "keys", "accomp", "organ", "harpsichord"];
+  const byName = parts.find((p: any) => {
+    const n = String(p?.name ?? "").toLowerCase();
+    return pianoKeywords.some((k) => n.includes(k));
+  });
   if (byName) return byName;
+
+  // 3. staves field set to 2 (some parsers write this from <staves> XML element)
   const byStaves = parts.find((p: any) => Number(p?.staves ?? 1) >= 2);
   if (byStaves) return byStaves;
+
+  // 4. Inspect actual note events — find the part that has staff=2 notes
+  //    (grand-staff part where LH notes carry staff="2")
+  const byStaff2 = parts.find((p: any) => partHasStaff2Notes(p));
+  if (byStaff2) return byStaff2;
+
   return null;
 }
 
@@ -358,8 +389,11 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     }
 
     // LH mapping:
-    // - top LH note -> Viola
-    // - bottom LH note -> Cello
+    // - top LH note -> Viola (only when LH has 2+ simultaneous notes, i.e. a
+    //   chord-style LH such as bass+inner).  When LH has a single walking-bass
+    //   note per onset, Viola takes the RH bottom override instead; only Cello
+    //   receives the walking-bass note so it isn't doubled an octave above.
+    // - bottom LH note -> Cello (always)
     for (const key of Array.from(lhByOnset.keys()).sort()) {
       const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
       if (!selected.length) continue;
@@ -367,10 +401,13 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       const top = selected[selected.length - 1]!;
       const violaOverride = violaOverrideByOnset.get(key);
       if (violaOverride) {
+        // RH bottom override takes priority (covers single-note walking-bass case)
         pushMappedNote(vam, violaOverride, "viola", "va-rh-override", ++seq);
-      } else {
+      } else if (selected.length >= 2) {
+        // Only split top→Viola when LH has a true chord (bass + inner voice)
         pushMappedNote(vam, top, "viola", "va", ++seq);
       }
+      // Cello always gets the LH bottom note
       pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
     }
 

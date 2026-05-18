@@ -132,18 +132,30 @@ export function pipelineMusicxmlToArrangedMusicxml(
       }
     }
 
-    // 4. Harmonize
-    let outScore: any;
-    try {
-      outScore = (harmonizeSatbFromChords as any)(inputScore, finalChords, harmOpts);
-    } catch {
-      outScore = (harmonizeSatbFromChords as any)({
-        scoreModel: inputScore,
-        chords: finalChords,
-        options: harmOpts
-      });
+    // 4. Harmonize — skip for copy instrumentation modes; the arranger works
+    //    directly on the original parsed score (piano LH/RH staves preserved).
+    const isCopyInstrumentation =
+      settings.instrumentation === "piano_copy_to_string_quartet" ||
+      settings.instrumentation === "satb_to_string_quartet" ||
+      settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
+      settings.instrumentation === "satb_to_woodwind_quartet";
+
+    let harmonizedScore: any;
+    if (isCopyInstrumentation) {
+      harmonizedScore = inputScore;
+    } else {
+      let outScore: any;
+      try {
+        outScore = (harmonizeSatbFromChords as any)(inputScore, finalChords, harmOpts);
+      } catch {
+        outScore = (harmonizeSatbFromChords as any)({
+          scoreModel: inputScore,
+          chords: finalChords,
+          options: harmOpts
+        });
+      }
+      harmonizedScore = normalizeHarmonizeReturn(outScore);
     }
-    const harmonizedScore = normalizeHarmonizeReturn(outScore);
 
     if (!harmonizedScore || typeof harmonizedScore !== "object") {
       return { ok: false, error: "Harmonizer returned an invalid scoreModel.", warnings };
