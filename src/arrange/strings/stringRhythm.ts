@@ -77,8 +77,23 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
     return { activity: "grounded", minMidi: mn, maxMidi: mx, approachDensity: 0, minSubdivision: 1.0 };
   }
   // ── Intermediate: Volumes 2–3 ────────────────────────────────────────────
-  // Adds 2nd–3rd position (violin/viola/cello) and extended thumb area (cello).
-  // Sparse approach notes introduced (density 0.20), eighth-note minimum.
+  // Ranges derived from Suzuki Vol. 2 & 3 scores (Violin, Viola, Cello, Bass).
+  // Vol. 2 introduces 2nd–3rd position across all instruments; 8th notes become
+  // the primary subdivision; dotted quarter+8th patterns are stylistically defining;
+  // 16th notes appear ornamentally (Gavotte, Humoresque, Bach dance forms).
+  // Vol. 3 escalates to structural 16th note scalar runs (Bach Minuet, Bourrée,
+  // Gavotte in G minor); triplets introduced; both 8th and 16th note approach
+  // passages are standard technique by this volume across all four instruments.
+  // Violin: 2nd–3rd position tops at C6 (MIDI 84); 8th+16th approaches confirmed.
+  // Viola:  2nd–3rd position tops at G5 (MIDI 79); same dance-form repertoire.
+  // Cello:  2nd–3rd position + entry-level thumb reaches G4 (MIDI 67); 16th runs
+  //         structural in Vol. 3 Bach pieces; approach density matches upper strings.
+  // Bass:   extended position usage tops at G3 (MIDI 55); quarter-note walk
+  //         patterns idiomatic; approach density naturally lower than upper strings,
+  //         but 8th note approaches present and confirmed across Vol. 2 repertoire.
+  // approachDensity 0.25: Vol. 2 supports ~0.20; Vol. 3 standard 8th+16th use → 0.25.
+  // minSubdivision 0.25: Vol. 2 eighth-note floor confirmed; Vol. 3 structural 16th
+  //   runs across violin/viola/cello require 16th-note capability for the bracket.
   if (volume <= 3) {
     const ranges: Record<string, [number, number]> = {
       violin: [55, 84],   // G3–C6  (2nd–3rd position added)
@@ -87,7 +102,7 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
       bass:   [28, 55],   // E1–G3  (extended position usage)
     };
     const [mn, mx] = ranges[instrument] ?? [36, 84];
-    return { activity: "less_active", minMidi: mn, maxMidi: mx, approachDensity: 0.20, minSubdivision: 0.5 };
+    return { activity: "less_active", minMidi: mn, maxMidi: mx, approachDensity: 0.25, minSubdivision: 0.25 };
   }
   // ── Advanced: Volumes 4–5 ────────────────────────────────────────────────
   if (volume <= 5) {
