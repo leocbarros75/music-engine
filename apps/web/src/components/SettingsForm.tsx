@@ -426,6 +426,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
   const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
   const isStrings = settings.ensemble === "string_ensemble";
   const isWoodwinds = settings.ensemble === "woodwind_ensemble";
+  const isCopyInstrumentation =
+    settings.instrumentation === "piano_copy_to_string_quartet" ||
+    settings.instrumentation === "satb_to_string_quartet";
   const instrumentationHelp =
     (isStrings ? STRING_INSTRUMENTATION_OPTIONS : isWoodwinds ? WOODWIND_INSTRUMENTATION_OPTIONS : []).find(
       (opt) => opt.value === settings.instrumentation
@@ -805,7 +808,12 @@ export default function SettingsForm({ settings, onChange }: Props) {
             <label>Instrumentation</label>
             <select
               value={settings.instrumentation ?? "auto"}
-              onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
+              onChange={(e) => {
+                const instr = e.target.value as Settings["instrumentation"];
+                const isCopy =
+                  instr === "piano_copy_to_string_quartet" || instr === "satb_to_string_quartet";
+                onChange({ ...settings, instrumentation: instr, ...(isCopy ? { level: "advanced" } : {}) });
+              }}
             >
               {STRING_INSTRUMENTATION_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1038,8 +1046,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
             />
           </div>
 
-          {/* Style */}
-          <div className="field">
+          {/* Style — hidden in copy mode (style is already baked into the source) */}
+          {!isCopyInstrumentation && <div className="field">
             <label>Style</label>
             <select
               value={["baroque", "classical", "romantic", "modern"].includes(settings.style) ? settings.style : "classical"}
@@ -1062,9 +1070,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 {PERIOD_STYLE_OPTIONS.find((o) => o.value === settings.style)?.help ?? ""}
               </span>
             </div>
-          </div>
+          </div>}
 
-          {settings.style === "modern" && (
+          {!isCopyInstrumentation && settings.style === "modern" && (
             <div className="field">
               <label>Modern Sub-mode</label>
               <select
@@ -1093,8 +1101,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </select>
           </div>
 
-          {/* Accompaniment — homophonic / polyphonic only */}
-          <div className="field">
+          {/* Accompaniment — homophonic / polyphonic only; hidden in copy mode */}
+          {!isCopyInstrumentation && <div className="field">
             <label>Accompaniment</label>
             <select
               value={settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic"}
@@ -1121,7 +1129,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
                   : "All voices move together in vertical block chords."}
               </span>
             </div>
-          </div>
+          </div>}
         </>
 
       ) : (

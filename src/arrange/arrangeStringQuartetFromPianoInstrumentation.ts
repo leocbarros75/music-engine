@@ -89,6 +89,79 @@ function findPianoPart(score: ScoreModel): PartLike | null {
   return null;
 }
 
+type SatbParts = { soprano: PartLike; alto: PartLike; tenor: PartLike; bass: PartLike };
+
+function findSatbParts(score: ScoreModel): SatbParts | null {
+  const parts = score.parts ?? [];
+  const find = (...keywords: string[]) =>
+    parts.find((p: any) => {
+      const n = String(p?.name ?? "").toLowerCase();
+      return keywords.some((k) => n.includes(k));
+    }) ?? null;
+  const soprano = find("soprano", "sop");
+  const alto    = find("alto", "alt");
+  const tenor   = find("tenor", "ten");
+  const bass    = find("bass", "bas");
+  if (soprano && alto && tenor && bass) return { soprano, alto, tenor, bass };
+  // Fallback: if exactly 4 parts, treat them as S/A/T/B in order
+  if (parts.length === 4) {
+    return { soprano: parts[0], alto: parts[1], tenor: parts[2], bass: parts[3] };
+  }
+  return null;
+}
+
+function clonePartAs(source: PartLike, partId: string, name: string, instrument: string): PartLike {
+  const cloned = clone(source);
+  cloned.part_id  = partId;
+  cloned.name     = name;
+  cloned.instrument = instrument;
+  cloned.staves   = 1;
+  return cloned;
+}
+
+function arrangeSatbToStringQuartet(
+  score: ScoreModel,
+  satb: SatbParts,
+  options: ArrangeOptions
+): ScoreModel {
+  const violin1 = clonePartAs(satb.soprano, "P_V1", "Violin I",  "violin_1");
+  const violin2 = clonePartAs(satb.alto,    "P_V2", "Violin II", "violin_2");
+  const viola   = clonePartAs(satb.tenor,   "P_VA", "Viola",     "viola");
+  const cello   = clonePartAs(satb.bass,    "P_VC", "Cello",     "cello");
+
+  // Clamp any notes that fall outside each instrument's absolute range
+  for (const [part, instrId] of [
+    [violin1, "violin_1"],
+    [violin2, "violin_2"],
+    [viola,   "viola"],
+    [cello,   "cello"],
+  ] as const) {
+    for (const measure of (part.measures ?? []) as MeasureLike[]) {
+      for (const ev of (measure.events ?? []) as EventLike[]) {
+        if (ev?.type !== "note") continue;
+        const midi = eventMidi(ev);
+        if (typeof midi !== "number") continue;
+        const clamped = clampMidiToAbsoluteRange(midi, instrId);
+        if (clamped !== midi) {
+          ev.midi  = clamped;
+          ev.pitch = midiToPitch(clamped);
+        }
+      }
+    }
+  }
+
+  warn(
+    options.warnings,
+    "[strings] SATB instrumentation copy applied: Soprano→Violin I, Alto→Violin II, Tenor→Viola, Bass→Cello."
+  );
+
+  return {
+    ...(score as any),
+    meta: { ...(score as any).meta, ensemble: "string_ensemble" },
+    parts: [violin1, violin2, viola, cello],
+  } as ScoreModel;
+}
+
 function makePart(partId: string, name: string, instrument: string, measures: MeasureLike[]): PartLike {
   const clonedMeasures = measures.map((m, i) => ({
     number: Number(m?.number ?? i + 1),
@@ -155,7 +228,9 @@ export function arrangeStringQuartetFromPianoInstrumentation(
   const warnings = options.warnings;
   const pianoPart = findPianoPart(score);
   if (!pianoPart) {
-    warn(warnings, "[strings] Instrumentation copy: piano part not found; returning original score.");
+    const satb = findSatbParts(score);
+    if (satb) return arrangeSatbToStringQuartet(score, satb, options);
+    warn(warnings, "[strings] Instrumentation copy: no piano or SATB parts found; returning original score.");
     return score;
   }
 
