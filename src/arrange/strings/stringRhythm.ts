@@ -122,6 +122,24 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
   //   etude explicitly introduced (page 4). In 5th position, 4th finger on A string
   //   reaches D6 (MIDI 86). Bach Suite I arpeggios and Moto Perpetuo active 16th
   //   runs confirm this ceiling. Approach density solidly in the 0.45 zone.
+  // Cello Vol. 4: Bréval Sonata C Major Op. 40 No. 1 (bass clef, 4th pos.),
+  //   Marcello Sonata E minor Op. 1 No. 2 (bass clef), Tchaikovsky Chanson Triste
+  //   Op. 40 No. 2 (tenor/alto clef introduced — 4th–5th pos. passages, ceiling
+  //   ~A4=69), Bach Suite G Minor Minuets (unaccompanied cello part). Consolidates
+  //   3rd–5th position without thumb; no thumb position introduced in Vol. 4.
+  // Cello Vol. 5: Vivaldi Sonata E minor Op. 14 No. 5 (Allegro movements in alto
+  //   clef confirm thumb position entry), Danse Rustique (Squire, bass clef + thumb-
+  //   pos. 8va brackets), Bach Arioso Cantata 156 (tenor clef throughout), Goltermann
+  //   Rondo Concerto No. 4 Op. 65 (thumb-pos. 8va brackets peak ~C5–D5), One-Finger
+  //   Scale (alto clef, explicit thumb-pos. intro; pedagogical ceiling = C5=72).
+  //   First volume in Suzuki sequence to formally introduce thumb position.
+  // Bass Vol. 4–5: Aria from Rigoletto (Verdi arr. Zimmermann) — bass + tenor clef,
+  //   ceiling ~C4=60; Sonata in G Major (Marcello arr. Harbold) — bass clef only, ceiling
+  //   ~A3=57; How High the Moon & Ornithology (arr. Rebeck) — treble clef, ceiling ~D4=62;
+  //   Après un Rêve (Fauré) — tenor clef Sul D/A/G passages, climax peak ~E4=64; Concerto
+  //   in F Major (Capuzzi, cadenza arr. Rebeck) — treble-clef cadenza fast triplet runs
+  //   peak at E4=64 (written E5=76 in treble clef). 2-octave major/minor scales use bass
+  //   → tenor/treble → bass clef; highest-key scales (Ab min, D# min) confirm E4=64.
   // approachDensity 0.45: confirmed by Vivaldi/Seitz/Bach concerto density across
   //   all four instruments at this level.
   // minSubdivision 0.25: 16th-note semiquaver runs are structurally dominant.
@@ -129,8 +147,8 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
     const ranges: Record<string, [number, number]> = {
       violin: [55, 91],   // G3–G6  (4th–early 6th position; Vol. 4 tops E6=88, Vol. 5 tops G6=91)
       viola:  [48, 86],   // C3–D6  (4th–5th position; Vol. 4 tops C6=84, Vol. 5 tops D6=86)
-      cello:  [36, 72],   // C2–C5  (high thumb position)
-      bass:   [28, 60],   // E1–C4  (high positions)
+      cello:  [36, 72],   // C2–C5  (Vol. 4: 4th–5th pos. without thumb, ceiling ~A4=69; Vol. 5: thumb pos. intro, One-Finger Scale + Goltermann peak at C5=72)
+      bass:   [28, 64],   // E1–E4  (5th-6th pos. + full thumb pos.; Vol. 5 Capuzzi cadenza + Après un Rêve peak E4=64)
     };
     const [mn, mx] = ranges[instrument] ?? [36, 91];
     return { activity: "active", minMidi: mn, maxMidi: mx, approachDensity: 0.45, minSubdivision: 0.25 };
@@ -152,13 +170,27 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
   //   represented in any piece in this volume.
   //   Approach density maximum: La Folia variations, Fiocco, and all three Handel
   //   Concerto movements have multi-note approach figures on virtually every phrase.
+  // Cello Vol. 7: Eccles Sonata G minor (Largo in tenor clef, Allegro con spirito
+  //   in bass clef; 4th–5th pos. ceiling ~E4=64), Bach Bourrées BWV 1009 C Major
+  //   (unaccompanied, advanced thumb pos., ceiling ~D5=74), Popper Gavotte Op. 23
+  //   No. 2 (treble clef confirmed for cello — Mosso D-major section + climactic
+  //   final passage reach G5=79), Sicilienne von Paradis arr. Dushkin (bass/tenor
+  //   clef, ceiling ~A4=69). Popper Gavotte treble-clef passages are the definitive
+  //   ceiling evidence; prior "harmonics territory" label replaced — this is high
+  //   thumb position only.
+  // Bass Vol. 6: Sonata No. 3 A minor (Vivaldi) — bass clef, ceiling ~Bb3–B3=58–59;
+  //   Traumerei (Schumann), Waltz (Dragonetti), Concerto in D Major Adagio (Dittersdorf),
+  //   Gavotte (Lorenziii), Chanson Triste + Valse Miniature (Koussevitzky) — full thumb-pos.
+  //   solo repertoire, practical ceiling ~G4=67. Three-octave major/minor scales introduced
+  //   (vs. 2-octave in Vol. 5): A major 3 octaves (A1=33→A4=69), G major (G2=43→G5=79)
+  //   confirm G4=67 as the practical solo-repertoire ceiling at this level.
   // approachDensity 0.65: maximum — confirmed across all pieces in both Vol. 6 books.
   // minSubdivision 0.25: 16th notes and compound 8th runs structurally dominant.
   const ranges: Record<string, [number, number]> = {
     violin: [55, 93],   // G3–A6  (6th–7th position; BWV 1042 tops at A6=93)
     viola:  [48, 88],   // C3–E6  (6th–7th position; 7th pos 4th finger = E6=88)
-    cello:  [36, 79],   // C2–G5  (extreme high thumb position, harmonics territory)
-    bass:   [28, 67],   // E1–G4  (high positions, near practical ceiling)
+    cello:  [36, 79],   // C2–G5  (Vol. 7: Popper Gavotte treble-clef Mosso + climax peaks G5=79; high thumb pos.)
+    bass:   [28, 67],   // E1–G4  (Vol. 6: Koussevitzky Chanson Triste + Valse Miniature peak ~G4=67; 3-octave scales confirm)
   };
   const [mn, mx] = ranges[instrument] ?? [28, 93];
   return { activity: "high_active", minMidi: mn, maxMidi: mx, approachDensity: 0.65, minSubdivision: 0.25 };
