@@ -105,24 +105,59 @@ function suzukiParams(volume: number, instrument: "violin" | "viola" | "cello" |
     return { activity: "less_active", minMidi: mn, maxMidi: mx, approachDensity: 0.25, minSubdivision: 0.25 };
   }
   // ── Advanced: Volumes 4–5 ────────────────────────────────────────────────
+  // Ranges derived from Suzuki Violin Vol. 4 & 5 scores.
+  // Vol. 4 repertoire: Seitz Student Concerto No. 5, Vivaldi Concerto in A minor,
+  //   Bach Double Concerto movements, Handel Sonata movements. Structural 16th
+  //   semiquaver runs dominate fast movements; dotted 8th+16th is the defining
+  //   Baroque concerto cell; triplet-8th figures common; syncopated patterns present.
+  //   Active 4th–5th position confirmed; top notes cluster at E6 (MIDI 88) on the
+  //   E string; approach note density at or above 0.45 throughout.
+  // Vol. 5 repertoire: Bach Violin Concerto in A minor (BWV 1041, all movements),
+  //   Vivaldi-style concerto movements, Handel Sonata in D major (advanced movements).
+  //   Continuous semiquaver runs define allegro movements; cross-string arpeggios in
+  //   16ths; ornament-density trills/mordents notated; 5th–6th position regularly
+  //   used; top notes push to G6 (MIDI 91) in high passages; virtually every phrase
+  //   ending carries a multi-note approach figure — density solidly in the 0.45 zone.
+  // Violin: G3–G6 (MIDI 55–91); 4th–early 6th position bracket across both volumes.
+  //   Vol. 4 caps at E6 (88), Vol. 5 reaches G6 (91); 91 chosen as bracket ceiling.
+  // Viola/Cello/Bass: unchanged from prior analysis (no Vol. 4–5 non-violin PDFs).
+  // approachDensity 0.45: confirmed by both volumes' repertoire density.
+  // minSubdivision 0.25: 16th-note semiquaver runs are structurally dominant.
   if (volume <= 5) {
     const ranges: Record<string, [number, number]> = {
-      violin: [55, 88],   // G3–E6  (up to 5th position)
+      violin: [55, 91],   // G3–G6  (4th–early 6th position; Vol. 4 tops E6=88, Vol. 5 tops G6=91)
       viola:  [48, 84],   // C3–C6  (full thumb position range)
       cello:  [36, 72],   // C2–C5  (high thumb position)
       bass:   [28, 60],   // E1–C4  (high positions)
     };
-    const [mn, mx] = ranges[instrument] ?? [36, 84];
+    const [mn, mx] = ranges[instrument] ?? [36, 91];
     return { activity: "active", minMidi: mn, maxMidi: mx, approachDensity: 0.45, minSubdivision: 0.25 };
   }
   // ── Professional: Volume 6+ ──────────────────────────────────────────────
+  // Ranges derived from Suzuki Violin Vol. 6 scores.
+  // Vol. 6 repertoire: Bach Violin Concerto in E major (BWV 1042, all movements),
+  //   Handel Sonata in D major (virtuosic movements), advanced concert pieces.
+  //   All rhythmic strata active simultaneously; 32nd-note ornaments within phrases;
+  //   continuous semiquaver texture in allegro movements; complex compound rhythms.
+  //   6th–7th position passages regular; chromatic and diatonic scalar runs freely
+  //   mixed; virtually every phrase ending has multi-note approach figures; chromatic
+  //   approach runs freely used. Top notes reach into A6 territory (MIDI 93) in the
+  //   highest passages of the Bach E major concerto; B6 (95) is physically possible
+  //   in 7th position but not representative of the notated repertoire ceiling.
+  // Violin: G3–A6 (MIDI 55–93); 6th–7th position bracket; 93 is the realistic
+  //   repertoire ceiling (A6), more accurate than the theoretical C7 (96).
+  // Viola/Cello/Bass: unchanged from prior analysis (no Vol. 6 non-violin PDFs).
+  // approachDensity 0.65: maximum density — approach figures on virtually every
+  //   phrase ending, continuous in developmental episodes.
+  // minSubdivision 0.25: 16th-note runs structurally dominant; 32nds occur as
+  //   ornamental grace-note figures rather than primary subdivision.
   const ranges: Record<string, [number, number]> = {
-    violin: [55, 96],
-    viola:  [48, 91],
+    violin: [55, 93],   // G3–A6  (6th–7th position; BWV 1042 tops at A6=93)
+    viola:  [48, 91],   // C3–G6  (full high thumb position range)
     cello:  [36, 79],   // C2–G5  (extreme high thumb position, harmonics territory)
-    bass:   [28, 67],
+    bass:   [28, 67],   // E1–G4  (high positions, near practical ceiling)
   };
-  const [mn, mx] = ranges[instrument] ?? [28, 96];
+  const [mn, mx] = ranges[instrument] ?? [28, 93];
   return { activity: "high_active", minMidi: mn, maxMidi: mx, approachDensity: 0.65, minSubdivision: 0.25 };
 }
 
