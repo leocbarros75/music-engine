@@ -1,18 +1,7 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrangeStringQuartetFromPianoInstrumentation = arrangeStringQuartetFromPianoInstrumentation;
-var instrumentCatalog_1 = require("../instruments/instrumentCatalog");
+const instrumentCatalog_1 = require("../instruments/instrumentCatalog");
 function warn(warnings, msg) {
     if (!warnings)
         return;
@@ -22,58 +11,133 @@ function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 function eventMidi(ev) {
-    if (typeof (ev === null || ev === void 0 ? void 0 : ev.midi) === "number" && Number.isFinite(ev.midi))
+    if (typeof ev?.midi === "number" && Number.isFinite(ev.midi))
         return ev.midi;
-    if (ev === null || ev === void 0 ? void 0 : ev.pitch) {
+    if (ev?.pitch) {
         try {
             return (0, instrumentCatalog_1.pitchToMidi)(ev.pitch);
         }
-        catch (_a) {
+        catch {
             return null;
         }
     }
     return null;
 }
 function resolveStaff(ev) {
-    var staff = Number(ev === null || ev === void 0 ? void 0 : ev.staff);
+    const staff = Number(ev?.staff);
     if (staff === 2)
         return 2;
     if (staff === 1)
         return 1;
-    var midi = eventMidi(ev);
+    const midi = eventMidi(ev);
     if (typeof midi === "number" && midi < 60)
         return 2;
     return 1;
 }
 function measureEventSort(a, b) {
-    var _a, _b, _c, _d;
-    var dt = Number((_a = a === null || a === void 0 ? void 0 : a.t) !== null && _a !== void 0 ? _a : 0) - Number((_b = b === null || b === void 0 ? void 0 : b.t) !== null && _b !== void 0 ? _b : 0);
+    const dt = Number(a?.t ?? 0) - Number(b?.t ?? 0);
     if (Math.abs(dt) > 1e-9)
         return dt;
-    var da = Number((_c = a === null || a === void 0 ? void 0 : a.dur) !== null && _c !== void 0 ? _c : 0);
-    var db = Number((_d = b === null || b === void 0 ? void 0 : b.dur) !== null && _d !== void 0 ? _d : 0);
+    const da = Number(a?.dur ?? 0);
+    const db = Number(b?.dur ?? 0);
     if (Math.abs(da - db) > 1e-9)
         return db - da;
     return 0;
 }
 function quantizeOnset(t) {
     // Group near-simultaneous notes into one onset while preserving 16th-note events.
-    var grid = 64; // 1/64 beat
+    const grid = 64; // 1/64 beat
     return Math.round(t * grid) / grid;
 }
 function onsetKey(t) {
     return quantizeOnset(t).toFixed(6);
 }
+// ── Diatonic harmony helpers ──────────────────────────────────────────────────
+// Build the set of 7 diatonic pitch classes for a given key signature (fifths).
+function getDiatonicPCs(fifths) {
+    // Sharps/flats added in order (sharps: F C G D A E B; flats: Bb Eb Ab Db Gb Cb Fb)
+    const sharpsOrder = [6, 1, 8, 3, 10, 5, 0];
+    const flatsOrder = [10, 3, 8, 1, 6, 11, 4];
+    const pcs = new Set([0, 2, 4, 5, 7, 9, 11]); // C major
+    const f = Math.max(-7, Math.min(7, Math.round(fifths)));
+    if (f > 0) {
+        for (let i = 0; i < f; i++) {
+            pcs.delete((sharpsOrder[i] - 1 + 12) % 12); // remove natural
+            pcs.add(sharpsOrder[i]); // add sharp
+        }
+    }
+    else if (f < 0) {
+        for (let i = 0; i < -f; i++) {
+            pcs.delete((flatsOrder[i] + 1) % 12); // remove natural
+            pcs.add(flatsOrder[i]); // add flat
+        }
+    }
+    return [...pcs].sort((a, b) => a - b);
+}
+// Return the MIDI of the note N diatonic steps BELOW `midi` in the given key.
+function diatonicStepsBelow(midi, steps, fifths) {
+    const pcs = getDiatonicPCs(fifths);
+    let pc = ((midi % 12) + 12) % 12;
+    let idx = pcs.indexOf(pc);
+    if (idx < 0) {
+        // Non-diatonic: snap down to nearest scale tone
+        let best = pcs[0], bestDist = 13;
+        for (const spc of pcs) {
+            const d = ((pc - spc) % 12 + 12) % 12; // distance going down
+            if (d > 0 && d < bestDist) {
+                bestDist = d;
+                best = spc;
+            }
+        }
+        midi = midi - bestDist;
+        pc = best;
+        idx = pcs.indexOf(pc);
+    }
+    const newIdx = ((idx - steps) % 7 + 7) % 7;
+    const newPc = pcs[newIdx];
+    const baseOctave = Math.floor(midi / 12) * 12;
+    let result = baseOctave + newPc;
+    if (result >= midi)
+        result -= 12;
+    return result;
+}
+// Return the MIDI of the note N diatonic steps ABOVE `midi` in the given key.
+function diatonicStepsAbove(midi, steps, fifths) {
+    const pcs = getDiatonicPCs(fifths);
+    let pc = ((midi % 12) + 12) % 12;
+    let idx = pcs.indexOf(pc);
+    if (idx < 0) {
+        // Non-diatonic: snap up to nearest scale tone
+        let best = pcs[0], bestDist = 13;
+        for (const spc of pcs) {
+            const d = ((spc - pc) % 12 + 12) % 12; // distance going up
+            if (d > 0 && d < bestDist) {
+                bestDist = d;
+                best = spc;
+            }
+        }
+        midi = midi + bestDist;
+        pc = best;
+        idx = pcs.indexOf(pc);
+    }
+    const newIdx = (idx + steps) % 7;
+    const newPc = pcs[newIdx];
+    const baseOctave = Math.floor(midi / 12) * 12;
+    let result = baseOctave + newPc;
+    if (result <= midi)
+        result += 12;
+    return result;
+}
 function clampMidiToAbsoluteRange(midi, instrumentId) {
-    var spec = (0, instrumentCatalog_1.getInstrumentSpec)(instrumentId);
+    const spec = (0, instrumentCatalog_1.getInstrumentSpec)(instrumentId);
     if (!spec)
         return midi;
-    var lo = Number(spec.midi_low);
-    var hi = Number(spec.midi_high);
+    const lo = Number(spec.midi_low);
+    const hi = Number(spec.midi_high);
     if (Number.isFinite(lo) && Number.isFinite(hi) && midi >= lo && midi <= hi) {
         return midi;
     }
-    var m = midi;
+    let m = midi;
     while (Number.isFinite(lo) && m < lo)
         m += 12;
     while (Number.isFinite(hi) && m > hi)
@@ -84,207 +148,277 @@ function clampMidiToAbsoluteRange(midi, instrumentId) {
         m = hi;
     return m;
 }
+function partHasStaff2Notes(part) {
+    // Check whether any note event in this part is on staff 2 — this identifies
+    // a grand-staff piano part even when the part name is not "Piano".
+    for (const measure of (part?.measures ?? [])) {
+        for (const ev of (measure?.events ?? [])) {
+            if (ev?.type === "note" && Number(ev?.staff) === 2)
+                return true;
+        }
+    }
+    return false;
+}
 function findPianoPart(score) {
-    var _a;
-    var parts = (_a = score.parts) !== null && _a !== void 0 ? _a : [];
-    var byInstrument = parts.find(function (p) { var _a; return String((_a = p === null || p === void 0 ? void 0 : p.instrument) !== null && _a !== void 0 ? _a : "").toLowerCase().includes("piano"); });
+    const parts = score.parts ?? [];
+    // 1. Explicit instrument field (set by some parsers)
+    const byInstrument = parts.find((p) => String(p?.instrument ?? "").toLowerCase().includes("piano") ||
+        String(p?.instrument ?? "").toLowerCase().includes("keyboard") ||
+        String(p?.instrument ?? "").toLowerCase().includes("keys"));
     if (byInstrument)
         return byInstrument;
-    var byName = parts.find(function (p) { var _a; return String((_a = p === null || p === void 0 ? void 0 : p.name) !== null && _a !== void 0 ? _a : "").toLowerCase().includes("piano"); });
+    // 2. Part name contains a keyboard keyword
+    const pianoKeywords = ["piano", "pno", "keyboard", "keys", "accomp", "organ", "harpsichord"];
+    const byName = parts.find((p) => {
+        const n = String(p?.name ?? "").toLowerCase();
+        return pianoKeywords.some((k) => n.includes(k));
+    });
     if (byName)
         return byName;
-    var byStaves = parts.find(function (p) { var _a; return Number((_a = p === null || p === void 0 ? void 0 : p.staves) !== null && _a !== void 0 ? _a : 1) >= 2; });
+    // 3. staves field set to 2 (some parsers write this from <staves> XML element)
+    const byStaves = parts.find((p) => Number(p?.staves ?? 1) >= 2);
     if (byStaves)
         return byStaves;
+    // 4. Inspect actual note events — find the part that has staff=2 notes
+    //    (grand-staff part where LH notes carry staff="2")
+    const byStaff2 = parts.find((p) => partHasStaff2Notes(p));
+    if (byStaff2)
+        return byStaff2;
     return null;
 }
+function findSatbParts(score) {
+    const parts = score.parts ?? [];
+    const find = (...keywords) => parts.find((p) => {
+        const n = String(p?.name ?? "").toLowerCase();
+        return keywords.some((k) => n.includes(k));
+    }) ?? null;
+    const soprano = find("soprano", "sop");
+    const alto = find("alto", "alt");
+    const tenor = find("tenor", "ten");
+    const bass = find("bass", "bas");
+    if (soprano && alto && tenor && bass)
+        return { soprano, alto, tenor, bass };
+    // Fallback: if exactly 4 parts, treat them as S/A/T/B in order
+    if (parts.length === 4) {
+        return { soprano: parts[0], alto: parts[1], tenor: parts[2], bass: parts[3] };
+    }
+    return null;
+}
+function clonePartAs(source, partId, name, instrument) {
+    const cloned = clone(source);
+    cloned.part_id = partId;
+    cloned.name = name;
+    cloned.instrument = instrument;
+    cloned.staves = 1;
+    return cloned;
+}
+function arrangeSatbToStringQuartet(score, satb, options) {
+    const violin1 = clonePartAs(satb.soprano, "P_V1", "Violin I", "violin_1");
+    const violin2 = clonePartAs(satb.alto, "P_V2", "Violin II", "violin_2");
+    const viola = clonePartAs(satb.tenor, "P_VA", "Viola", "viola");
+    const cello = clonePartAs(satb.bass, "P_VC", "Cello", "cello");
+    // Clamp any notes that fall outside each instrument's absolute range
+    for (const [part, instrId] of [
+        [violin1, "violin_1"],
+        [violin2, "violin_2"],
+        [viola, "viola"],
+        [cello, "cello"],
+    ]) {
+        for (const measure of (part.measures ?? [])) {
+            for (const ev of (measure.events ?? [])) {
+                if (ev?.type !== "note")
+                    continue;
+                const midi = eventMidi(ev);
+                if (typeof midi !== "number")
+                    continue;
+                const clamped = clampMidiToAbsoluteRange(midi, instrId);
+                if (clamped !== midi) {
+                    ev.midi = clamped;
+                    ev.pitch = (0, instrumentCatalog_1.midiToPitch)(clamped);
+                }
+            }
+        }
+    }
+    warn(options.warnings, "[strings] SATB instrumentation copy applied: Soprano→Violin I, Alto→Violin II, Tenor→Viola, Bass→Cello.");
+    return {
+        ...score,
+        meta: { ...score.meta, ensemble: "string_ensemble" },
+        parts: [violin1, violin2, viola, cello],
+    };
+}
 function makePart(partId, name, instrument, measures) {
-    var clonedMeasures = measures.map(function (m, i) {
-        var _a;
-        return (__assign(__assign({ number: Number((_a = m === null || m === void 0 ? void 0 : m.number) !== null && _a !== void 0 ? _a : i + 1) }, (i === 0 && (m === null || m === void 0 ? void 0 : m.attributes) ? { attributes: clone(m.attributes) } : {})), { events: [] }));
-    });
+    const clonedMeasures = measures.map((m, i) => ({
+        number: Number(m?.number ?? i + 1),
+        ...(i === 0 && m?.attributes ? { attributes: clone(m.attributes) } : {}),
+        events: []
+    }));
     return {
         part_id: partId,
-        name: name,
-        instrument: instrument,
+        name,
+        instrument,
         staves: 1,
         measures: clonedMeasures
     };
 }
 function pushMappedNote(targetMeasure, source, instrumentId, idPrefix, seq, options) {
-    var _a, _b, _c, _d;
-    var t = Number.isFinite(options === null || options === void 0 ? void 0 : options.t) ? Number(options === null || options === void 0 ? void 0 : options.t) : Number((_a = source.ev) === null || _a === void 0 ? void 0 : _a.t);
-    var dur = Number.isFinite(options === null || options === void 0 ? void 0 : options.dur) ? Number(options === null || options === void 0 ? void 0 : options.dur) : Number((_b = source.ev) === null || _b === void 0 ? void 0 : _b.dur);
+    const t = Number.isFinite(options?.t) ? Number(options?.t) : Number(source.ev?.t);
+    const dur = Number.isFinite(options?.dur) ? Number(options?.dur) : Number(source.ev?.dur);
     if (!Number.isFinite(t) || !Number.isFinite(dur) || dur <= 0)
         return;
-    var clampedMidi = clampMidiToAbsoluteRange(source.midi, instrumentId);
-    var tieStart = ((_c = source.ev) === null || _c === void 0 ? void 0 : _c.tieStart) === true;
-    var tieStop = ((_d = source.ev) === null || _d === void 0 ? void 0 : _d.tieStop) === true;
-    targetMeasure.events.push(__assign(__assign(__assign({ id: "".concat(idPrefix, "-").concat(targetMeasure.number, "-").concat(seq), t: t, dur: dur, type: "note", pitch: (0, instrumentCatalog_1.midiToPitch)(clampedMidi), voice: 1, staff: 1 }, (tieStart ? { tieStart: true } : {})), (tieStop ? { tieStop: true } : {})), ((options === null || options === void 0 ? void 0 : options.chord) === true ? { chord: true } : {})));
+    const clampedMidi = clampMidiToAbsoluteRange(source.midi, instrumentId);
+    const tieStart = source.ev?.tieStart === true;
+    const tieStop = source.ev?.tieStop === true;
+    targetMeasure.events.push({
+        id: `${idPrefix}-${targetMeasure.number}-${seq}`,
+        t,
+        dur,
+        type: "note",
+        pitch: (0, instrumentCatalog_1.midiToPitch)(clampedMidi),
+        voice: 1,
+        staff: 1,
+        ...(tieStart ? { tieStart: true } : {}),
+        ...(tieStop ? { tieStop: true } : {}),
+        ...(options?.chord === true ? { chord: true } : {})
+    });
 }
 function selectNotesForOnset(events) {
     return events
-        .map(function (ev) {
-        var midi = eventMidi(ev);
+        .map((ev) => {
+        const midi = eventMidi(ev);
         if (typeof midi !== "number")
             return null;
-        return { ev: ev, midi: midi };
+        return { ev, midi };
     })
-        .filter(function (x) { return !!x; })
-        .sort(function (a, b) {
-        var _a, _b, _c, _d;
+        .filter((x) => !!x)
+        .sort((a, b) => {
         if (a.midi !== b.midi)
             return a.midi - b.midi;
-        var ad = Number((_b = (_a = a.ev) === null || _a === void 0 ? void 0 : _a.dur) !== null && _b !== void 0 ? _b : 0);
-        var bd = Number((_d = (_c = b.ev) === null || _c === void 0 ? void 0 : _c.dur) !== null && _d !== void 0 ? _d : 0);
+        const ad = Number(a.ev?.dur ?? 0);
+        const bd = Number(b.ev?.dur ?? 0);
         return ad - bd;
     });
 }
-function arrangeStringQuartetFromPianoInstrumentation(score, options) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
-    if (options === void 0) { options = {}; }
-    var warnings = options.warnings;
-    var pianoPart = findPianoPart(score);
+function arrangeStringQuartetFromPianoInstrumentation(score, options = {}) {
+    const warnings = options.warnings;
+    const pianoPart = findPianoPart(score);
     if (!pianoPart) {
-        warn(warnings, "[strings] Instrumentation copy: piano part not found; returning original score.");
+        const satb = findSatbParts(score);
+        if (satb)
+            return arrangeSatbToStringQuartet(score, satb, options);
+        warn(warnings, "[strings] Instrumentation copy: no piano or SATB parts found; returning original score.");
         return score;
     }
-    var sourceMeasures = Array.isArray(pianoPart === null || pianoPart === void 0 ? void 0 : pianoPart.measures) ? pianoPart.measures : [];
-    var violin1 = makePart("P_V1", "Violin I", "violin_1", sourceMeasures);
-    var violin2 = makePart("P_V2", "Violin II", "violin_2", sourceMeasures);
-    var viola = makePart("P_VA", "Viola", "viola", sourceMeasures);
-    var cello = makePart("P_VC", "Cello", "cello", sourceMeasures);
-    var seq = 0;
-    for (var mi = 0; mi < sourceMeasures.length; mi++) {
-        var srcMeasure = (_a = sourceMeasures[mi]) !== null && _a !== void 0 ? _a : {};
-        var srcEvents = Array.isArray(srcMeasure === null || srcMeasure === void 0 ? void 0 : srcMeasure.events) ? srcMeasure.events : [];
-        var noteEvents = srcEvents
-            .filter(function (ev) { return (ev === null || ev === void 0 ? void 0 : ev.type) === "note"; })
+    const sourceMeasures = Array.isArray(pianoPart?.measures) ? pianoPart.measures : [];
+    const violin1 = makePart("P_V1", "Violin I", "violin_1", sourceMeasures);
+    const violin2 = makePart("P_V2", "Violin II", "violin_2", sourceMeasures);
+    const viola = makePart("P_VA", "Viola", "viola", sourceMeasures);
+    const cello = makePart("P_VC", "Cello", "cello", sourceMeasures);
+    // Track running key signature (updated when a measure has new attributes)
+    let currentKeyFifths = 0;
+    const firstAttrs = sourceMeasures.find((m) => m?.attributes?.key_fifths !== undefined);
+    if (firstAttrs)
+        currentKeyFifths = Number(firstAttrs.attributes.key_fifths) || 0;
+    let seq = 0;
+    for (let mi = 0; mi < sourceMeasures.length; mi++) {
+        const srcMeasure = sourceMeasures[mi] ?? {};
+        // Update key signature if this measure has new attributes
+        if (Number.isFinite(srcMeasure?.attributes?.key_fifths)) {
+            currentKeyFifths = Number(srcMeasure.attributes.key_fifths);
+        }
+        const srcEvents = Array.isArray(srcMeasure?.events) ? srcMeasure.events : [];
+        const noteEvents = srcEvents
+            .filter((ev) => ev?.type === "note")
             .sort(measureEventSort);
-        var rhByOnset = new Map();
-        var lhByOnset = new Map();
-        for (var _i = 0, noteEvents_1 = noteEvents; _i < noteEvents_1.length; _i++) {
-            var ev = noteEvents_1[_i];
-            var t = Number(ev === null || ev === void 0 ? void 0 : ev.t);
+        const rhByOnset = new Map();
+        const lhByOnset = new Map();
+        for (const ev of noteEvents) {
+            const t = Number(ev?.t);
             if (!Number.isFinite(t))
                 continue;
-            var key = onsetKey(t);
-            var staff = resolveStaff(ev);
-            var map = staff === 2 ? lhByOnset : rhByOnset;
-            var bucket = (_b = map.get(key)) !== null && _b !== void 0 ? _b : [];
+            const key = onsetKey(t);
+            const staff = resolveStaff(ev);
+            const map = staff === 2 ? lhByOnset : rhByOnset;
+            const bucket = map.get(key) ?? [];
             bucket.push(ev);
             map.set(key, bucket);
         }
-        var v1m = violin1.measures[mi];
-        var v2m = violin2.measures[mi];
-        var vam = viola.measures[mi];
-        var vcm = cello.measures[mi];
-        var violaOverrideByOnset = new Map();
-        // RH mapping:
-        // - top RH note -> Violin I
-        // - inner RH note (highest note below top) -> Violin II
-        // - RH unison/single-note case: Violin II may double Violin I
-        // - fallback: if RH has 3 notes and LH is absent at this onset,
-        //   Viola takes the bottom RH note.
-        // - if RH has 3 notes and LH top doubles LH bass, Viola takes bottom RH note.
-        // - if RH has 3 notes and LH top is different from LH bass, Violin II plays divisi
-        //   (inner RH + bottom RH).
-        for (var _j = 0, _k = Array.from(rhByOnset.keys()).sort(); _j < _k.length; _j++) {
-            var key = _k[_j];
-            var onset = Number(key);
-            var selected = selectNotesForOnset((_c = rhByOnset.get(key)) !== null && _c !== void 0 ? _c : []);
+        const v1m = violin1.measures[mi];
+        const v2m = violin2.measures[mi];
+        const vam = viola.measures[mi];
+        const vcm = cello.measures[mi];
+        // ── Unified routing rules ────────────────────────────────────────────────
+        //
+        // RH (per onset, sorted low→high):
+        //   1 note  : V1 = that note; V2 = engine-fill (diatonic 3rd below V1)
+        //   2 notes : V1 = top;        V2 = bottom
+        //   3+ notes: V1 = top;        V2 = double-stop (bottom + 2nd from bottom)
+        //
+        // LH (per onset, sorted low→high):
+        //   1 note  : VC = that note;  VA = engine-fill (diatonic 3rd above VC)
+        //   2+ notes: VC = bottom;     VA = index 1 (2nd from bottom)
+        // RH → V1 + V2
+        for (const key of Array.from(rhByOnset.keys()).sort()) {
+            const selected = selectNotesForOnset(rhByOnset.get(key) ?? []);
             if (!selected.length)
                 continue;
-            var lhSelectedAtOnset = selectNotesForOnset((_d = lhByOnset.get(key)) !== null && _d !== void 0 ? _d : []);
-            var hasLhOnset = lhSelectedAtOnset.length > 0;
-            var top_1 = selected[selected.length - 1];
-            var bottom = selected[0];
-            pushMappedNote(v1m, top_1, "violin_1", "v1", ++seq, { t: onset });
-            if (selected.length === 1) {
-                // RH unison/melody-only onset: allow Violin II to double Violin I.
-                pushMappedNote(v2m, top_1, "violin_2", "v2-unison", ++seq, { t: onset });
+            const top = selected[selected.length - 1];
+            const bottom = selected[0];
+            // V1 = top note (always)
+            pushMappedNote(v1m, top, "violin_1", "v1", ++seq);
+            if (selected.length >= 3) {
+                // V2 = double stop: bottom note first, then 2nd-from-bottom as chord
+                pushMappedNote(v2m, bottom, "violin_2", "v2-lo", ++seq);
+                pushMappedNote(v2m, selected[1], "violin_2", "v2-hi", ++seq, { chord: true });
             }
-            if (selected.length > 1 && selected.length !== 4) {
-                var inner = selected[selected.length - 2];
-                pushMappedNote(v2m, inner, "violin_2", "v2", ++seq, { t: onset });
-            }
-            if (selected.length !== 3 && !hasLhOnset) {
-                // Requested instrumentation rule:
-                // when RH is not a triad and LH has no onset note, Viola takes RH bottom note
-                // even if Violin II is already on the same pitch.
-                violaOverrideByOnset.set(key, bottom);
-            }
-            if (selected.length === 3) {
-                var lhSelected = lhSelectedAtOnset;
-                var hasLhTopVoice = lhSelected.length >= 2;
-                if (!hasLhTopVoice) {
-                    // Strict rule: with RH triad and no LH top voice, Viola takes bottom RH note.
-                    violaOverrideByOnset.set(key, bottom);
-                }
-                else {
-                    // Violin II divisi: add bottom RH note alongside the inner RH note.
-                    var inner = selected[selected.length - 2];
-                    if (bottom.midi !== inner.midi) {
-                        var innerDur = Number((_e = inner.ev) === null || _e === void 0 ? void 0 : _e.dur);
-                        pushMappedNote(v2m, bottom, "violin_2", "v2-divisi", ++seq, __assign(__assign({ t: onset }, (Number.isFinite(innerDur) && innerDur > 0 ? { dur: innerDur } : {})), { chord: true }));
-                    }
-                }
-            }
-            if (selected.length === 4) {
-                // Violin II takes both middle RH notes (divisi).
-                var middleHighSrc = selected[selected.length - 2];
-                var middleLowSrc = selected[selected.length - 3];
-                var highDur = Number((_f = middleHighSrc.ev) === null || _f === void 0 ? void 0 : _f.dur);
-                var lowDur = Number((_g = middleLowSrc.ev) === null || _g === void 0 ? void 0 : _g.dur);
-                var sharedDur = Number.isFinite(highDur) && highDur > 0 && Number.isFinite(lowDur) && lowDur > 0
-                    ? Math.min(highDur, lowDur)
-                    : undefined;
-                pushMappedNote(v2m, { ev: middleHighSrc.ev, midi: middleHighSrc.midi }, "violin_2", "v2-mid-high", ++seq, __assign({ t: onset }, (typeof sharedDur === "number" ? { dur: sharedDur } : {})));
-                if (middleLowSrc.midi !== middleHighSrc.midi) {
-                    pushMappedNote(v2m, { ev: middleLowSrc.ev, midi: middleLowSrc.midi }, "violin_2", "v2-mid-low", ++seq, __assign(__assign({ t: onset }, (typeof sharedDur === "number" ? { dur: sharedDur } : {})), { chord: true }));
-                }
-                // Viola takes RH bottom only when LH top is missing OR LH top doubles LH bass.
-                var lhSelected = lhSelectedAtOnset;
-                var hasLhTopVoice = lhSelected.length >= 2;
-                var lhBottom = lhSelected.length > 0 ? lhSelected[0] : null;
-                var lhTop = hasLhTopVoice ? lhSelected[lhSelected.length - 1] : null;
-                var lhTopDoublesBass = !!lhBottom && !!lhTop && ((lhTop.midi % 12 + 12) % 12) === ((lhBottom.midi % 12 + 12) % 12);
-                if (!hasLhTopVoice || lhTopDoublesBass) {
-                    violaOverrideByOnset.set(key, bottom);
-                }
-            }
-        }
-        // LH mapping:
-        // - top LH note -> Viola
-        // - bottom LH note -> Cello
-        for (var _l = 0, _m = Array.from(lhByOnset.keys()).sort(); _l < _m.length; _l++) {
-            var key = _m[_l];
-            var selected = selectNotesForOnset((_h = lhByOnset.get(key)) !== null && _h !== void 0 ? _h : []);
-            if (!selected.length)
-                continue;
-            var bottom = selected[0];
-            var top_2 = selected[selected.length - 1];
-            var violaOverride = violaOverrideByOnset.get(key);
-            if (violaOverride) {
-                pushMappedNote(vam, violaOverride, "viola", "va-rh-override", ++seq);
+            else if (selected.length === 2) {
+                // V2 = bottom note
+                pushMappedNote(v2m, bottom, "violin_2", "v2", ++seq);
             }
             else {
-                pushMappedNote(vam, top_2, "viola", "va", ++seq);
+                // Single RH note: V2 = engine-fill, diatonic 3rd below V1
+                const fillMidi = diatonicStepsBelow(top.midi, 2, currentKeyFifths);
+                if (fillMidi !== top.midi) {
+                    pushMappedNote(v2m, { ev: top.ev, midi: fillMidi }, "violin_2", "v2-fill", ++seq);
+                }
             }
-            pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
         }
-        // Apply Viola overrides for RH onsets where LH is missing.
-        for (var _o = 0, violaOverrideByOnset_1 = violaOverrideByOnset; _o < violaOverrideByOnset_1.length; _o++) {
-            var _p = violaOverrideByOnset_1[_o], key = _p[0], violaSource = _p[1];
-            if (lhByOnset.has(key))
+        // LH → VC + VA
+        for (const key of Array.from(lhByOnset.keys()).sort()) {
+            const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
+            if (!selected.length)
                 continue;
-            pushMappedNote(vam, violaSource, "viola", "va-rh-fallback", ++seq);
+            const bottom = selected[0];
+            // VC = bottom note (always)
+            pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
+            if (selected.length >= 2) {
+                // VA = 2nd note from bottom (tenor voice)
+                pushMappedNote(vam, selected[1], "viola", "va", ++seq);
+            }
+            else {
+                // Single LH note: VA = engine-fill, diatonic 3rd above VC clamped to viola range
+                let fillMidi = diatonicStepsAbove(bottom.midi, 2, currentKeyFifths);
+                // Keep fill within comfortable viola range (G3=55 … C6=84)
+                while (fillMidi < 55)
+                    fillMidi += 12;
+                while (fillMidi > 84)
+                    fillMidi -= 12;
+                if (fillMidi !== bottom.midi) {
+                    pushMappedNote(vam, { ev: bottom.ev, midi: fillMidi }, "viola", "va-fill", ++seq);
+                }
+            }
         }
         v1m.events.sort(measureEventSort);
         v2m.events.sort(measureEventSort);
         vam.events.sort(measureEventSort);
         vcm.events.sort(measureEventSort);
     }
-    warn(warnings, "[strings] Instrumentation copy applied: RH top->Violin I, RH inner->Violin II, LH top->Viola, LH bottom->Cello.");
-    return __assign(__assign({}, score), { meta: __assign(__assign({}, score.meta), { ensemble: "string_ensemble" }), parts: [violin1, violin2, viola, cello] });
+    warn(warnings, "[strings] Instrumentation copy applied: V1=top-RH, V2=bottom-RH(+fill), VA=upper-LH(+fill), VC=bottom-LH.");
+    return {
+        ...score,
+        meta: {
+            ...score.meta,
+            ensemble: "string_ensemble"
+        },
+        parts: [violin1, violin2, viola, cello]
+    };
 }
