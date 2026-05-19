@@ -62,6 +62,76 @@ function onsetKey(t: number): string {
   return quantizeOnset(t).toFixed(6);
 }
 
+// ── Diatonic harmony helpers ──────────────────────────────────────────────────
+// Build the set of 7 diatonic pitch classes for a given key signature (fifths).
+function getDiatonicPCs(fifths: number): number[] {
+  // Sharps/flats added in order (sharps: F C G D A E B; flats: Bb Eb Ab Db Gb Cb Fb)
+  const sharpsOrder = [6, 1, 8, 3, 10, 5, 0];
+  const flatsOrder  = [10, 3, 8, 1, 6, 11, 4];
+  const pcs = new Set<number>([0, 2, 4, 5, 7, 9, 11]); // C major
+  const f = Math.max(-7, Math.min(7, Math.round(fifths)));
+  if (f > 0) {
+    for (let i = 0; i < f; i++) {
+      pcs.delete((sharpsOrder[i]! - 1 + 12) % 12); // remove natural
+      pcs.add(sharpsOrder[i]!);                      // add sharp
+    }
+  } else if (f < 0) {
+    for (let i = 0; i < -f; i++) {
+      pcs.delete((flatsOrder[i]! + 1) % 12);         // remove natural
+      pcs.add(flatsOrder[i]!);                        // add flat
+    }
+  }
+  return [...pcs].sort((a, b) => a - b);
+}
+
+// Return the MIDI of the note N diatonic steps BELOW `midi` in the given key.
+function diatonicStepsBelow(midi: number, steps: number, fifths: number): number {
+  const pcs = getDiatonicPCs(fifths);
+  let pc = ((midi % 12) + 12) % 12;
+  let idx = pcs.indexOf(pc);
+  if (idx < 0) {
+    // Non-diatonic: snap down to nearest scale tone
+    let best = pcs[0]!, bestDist = 13;
+    for (const spc of pcs) {
+      const d = ((pc - spc) % 12 + 12) % 12; // distance going down
+      if (d > 0 && d < bestDist) { bestDist = d; best = spc; }
+    }
+    midi = midi - bestDist;
+    pc = best;
+    idx = pcs.indexOf(pc);
+  }
+  const newIdx = ((idx - steps) % 7 + 7) % 7;
+  const newPc = pcs[newIdx]!;
+  const baseOctave = Math.floor(midi / 12) * 12;
+  let result = baseOctave + newPc;
+  if (result >= midi) result -= 12;
+  return result;
+}
+
+// Return the MIDI of the note N diatonic steps ABOVE `midi` in the given key.
+function diatonicStepsAbove(midi: number, steps: number, fifths: number): number {
+  const pcs = getDiatonicPCs(fifths);
+  let pc = ((midi % 12) + 12) % 12;
+  let idx = pcs.indexOf(pc);
+  if (idx < 0) {
+    // Non-diatonic: snap up to nearest scale tone
+    let best = pcs[0]!, bestDist = 13;
+    for (const spc of pcs) {
+      const d = ((spc - pc) % 12 + 12) % 12; // distance going up
+      if (d > 0 && d < bestDist) { bestDist = d; best = spc; }
+    }
+    midi = midi + bestDist;
+    pc = best;
+    idx = pcs.indexOf(pc);
+  }
+  const newIdx = (idx + steps) % 7;
+  const newPc = pcs[newIdx]!;
+  const baseOctave = Math.floor(midi / 12) * 12;
+  let result = baseOctave + newPc;
+  if (result <= midi) result += 12;
+  return result;
+}
+
 function clampMidiToAbsoluteRange(midi: number, instrumentId: string): number {
   const spec = getInstrumentSpec(instrumentId);
   if (!spec) return midi;
@@ -271,9 +341,20 @@ export function arrangeStringQuartetFromPianoInstrumentation(
   const viola = makePart("P_VA", "Viola", "viola", sourceMeasures);
   const cello = makePart("P_VC", "Cello", "cello", sourceMeasures);
 
+  // Track running key signature (updated when a measure has new attributes)
+  let currentKeyFifths = 0;
+  const firstAttrs = sourceMeasures.find((m: any) => m?.attributes?.key_fifths !== undefined);
+  if (firstAttrs) currentKeyFifths = Number(firstAttrs.attributes.key_fifths) || 0;
+
   let seq = 0;
   for (let mi = 0; mi < sourceMeasures.length; mi++) {
     const srcMeasure = sourceMeasures[mi] ?? {};
+
+    // Update key signature if this measure has new attributes
+    if (Number.isFinite(srcMeasure?.attributes?.key_fifths)) {
+      currentKeyFifths = Number(srcMeasure.attributes.key_fifths);
+    }
+
     const srcEvents = Array.isArray(srcMeasure?.events) ? srcMeasure.events : [];
     const noteEvents = srcEvents
       .filter((ev: any) => ev?.type === "note")
@@ -297,174 +378,66 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     const vam = viola.measures[mi];
     const vcm = cello.measures[mi];
 
-    // Detect whether the RH (staff 1) contains multiple distinct voice numbers.
-    // Bach-style polyphonic piano has voice 1, 2, 3 each with their own independent
-    // rhythm — onset-based grouping won't cluster them together, so we must route
-    // by voice number directly.  Hymn-style block chords have a single voice in the
-    // RH; those use onset-based chord splitting (the else branch below).
-    const rhVoiceSet = new Set<number>();
-    for (const ev of noteEvents) {
-      if (resolveStaff(ev) === 1) {
-        rhVoiceSet.add(Number(ev?.voice ?? 1));
+    // ── Unified routing rules ────────────────────────────────────────────────
+    //
+    // RH (per onset, sorted low→high):
+    //   1 note  : V1 = that note; V2 = engine-fill (diatonic 3rd below V1)
+    //   2 notes : V1 = top;        V2 = bottom
+    //   3+ notes: V1 = top;        V2 = double-stop (bottom + 2nd from bottom)
+    //
+    // LH (per onset, sorted low→high):
+    //   1 note  : VC = that note;  VA = engine-fill (diatonic 3rd above VC)
+    //   2+ notes: VC = bottom;     VA = index 1 (2nd from bottom)
+
+    // RH → V1 + V2
+    for (const key of Array.from(rhByOnset.keys()).sort()) {
+      const selected = selectNotesForOnset(rhByOnset.get(key) ?? []);
+      if (!selected.length) continue;
+      const top    = selected[selected.length - 1]!;
+      const bottom = selected[0]!;
+
+      // V1 = top note (always)
+      pushMappedNote(v1m, top, "violin_1", "v1", ++seq);
+
+      if (selected.length >= 3) {
+        // V2 = double stop: bottom note first, then 2nd-from-bottom as chord
+        pushMappedNote(v2m, bottom,      "violin_2", "v2-lo", ++seq);
+        pushMappedNote(v2m, selected[1]!, "violin_2", "v2-hi", ++seq, { chord: true });
+      } else if (selected.length === 2) {
+        // V2 = bottom note
+        pushMappedNote(v2m, bottom, "violin_2", "v2", ++seq);
+      } else {
+        // Single RH note: V2 = engine-fill, diatonic 3rd below V1
+        const fillMidi = diatonicStepsBelow(top.midi, 2, currentKeyFifths);
+        if (fillMidi !== top.midi) {
+          pushMappedNote(v2m, { ev: top.ev, midi: fillMidi }, "violin_2", "v2-fill", ++seq);
+        }
       }
     }
-    const isPolyphonicRH = rhVoiceSet.size > 1;
 
-    if (isPolyphonicRH) {
-      // ── Polyphonic path: route every RH note to a string part by voice number ──
-      // Sort voice numbers ascending so the lowest (melody) → V1, next → V2, rest → VA.
-      const sortedVoices = Array.from(rhVoiceSet).sort((a, b) => a - b);
-      const v1VoiceNum = sortedVoices[0]!;
-      const v2VoiceNum = sortedVoices.length > 1 ? sortedVoices[1]! : -1;
-      // Any additional voice numbers (voice 3+) route to Viola.
+    // LH → VC + VA
+    for (const key of Array.from(lhByOnset.keys()).sort()) {
+      const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
+      if (!selected.length) continue;
+      const bottom = selected[0]!;
 
-      for (const ev of noteEvents) {
-        if (resolveStaff(ev) !== 1) continue; // LH handled in the block below
-        const midi = eventMidi(ev);
-        if (typeof midi !== "number") continue;
-        const src = { ev, midi };
-        const vn = Number(ev?.voice ?? 1);
+      // VC = bottom note (always)
+      pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
 
-        if (vn === v1VoiceNum) {
-          pushMappedNote(v1m, src, "violin_1", "v1", ++seq);
-        } else if (vn === v2VoiceNum) {
-          pushMappedNote(v2m, src, "violin_2", "v2", ++seq);
-        } else {
-          // Voice 3 and above → Viola
-          pushMappedNote(vam, src, "viola", "va-v3", ++seq);
+      if (selected.length >= 2) {
+        // VA = 2nd note from bottom (tenor voice)
+        pushMappedNote(vam, selected[1]!, "viola", "va", ++seq);
+      } else {
+        // Single LH note: VA = engine-fill, diatonic 3rd above VC clamped to viola range
+        let fillMidi = diatonicStepsAbove(bottom.midi, 2, currentKeyFifths);
+        // Keep fill within comfortable viola range (G3=55 … C6=84)
+        while (fillMidi < 55) fillMidi += 12;
+        while (fillMidi > 84) fillMidi -= 12;
+        if (fillMidi !== bottom.midi) {
+          pushMappedNote(vam, { ev: bottom.ev, midi: fillMidi }, "viola", "va-fill", ++seq);
         }
       }
-
-      // LH mapping — 3-way split by register:
-      //   3+ notes: top → Violin II, 2nd from bottom → Viola, bottom → Cello
-      //   2 notes:  top → Viola, bottom → Cello
-      //   1 note:   bottom → Cello only (single walking-bass note)
-      for (const key of Array.from(lhByOnset.keys()).sort()) {
-        const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
-        if (!selected.length) continue;
-        const bottom = selected[0]!;
-        if (selected.length >= 3) {
-          // 3-way: top → V2, 2nd (index 1) → VA, bottom → VC
-          pushMappedNote(v2m, selected[selected.length - 1]!, "violin_2", "v2-lh", ++seq);
-          pushMappedNote(vam, selected[1]!, "viola", "va-lh", ++seq);
-        } else if (selected.length === 2) {
-          pushMappedNote(vam, selected[1]!, "viola", "va-lh", ++seq);
-        }
-        pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
-      }
-    } else {
-      // ── Homophonic path: onset-based chord splitting (block chords / hymn style) ──
-      const violaOverrideByOnset = new Map<string, { ev: EventLike; midi: number }>();
-
-      // RH mapping (copy transcription rules):
-      // - top RH note -> Violin I (always)
-      // - inner RH note (2nd from top) -> Violin II (only when RH has 2+ simultaneous notes)
-      // - Violin II does NOT double Violin I on single-note melody passes; it rests.
-      // - Viola override: bottom RH note when RH has a full chord (3 or 4 notes)
-      //   and LH has no second voice to split to Viola. Handled in the 3- and 4-note
-      //   blocks below. For 1- or 2-note RH, Viola stays silent unless LH provides it.
-      for (const key of Array.from(rhByOnset.keys()).sort()) {
-        const onset = Number(key);
-        const selected = selectNotesForOnset(rhByOnset.get(key) ?? []);
-        if (!selected.length) continue;
-        const lhSelectedAtOnset = selectNotesForOnset(lhByOnset.get(key) ?? []);
-        const top = selected[selected.length - 1]!;
-        const bottom = selected[0]!;
-        pushMappedNote(v1m, top, "violin_1", "v1", ++seq, { t: onset });
-        // Violin II gets an inner voice only when the RH has a chord (2+ notes).
-        // Never mirror V1 on melody-only (single-note) onsets.
-        if (selected.length > 1 && selected.length !== 4) {
-          const inner = selected[selected.length - 2]!;
-          pushMappedNote(v2m, inner, "violin_2", "v2", ++seq, { t: onset });
-        }
-
-        if (selected.length === 3) {
-          const lhSelected = lhSelectedAtOnset;
-          const hasLhTopVoice = lhSelected.length >= 2;
-
-          if (!hasLhTopVoice) {
-            // Strict rule: with RH triad and no LH top voice, Viola takes bottom RH note.
-            violaOverrideByOnset.set(key, bottom);
-          } else {
-            // Violin II divisi: add bottom RH note alongside the inner RH note.
-            const inner = selected[selected.length - 2]!;
-            if (bottom.midi !== inner.midi) {
-              const innerDur = Number(inner.ev?.dur);
-              pushMappedNote(v2m, bottom, "violin_2", "v2-divisi", ++seq, {
-                t: onset,
-                ...(Number.isFinite(innerDur) && innerDur > 0 ? { dur: innerDur } : {}),
-                chord: true
-              });
-            }
-          }
-        }
-
-        if (selected.length === 4) {
-          // Violin II takes both middle RH notes (divisi).
-          const middleHighSrc = selected[selected.length - 2]!;
-          const middleLowSrc = selected[selected.length - 3]!;
-          const highDur = Number(middleHighSrc.ev?.dur);
-          const lowDur = Number(middleLowSrc.ev?.dur);
-          const sharedDur =
-            Number.isFinite(highDur) && highDur > 0 && Number.isFinite(lowDur) && lowDur > 0
-              ? Math.min(highDur, lowDur)
-              : undefined;
-          pushMappedNote(v2m, { ev: middleHighSrc.ev, midi: middleHighSrc.midi }, "violin_2", "v2-mid-high", ++seq, {
-            t: onset,
-            ...(typeof sharedDur === "number" ? { dur: sharedDur } : {})
-          });
-          if (middleLowSrc.midi !== middleHighSrc.midi) {
-            pushMappedNote(v2m, { ev: middleLowSrc.ev, midi: middleLowSrc.midi }, "violin_2", "v2-mid-low", ++seq, {
-              t: onset,
-              ...(typeof sharedDur === "number" ? { dur: sharedDur } : {}),
-              chord: true
-            });
-          }
-
-          // Viola takes RH bottom only when LH top is missing OR LH top doubles LH bass.
-          const lhSelected = lhSelectedAtOnset;
-          const hasLhTopVoice = lhSelected.length >= 2;
-          const lhBottom = lhSelected.length > 0 ? lhSelected[0]! : null;
-          const lhTop = hasLhTopVoice ? lhSelected[lhSelected.length - 1]! : null;
-          const lhTopDoublesBass =
-            !!lhBottom && !!lhTop && ((lhTop.midi % 12 + 12) % 12) === ((lhBottom.midi % 12 + 12) % 12);
-          if (!hasLhTopVoice || lhTopDoublesBass) {
-            violaOverrideByOnset.set(key, bottom);
-          }
-        }
-      }
-
-      // LH mapping — 3-way split by register:
-      //   3+ notes: top → Violin II, 2nd from bottom (index 1) → Viola, bottom → Cello
-      //   2 notes:  top (index 1) → Viola, bottom → Cello
-      //   1 note:   Cello only (single walking-bass note)
-      // violaOverride from RH bottom (3/4-note RH chord) takes priority over LH→VA splitting
-      // but does NOT prevent LH top from going to V2 on 3+ note onsets.
-      for (const key of Array.from(lhByOnset.keys()).sort()) {
-        const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
-        if (!selected.length) continue;
-        const bottom = selected[0]!;
-        const violaOverride = violaOverrideByOnset.get(key);
-        // V2: top LH note when LH has 3+ simultaneous notes
-        if (selected.length >= 3) {
-          pushMappedNote(v2m, selected[selected.length - 1]!, "violin_2", "v2-lh", ++seq);
-        }
-        // VA: RH bottom override takes priority; otherwise 2nd LH note when chord present
-        if (violaOverride) {
-          pushMappedNote(vam, violaOverride, "viola", "va-rh-override", ++seq);
-        } else if (selected.length >= 2) {
-          pushMappedNote(vam, selected[1]!, "viola", "va-lh", ++seq);
-        }
-        // Cello always gets the LH bottom note
-        pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
-      }
-
-      // Apply Viola overrides for RH onsets where LH is missing.
-      for (const [key, violaSource] of violaOverrideByOnset) {
-        if (lhByOnset.has(key)) continue;
-        pushMappedNote(vam, violaSource, "viola", "va-rh-fallback", ++seq);
-      }
-    } // end homophonic path
+    }
 
     v1m.events.sort(measureEventSort);
     v2m.events.sort(measureEventSort);
@@ -474,7 +447,7 @@ export function arrangeStringQuartetFromPianoInstrumentation(
 
   warn(
     warnings,
-    "[strings] Instrumentation copy applied: RH top->Violin I, RH inner->Violin II, LH top->Viola, LH bottom->Cello."
+    "[strings] Instrumentation copy applied: V1=top-RH, V2=bottom-RH(+fill), VA=upper-LH(+fill), VC=bottom-LH."
   );
 
   return {
