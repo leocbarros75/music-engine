@@ -335,16 +335,20 @@ export function arrangeStringQuartetFromPianoInstrumentation(
         }
       }
 
-      // LH mapping (same for both paths):
-      // - When LH has 2+ simultaneous notes (chord-style), top → Viola, bottom → Cello.
-      // - When LH has a single walking-bass note, only Cello receives it.
+      // LH mapping — 3-way split by register:
+      //   3+ notes: top → Violin II, 2nd from bottom → Viola, bottom → Cello
+      //   2 notes:  top → Viola, bottom → Cello
+      //   1 note:   bottom → Cello only (single walking-bass note)
       for (const key of Array.from(lhByOnset.keys()).sort()) {
         const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
         if (!selected.length) continue;
         const bottom = selected[0]!;
-        const top = selected[selected.length - 1]!;
-        if (selected.length >= 2) {
-          pushMappedNote(vam, top, "viola", "va-lh", ++seq);
+        if (selected.length >= 3) {
+          // 3-way: top → V2, 2nd (index 1) → VA, bottom → VC
+          pushMappedNote(v2m, selected[selected.length - 1]!, "violin_2", "v2-lh", ++seq);
+          pushMappedNote(vam, selected[1]!, "viola", "va-lh", ++seq);
+        } else if (selected.length === 2) {
+          pushMappedNote(vam, selected[1]!, "viola", "va-lh", ++seq);
         }
         pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
       }
@@ -430,24 +434,26 @@ export function arrangeStringQuartetFromPianoInstrumentation(
         }
       }
 
-      // LH mapping:
-      // - top LH note -> Viola (only when LH has 2+ simultaneous notes, i.e. a
-      //   chord-style LH such as bass+inner).  When LH has a single walking-bass
-      //   note per onset, Viola takes the RH bottom override instead; only Cello
-      //   receives the walking-bass note so it isn't doubled an octave above.
-      // - bottom LH note -> Cello (always)
+      // LH mapping — 3-way split by register:
+      //   3+ notes: top → Violin II, 2nd from bottom (index 1) → Viola, bottom → Cello
+      //   2 notes:  top (index 1) → Viola, bottom → Cello
+      //   1 note:   Cello only (single walking-bass note)
+      // violaOverride from RH bottom (3/4-note RH chord) takes priority over LH→VA splitting
+      // but does NOT prevent LH top from going to V2 on 3+ note onsets.
       for (const key of Array.from(lhByOnset.keys()).sort()) {
         const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
         if (!selected.length) continue;
         const bottom = selected[0]!;
-        const top = selected[selected.length - 1]!;
         const violaOverride = violaOverrideByOnset.get(key);
+        // V2: top LH note when LH has 3+ simultaneous notes
+        if (selected.length >= 3) {
+          pushMappedNote(v2m, selected[selected.length - 1]!, "violin_2", "v2-lh", ++seq);
+        }
+        // VA: RH bottom override takes priority; otherwise 2nd LH note when chord present
         if (violaOverride) {
-          // RH bottom override takes priority (covers single-note walking-bass case)
           pushMappedNote(vam, violaOverride, "viola", "va-rh-override", ++seq);
         } else if (selected.length >= 2) {
-          // Only split top→Viola when LH has a true chord (bass + inner voice)
-          pushMappedNote(vam, top, "viola", "va", ++seq);
+          pushMappedNote(vam, selected[1]!, "viola", "va-lh", ++seq);
         }
         // Cello always gets the LH bottom note
         pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
