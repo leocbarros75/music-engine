@@ -375,7 +375,16 @@ export default function SettingsForm({ settings, onChange }: Props) {
           ? new Set(WOODWIND_INSTRUMENTATION_OPTIONS.map((opt) => opt.value))
           : new Set(["auto"]);
     if (!validInstrumentation.has(next.instrumentation ?? "auto")) {
-      next.instrumentation = "auto";
+      // Default to the primary copy instrumentation for each ensemble rather than
+      // "auto" — "auto" is not a valid option for strings/woodwinds and silently
+      // routes through the SATB harmonizer instead of the piano-copy path.
+      if (nextEnsemble === "string_ensemble") {
+        next.instrumentation = "piano_copy_to_string_quartet";
+      } else if (nextEnsemble === "woodwind_ensemble") {
+        next.instrumentation = "piano_copy_to_woodwind_quartet";
+      } else {
+        next.instrumentation = "auto";
+      }
     }
     onChange(next);
   }
