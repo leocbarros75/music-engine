@@ -705,7 +705,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-05-21-v9" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-05-21-v10" });
       return;
     }
 
@@ -729,14 +729,21 @@ const server = http.createServer(async (req, res) => {
           : path.join(publicDir, "index.html");
         if (fs.existsSync(filePath)) {
           const mime = ext ? (MIME[ext] ?? "application/octet-stream") : "text/html";
-          res.writeHead(200, { "Content-Type": mime });
+          // Vite hashes JS/CSS/asset filenames — cache them aggressively.
+          // HTML files must never be cached so the browser always fetches the
+          // latest index.html (which references the current hashed asset names).
+          const isHtml = mime === "text/html";
+          const cacheControl = isHtml
+            ? "no-cache, no-store, must-revalidate"
+            : "public, max-age=31536000, immutable";
+          res.writeHead(200, { "Content-Type": mime, "Cache-Control": cacheControl });
           fs.createReadStream(filePath).pipe(res);
           return;
         }
         // SPA fallback — serve index.html for any unknown path
         const indexPath = path.join(publicDir, "index.html");
         if (fs.existsSync(indexPath)) {
-          res.writeHead(200, { "Content-Type": "text/html" });
+          res.writeHead(200, { "Content-Type": "text/html", "Cache-Control": "no-cache, no-store, must-revalidate" });
           fs.createReadStream(indexPath).pipe(res);
           return;
         }
