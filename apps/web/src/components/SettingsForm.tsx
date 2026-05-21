@@ -7,6 +7,7 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "piano with melody (RH)", value: "piano_with_melody" },
   { label: "string ensemble (auto)", value: "string_ensemble" },
   { label: "piano → string quartet", value: "piano_string_quartet" },
+  { label: "SATB → string quartet", value: "satb_string_quartet" },
   { label: "woodwind ensemble", value: "woodwind_ensemble" },
   { label: "brass ensemble", value: "brass_ensemble" },
   { label: "orchestra", value: "orchestra" }
@@ -434,6 +435,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
   const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
   const isStrings = settings.ensemble === "string_ensemble";
   const isPianoStringQuartet = settings.ensemble === "piano_string_quartet";
+  const isSatbStringQuartet  = settings.ensemble === "satb_string_quartet";
   const isWoodwinds = settings.ensemble === "woodwind_ensemble";
   const isCopyInstrumentation = false; // legacy — routing now handled by ensemble value
   const instrumentationHelp =
@@ -567,6 +569,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "piano_with_melody" &&
           settings.ensemble !== "string_ensemble" &&
           settings.ensemble !== "piano_string_quartet" &&
+          settings.ensemble !== "satb_string_quartet" &&
           settings.ensemble !== "woodwind_ensemble" &&
           settings.ensemble !== "brass_ensemble" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
@@ -816,6 +819,48 @@ export default function SettingsForm({ settings, onChange }: Props) {
             <div className="pill info" style={{ marginBottom: 4 }}>
               Copies piano notes directly: RH → Violin I &amp; II · LH → Viola &amp; Cello.
               Upload a piano score and the engine will preserve every chord note.
+            </div>
+          </div>
+
+          {/* Key Signature */}
+          <div className="field">
+            <label>Key Signature</label>
+            <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>
+              <option value="original">Original (from file)</option>
+              <optgroup label="Major">
+                {KEY_OPTIONS_MAJOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Minor">
+                {KEY_OPTIONS_MINOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+
+          {/* Tempo */}
+          <div className="field">
+            <label>Tempo (BPM)</label>
+            <input
+              type="number" min={30} max={240}
+              value={settings.tempo}
+              onChange={(e) => update("tempo", Number(e.target.value))}
+            />
+          </div>
+        </>
+
+      ) : isSatbStringQuartet ? (
+        /* ════════════════════════════════════════════════════════════════════
+           SATB → STRING QUARTET — direct voice mapping, no harmonizer
+           Soprano→Violin I · Alto→Violin II · Tenor→Viola · Bass→Cello
+           ════════════════════════════════════════════════════════════════════ */
+        <>
+          <div className="field">
+            <div className="pill info" style={{ marginBottom: 4 }}>
+              Maps each SATB voice directly to strings: Soprano→Violin I · Alto→Violin II · Tenor→Viola · Bass→Cello.
+              Upload a choral SATB score; notes are clamped to each instrument's range.
             </div>
           </div>
 

@@ -164,6 +164,24 @@ export function scoreHasPianoPart(score: any): boolean {
   return findPianoPart(score as ScoreModel) !== null;
 }
 
+/**
+ * Dedicated SATB → String Quartet copy.
+ * Maps S→Violin I, A→Violin II, T→Viola, B→Cello.
+ * Clamps notes to each instrument's absolute range.
+ * Exported for the "satb_string_quartet" ensemble.
+ */
+export function arrangeSatbToStringQuartetDirect(
+  score: any,
+  options: ArrangeOptions = {}
+): any {
+  const satb = findSatbParts(score as ScoreModel);
+  if (!satb) {
+    warn(options.warnings, "[strings] SATB → String Quartet: no SATB parts found; returning original score.");
+    return score;
+  }
+  return arrangeSatbToStringQuartet(score as ScoreModel, satb, options);
+}
+
 function findPianoPart(score: ScoreModel): PartLike | null {
   const parts = score.parts ?? [];
 

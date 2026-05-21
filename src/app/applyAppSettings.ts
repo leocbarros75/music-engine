@@ -13,7 +13,7 @@ import { analyzeTexture } from "../texture/textureAnalyzer";
 import { arrangePianoFromSatb } from "../arrange/arrangePianoFromSatb";
 import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
-import { arrangeStringQuartetFromPianoInstrumentation, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
+import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
@@ -1450,9 +1450,12 @@ export function applyAppSettings(
   const wantsPianoWithMelody = ensemble === "piano_with_melody";
   const wantsPiano =
     wantsPianoWithMelody || ensemble === "piano" || ensemble === "grand_piano" || ensemble === "acoustic_piano";
-  // "piano_string_quartet" is a dedicated ensemble that always uses the piano-copy path.
-  // "string_ensemble" is the auto arranger (lead sheet / melody + style → stylistic strings).
+  // Dedicated copy ensembles — each has exactly one code path, no routing switches:
+  //   "piano_string_quartet"  → piano LH/RH → V1/V2/VA/VC (skip harmonizer)
+  //   "satb_string_quartet"   → SATB S/A/T/B → V1/V2/VA/VC (skip harmonizer)
+  //   "string_ensemble"       → auto arranger: lead sheet + style → stylistic strings
   const wantsPianoStringQuartet = ensemble === "piano_string_quartet";
+  const wantsSatbStringQuartet  = ensemble === "satb_string_quartet";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
   const wantsWoodwinds = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
@@ -1536,6 +1539,19 @@ export function applyAppSettings(
 
   if (usePianoCopyStringQuartetInstrumentation) {
     const finalScore = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsSatbStringQuartet) {
+    const finalScore = arrangeSatbToStringQuartetDirect(scoreModel, { warnings });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,

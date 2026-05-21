@@ -139,6 +139,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const ensembleLower = String(settings.ensemble ?? "").toLowerCase();
     const isCopyInstrumentation =
       ensembleLower === "piano_string_quartet" ||
+      ensembleLower === "satb_string_quartet" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
@@ -174,7 +175,8 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const ensembleRaw = String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "").toLowerCase();
     const isPiano = ensembleRaw === "piano" || ensembleRaw === "piano_with_melody" || ensembleRaw === "grand_piano";
     const isPianoStringQuartet = ensembleRaw === "piano_string_quartet";
-    const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings" || isPianoStringQuartet;
+    const isSatbStringQuartet  = ensembleRaw === "satb_string_quartet";
+    const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings" || isPianoStringQuartet || isSatbStringQuartet;
     const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds";
     const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass";
     const isOrchestra = ensembleRaw === "orchestra";
