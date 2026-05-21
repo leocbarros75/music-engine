@@ -383,11 +383,16 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     // RH (per onset, sorted low→high):
     //   1 note  : V1 = that note; V2 = engine-fill (diatonic 3rd below V1)
     //   2 notes : V1 = top;        V2 = bottom
-    //   3+ notes: V1 = top;        V2 = double-stop (bottom + 2nd from bottom)
+    //   3 notes : V1 = top;        V2 = bottom + middle as chord addition
+    //   4+ notes: V1 = top;        V2 = bottom + ALL inner notes as chord additions
+    //             (extra inner notes beyond the 1st are added to V2 so no piano
+    //              note is dropped when the chord is larger than 4 voices)
     //
     // LH (per onset, sorted low→high):
     //   1 note  : VC = that note;  VA = engine-fill (diatonic 3rd above VC)
-    //   2+ notes: VC = bottom;     VA = index 1 (2nd from bottom)
+    //   2 notes : VC = bottom;     VA = 2nd from bottom
+    //   3+ notes: VC = bottom;     VA = 2nd from bottom + ALL remaining notes
+    //             as chord additions (so a full LH chord is preserved in VA)
 
     // RH → V1 + V2
     for (const key of Array.from(rhByOnset.keys()).sort()) {
@@ -400,9 +405,11 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       pushMappedNote(v1m, top, "violin_1", "v1", ++seq);
 
       if (selected.length >= 3) {
-        // V2 = double stop: bottom note first, then 2nd-from-bottom as chord
-        pushMappedNote(v2m, bottom,      "violin_2", "v2-lo", ++seq);
-        pushMappedNote(v2m, selected[1]!, "violin_2", "v2-hi", ++seq, { chord: true });
+        // V2 = bottom note as primary; all inner notes (between bottom and top) as chord additions
+        pushMappedNote(v2m, bottom, "violin_2", "v2-lo", ++seq);
+        for (let i = 1; i <= selected.length - 2; i++) {
+          pushMappedNote(v2m, selected[i]!, "violin_2", "v2-inner", ++seq, { chord: true });
+        }
       } else if (selected.length === 2) {
         // V2 = bottom note
         pushMappedNote(v2m, bottom, "violin_2", "v2", ++seq);
@@ -425,8 +432,11 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
 
       if (selected.length >= 2) {
-        // VA = 2nd note from bottom (tenor voice)
+        // VA = 2nd note from bottom as primary; any additional LH notes as chord additions
         pushMappedNote(vam, selected[1]!, "viola", "va", ++seq);
+        for (let i = 2; i < selected.length; i++) {
+          pushMappedNote(vam, selected[i]!, "viola", "va-extra", ++seq, { chord: true });
+        }
       } else {
         // Single LH note: VA = engine-fill, diatonic 3rd above VC clamped to viola range
         let fillMidi = diatonicStepsAbove(bottom.midi, 2, currentKeyFifths);
