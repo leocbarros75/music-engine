@@ -13,7 +13,7 @@ import { analyzeTexture } from "../texture/textureAnalyzer";
 import { arrangePianoFromSatb } from "../arrange/arrangePianoFromSatb";
 import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
-import { arrangeStringQuartetFromPianoInstrumentation } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
+import { arrangeStringQuartetFromPianoInstrumentation, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
@@ -1455,14 +1455,14 @@ export function applyAppSettings(
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
-  // "auto" is not a valid option for strings/woodwinds in the UI — if it arrives
-  // here it means the front-end didn't set it (e.g. default state). Fall back to
-  // the piano-copy path, which is the correct default for piano input → strings/woodwinds.
+  // "auto" + strings/woodwinds: detect from the score itself.
+  //   • Piano input (grand staff / instrument named piano) → copy path
+  //   • Lead sheet / SATB / anything else              → string/woodwind arranger
+  const autoUsePianoCopy = instrumentation === "auto" && (wantsStrings || wantsWoodwinds) && scoreHasPianoPart(scoreModel);
   const usePianoCopyStringQuartetInstrumentation =
-    wantsStrings && (instrumentation === "auto" || instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
+    wantsStrings && (autoUsePianoCopy || instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
   const usePianoCopyWoodwindQuartetInstrumentation =
-    wantsWoodwinds &&
-    (instrumentation === "auto" || instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
+    wantsWoodwinds && (autoUsePianoCopy || instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
 
   const detectedKey = getKeyInfo(scoreModel);
   const detectedInputKeyFifths = detectedKey.value;

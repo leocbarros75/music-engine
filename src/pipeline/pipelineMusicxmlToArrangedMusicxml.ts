@@ -9,6 +9,7 @@ import { exportScoreModelToMusicXML } from "../exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "../exporters/satbMusicxmlExporter";
 import { extractChordEventsFromMusicXml, type ChordEvent } from "../extract/chordEventsFromMusicXml";
 import { mapPianoToFullOrchestraOpen } from "../arrange/mapToFullOrchestra";
+import { scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 
 export type PipelineRequest = {
   musicxml: string;
@@ -134,14 +135,17 @@ export function pipelineMusicxmlToArrangedMusicxml(
 
     // 4. Harmonize — skip for copy instrumentation modes; the arranger works
     //    directly on the original parsed score (piano LH/RH staves preserved).
-    // "auto" with strings/woodwinds also skips harmonization: the piano-copy
-    // path is the correct default when the UI didn't set an explicit instrumentation.
+    // "auto" + strings/woodwinds: skip harmonization only when the input score
+    // is a piano score (grand staff) — in that case applyAppSettings will route
+    // to the piano-copy arranger. For lead sheets the harmonizer must run first.
     const ensembleLower = String(settings.ensemble ?? "").toLowerCase();
-    const autoStrings = (settings.instrumentation === "auto" || !settings.instrumentation) &&
+    const autoIsStringsOrWoodwinds =
+      (settings.instrumentation === "auto" || !settings.instrumentation) &&
       (ensembleLower === "string_ensemble" || ensembleLower === "strings" ||
        ensembleLower === "woodwind_ensemble" || ensembleLower === "woodwinds");
+    const autoSkipHarmonize = autoIsStringsOrWoodwinds && scoreHasPianoPart(inputScore);
     const isCopyInstrumentation =
-      autoStrings ||
+      autoSkipHarmonize ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||

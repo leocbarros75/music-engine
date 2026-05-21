@@ -159,6 +159,11 @@ function partHasStaff2Notes(part: PartLike): boolean {
   return false;
 }
 
+/** Exported so pipeline/applyAppSettings can auto-detect piano input for "auto" routing. */
+export function scoreHasPianoPart(score: any): boolean {
+  return findPianoPart(score as ScoreModel) !== null;
+}
+
 function findPianoPart(score: ScoreModel): PartLike | null {
   const parts = score.parts ?? [];
 
