@@ -1450,19 +1450,19 @@ export function applyAppSettings(
   const wantsPianoWithMelody = ensemble === "piano_with_melody";
   const wantsPiano =
     wantsPianoWithMelody || ensemble === "piano" || ensemble === "grand_piano" || ensemble === "acoustic_piano";
+  // "piano_string_quartet" is a dedicated ensemble that always uses the piano-copy path.
+  // "string_ensemble" is the auto arranger (lead sheet / melody + style → stylistic strings).
+  const wantsPianoStringQuartet = ensemble === "piano_string_quartet";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
   const wantsWoodwinds = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
-  // "auto" + strings/woodwinds: detect from the score itself.
-  //   • Piano input (grand staff / instrument named piano) → copy path
-  //   • Lead sheet / SATB / anything else              → string/woodwind arranger
-  const autoUsePianoCopy = instrumentation === "auto" && (wantsStrings || wantsWoodwinds) && scoreHasPianoPart(scoreModel);
   const usePianoCopyStringQuartetInstrumentation =
-    wantsStrings && (autoUsePianoCopy || instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
+    wantsPianoStringQuartet ||
+    (wantsStrings && (instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet"));
   const usePianoCopyWoodwindQuartetInstrumentation =
-    wantsWoodwinds && (autoUsePianoCopy || instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
+    wantsWoodwinds && (instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
 
   const detectedKey = getKeyInfo(scoreModel);
   const detectedInputKeyFifths = detectedKey.value;

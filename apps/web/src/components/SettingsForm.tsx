@@ -5,7 +5,8 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "choral (SATB)", value: "choral" },
   { label: "piano", value: "piano" },
   { label: "piano with melody (RH)", value: "piano_with_melody" },
-  { label: "string ensemble", value: "string_ensemble" },
+  { label: "string ensemble (auto)", value: "string_ensemble" },
+  { label: "piano → string quartet", value: "piano_string_quartet" },
   { label: "woodwind ensemble", value: "woodwind_ensemble" },
   { label: "brass ensemble", value: "brass_ensemble" },
   { label: "orchestra", value: "orchestra" }
@@ -368,22 +369,20 @@ export default function SettingsForm({ settings, onChange }: Props) {
     } else if (nextEnsemble === "choral" && next.textureMode === "homophony_melody_accompaniment") {
       next.textureMode = "homophony_homorhythmic";
     }
-    const validInstrumentation =
-      nextEnsemble === "string_ensemble"
-        ? new Set(STRING_INSTRUMENTATION_OPTIONS.map((opt) => opt.value))
-        : nextEnsemble === "woodwind_ensemble"
+    // piano_string_quartet has its own ensemble value — no instrumentation needed.
+    // string_ensemble (auto) and woodwind_ensemble keep their own instrumentation dropdowns.
+    if (nextEnsemble === "piano_string_quartet") {
+      next.instrumentation = "piano_copy_to_string_quartet"; // kept for back-compat; routing is by ensemble
+      next.level = "advanced";
+    } else {
+      const validInstrumentation =
+        nextEnsemble === "woodwind_ensemble"
           ? new Set(WOODWIND_INSTRUMENTATION_OPTIONS.map((opt) => opt.value))
           : new Set(["auto"]);
-    if (!validInstrumentation.has(next.instrumentation ?? "auto")) {
-      // Default to the primary copy instrumentation for each ensemble rather than
-      // "auto" — "auto" is not a valid option for strings/woodwinds and silently
-      // routes through the SATB harmonizer instead of the piano-copy path.
-      if (nextEnsemble === "string_ensemble") {
-        next.instrumentation = "piano_copy_to_string_quartet";
-      } else if (nextEnsemble === "woodwind_ensemble") {
-        next.instrumentation = "piano_copy_to_woodwind_quartet";
-      } else {
-        next.instrumentation = "auto";
+      if (!validInstrumentation.has(next.instrumentation ?? "auto")) {
+        next.instrumentation = nextEnsemble === "woodwind_ensemble"
+          ? "piano_copy_to_woodwind_quartet"
+          : "auto";
       }
     }
     onChange(next);
@@ -434,10 +433,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
     BASS_ACTIVITY_OPTIONS.find((opt) => opt.value === settings.cbActivity)?.help ?? "Choose activity level.";
   const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
   const isStrings = settings.ensemble === "string_ensemble";
+  const isPianoStringQuartet = settings.ensemble === "piano_string_quartet";
   const isWoodwinds = settings.ensemble === "woodwind_ensemble";
-  const isCopyInstrumentation =
-    settings.instrumentation === "piano_copy_to_string_quartet" ||
-    settings.instrumentation === "satb_to_string_quartet";
+  const isCopyInstrumentation = false; // legacy — routing now handled by ensemble value
   const instrumentationHelp =
     (isStrings ? STRING_INSTRUMENTATION_OPTIONS : isWoodwinds ? WOODWIND_INSTRUMENTATION_OPTIONS : []).find(
       (opt) => opt.value === settings.instrumentation
@@ -568,6 +566,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "piano" &&
           settings.ensemble !== "piano_with_melody" &&
           settings.ensemble !== "string_ensemble" &&
+          settings.ensemble !== "piano_string_quartet" &&
           settings.ensemble !== "woodwind_ensemble" &&
           settings.ensemble !== "brass_ensemble" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
@@ -807,34 +806,55 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           </div>
         </>
-      ) : isStrings ? (
+      ) : isPianoStringQuartet ? (
         /* ════════════════════════════════════════════════════════════════════
-           STRING ENSEMBLE — simplified panel
+           PIANO → STRING QUARTET — direct copy, no harmonizer
+           RH → Violin I + II  |  LH → Viola + Cello
            ════════════════════════════════════════════════════════════════════ */
         <>
-          {/* Instrumentation */}
           <div className="field">
-            <label>Instrumentation</label>
-            <select
-              value={settings.instrumentation ?? "auto"}
-              onChange={(e) => {
-                const instr = e.target.value as Settings["instrumentation"];
-                const isCopy =
-                  instr === "piano_copy_to_string_quartet" || instr === "satb_to_string_quartet";
-                onChange({ ...settings, instrumentation: instr, ...(isCopy ? { level: "advanced" } : {}) });
-              }}
-            >
-              {STRING_INSTRUMENTATION_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            <div className="key-preview">
-              <span className="slider-help">{instrumentationHelp}</span>
+            <div className="pill info" style={{ marginBottom: 4 }}>
+              Copies piano notes directly: RH → Violin I &amp; II · LH → Viola &amp; Cello.
+              Upload a piano score and the engine will preserve every chord note.
             </div>
           </div>
 
-          {/* String Texture — only when Auto arranger is selected */}
-          {(settings.instrumentation ?? "auto") === "auto" && (() => {
+          {/* Key Signature */}
+          <div className="field">
+            <label>Key Signature</label>
+            <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>
+              <option value="original">Original (from file)</option>
+              <optgroup label="Major">
+                {KEY_OPTIONS_MAJOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Minor">
+                {KEY_OPTIONS_MINOR.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+
+          {/* Tempo */}
+          <div className="field">
+            <label>Tempo (BPM)</label>
+            <input
+              type="number" min={30} max={240}
+              value={settings.tempo}
+              onChange={(e) => update("tempo", Number(e.target.value))}
+            />
+          </div>
+        </>
+
+      ) : isStrings ? (
+        /* ════════════════════════════════════════════════════════════════════
+           STRING ENSEMBLE (AUTO) — style-driven arranger for lead sheets
+           ════════════════════════════════════════════════════════════════════ */
+        <>
+          {/* String Texture */}
+          {true && (() => {
             const currentTexture = settings.stringTexture ?? "melody_harmony";
             const textureOpt = STRING_TEXTURE_OPTIONS.find((o) => o.value === currentTexture);
             return (
@@ -869,7 +889,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
           })()}
 
           {/* Examples — reference pieces grouped by texture mode */}
-          {(settings.instrumentation ?? "auto") === "auto" && (() => {
+          {true && (() => {
             const currentTexture = settings.stringTexture ?? "melody_harmony";
             // Counterpoint mode accepts any string quartet piece as a reference;
             // show all examples rather than returning an empty list.

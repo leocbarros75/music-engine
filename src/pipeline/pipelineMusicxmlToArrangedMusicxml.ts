@@ -135,17 +135,10 @@ export function pipelineMusicxmlToArrangedMusicxml(
 
     // 4. Harmonize — skip for copy instrumentation modes; the arranger works
     //    directly on the original parsed score (piano LH/RH staves preserved).
-    // "auto" + strings/woodwinds: skip harmonization only when the input score
-    // is a piano score (grand staff) — in that case applyAppSettings will route
-    // to the piano-copy arranger. For lead sheets the harmonizer must run first.
+    // "piano_string_quartet" is a dedicated ensemble that always skips harmonization.
     const ensembleLower = String(settings.ensemble ?? "").toLowerCase();
-    const autoIsStringsOrWoodwinds =
-      (settings.instrumentation === "auto" || !settings.instrumentation) &&
-      (ensembleLower === "string_ensemble" || ensembleLower === "strings" ||
-       ensembleLower === "woodwind_ensemble" || ensembleLower === "woodwinds");
-    const autoSkipHarmonize = autoIsStringsOrWoodwinds && scoreHasPianoPart(inputScore);
     const isCopyInstrumentation =
-      autoSkipHarmonize ||
+      ensembleLower === "piano_string_quartet" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
@@ -179,8 +172,9 @@ export function pipelineMusicxmlToArrangedMusicxml(
 
     // 6. Choral rule check (skip for non-SATB ensembles)
     const ensembleRaw = String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "").toLowerCase();
-    const isPiano = ensembleRaw.includes("piano");
-    const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings";
+    const isPiano = ensembleRaw === "piano" || ensembleRaw === "piano_with_melody" || ensembleRaw === "grand_piano";
+    const isPianoStringQuartet = ensembleRaw === "piano_string_quartet";
+    const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings" || isPianoStringQuartet;
     const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds";
     const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass";
     const isOrchestra = ensembleRaw === "orchestra";
