@@ -1455,11 +1455,14 @@ export function applyAppSettings(
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
+  // "auto" is not a valid option for strings/woodwinds in the UI — if it arrives
+  // here it means the front-end didn't set it (e.g. default state). Fall back to
+  // the piano-copy path, which is the correct default for piano input → strings/woodwinds.
   const usePianoCopyStringQuartetInstrumentation =
-    wantsStrings && (instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
+    wantsStrings && (instrumentation === "auto" || instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet");
   const usePianoCopyWoodwindQuartetInstrumentation =
     wantsWoodwinds &&
-    (instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
+    (instrumentation === "auto" || instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
 
   const detectedKey = getKeyInfo(scoreModel);
   const detectedInputKeyFifths = detectedKey.value;

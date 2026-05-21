@@ -134,7 +134,14 @@ export function pipelineMusicxmlToArrangedMusicxml(
 
     // 4. Harmonize — skip for copy instrumentation modes; the arranger works
     //    directly on the original parsed score (piano LH/RH staves preserved).
+    // "auto" with strings/woodwinds also skips harmonization: the piano-copy
+    // path is the correct default when the UI didn't set an explicit instrumentation.
+    const ensembleLower = String(settings.ensemble ?? "").toLowerCase();
+    const autoStrings = (settings.instrumentation === "auto" || !settings.instrumentation) &&
+      (ensembleLower === "string_ensemble" || ensembleLower === "strings" ||
+       ensembleLower === "woodwind_ensemble" || ensembleLower === "woodwinds");
     const isCopyInstrumentation =
+      autoStrings ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
