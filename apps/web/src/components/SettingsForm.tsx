@@ -543,18 +543,34 @@ export default function SettingsForm({ settings, onChange }: Props) {
   // ───────────────────────────────────────────────────────────────────────────
 
   // ── Piano simplified controls ────────────────────────────────────────────
+  // pianoMode is the output layout (choral grand-staff vs melody+LH pattern).
+  // pianoAccomp is the harmonizer texture (homophonic vs polyphonic counterpoint).
+  // When polyphonic is active, textureMode = "polyphony" so the pipeline routes
+  // correctly through the polyphonic harmonizer instead of being overridden.
+  const pianoAccomp = (
+    settings.accompaniment === "polyphonic" || settings.textureMode === "polyphony"
+      ? "polyphonic" : "homophonic"
+  ) as "homophonic" | "polyphonic";
+
+  // pianoMode only applies when polyphonic is OFF (choral/accompaniment distinction
+  // is irrelevant in polyphonic — the counterpoint harmonizer drives everything).
   const pianoMode = (
     settings.textureMode === "homophony_melody_accompaniment" ? "accompaniment" : "choral"
   ) as "choral" | "accompaniment";
 
-  const pianoAccomp = (
-    settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic"
-  ) as "homophonic" | "polyphonic";
+  // Remember last homophonic sub-mode so toggling polyphonic on/off is lossless.
+  const pianoHomophonicTexture: Settings["textureMode"] =
+    settings.textureMode === "homophony_melody_accompaniment"
+      ? "homophony_melody_accompaniment"
+      : "homophony_homorhythmic";
 
   function updatePianoMode(mode: "choral" | "accompaniment") {
     const next = { ...settings };
-    next.textureMode =
-      mode === "accompaniment" ? "homophony_melody_accompaniment" : "homophony_homorhythmic";
+    // Keep polyphonic if active; just store what mode we'd return to
+    if (pianoAccomp !== "polyphonic") {
+      next.textureMode =
+        mode === "accompaniment" ? "homophony_melody_accompaniment" : "homophony_homorhythmic";
+    }
     next.styleProfile = "classical";
     next.level = "intermediate";
     next.ruleStrictness = "standard";
@@ -564,7 +580,15 @@ export default function SettingsForm({ settings, onChange }: Props) {
   function updatePianoAccomp(accomp: "homophonic" | "polyphonic") {
     const next = { ...settings };
     next.accompaniment = accomp;
-    if (accomp === "polyphonic") next.styleProfile = next.styleProfile ?? "classical";
+    if (accomp === "polyphonic") {
+      next.styleProfile = next.styleProfile ?? "classical";
+      // Route through the full polyphonic harmonizer — same path as choral counterpoint.
+      // textureMode "polyphony" makes the pipeline set harmOpts.accompanimentType = "polyphonic".
+      next.textureMode = "polyphony";
+    } else {
+      // Restore the pre-polyphonic layout mode
+      next.textureMode = pianoHomophonicTexture;
+    }
     onChange(next);
   }
   // ─────────────────────────────────────────────────────────────────────────
@@ -742,8 +766,10 @@ export default function SettingsForm({ settings, onChange }: Props) {
             />
           </div>
 
+          {/* Mode: Choral / Accompaniment — hidden when Polyphonic is active */}
+          {pianoAccomp !== "polyphonic" && (
           <div className="field">
-            <label>Style</label>
+            <label>Mode</label>
             <select
               value={pianoMode}
               onChange={(e) => updatePianoMode(e.target.value as "choral" | "accompaniment")}
@@ -759,8 +785,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </span>
             </div>
           </div>
+          )}
 
-          {pianoMode === "accompaniment" && (() => {
+          {pianoMode === "accompaniment" && pianoAccomp !== "polyphonic" && (() => {
             const currentPattern = settings.lhPattern ?? "auto";
             const patternHelp = LH_PATTERN_OPTIONS.find(o => o.value === currentPattern)?.help ?? "";
             return (
