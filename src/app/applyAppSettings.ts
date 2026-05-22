@@ -23,6 +23,7 @@ import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPoly
 import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble";
 import { mapPianoToBrassEnsembleOpen } from "../arrange/mapToBrassEnsemble";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
+import { resolveChoralProfile } from "../harmonize/satb/choralStyleProfiles";
 
 export type AppSettings = {
   title?: string;
@@ -1534,6 +1535,24 @@ export function applyAppSettings(
   const sopranoMelodyShare = typeof settings.sopranoMelodyShare === "number" ? settings.sopranoMelodyShare : 30;
   const useSopranoTexture = wantsPiano && !wantsPianoWithMelody && sopranoActivity !== "grounded";
   const tempoBpm = getTempoBpmFromSettings(scoreModel, settings);
+
+  // ── Choral style profile resolution ────────────────────────────────────────
+  // When ensemble=choral + a period style is selected, resolve the 5-dimension
+  // profile and use it as the default for activity levels the user hasn't set.
+  // (The user's explicit bassActivity / tenorActivity / altoActivity always win.)
+  const isChoralEnsemble = ensemble === "choral" || ensemble === "satb";
+  const choralProfile = (isChoralEnsemble && styleRaw && styleRaw !== "")
+    ? resolveChoralProfile(styleRaw, undefined)
+    : null;
+  // Effective activity: user override → choral profile default → hardcoded fallback
+  const effectiveBassActivity   = settings.bassActivity   ?? choralProfile?.bassActivity   ?? "less_active";
+  const effectiveTenorActivity  = settings.tenorActivity  ?? choralProfile?.tenorActivity  ?? "less_active";
+  const effectiveAltoActivity   = settings.altoActivity   ?? choralProfile?.altoActivity   ?? "less_active";
+  if (choralProfile) {
+    warnings.push(
+      `[choral] Style profile "${styleRaw}": bass=${effectiveBassActivity}, tenor=${effectiveTenorActivity}, alto=${effectiveAltoActivity}, voiceIndependence=${choralProfile.voiceIndependence.toFixed(2)}`
+    );
+  }
   const omitMelodyInPiano = wantsPianoWithMelody ? false : worshipPiano || useSopranoTexture;
   const pianoEnsembleTag = wantsPianoWithMelody ? "piano_with_melody" : "piano";
 
@@ -1917,27 +1936,26 @@ export function applyAppSettings(
       if (!pianoArpApplied) {
         const bassRhythm = applyPolyphonicBassCounterRhythm(scoreModel, chords, {
           allowRests: true,
-          activity: settings.bassActivity ?? "less_active",
+          activity: effectiveBassActivity,
           randomizeOffsets: settings.randomizeOffsets !== false,
           minMidiOverride: pianoAdvanced ? 40 : undefined,
           maxMidiOverride: pianoAdvanced ? 52 : undefined
         });
         warnings.push(...(bassRhythm.warnings ?? []));
       }
-      const tenorActivity = settings.tenorActivity ?? settings.bassActivity ?? "less_active";
       const tenorRhythm = applyPolyphonicTenorCounterRhythm(scoreModel, chords, {
         allowRests: true,
-        activity: tenorActivity,
+        activity: effectiveTenorActivity,
         randomizeOffsets: settings.randomizeOffsets !== false,
         minMidiOverride: pianoAdvanced ? 52 : undefined,
         maxMidiOverride: pianoAdvanced ? 64 : undefined,
         durationWhitelist:
-          wantsPiano && worshipPiano && settings.level === "advanced" && tenorActivity === "less_active" ? [1, 2] : undefined
+          wantsPiano && worshipPiano && settings.level === "advanced" && effectiveTenorActivity === "less_active" ? [1, 2] : undefined
       });
       warnings.push(...(tenorRhythm.warnings ?? []));
       const altoRhythm = applyPolyphonicAltoCounterRhythm(scoreModel, chords, {
         allowRests: true,
-        activity: settings.altoActivity ?? settings.bassActivity ?? "less_active",
+        activity: effectiveAltoActivity,
         randomizeOffsets: settings.randomizeOffsets !== false
       });
       warnings.push(...(altoRhythm.warnings ?? []));

@@ -6,7 +6,7 @@ export type VoiceState = { S: number; A: number; T: number; B: number };
 
 export type VoiceRanges = { S: Range; A: Range; T: Range; B: Range };
 
-export type PolyphonicProfileName = "baroque" | "classical" | "romantic" | "modern";
+export type PolyphonicProfileName = "baroque" | "classical" | "romantic" | "modern" | "worship";
 
 export type ModernMode = "modernTonal" | "modal" | "atonal";
 

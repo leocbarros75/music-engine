@@ -122,10 +122,11 @@ export function pipelineMusicxmlToArrangedMusicxml(
     if (accompanimentLower === "polyphonic") {
       if (!harmOpts.styleProfile) {
         const style = String(settings.style ?? "").toLowerCase();
-        if (style === "baroque")       harmOpts.styleProfile = "baroque";
-        else if (style === "romantic") harmOpts.styleProfile = "romantic";
-        else if (style === "modern")   harmOpts.styleProfile = "modern";
-        else if (style === "classical" || style === "worship") harmOpts.styleProfile = "classical";
+        if (style === "baroque")        harmOpts.styleProfile = "baroque";
+        else if (style === "romantic")  harmOpts.styleProfile = "romantic";
+        else if (style === "modern")    harmOpts.styleProfile = "modern";
+        else if (style === "worship")   harmOpts.styleProfile = "worship";  // dedicated worship profile
+        else if (style === "classical") harmOpts.styleProfile = "classical";
         else harmOpts.styleProfile = "classical"; // pop/funk/samba → classical voice-leading
       }
       if (String(harmOpts.styleProfile).toLowerCase() === "modern" && !harmOpts.modernMode) {

@@ -112,6 +112,40 @@ const PROFILES: Record<string, PolyphonicProfile> = {
     allowDirectPerfects: false,
     enableTendencyRules: true
   },
+  worship: {
+    // Hymn / contemporary choral worship.
+    // Goal: accessible, clear SATB texture.
+    //   • Soprano melody must be clean — parallel 5ths/8ths firmly blocked
+    //   • Inner voices are harmonic support — less strict than baroque on leaps
+    //   • Bass sits on root notes — chord tones preferred, leaps tolerated
+    //   • Spacing is intentionally open/warm — allow slightly wider SA/AT
+    // Strictness sits between classical and baroque.
+    name: "worship",
+    penalties: {
+      ...DEFAULT_PENALTIES,
+      parallelPerfect: 50,        // strict — clarity is paramount
+      directPerfect: 24,
+      directPerfectOuterLeap: 26,
+      perfectMotionSimilar: 9,
+      perfectConsonanceHold: 7,
+      dissonance: 9,
+      dissonanceLeap: 13,
+      similarMotionAll: 9,
+      spacing: 7,                  // slightly relaxed — open voicing sounds warm
+      crossing: 28,
+      overlap: 18,
+      leapAboveThird: 4,
+      leapAboveFifth: 11,          // Bass leaps of a 4th/5th are normal in hymns
+      leapAboveOctave: 19,
+      tendencyUnresolved: 15,
+      seventhUnresolved: 13,
+      doubleTendency: 11,
+      doubleSeventh: 9
+    },
+    allowParallels: false,
+    allowDirectPerfects: false,
+    enableTendencyRules: true
+  },
   modern: {
     name: "modern",
     modernMode: "modernTonal",
@@ -207,7 +241,7 @@ export function resolvePolyphonicProfile(
   modernMode?: string | null
 ): PolyphonicProfile {
   const nameRaw = String(styleProfile || "classical").toLowerCase();
-  const name = (["baroque", "classical", "romantic", "modern"] as PolyphonicProfileName[]).includes(
+  const name = (["baroque", "classical", "romantic", "modern", "worship"] as PolyphonicProfileName[]).includes(
     nameRaw as PolyphonicProfileName
   )
     ? (nameRaw as PolyphonicProfileName)
