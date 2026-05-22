@@ -1538,6 +1538,16 @@ export function applyAppSettings(
   const pianoEnsembleTag = wantsPianoWithMelody ? "piano_with_melody" : "piano";
 
   if (usePianoCopyStringQuartetInstrumentation) {
+    // Guard: warn clearly if the input is not a piano score
+    if (wantsPianoStringQuartet && !scoreHasPianoPart(scoreModel)) {
+      const partNames = (scoreModel as any)?.parts?.map((p: any) => p?.name ?? "?").join(", ") ?? "none";
+      warnings.push(
+        `[piano→strings] Your uploaded file does not appear to be a piano score. ` +
+        `Found parts: ${partNames}. ` +
+        `The "piano → string quartet" mode expects a piano score with treble+bass staves. ` +
+        `Please upload the original piano file.`
+      );
+    }
     const finalScore = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
     attachTextureAnalysis(finalScore, warnings);
     return {
