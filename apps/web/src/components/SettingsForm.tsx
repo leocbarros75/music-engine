@@ -468,49 +468,76 @@ export default function SettingsForm({ settings, onChange }: Props) {
   }, [settings, onChange]);
 
   // ── Choral simplified controls ──────────────────────────────────────────────
-  type ChoralStyle = "baroque" | "classical" | "romantic" | "modern";
-  type ChoralAccompaniment = "homophonic" | "polyphonic";
+  // Three top-level accompaniment modes:
+  //   "homophonic" → block chords (homorhythmic)
+  //   "polyphonic" → four-voice counterpoint
+  //   "style"      → style-driven harmonisation; reveals style sub-picker
 
-  const choralStyle: ChoralStyle =
-    settings.style === "baroque" ? "baroque" :
-    settings.style === "romantic" ? "romantic" :
-    settings.style === "modern" ? "modern" : "classical";
+  type ChoralAccompMode = "homophonic" | "polyphonic" | "style";
 
-  const choralAccomp: ChoralAccompaniment =
+  // Style options for the choral "Style" sub-panel (includes Worship)
+  const CHORAL_STYLE_OPTIONS: Array<{ label: string; value: Settings["style"]; help: string }> = [
+    { label: "Baroque",   value: "baroque",   help: "Strict Bach/Handel counterpoint — close spacing, no parallel 5ths/8ths (1600–1750)." },
+    { label: "Classical", value: "classical", help: "Haydn/Mozart clarity — balanced voice-leading and phrase symmetry (1750–1820)." },
+    { label: "Romantic",  value: "romantic",  help: "Brahms/Dvořák richness — wider spacing, chromatic colour, expressive leaps (1820–1900)." },
+    { label: "Modern",    value: "modern",    help: "Extended harmony — tonal, modal, or atonal sub-modes (1900–present)." },
+    { label: "Worship",   value: "worship",   help: "Hymn-style four-voice writing — devotional, accessible harmonisation." },
+  ];
+
+  // Derive the active mode from settings (backward-compat: fall back to accompaniment field)
+  const choralMode: ChoralAccompMode =
+    settings.choralMode === "style"      ? "style"      :
+    settings.choralMode === "polyphonic" ? "polyphonic" :
+    settings.choralMode === "homophonic" ? "homophonic" :
     settings.accompaniment === "polyphonic" ? "polyphonic" : "homophonic";
 
-  function updateChoralStyle(style: ChoralStyle) {
-    const next = { ...settings, style: style as Settings["style"] };
-    if (style === "baroque") {
-      next.styleProfile = "baroque";
-      next.level = "advanced";
-      next.ruleStrictness = "strict";
-    } else if (style === "romantic") {
-      next.styleProfile = "romantic";
-      next.level = "intermediate";
-      next.ruleStrictness = "relaxed";
-    } else if (style === "modern") {
-      next.styleProfile = "modern";
-      next.level = "professional";
-      next.ruleStrictness = "relaxed";
-      if (!next.modernMode) next.modernMode = "modernTonal";
+  // Active style value (only shown in "style" sub-panel)
+  const choralStyle: Settings["style"] = (
+    ["baroque", "classical", "romantic", "modern", "worship"].includes(settings.style ?? "")
+      ? settings.style
+      : "classical"
+  ) as Settings["style"];
+
+  function updateChoralAccomp(mode: ChoralAccompMode) {
+    const next: Settings = { ...settings, choralMode: mode };
+    if (mode === "polyphonic") {
+      next.accompaniment = "polyphonic";
+      next.textureMode   = "polyphony";
+      next.styleProfile  = next.styleProfile ?? "classical";
+    } else if (mode === "style") {
+      next.accompaniment = "polyphonic";
+      next.textureMode   = "polyphony";
+      // Keep current style or default to classical
+      const s = choralStyle ?? "classical";
+      const profileMap: Record<string, Settings["styleProfile"]> = {
+        baroque: "baroque", classical: "classical", romantic: "romantic",
+        modern: "modern", worship: "classical",
+      };
+      next.styleProfile  = profileMap[s] ?? "classical";
     } else {
-      next.styleProfile = "classical";
-      next.level = "intermediate";
-      next.ruleStrictness = "standard";
+      next.accompaniment = "homophonic";
+      next.textureMode   = "homophony_homorhythmic";
     }
     onChange(next);
   }
 
-  function updateChoralAccomp(accomp: ChoralAccompaniment) {
-    const next = { ...settings };
-    if (accomp === "polyphonic") {
-      next.accompaniment = "polyphonic";
-      next.textureMode = "polyphony";
-    } else {
-      next.accompaniment = "homophonic";
-      next.textureMode = "homophony_homorhythmic";
-    }
+  function updateChoralStyle(style: Settings["style"]) {
+    const profileMap: Record<string, Settings["styleProfile"]> = {
+      baroque: "baroque", classical: "classical", romantic: "romantic",
+      modern: "modern", worship: "classical",
+    };
+    const next: Settings = {
+      ...settings,
+      style,
+      styleProfile: profileMap[style] ?? "classical",
+      choralMode: "style",
+      accompaniment: "polyphonic",
+      textureMode: "polyphony",
+    };
+    if (style === "baroque")        { next.level = "advanced";      next.ruleStrictness = "strict";   }
+    else if (style === "romantic")  { next.level = "intermediate";  next.ruleStrictness = "relaxed";  }
+    else if (style === "modern")    { next.level = "professional";  next.ruleStrictness = "relaxed";  if (!next.modernMode) next.modernMode = "modernTonal"; }
+    else                            { next.level = "intermediate";  next.ruleStrictness = "standard"; }
     onChange(next);
   }
   // ───────────────────────────────────────────────────────────────────────────
@@ -578,9 +605,10 @@ export default function SettingsForm({ settings, onChange }: Props) {
 
       {settings.ensemble === "choral" ? (
         /* ════════════════════════════════════════════════════════════════════
-           CHORAL — simplified panel: Key · Tempo · Style · Accompaniment
+           CHORAL — Key · Tempo · Accompaniment (3 modes) · [Style sub-panel]
            ════════════════════════════════════════════════════════════════════ */
         <>
+          {/* Key */}
           <div className="field">
             <label>Key Signature</label>
             <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>
@@ -601,6 +629,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           </div>
 
+          {/* Tempo */}
           <div className="field">
             <label>Tempo (BPM)</label>
             <input
@@ -612,21 +641,44 @@ export default function SettingsForm({ settings, onChange }: Props) {
             />
           </div>
 
+          {/* Accompaniment — 3-way primary selector */}
           <div className="field">
-            <label>Style</label>
-            <select value={choralStyle} onChange={(e) => updateChoralStyle(e.target.value as ChoralStyle)}>
-              {PERIOD_STYLE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
+            <label>Accompaniment</label>
+            <select value={choralMode} onChange={(e) => updateChoralAccomp(e.target.value as ChoralAccompMode)}>
+              <option value="homophonic">Homophonic</option>
+              <option value="polyphonic">Polyphonic (Counterpoint)</option>
+              <option value="style">Style</option>
             </select>
             <div className="key-preview">
               <span className="slider-help">
-                {PERIOD_STYLE_OPTIONS.find((o) => o.value === choralStyle)?.help ?? ""}
+                {choralMode === "homophonic"
+                  ? "All voices move together in block chords (homorhythmic)."
+                  : choralMode === "polyphonic"
+                  ? "Four independent melodic lines with shared harmony — classic SATB counterpoint."
+                  : "Harmonisation guided by the chosen musical period style."}
               </span>
             </div>
           </div>
 
-          {choralStyle === "modern" && (
+          {/* Style sub-panel — only shown when "Style" accompaniment is selected */}
+          {choralMode === "style" && (
+            <div className="field">
+              <label>Style</label>
+              <select value={choralStyle} onChange={(e) => updateChoralStyle(e.target.value as Settings["style"])}>
+                {CHORAL_STYLE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  {CHORAL_STYLE_OPTIONS.find((o) => o.value === choralStyle)?.help ?? ""}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Modern sub-mode — only shown when Style mode + Modern selected */}
+          {choralMode === "style" && choralStyle === "modern" && (
             <div className="field">
               <label>Modern Sub-mode</label>
               <select
@@ -644,24 +696,6 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </div>
             </div>
           )}
-
-          <div className="field">
-            <label>Accompaniment</label>
-            <select
-              value={choralAccomp}
-              onChange={(e) => updateChoralAccomp(e.target.value as ChoralAccompaniment)}
-            >
-              <option value="homophonic">Homophonic</option>
-              <option value="polyphonic">Polyphonic</option>
-            </select>
-            <div className="key-preview">
-              <span className="slider-help">
-                {choralAccomp === "polyphonic"
-                  ? "Independent melodic lines with shared harmony (counterpoint)."
-                  : "All voices move together sharing the same rhythm (block chords)."}
-              </span>
-            </div>
-          </div>
         </>
       ) : isPiano ? (
         /* ════════════════════════════════════════════════════════════════════

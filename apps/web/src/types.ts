@@ -67,6 +67,15 @@ export type Settings = {
    */
   melodyOnly?: boolean;
   /**
+   * Top-level accompaniment mode for the choral (SATB) ensemble.
+   * Drives which sub-panel is shown and which engine settings are applied.
+   *   "homophonic"  → block chords, all voices homorhythmic
+   *   "polyphonic"  → four-voice counterpoint, no explicit style picker
+   *   "style"       → style-driven harmonisation; reveals the style sub-dropdown
+   */
+  choralMode?: "homophonic" | "polyphonic" | "style";
+
+  /**
    * Explicit LH accompaniment pattern override for piano accompaniment mode.
    * When set, bypasses the auto-selection based on style + time signature.
    * "auto" means let the engine decide.
