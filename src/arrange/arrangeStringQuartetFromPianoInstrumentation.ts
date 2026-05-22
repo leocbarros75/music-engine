@@ -164,22 +164,191 @@ export function scoreHasPianoPart(score: any): boolean {
   return findPianoPart(score as ScoreModel) !== null;
 }
 
+// ── SA/TB Choral format detection ────────────────────────────────────────────
+// Handles scores where SA voices share one treble staff and TB voices share
+// one bass staff, with top/bottom notes at each onset representing each voice.
+type SaTbParts = { sa: PartLike; tb: PartLike };
+
+function findSaTbParts(score: ScoreModel): SaTbParts | null {
+  const parts = (score.parts ?? []) as PartLike[];
+  if (parts.length < 2) return null;
+
+  // 1. Explicit name detection — common SA/TB naming conventions
+  const matchesAny = (p: any, keywords: string[]) =>
+    keywords.some(k => String(p?.name ?? "").toLowerCase().includes(k));
+
+  const saByName = parts.find(p =>
+    matchesAny(p, ["sa", "s/a", "sop/alt", "soprano/alto", "treble", "women", "upper"])
+  ) ?? null;
+  const tbByName = parts.find(p =>
+    matchesAny(p, ["tb", "t/b", "ten/bas", "tenor/bass", "men", "lower"]) &&
+    p !== saByName
+  ) ?? null;
+  if (saByName && tbByName) return { sa: saByName, tb: tbByName };
+
+  // 2. Fallback: exactly 2 non-piano parts where at least one has chord notes
+  //    (≥2 notes at the same onset — typical SA/TB piano-reduction format)
+  if (parts.length === 2) {
+    const hasChordNotes = (p: PartLike) =>
+      (p?.measures ?? []).some((m: any) => {
+        const notes = (m?.events ?? []).filter((e: any) => e?.type === "note");
+        const onsets = new Map<string, number>();
+        for (const n of notes) {
+          const k = onsetKey(Number(n?.t));
+          onsets.set(k, (onsets.get(k) ?? 0) + 1);
+        }
+        return [...onsets.values()].some(v => v >= 2);
+      });
+    if (hasChordNotes(parts[0]) || hasChordNotes(parts[1])) {
+      return { sa: parts[0], tb: parts[1] };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Copy one SA or TB choral part into two string parts (straight pitch-split).
+ * At each onset:
+ *   - 1 note  : both top and bottom parts receive it (unison)
+ *   - 2 notes : top → topPart; bottom → bottomPart
+ *   - 3+ notes: top → topPart; bottom + inner notes (as chord additions) → bottomPart
+ * No transposition or range clamping — "copy as-is" per user requirement.
+ */
+function splitChoralPartToStringPair(
+  srcMeasures: MeasureLike[],
+  topPart: PartLike,
+  bottomPart: PartLike
+): void {
+  for (let mi = 0; mi < srcMeasures.length; mi++) {
+    const srcMeasure = srcMeasures[mi] ?? {};
+    const srcEvents = (srcMeasure.events ?? []).filter((e: any) => e?.type === "note");
+    const topM = topPart.measures[mi];
+    const botM = bottomPart.measures[mi];
+    if (!topM || !botM) continue;
+
+    // Group by onset
+    const byOnset = new Map<string, EventLike[]>();
+    for (const ev of srcEvents) {
+      const t = Number(ev?.t);
+      if (!Number.isFinite(t)) continue;
+      const key = onsetKey(t);
+      const bucket = byOnset.get(key) ?? [];
+      bucket.push(ev);
+      byOnset.set(key, bucket);
+    }
+
+    // Process onsets in time order
+    const sortedOnsets = [...byOnset.entries()].sort(
+      (a, b) => parseFloat(a[0]) - parseFloat(b[0])
+    );
+
+    for (const [, events] of sortedOnsets) {
+      // Sort notes high→low by MIDI pitch
+      const sorted = events
+        .map(ev => ({ ev, midi: eventMidi(ev) }))
+        .filter((x): x is { ev: EventLike; midi: number } => x.midi !== null)
+        .sort((a, b) => b.midi - a.midi);
+
+      if (sorted.length === 0) continue;
+
+      const topNote = sorted[0]!;
+      const botNote = sorted[sorted.length - 1]!;
+
+      // Top note → top part (straight copy, voice 1, staff 1)
+      const topEv = { ...clone(topNote.ev), voice: 1, staff: 1 };
+      topM.events.push(topEv);
+
+      if (sorted.length === 1) {
+        // Single note: both parts play it
+        botM.events.push({ ...clone(topNote.ev), voice: 1, staff: 1 });
+      } else {
+        // Bottom note → bottom part
+        const botEv = { ...clone(botNote.ev), voice: 1, staff: 1 };
+        botM.events.push(botEv);
+
+        // Any inner notes → chord additions on bottom part
+        for (let i = sorted.length - 2; i >= 1; i--) {
+          const innerEv = { ...clone(sorted[i]!.ev), voice: 1, staff: 1, chord: true };
+          botM.events.push(innerEv);
+        }
+      }
+    }
+  }
+}
+
+/** Build a new empty part whose measure structure (number, attributes) mirrors src. */
+function makePartFromSource(
+  partId: string,
+  name: string,
+  instrument: string,
+  srcMeasures: MeasureLike[]
+): PartLike {
+  return {
+    part_id: partId,
+    name,
+    instrument,
+    staves: 1,
+    measures: srcMeasures.map((m, i) => ({
+      number: Number(m?.number ?? i + 1),
+      ...(m?.attributes ? { attributes: clone(m.attributes) } : {}),
+      events: [] as EventLike[]
+    }))
+  };
+}
+
+/** Arrange SA/TB choral score → string quartet: SA top→V1, SA bottom→V2, TB top→VA, TB bottom→VC. */
+function arrangeSaTbChoralToStringQuartet(
+  score: ScoreModel,
+  choralParts: SaTbParts,
+  options: ArrangeOptions
+): ScoreModel {
+  const { sa, tb } = choralParts;
+  const saMeasures = (sa?.measures ?? []) as MeasureLike[];
+  const tbMeasures = (tb?.measures ?? []) as MeasureLike[];
+
+  const violin1 = makePartFromSource("P_V1", "Violin I",  "violin_1", saMeasures);
+  const violin2 = makePartFromSource("P_V2", "Violin II", "violin_2", saMeasures);
+  const viola   = makePartFromSource("P_VA", "Viola",     "viola",    tbMeasures);
+  const cello   = makePartFromSource("P_VC", "Cello",     "cello",    tbMeasures);
+
+  splitChoralPartToStringPair(saMeasures, violin1, violin2);
+  splitChoralPartToStringPair(tbMeasures, viola,   cello);
+
+  warn(
+    options.warnings,
+    "[strings] SA/TB choral copy applied: SA high→Violin I, SA low→Violin II, TB high→Viola, TB low→Cello."
+  );
+
+  return {
+    ...(score as any),
+    meta: { ...(score as any).meta, ensemble: "satb_string_quartet" },
+    parts: [violin1, violin2, viola, cello],
+  } as ScoreModel;
+}
+
 /**
  * Dedicated SATB → String Quartet copy.
- * Maps S→Violin I, A→Violin II, T→Viola, B→Cello.
- * Clamps notes to each instrument's absolute range.
+ * Handles three input formats automatically:
+ *   1. SA/TB choral (2 parts with chord notes): SA top→V1, SA bottom→V2, TB top→VA, TB bottom→VC
+ *   2. Four separate parts (Soprano/Alto/Tenor/Bass): direct clone S→V1, A→V2, T→VA, B→VC
+ * Straight copy — no transposition, no arrangement.
  * Exported for the "satb_string_quartet" ensemble.
  */
 export function arrangeSatbToStringQuartetDirect(
   score: any,
   options: ArrangeOptions = {}
 ): any {
+  // Priority 1: SA/TB choral format (2 parts with top/bottom voices as chord notes)
+  const saTb = findSaTbParts(score as ScoreModel);
+  if (saTb) return arrangeSaTbChoralToStringQuartet(score as ScoreModel, saTb, options);
+
+  // Priority 2: four separate SATB parts
   const satb = findSatbParts(score as ScoreModel);
-  if (!satb) {
-    warn(options.warnings, "[strings] SATB → String Quartet: no SATB parts found; returning original score.");
-    return score;
-  }
-  return arrangeSatbToStringQuartet(score as ScoreModel, satb, options);
+  if (satb) return arrangeSatbToStringQuartet(score as ScoreModel, satb, options);
+
+  warn(options.warnings, "[strings] SATB → String Quartet: no SATB or SA/TB parts found; returning original score.");
+  return score;
 }
 
 function findPianoPart(score: ScoreModel): PartLike | null {
