@@ -24,6 +24,7 @@ import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble
 import { mapPianoToBrassEnsembleOpen } from "../arrange/mapToBrassEnsemble";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 import { resolveChoralProfile } from "../harmonize/satb/choralStyleProfiles";
+import { preserveFinalMeasuresRhythm } from "../rhythm/preserveFinalMeasuresRhythm";
 
 export type AppSettings = {
   title?: string;
@@ -1672,6 +1673,8 @@ export function applyAppSettings(
   // grand staff: soprano+alto on treble, tenor+bass on bass.
   const wantsPianoChoral = wantsPiano && useHomorhythmic;
   if (wantsPianoChoral) {
+    // Lock last 2 measures of A/T/B to the soprano rhythm before stacking onto grand staff
+    preserveFinalMeasuresRhythm(scoreModel, 2, warnings);
     const finalScore = arrangePianoFromSatb(scoreModel, {
       warnings,
       choralHymn: true
@@ -1823,6 +1826,8 @@ export function applyAppSettings(
       warnings.push("[rhythm] Homophonic accompaniment: copied melody rhythm to inner voices and Bass.");
     }
     enforceBassToChords(scoreModel, chords, warnings, { useMelodyRhythm: true });
+    // Ensure last 2 measures are strictly homorhythmic even if chord-lock shifted any notes
+    preserveFinalMeasuresRhythm(scoreModel, 2, warnings);
     const finalScore = wantsPiano
       ? arrangePianoFromSatb(scoreModel, {
           level: settings.level,
@@ -1988,6 +1993,13 @@ export function applyAppSettings(
   if (!pianoBeginnerApplied && !wantsStrings) {
     enforceBassToChords(scoreModel, chords, warnings, { useMelodyRhythm: useMelodyRhythmForBass });
   }
+
+  // ── Homorhythmic cadence: lock last 2 measures to soprano rhythm ───────────
+  // Regardless of what rhythm the counter-point functions applied to A/T/B,
+  // the final 2 measures must match the original melody — standard SATB rule.
+  preserveFinalMeasuresRhythm(scoreModel, 2, warnings);
+  // ─────────────────────────────────────────────────────────────────────────
+
   const finalScore = wantsPiano
     ? arrangePianoFromSatb(scoreModel, {
         level: settings.level,
