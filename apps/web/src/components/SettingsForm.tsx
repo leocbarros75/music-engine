@@ -808,6 +808,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
             );
           })()}
 
+          {/* Style — hidden for Piano Choral Homophonic (no effect there; hymn texture is fixed) */}
+          {(pianoAccomp === "polyphonic" || pianoMode === "accompaniment") && (
           <div className="field">
             <label>Style</label>
             <select
@@ -832,8 +834,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </span>
             </div>
           </div>
+          )}
 
-          {settings.style === "modern" && (
+          {settings.style === "modern" && (pianoAccomp === "polyphonic" || pianoMode === "accompaniment") && (
             <div className="field">
               <label>Modern Sub-mode</label>
               <select

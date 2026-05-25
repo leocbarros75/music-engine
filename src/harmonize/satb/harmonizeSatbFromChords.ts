@@ -24,6 +24,8 @@ type HarmonizeOptions = {
   forceRootInBass?: boolean; // default true
   tenorRangeOverride?: Range;
   tenorMinOverride?: number;
+  /** Raise the bass range floor (MIDI). Used for piano choral to keep LH hand span playable. */
+  bassMinOverride?: number;
   accompanimentType?: string;
   styleProfile?: string;
   modernMode?: string;
@@ -994,6 +996,13 @@ export function harmonizeSatbFromChords(
     tenorRange.min = Math.max(tenorRange.min, Math.round(options.tenorMinOverride));
     if (tenorRange.min > tenorRange.max) tenorRange.min = tenorRange.max;
   }
+  // Optionally raise the bass floor (e.g. for piano choral where a low bass + high tenor
+  // creates an unplayable LH stretch).  Never lowers the floor or changes the ceiling.
+  const bassRange: Range = { ...RANGES.Bass };
+  if (typeof options.bassMinOverride === "number" && Number.isFinite(options.bassMinOverride)) {
+    bassRange.min = Math.max(bassRange.min, Math.round(options.bassMinOverride));
+    if (bassRange.min > bassRange.max) bassRange.min = bassRange.max;
+  }
   const measuresTemplate = (soprPart.measures ?? []).map((m: any) => ({
     number: m.number,
     attributes: m.attributes ? { ...m.attributes } : undefined
@@ -1002,7 +1011,7 @@ export function harmonizeSatbFromChords(
     S: { min: soprRange.min, max: soprRange.max },
     A: RANGES.Alto,
     T: tenorRange,
-    B: RANGES.Bass
+    B: bassRange
   };
 
   const lastMeasureNumber = Number(measuresTemplate[measuresTemplate.length - 1]?.number ?? measuresTemplate.length);
@@ -1216,7 +1225,7 @@ export function harmonizeSatbFromChords(
             voice: "Bass",
             chordPcs,
             targetMidi: bassTarget,
-            range: RANGES.Bass,
+            range: bassRange,
             belowMidi: soprMidi,
             preferPc: bassPcPref,
             restrictToPreferPc: lockBassToPref,
@@ -1228,7 +1237,7 @@ export function harmonizeSatbFromChords(
                 voice: "Bass",
                 chordPcs,
                 targetMidi: bassTarget,
-                range: RANGES.Bass,
+                range: bassRange,
                 preferPc: bassPcPref,
                 restrictToPreferPc: false,
                 extraPenalty: bassExtraPenalty
@@ -1238,7 +1247,7 @@ export function harmonizeSatbFromChords(
             voice: "Bass",
             chordPcs,
             targetMidi: bassTarget,
-            range: RANGES.Bass,
+            range: bassRange,
             preferPc: bassPcPref,
             restrictToPreferPc: false,
             extraPenalty: bassExtraPenalty
@@ -1634,7 +1643,7 @@ export function harmonizeSatbFromChords(
             parsedChord: parsed,
             soprMidi,
             prev: { prevA, prevT, prevB, prevS },
-            ranges: { Bass: RANGES.Bass, Tenor: tenorRange, Alto: RANGES.Alto },
+            ranges: { Bass: bassRange, Tenor: tenorRange, Alto: RANGES.Alto },
             options: { forceRootInBass, allowOctaveShift: true, allowTenorAltoUnisonD4: true },
             targets: { bassTarget, tenorTarget, altoTarget },
             context: { measure: measureNumber, t }
@@ -1682,7 +1691,7 @@ export function harmonizeSatbFromChords(
               voice: "Bass",
               chordPcs,
               targetMidi: bassTarget,
-              range: RANGES.Bass
+              range: bassRange
             }) ?? bassTarget;
           if (bassPitchSpelling && pcFromSpelling(bassPitchSpelling) !== pc(bassMidi)) {
             bassPitchSpelling = null;
@@ -1803,7 +1812,7 @@ export function harmonizeSatbFromChords(
         prevMidi: prevB,
         currMidi: bassMidi,
         scalePcs,
-        range: RANGES.Bass,
+        range: bassRange,
         nextPos,
         measureNumber,
         t,

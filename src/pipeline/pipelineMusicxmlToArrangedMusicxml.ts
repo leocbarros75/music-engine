@@ -118,6 +118,12 @@ export function pipelineMusicxmlToArrangedMusicxml(
     }
     if (accompanimentLower === "homophonic") {
       harmOpts.tenorRangeOverride = { min: 57, max: 62 };
+      // Piano Choral Homophonic: raise bass floor to C3 so the left-hand span
+      // (tenor + bass on staff 2) stays within a comfortable major 9th for most pianists.
+      // Non-piano homophonic (choral ensemble) keeps the full E2-A3 bass range.
+      if (textureMode === "homophony_homorhythmic") {
+        harmOpts.bassMinOverride = 48; // C3
+      }
     }
     if (accompanimentLower === "polyphonic") {
       if (!harmOpts.styleProfile) {
