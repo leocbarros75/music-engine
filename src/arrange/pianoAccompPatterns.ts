@@ -14,6 +14,12 @@
  *                        Ascending root-3rd-5th-oct arpeggio per beat in 16th notes
  *   "waltz_bass"       — Classic 3/4 waltz texture (root on 1, chord on 2+3)
  *
+ * Patterns added from "Pop Ballad Accompaniment" (Ron Drotos / keyboardimprov.com):
+ *   "pop_arpeggio"     — Lessons 4: 8th-note rolling arpeggio root→5th→oct→5th cycling
+ *   "walking_bass"     — Lessons 12, 14: chromatic walking bass, quarter notes, approaches
+ *                        next chord root chromatically on the final beat
+ *   "pedal_bass"       — Lesson 13: root sustained as whole note (Elton John pedal-tone style)
+ *
  * All patterns handle mid-measure chord changes automatically: the active chord
  * is looked up at the start of each pattern group (Alberti group, beat, etc.)
  * using carry-forward from the nearest preceding chord symbol.
@@ -79,7 +85,30 @@ export type LhPatternId =
    *     12/8 → 4 groups, 6/8 → 2 groups, 9/8 → 3 groups
    *   Creates the characteristic rolling compound-time texture of Romantic nocturnes.
    */
-  | "nocturne";
+  | "nocturne"
+  /**
+   * Pop Ballad rolling 8th-note arpeggio (Ron Drotos Lesson 4):
+   *   8th notes cycling root→5th→oct→5th throughout the measure.
+   *   Smoother than broken_ascending (8ths vs 16ths); characteristic of pop piano LH.
+   *   In 4/4: 8 eighth notes = 2 full cycles. In 3/4: 6 eighths = 1.5 cycles.
+   */
+  | "pop_arpeggio"
+  /**
+   * Walking bass with chromatic approach (Ron Drotos Lessons 12, 14):
+   *   Quarter-note bass line walking through chord tones: root→3rd→5th→approach.
+   *   Final beat uses a chromatic approach note (one semitone below/above) leading
+   *   toward the next measure's chord root. Creates the melodic "walking" feel
+   *   characteristic of pop ballad and gospel bass lines.
+   */
+  | "walking_bass"
+  /**
+   * Pedal tone (sustained root) — Ron Drotos Lesson 13 / Elton John style:
+   *   Root note sustained as a whole note for the entire measure.
+   *   While the LH holds still, the RH can move through neighbor/passing chords
+   *   (e.g., C → F/C → C with bass pedaling on C throughout).
+   *   Creates the spacious, open quality of Elton John / gospel piano ballads.
+   */
+  | "pedal_bass";
 
 export type LhPatternOptions = {
   chords: Array<{ measure: number; t: number; symbol: string }>;
@@ -573,6 +602,122 @@ function buildNocturne(
   return events;
 }
 
+/**
+ * POP BALLAD ARPEGGIO (Ron Drotos Lesson 4)
+ *
+ * Rolling 8th-note LH arpeggio cycling: root→5th→oct→5th
+ * Smoother feel than broken_ascending (8ths vs 16ths, fewer subdivisions per beat).
+ *
+ * 4/4: 8 eighth notes = 2 full root→5th→oct→5th cycles.
+ * 3/4: 6 eighth notes = 1.5 cycles (ends on oct after the 2nd loop).
+ */
+function buildPopArpeggio(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  voice: number,
+  staff: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const noteDur = 0.5; // eighth note
+  const totalEighths = Math.round(measureBeats / noteDur);
+
+  for (let i = 0; i < totalEighths; i++) {
+    const t = i * noteDur;
+    const v = getVoices(t);
+    if (!v) continue;
+    const cycle = [v.bass, v.high, v.bass + 12, v.high] as const; // root→5th→oct→5th
+    events.push(
+      makeNote(cycle[i % 4]!, t, noteDur, voice, staff, `lh-parp-${mNum}-${t.toFixed(3)}-${i}`)
+    );
+  }
+  return events;
+}
+
+/**
+ * WALKING BASS with chromatic approach (Ron Drotos Lessons 12, 14)
+ *
+ * Quarter-note bass line walking through chord tones:
+ *   beat 1: root
+ *   beat 2: 3rd
+ *   beat 3: 5th
+ *   beat 4: chromatic approach note toward next chord's root (one semitone below/above)
+ *           Falls back to 5th if no next chord is available or chord doesn't change.
+ *
+ * In 3/4: root → 3rd → approach (3 beats).
+ * Looks ahead to next measure using the full chords array.
+ */
+function buildWalkingBass(
+  getVoices: (t: number) => ChordVoices | null,
+  chords: Array<{ measure: number; t: number; symbol: string }>,
+  measureNumber: number,
+  measureBeats: number,
+  bassMin: number,
+  bassMax: number,
+  voice: number,
+  staff: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const beats = Math.round(measureBeats);
+  const walkSeq = (v: ChordVoices) => [v.bass, v.mid, v.high, v.bass + 12]; // root→3rd→5th→oct
+
+  for (let b = 0; b < beats; b++) {
+    const v = getVoices(b);
+    if (!v) continue;
+
+    const isLastBeat = b === beats - 1;
+    let midi: number;
+
+    if (!isLastBeat) {
+      // Walk through chord tones: root(0)→3rd(1)→5th(2)→oct(3)→…
+      const seq = walkSeq(v);
+      midi = seq[b % 4] ?? v.bass;
+    } else {
+      // Final beat: chromatic approach toward next chord root
+      const nextSym = pickChordAt(chords, measureNumber + 1, 0);
+      if (nextSym) {
+        const nextV = chordVoicesInRange(nextSym, bassMin, bassMax);
+        if (nextV && nextV.bass !== v.bass) {
+          // One semitone in the direction of the next root
+          const diff = nextV.bass - v.bass;
+          midi = diff > 0 ? nextV.bass - 1 : nextV.bass + 1;
+          // Clamp to bass range
+          midi = Math.max(bassMin, Math.min(bassMax, midi));
+        } else {
+          midi = v.high; // same chord or parse failure → 5th
+        }
+      } else {
+        midi = v.high; // no next chord info → 5th
+      }
+    }
+
+    events.push(makeNote(midi, b, 1, voice, staff, `lh-wlk-${mNum}-${b}`));
+  }
+  return events;
+}
+
+/**
+ * PEDAL BASS — sustained root (Ron Drotos Lesson 13 / Elton John style)
+ *
+ * Root note held as a whole note for the entire measure.
+ * Creates the spacious, open quality of Elton John / gospel ballads where the LH
+ * holds still while the RH moves through neighbor chords (e.g., C → F/C → C).
+ *
+ * Works in any time signature; always one note per measure.
+ */
+function buildPedalBass(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  voice: number,
+  staff: number,
+  mNum: number
+): NoteEvent[] {
+  const v = getVoices(0);
+  if (!v) return [];
+  return [makeNote(v.bass, 0, measureBeats, voice, staff, `lh-ped-${mNum}-0`)];
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 /**
@@ -648,6 +793,18 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
     case "nocturne":
       return buildNocturne(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
 
+    case "pop_arpeggio":
+      return buildPopArpeggio(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
+
+    case "walking_bass":
+      return buildWalkingBass(
+        getVoices, chords, measureNumber, measureBeats,
+        bassMin, bassMax, LH_VOICE, LH_STAFF, measureNumber
+      );
+
+    case "pedal_bass":
+      return buildPedalBass(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
+
     default:
       warnings.push(`[accomp] Unknown LH pattern "${lhPattern as string}" — no notes generated`);
       return [];
@@ -701,7 +858,16 @@ export type RhPatternId =
    *   into piano staff 1 voice 1, and no separate Melody part is created.
    *   generateRhPattern returns [] for this value.
    */
-  | "melody_only";
+  | "melody_only"
+  /**
+   * Dotted ballad — 3+1 dotted-quarter + 8th groupings (Ron Drotos Lesson 15).
+   *   Per 2-beat group: chord(dotted quarter, 1.5 beats) + chord(8th, 0.5 beats).
+   *   The short 8th hit falls on the "and of beat 2" (or "and of beat 4"), creating
+   *   the signature forward-leaning rhythmic feel of Elton John's "Your Song" and
+   *   similar pop ballad piano accompaniments.
+   *   In 4/4: 2 groups; in 3/4: 1 group (2 beats) + 1 quarter (beat 3).
+   */
+  | "dotted_ballad";
 
 export type RhPatternOptions = {
   chords: Array<{ measure: number; t: number; symbol: string }>;
@@ -867,6 +1033,63 @@ function buildRhArpeggio(
   return events;
 }
 
+/**
+ * RH DOTTED BALLAD — Elton John / "Your Song" feel (Ron Drotos Lesson 15)
+ *
+ * 3+1 subdivision: dotted quarter (1.5 beats) + 8th (0.5 beats) per 2-beat group.
+ * The short 8th hit lands on the "and of beat 2" (t=1.5) and "and of beat 4" (t=3.5),
+ * creating the characteristic forward-leaning, guitar-strum feel of pop ballad piano.
+ *
+ * Per group (2 beats):
+ *   tGroup + 0.0: mid+high chord (dotted quarter, 1.5 beats)
+ *   tGroup + 1.5: mid+high chord (8th, 0.5 beats)
+ *
+ * 4/4: 2 complete groups.
+ * 3/4: 1 complete group (2 beats) + remainder quarter on beat 3.
+ *
+ * Uses mid+high only — root lives in the LH pedal or walking bass.
+ */
+function buildRhDottedBallad(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V = 1, S = 1;
+
+  const numGroups = Math.floor(measureBeats / 2);
+
+  for (let g = 0; g < numGroups; g++) {
+    const tGroup = g * 2;
+
+    // Dotted quarter hit (1.5 beats)
+    const v0 = getVoices(tGroup);
+    if (v0) {
+      events.push(makeNote(v0.mid,  tGroup,       1.5, V, S, `rh-db-${mNum}-${g}-m0`));
+      events.push(makeNote(v0.high, tGroup,       1.5, V, S, `rh-db-${mNum}-${g}-h0`));
+    }
+    // 8th note hit — "and of beat 2" / "and of beat 4"
+    const v1 = getVoices(tGroup + 1.5);
+    if (v1) {
+      events.push(makeNote(v1.mid,  tGroup + 1.5, 0.5, V, S, `rh-db-${mNum}-${g}-m1`));
+      events.push(makeNote(v1.high, tGroup + 1.5, 0.5, V, S, `rh-db-${mNum}-${g}-h1`));
+    }
+  }
+
+  // Remainder beat(s) after last complete group (e.g., beat 3 in 3/4)
+  const remainStart = numGroups * 2;
+  if (remainStart < measureBeats - 1e-6) {
+    const vR = getVoices(remainStart);
+    if (vR) {
+      const remainDur = measureBeats - remainStart;
+      events.push(makeNote(vR.mid,  remainStart, remainDur, V, S, `rh-db-${mNum}-rem-m`));
+      events.push(makeNote(vR.high, remainStart, remainDur, V, S, `rh-db-${mNum}-rem-h`));
+    }
+  }
+
+  return events;
+}
+
 // ─── RH main export ───────────────────────────────────────────────────────────
 
 /**
@@ -911,6 +1134,8 @@ export function generateRhPattern(options: RhPatternOptions): NoteEvent[] {
       return buildRhSyncopated(getRhVoices, measureBeats, measureNumber);
     case "arpeggio":
       return buildRhArpeggio(getRhVoices, measureBeats, measureNumber);
+    case "dotted_ballad":
+      return buildRhDottedBallad(getRhVoices, measureBeats, measureNumber);
     case "melody_only":
       return []; // melody is placed in piano RH by the caller; nothing extra needed
     default:

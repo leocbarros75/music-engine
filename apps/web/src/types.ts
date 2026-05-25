@@ -92,7 +92,10 @@ export type Settings = {
     | "interval_oscillation"
     | "jazz_shell"
     | "octave_bass"
-    | "nocturne";
+    | "nocturne"
+    | "pop_arpeggio"
+    | "walking_bass"
+    | "pedal_bass";
   /**
    * Explicit RH pattern for piano accompaniment mode.
    * "block_beats"        — full block chord every beat
@@ -108,7 +111,8 @@ export type Settings = {
     | "melody_fill_eighths"
     | "syncopated"
     | "arpeggio"
-    | "melody_only";
+    | "melody_only"
+    | "dotted_ballad";
 };
 
 export type JobResult = {

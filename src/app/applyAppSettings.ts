@@ -1727,6 +1727,7 @@ export function applyAppSettings(
       "alberti", "block_beats", "boom_chick", "broken_ascending", "waltz_bass",
       "serenade_strum", "root_chord_stabs", "interval_oscillation",
       "jazz_shell", "octave_bass", "nocturne",
+      "pop_arpeggio", "walking_bass", "pedal_bass",
     ]);
     const explicitPattern = settings.lhPattern && settings.lhPattern !== "auto"
       ? (VALID_LH_PATTERNS.has(settings.lhPattern as LhPatternId) ? settings.lhPattern as LhPatternId : null)
@@ -1751,7 +1752,9 @@ export function applyAppSettings(
       lhPattern = "waltz_bass";                 // classic root-1 / chord-2+3
     } else if (styleRaw === "baroque" || styleRaw === "romantic") {
       lhPattern = "root_chord_stabs";           // dramatic root + chord blocks
-    } else if (styleRaw === "worship" || styleRaw === "contemporary" || styleRaw === "pop") {
+    } else if (styleRaw === "pop") {
+      lhPattern = "walking_bass";               // pop ballad walking bass (Drotos Lessons 12, 14)
+    } else if (styleRaw === "worship" || styleRaw === "contemporary") {
       lhPattern = "boom_chick";                 // boom-chick pattern
     } else {
       lhPattern = "alberti";                    // classical default (K.545 style)
@@ -1776,7 +1779,7 @@ export function applyAppSettings(
     // a long-note family (boom_chick, block_beats, jazz_shell, octave_bass).
     const FAST_TEMPO_THRESHOLD = 144;
     const FIGURATION_PATTERNS = new Set<LhPatternId>([
-      "alberti", "broken_ascending", "interval_oscillation", "nocturne",
+      "alberti", "broken_ascending", "interval_oscillation", "nocturne", "pop_arpeggio",
     ]);
     if (
       !explicitPattern &&
@@ -1797,16 +1800,18 @@ export function applyAppSettings(
     //   homophonic       → melody_inner_voice  (default — polyphonic feel for accompaniment)
     const VALID_RH_PATTERNS = new Set([
       "block_beats", "melody_inner_voice", "melody_fill_eighths",
-      "syncopated", "arpeggio", "melody_only",
+      "syncopated", "arpeggio", "melody_only", "dotted_ballad",
     ]);
     const userRhPattern = settings.rhPattern && VALID_RH_PATTERNS.has(settings.rhPattern)
       ? settings.rhPattern as import("../arrange/pianoAccompPatterns").RhPatternId
       : null;
     const rhPatternAuto =
       userRhPattern ?? (
-        (isWaltz || lhPattern === "serenade_strum" || lhPattern === "nocturne")
-          ? "melody_fill_eighths" as const
-          : "melody_inner_voice" as const
+        styleRaw === "pop"
+          ? "dotted_ballad" as const               // Elton John / pop ballad 3+1 feel
+          : (isWaltz || lhPattern === "serenade_strum" || lhPattern === "nocturne")
+            ? "melody_fill_eighths" as const
+            : "melody_inner_voice" as const
       );
 
     const finalScore = arrangePianoFromSatb(scoreModel, {
