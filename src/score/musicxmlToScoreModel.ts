@@ -66,10 +66,15 @@ export function musicxmlToScoreModel(xml: string): ScoreModel {
           : undefined;
 
       const notesXml = asArray(mXml["note"]);
-let t = 0;
 
-// For <chord/> notes: they share the same onset as the previous note
-let lastOnset = 0;
+// Per-voice time cursors — each MusicXML voice is an independent time stream.
+// This correctly handles <backup>/<forward> implicit resets: when Dorico (or any
+// notation app) writes a grand-staff piano, it encodes voice 1 (RH staff 1), then
+// emits <backup> and encodes voice 2 (LH staff 2). Because fast-xml-parser ignores
+// <backup>, using a single shared cursor pushed LH notes past the measure boundary.
+// Independent per-voice cursors make <backup> irrelevant — each voice starts at 0.
+const voiceCursors    = new Map<number, number>(); // voice → next onset
+const voiceLastOnset  = new Map<number, number>(); // voice → last non-chord onset
 
 const events: NoteEvent[] = notesXml.map((nXml: any, idx: number) => {
   const dur = nXml["duration"] != null ? Number(nXml["duration"]) : 0;
@@ -79,8 +84,12 @@ const events: NoteEvent[] = notesXml.map((nXml: any, idx: number) => {
   const isRest = nXml["rest"] != null;
   const isChordTone = nXml["chord"] != null;
 
-  // onset: if chord tone, do NOT advance time
-  const onset = isChordTone ? lastOnset : t;
+  // Each voice has its own independent onset cursor
+  const vt         = voiceCursors.get(voice) ?? 0;
+  const vLastOnset = voiceLastOnset.get(voice) ?? 0;
+
+  // onset: chord tones share the previous note's onset within the same voice
+  const onset = isChordTone ? vLastOnset : vt;
 
   const id = makeId(`P${part_id}_M${number}_N${idx}`);
 
@@ -104,10 +113,10 @@ const events: NoteEvent[] = notesXml.map((nXml: any, idx: number) => {
     }
   }
 
-  // update lastOnset and time cursor
+  // Advance this voice's cursor (chord tones do not advance it)
   if (!isChordTone) {
-    lastOnset = onset;
-    t += dur;
+    voiceLastOnset.set(voice, onset);
+    voiceCursors.set(voice, vt + dur);
   }
   return ev;
 });
