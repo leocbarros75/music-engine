@@ -680,7 +680,28 @@ export type RhPatternId =
    *   Smooth, flowing line that connects chords like a flowing inner register.
    * Best for: ballad, lyrical 3/4, romantic accompaniment.
    */
-  | "melody_fill_eighths";
+  | "melody_fill_eighths"
+  /**
+   * Syncopated offbeat chord hits.
+   *   Mid + high chord tones on the "and" of each beat (8th-note upbeats).
+   *   Produces the characteristic syncopated piano feel of pop / gospel / light jazz.
+   *   No notes on the downbeats — the LH bass provides the metric anchor.
+   */
+  | "syncopated"
+  /**
+   * Ascending arpeggio per beat (treble range).
+   *   Each beat: root(16th) → 3rd(16th) → 5th(16th) → root+oct(16th).
+   *   Creates a flowing broken-chord texture across the whole measure.
+   *   Best for: romantic, classical, ballad, through-composed passages.
+   */
+  | "arpeggio"
+  /**
+   * Melody only — piano RH carries just the melody; no chord accompaniment.
+   *   Handled externally by arrangePianoFromSatb: the melody notes are copied
+   *   into piano staff 1 voice 1, and no separate Melody part is created.
+   *   generateRhPattern returns [] for this value.
+   */
+  | "melody_only";
 
 export type RhPatternOptions = {
   chords: Array<{ measure: number; t: number; symbol: string }>;
@@ -793,6 +814,59 @@ function buildRhMelodyFillEighths(
   return events;
 }
 
+/**
+ * RH SYNCOPATED — offbeat chord hits on the "and" of every beat.
+ *
+ * Only fires on odd 8th-note positions (t = 0.5, 1.5, 2.5 …).
+ * The downbeat rests let the LH bass articulate the metric pulse cleanly.
+ * Mid + high chord tones only (no root — root lives in the LH bass).
+ */
+function buildRhSyncopated(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V = 1, S = 1;
+  const noteDur = 0.5; // 8th note
+  const totalEighths = Math.round(measureBeats / noteDur);
+  for (let i = 0; i < totalEighths; i++) {
+    if (i % 2 === 0) continue; // skip downbeats — fire only on offbeats
+    const t = i * noteDur;
+    const v = getVoices(t);
+    if (!v) continue;
+    events.push(makeNote(v.mid,  t, noteDur, V, S, `rh-syn-${mNum}-${i}-m`));
+    events.push(makeNote(v.high, t, noteDur, V, S, `rh-syn-${mNum}-${i}-h`));
+  }
+  return events;
+}
+
+/**
+ * RH ARPEGGIO — ascending 16th-note broken chord per beat (treble range).
+ *
+ * Each beat: root(16th) → 3rd(16th) → 5th(16th) → root+octave(16th).
+ * Re-reads the chord on each beat to handle mid-measure changes.
+ * Best for: romantic, classical, ballad, long-note melody passages.
+ */
+function buildRhArpeggio(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V = 1, S = 1;
+  const noteDur = 0.25; // 16th note
+  for (let b = 0; b < Math.round(measureBeats); b++) {
+    const v = getVoices(b);
+    if (!v) continue;
+    const seq = [v.bass, v.mid, v.high, v.bass + 12] as const;
+    for (let i = 0; i < 4; i++) {
+      events.push(makeNote(seq[i]!, b + i * noteDur, noteDur, V, S, `rh-arp-${mNum}-${b}-${i}`));
+    }
+  }
+  return events;
+}
+
 // ─── RH main export ───────────────────────────────────────────────────────────
 
 /**
@@ -833,8 +907,14 @@ export function generateRhPattern(options: RhPatternOptions): NoteEvent[] {
       return buildRhMelodyInnerVoice(getRhVoices, measureBeats, measureNumber);
     case "melody_fill_eighths":
       return buildRhMelodyFillEighths(getRhVoices, measureBeats, measureNumber);
+    case "syncopated":
+      return buildRhSyncopated(getRhVoices, measureBeats, measureNumber);
+    case "arpeggio":
+      return buildRhArpeggio(getRhVoices, measureBeats, measureNumber);
+    case "melody_only":
+      return []; // melody is placed in piano RH by the caller; nothing extra needed
     default:
-      warnings.push(`[rh-accomp] Unknown RH pattern "${rhPattern as string}" — falling back to block_beats`);
-      return buildRhBlockBeats(getRhVoices, measureBeats, measureNumber);
+      warnings.push(`[rh-accomp] Unknown RH pattern "${rhPattern as string}" — falling back to melody_inner_voice`);
+      return buildRhMelodyInnerVoice(getRhVoices, measureBeats, measureNumber);
   }
 }

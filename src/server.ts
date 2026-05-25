@@ -643,6 +643,7 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     pianoStylePresetPath: typeof anyRaw.pianoStylePresetPath === "string" ? anyRaw.pianoStylePresetPath : undefined,
     useStringEnsembleArranger: typeof anyRaw.useStringEnsembleArranger === "boolean" ? anyRaw.useStringEnsembleArranger : undefined,
     lhPattern: typeof anyRaw.lhPattern === "string" ? anyRaw.lhPattern : undefined,
+    rhPattern: typeof anyRaw.rhPattern === "string" ? anyRaw.rhPattern : undefined,
     suzukiVolume:
       typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
         ? (anyRaw.suzukiVolume as number)
@@ -705,7 +706,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-05-25-v15" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-05-25-v16" });
       return;
     }
 

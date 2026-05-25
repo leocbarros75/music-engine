@@ -74,6 +74,11 @@ export type AppSettings = {
    */
   lhPattern?: string;
   /**
+   * Explicit RH pattern for piano accompaniment mode.
+   * When set, overrides auto-selection.
+   */
+  rhPattern?: string;
+  /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
    *   "melody_harmony"   — Vln I foreground melody; Vln II + Vla inner harmony; Vc bass; Cb -8va (default)
@@ -1785,16 +1790,24 @@ export function applyAppSettings(
       );
     }
 
+    // RH pattern: user-selected takes priority; fall back to auto-selection.
     // Auto-select RH pattern to match the LH/texture choice:
     //   polyphonic mode  → melody_inner_voice  (2-voice chiming, Worship Example 1 + Example 3)
     //   lyrical/3/4 mode → melody_fill_eighths (ascending broken-chord fill, Example 3/4)
-    //   homophonic       → block_beats         (block chord on every beat, default)
+    //   homophonic       → melody_inner_voice  (default — polyphonic feel for accompaniment)
+    const VALID_RH_PATTERNS = new Set([
+      "block_beats", "melody_inner_voice", "melody_fill_eighths",
+      "syncopated", "arpeggio", "melody_only",
+    ]);
+    const userRhPattern = settings.rhPattern && VALID_RH_PATTERNS.has(settings.rhPattern)
+      ? settings.rhPattern as import("../arrange/pianoAccompPatterns").RhPatternId
+      : null;
     const rhPatternAuto =
-      (usePolyphonic || accompaniment === "polyphonic" || lhPattern === "broken_ascending")
-        ? "melody_inner_voice" as const
-        : (isWaltz || lhPattern === "serenade_strum" || lhPattern === "nocturne")
+      userRhPattern ?? (
+        (isWaltz || lhPattern === "serenade_strum" || lhPattern === "nocturne")
           ? "melody_fill_eighths" as const
-          : "block_beats" as const;
+          : "melody_inner_voice" as const
+      );
 
     const finalScore = arrangePianoFromSatb(scoreModel, {
       warnings,
@@ -1802,6 +1815,9 @@ export function applyAppSettings(
       lhPattern,
       rhPattern: rhPatternAuto,
       polyphonic: usePolyphonic || accompaniment === "polyphonic",
+      // forcePattern: when the user explicitly chose an LH or RH pattern, skip
+      // the Schoenberg density-simplification override so their choice is honoured.
+      forcePattern: !!(explicitPattern || userRhPattern),
     });
     attachTextureAnalysis(finalScore, warnings);
     return {

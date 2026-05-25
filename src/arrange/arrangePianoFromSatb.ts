@@ -45,9 +45,17 @@ type ArrangePianoOptions = {
    *                          source: Piano Worship Example 1 + Example 3)
    *   "melody_fill_eighths"— ascending broken-chord 8th fill (lyrical/romantic,
    *                          source: Example 3 / Example 4)
+   *   "syncopated"         — offbeat chord hits on the 'and' of each beat
+   *   "arpeggio"           — ascending 16th-note arpeggios per beat (treble range)
+   *   "melody_only"        — no piano RH chords; melody becomes piano voice 1 on staff 1
    * Auto-selected when not provided: polyphonic → melody_inner_voice, else → block_beats.
    */
   rhPattern?: RhPatternId;
+  /**
+   * When true, the Schoenberg density-simplification override is suppressed.
+   * Use when the user explicitly chose a pattern — honour it even in ornate measures.
+   */
+  forcePattern?: boolean;
 };
 
 type VoiceMap = {
@@ -2660,15 +2668,18 @@ function buildPianoMelodyAccomp(
     warn(warnings, "[piano:accomp] No chord data available; LH will be empty. Provide chord symbols for accompaniment patterns.");
   }
 
-  const lhPattern = options.lhPattern ?? "alberti";
+  const lhPattern = options.lhPattern ?? "broken_ascending";
+  const forcePattern = options.forcePattern === true;
 
-  // Auto-select RH pattern based on mode:
-  //   polyphonic → melody_inner_voice (2-voice chiming, from Worship Example 1)
-  //   lyrical/3/4 → melody_fill_eighths (ascending broken-chord fill, from Example 3)
-  //   homophonic (default) → block_beats (chord on every beat)
+  // Auto-select RH pattern based on mode.
+  // When the user has explicitly picked a pattern (forcePattern), use it directly.
+  // Default: melody_inner_voice (chiming inner-voice polyphonic feel).
   const isPolyphonic = options.polyphonic === true || options.lhPattern === "broken_ascending";
   const rhPattern: RhPatternId = options.rhPattern
-    ?? (isPolyphonic ? "melody_inner_voice" : "block_beats");
+    ?? (isPolyphonic ? "melody_inner_voice" : "melody_inner_voice");
+
+  // melody_only: piano RH doubles the melody; no separate melody part above piano.
+  const isMelodyOnly = rhPattern === "melody_only";
 
   // ── Melody Part (separate staff above piano) ──────────────────────────────
   // Melody appears on its own part so it renders as a dedicated staff above
@@ -2805,21 +2816,33 @@ function buildPianoMelodyAccomp(
         lhPattern === "serenade_strum" ||
         lhPattern === "octave_bass";
 
-      const activeLhPattern: LhPatternId = simplify && !isWaltzFamily ? "block_beats" : lhPattern;
-      const activeRhPattern: RhPatternId = simplify ? "block_beats" : rhPattern;
+      // Schoenberg override: simplify only when pattern was NOT explicitly chosen by the user.
+      // When forcePattern is true, the user's selection is always honoured verbatim.
+      const activeLhPattern: LhPatternId =
+        (!forcePattern && simplify && !isWaltzFamily) ? "block_beats" : lhPattern;
+      const activeRhPattern: RhPatternId =
+        (!forcePattern && simplify) ? "block_beats" : rhPattern;
 
-      // Staff 1 (treble) — RH inner-voice pattern from chord symbols.
-      // generateRhPattern outputs voice 1 (and optionally voice 2) on staff 1 directly.
-      const rhEvents = generateRhPattern({
-        chords: chordsForArrange,
-        measureNumber: mNum,
-        measureBeats,
-        rhPattern: activeRhPattern,
-        trebleMin: 60, // C4
-        trebleMax: 72, // C5
-        warnings,
-      });
-      evs.push(...rhEvents);
+      // Staff 1 (treble) — RH pattern (chords, arpeggios, inner-voice, etc.)
+      // For melody_only the RH is handled below via melody note copy.
+      if (!isMelodyOnly) {
+        const rhEvents = generateRhPattern({
+          chords: chordsForArrange,
+          measureNumber: mNum,
+          measureBeats,
+          rhPattern: activeRhPattern,
+          trebleMin: 60, // C4
+          trebleMax: 72, // C5
+          warnings,
+        });
+        evs.push(...rhEvents);
+      } else {
+        // melody_only: copy melody notes into piano staff 1 (voice 1) directly
+        const srcEvents = melody.measures?.[i]?.events ?? [];
+        evs.push(
+          ...mapVoiceEvents({ srcEvents, voice: 1, staff: 1, measureNumber: mNum, warnings })
+        );
+      }
 
       // Staff 2 (bass) — generated LH pattern from chord symbols, Voice 4
       const lhEvents = generateLhPattern({
@@ -2839,7 +2862,8 @@ function buildPianoMelodyAccomp(
 
   return {
     ...score,
-    parts: [melodyPart, pianoPart],
+    // melody_only: piano RH carries the melody — no separate vocal/melody staff above.
+    parts: isMelodyOnly ? [pianoPart] : [melodyPart, pianoPart],
     meta: {
       ...score.meta,
       ensemble: "piano",

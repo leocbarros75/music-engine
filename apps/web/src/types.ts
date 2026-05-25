@@ -93,6 +93,22 @@ export type Settings = {
     | "jazz_shell"
     | "octave_bass"
     | "nocturne";
+  /**
+   * Explicit RH pattern for piano accompaniment mode.
+   * "block_beats"        — full block chord every beat
+   * "melody_inner_voice" — chiming inner voice (worship/polyphonic feel)
+   * "melody_fill_eighths"— ascending broken-chord 8th fills (lyrical)
+   * "syncopated"         — offbeat chord hits on the 'and' of each beat
+   * "arpeggio"           — ascending 16th-note arpeggios per beat
+   * "melody_only"        — melody in piano RH, no chord accompaniment
+   */
+  rhPattern?:
+    | "block_beats"
+    | "melody_inner_voice"
+    | "melody_fill_eighths"
+    | "syncopated"
+    | "arpeggio"
+    | "melody_only";
 };
 
 export type JobResult = {

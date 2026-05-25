@@ -283,6 +283,16 @@ const LH_PATTERN_OPTIONS: Array<{ label: string; value: LhPatternValue; help: st
   { value: "nocturne",           label: "Nocturne",                         help: "Compound-beat rolling arpeggio: bass + chord + chord per dotted quarter. Source: Chopin Op.9 No.2, Mendelssohn Op.19 No.3." },
 ];
 
+type RhPatternValue = NonNullable<Settings["rhPattern"]>;
+const RH_PATTERN_OPTIONS: Array<{ label: string; value: RhPatternValue; help: string }> = [
+  { value: "melody_only",        label: "Melody Only",         help: "Piano RH plays just the melody line. All harmony in the LH." },
+  { value: "melody_inner_voice", label: "Inner Voice (Poly.)", help: "Chiming 8th inner voice with harmonic anchor. Best for worship / polyphonic style." },
+  { value: "syncopated",         label: "Syncopated",          help: "Chord hits on the 'and' of each beat — pop / gospel bounce feel." },
+  { value: "arpeggio",           label: "Arpeggio",            help: "Ascending 16th-note broken chord per beat — flowing, romantic texture." },
+  { value: "block_beats",        label: "Block Chords",        help: "Full chord block on every beat — solid harmonic foundation." },
+  { value: "melody_fill_eighths",label: "Fill Eighths",        help: "Ascending broken-chord 8th fills cycling root→3rd→5th→3rd. Lyrical feel." },
+];
+
 const STRICTNESS_OPTIONS: Array<{ label: string; value: Settings["ruleStrictness"]; help: string }> = [
   { label: "Relaxed", value: "relaxed", help: "Warnings only, fewer errors." },
   { label: "Standard", value: "standard", help: "Balanced warnings for most cases." },
@@ -543,52 +553,22 @@ export default function SettingsForm({ settings, onChange }: Props) {
   // ───────────────────────────────────────────────────────────────────────────
 
   // ── Piano simplified controls ────────────────────────────────────────────
-  // pianoMode is the output layout (choral grand-staff vs melody+LH pattern).
-  // pianoAccomp is the harmonizer texture (homophonic vs polyphonic counterpoint).
-  // When polyphonic is active, textureMode = "polyphony" so the pipeline routes
-  // correctly through the polyphonic harmonizer instead of being overridden.
-  const pianoAccomp = (
-    settings.accompaniment === "polyphonic" || settings.textureMode === "polyphony"
-      ? "polyphonic" : "homophonic"
-  ) as "homophonic" | "polyphonic";
-
-  // pianoMode only applies when polyphonic is OFF (choral/accompaniment distinction
-  // is irrelevant in polyphonic — the counterpoint harmonizer drives everything).
+  // pianoMode: "choral"       → 4-voice hymn on grand staff (buildChoralHymnGrandStaff)
+  //            "accompaniment"→ melody + LH pattern + RH pattern (buildPianoMelodyAccomp)
+  // The Homophonic/Polyphonic harmonizer toggle has been removed: piano always uses
+  // the homophonic harmonizer (optimal for chord-symbol-driven LH patterns).
   const pianoMode = (
     settings.textureMode === "homophony_melody_accompaniment" ? "accompaniment" : "choral"
   ) as "choral" | "accompaniment";
 
-  // Remember last homophonic sub-mode so toggling polyphonic on/off is lossless.
-  const pianoHomophonicTexture: Settings["textureMode"] =
-    settings.textureMode === "homophony_melody_accompaniment"
-      ? "homophony_melody_accompaniment"
-      : "homophony_homorhythmic";
-
   function updatePianoMode(mode: "choral" | "accompaniment") {
     const next = { ...settings };
-    // Keep polyphonic if active; just store what mode we'd return to
-    if (pianoAccomp !== "polyphonic") {
-      next.textureMode =
-        mode === "accompaniment" ? "homophony_melody_accompaniment" : "homophony_homorhythmic";
-    }
+    next.textureMode =
+      mode === "accompaniment" ? "homophony_melody_accompaniment" : "homophony_homorhythmic";
+    next.accompaniment = "homophonic";
     next.styleProfile = "classical";
     next.level = "intermediate";
     next.ruleStrictness = "standard";
-    onChange(next);
-  }
-
-  function updatePianoAccomp(accomp: "homophonic" | "polyphonic") {
-    const next = { ...settings };
-    next.accompaniment = accomp;
-    if (accomp === "polyphonic") {
-      next.styleProfile = next.styleProfile ?? "classical";
-      // Route through the full polyphonic harmonizer — same path as choral counterpoint.
-      // textureMode "polyphony" makes the pipeline set harmOpts.accompanimentType = "polyphonic".
-      next.textureMode = "polyphony";
-    } else {
-      // Restore the pre-polyphonic layout mode
-      next.textureMode = pianoHomophonicTexture;
-    }
     onChange(next);
   }
   // ─────────────────────────────────────────────────────────────────────────
@@ -766,8 +746,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
             />
           </div>
 
-          {/* Mode: Choral / Accompaniment — hidden when Polyphonic is active */}
-          {pianoAccomp !== "polyphonic" && (
+          {/* Mode: Choral / Accompaniment */}
           <div className="field">
             <label>Mode</label>
             <select
@@ -785,93 +764,46 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </span>
             </div>
           </div>
-          )}
 
-          {pianoMode === "accompaniment" && pianoAccomp !== "polyphonic" && (() => {
-            const currentPattern = settings.lhPattern ?? "auto";
-            const patternHelp = LH_PATTERN_OPTIONS.find(o => o.value === currentPattern)?.help ?? "";
+          {/* LH Pattern + RH Pattern — Accompaniment mode only */}
+          {pianoMode === "accompaniment" && (() => {
+            const currentLhPattern = settings.lhPattern ?? "auto";
+            const lhHelp = LH_PATTERN_OPTIONS.find(o => o.value === currentLhPattern)?.help ?? "";
+            const currentRhPattern = (settings.rhPattern ?? "melody_inner_voice") as RhPatternValue;
+            const rhHelp = RH_PATTERN_OPTIONS.find(o => o.value === currentRhPattern)?.help ?? "";
             return (
-              <div className="field">
-                <label>LH Pattern</label>
-                <select
-                  value={currentPattern}
-                  onChange={(e) => update("lhPattern", e.target.value as LhPatternValue)}
-                >
-                  {LH_PATTERN_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-                <div className="key-preview">
-                  <span className="slider-help">{patternHelp}</span>
+              <>
+                <div className="field">
+                  <label>LH Pattern</label>
+                  <select
+                    value={currentLhPattern}
+                    onChange={(e) => update("lhPattern", e.target.value as LhPatternValue)}
+                  >
+                    {LH_PATTERN_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <div className="key-preview">
+                    <span className="slider-help">{lhHelp}</span>
+                  </div>
                 </div>
-              </div>
+                <div className="field">
+                  <label>RH Pattern</label>
+                  <select
+                    value={currentRhPattern}
+                    onChange={(e) => update("rhPattern", e.target.value as RhPatternValue)}
+                  >
+                    {RH_PATTERN_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <div className="key-preview">
+                    <span className="slider-help">{rhHelp}</span>
+                  </div>
+                </div>
+              </>
             );
           })()}
-
-          {/* Style — hidden for Piano Choral Homophonic (no effect there; hymn texture is fixed) */}
-          {(pianoAccomp === "polyphonic" || pianoMode === "accompaniment") && (
-          <div className="field">
-            <label>Style</label>
-            <select
-              value={settings.style}
-              onChange={(e) => {
-                const s = e.target.value as Settings["style"];
-                const next: Partial<Settings> = { style: s };
-                if (s === "baroque")   { next.styleProfile = "baroque";   next.ruleStrictness = "strict"; }
-                else if (s === "romantic") { next.styleProfile = "romantic"; next.ruleStrictness = "relaxed"; }
-                else if (s === "modern")   { next.styleProfile = "modern";   next.ruleStrictness = "relaxed"; if (!settings.modernMode) next.modernMode = "modernTonal"; }
-                else                   { next.styleProfile = "classical"; next.ruleStrictness = "standard"; }
-                onChange({ ...settings, ...next });
-              }}
-            >
-              {PIANO_STYLE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            <div className="key-preview">
-              <span className="slider-help">
-                {PIANO_STYLE_OPTIONS.find((o) => o.value === settings.style)?.help ?? ""}
-              </span>
-            </div>
-          </div>
-          )}
-
-          {settings.style === "modern" && (pianoAccomp === "polyphonic" || pianoMode === "accompaniment") && (
-            <div className="field">
-              <label>Modern Sub-mode</label>
-              <select
-                value={settings.modernMode ?? "modernTonal"}
-                onChange={(e) => update("modernMode", e.target.value as Settings["modernMode"])}
-              >
-                {MODERN_MODES.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              <div className="key-preview">
-                <span className="slider-help">
-                  {MODERN_MODES.find((o) => o.value === (settings.modernMode ?? "modernTonal"))?.help ?? ""}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <div className="field">
-            <label>Accompaniment</label>
-            <select
-              value={pianoAccomp}
-              onChange={(e) => updatePianoAccomp(e.target.value as "homophonic" | "polyphonic")}
-            >
-              <option value="homophonic">Homophonic</option>
-              <option value="polyphonic">Polyphonic</option>
-            </select>
-            <div className="key-preview">
-              <span className="slider-help">
-                {pianoAccomp === "polyphonic"
-                  ? "Independent melodic lines with shared harmony (counterpoint)."
-                  : "Voices share the same rhythm with vertical harmony (block chords)."}
-              </span>
-            </div>
-          </div>
         </>
       ) : isPianoStringQuartet ? (
         /* ════════════════════════════════════════════════════════════════════
