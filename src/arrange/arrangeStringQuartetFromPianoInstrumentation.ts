@@ -514,6 +514,141 @@ function selectNotesForOnset(events: EventLike[]): Array<{ ev: EventLike; midi: 
     });
 }
 
+// ── Chord inference & harmonic fill helpers ───────────────────────────────────
+
+/** Triad / seventh-chord templates: intervals (semitones) above the root. */
+const CHORD_SHAPES = [
+  { pcs: [0, 4, 7]  },   // major triad
+  { pcs: [0, 3, 7]  },   // minor triad
+  { pcs: [0, 4, 7, 10] }, // dominant 7th
+  { pcs: [0, 4, 7, 11] }, // major 7th
+  { pcs: [0, 3, 7, 10] }, // minor 7th
+  { pcs: [0, 3, 6]  },   // diminished triad
+  { pcs: [0, 3, 6, 9]  }, // diminished 7th
+  { pcs: [0, 4, 8]  },   // augmented
+  { pcs: [0, 5, 7]  },   // sus4
+  { pcs: [0, 2, 7]  },   // sus2
+];
+
+type ChordCandidate = { rootPc: number; pcs: number[] };
+
+/**
+ * Infer the best-matching triad/7th chord from a set of MIDI pitches.
+ * Returns `null` when fewer than 2 distinct pitch-classes are given.
+ * Scoring: +10 per present PC that belongs to the chord, −5 per present PC
+ * that does NOT belong, −0.5 per chord tone (prefers triads over 7ths).
+ */
+function inferChordFromNotes(midis: number[]): ChordCandidate | null {
+  if (midis.length < 2) return null;
+  const presentPcs = new Set(midis.map(m => ((m % 12) + 12) % 12));
+  if (presentPcs.size < 2) return null;
+
+  let bestScore = -Infinity;
+  let best: ChordCandidate | null = null;
+
+  for (let root = 0; root < 12; root++) {
+    for (const shape of CHORD_SHAPES) {
+      const chordPcs = shape.pcs.map(i => (root + i) % 12);
+      const hits      = chordPcs.filter(pc => presentPcs.has(pc)).length;
+      const misses    = [...presentPcs].filter(pc => !chordPcs.includes(pc)).length;
+      const score     = hits * 10 - misses * 5 - shape.pcs.length * 0.5;
+      if (score > bestScore) {
+        bestScore = score;
+        best = { rootPc: root, pcs: chordPcs };
+      }
+    }
+  }
+  return best;
+}
+
+/**
+ * Given a set of already-present pitch-classes and an inferred chord, find
+ * the MIDI of the most important *missing* chord tone in [rangeMin, rangeMax].
+ *
+ * Priority order: 3rd (defines major/minor quality) → 5th → root → 7th.
+ * Returns `null` when all chord tones are present or none fit in range.
+ */
+function findMissingChordTone(
+  presentPcs: Set<number>,
+  chord: ChordCandidate,
+  rangeMin: number,
+  rangeMax: number
+): number | null {
+  const missing = chord.pcs.filter(pc => !presentPcs.has(pc));
+  if (missing.length === 0) return null;
+
+  // Index priority: 3rd(1) → 5th(2) → root(0) → 7th(3)
+  const priority = [1, 2, 0, 3];
+  let targetPc: number | null = null;
+  for (const idx of priority) {
+    const pc = chord.pcs[idx];
+    if (pc !== undefined && missing.includes(pc)) { targetPc = pc; break; }
+  }
+  if (targetPc === null) targetPc = missing[0]!;
+
+  // Place targetPc in range
+  let midi = 12 + targetPc;
+  while (midi < rangeMin) midi += 12;
+  while (midi > rangeMax) midi -= 12;
+  return (midi >= rangeMin && midi <= rangeMax) ? midi : null;
+}
+
+/**
+ * Expand a single fill pitch into a sequence of notes that mirrors the
+ * rhythmic pulse of a "donor" voice already placed in the measure.
+ *
+ * Algorithm:
+ *   1. Collect the unique onset times (quantised to 1/64 beat) of donor note
+ *      events that fall within [fillOnset, fillOnset + fillDur).
+ *   2. Ensure the fill-onset itself appears as the first entry.
+ *   3. Produce one sub-note per unique onset; each sub-note lasts until the
+ *      next onset (or the end of the fill window).
+ *   4. If 0 or 1 donor subdivisions exist, return a single note — no change
+ *      to the current behaviour for already-simple textures.
+ *
+ * This gives fill voices the same rhythmic energy as their companion without
+ * duplicating pitches — Violin II follows Violin I's rhythm, Viola follows
+ * the most-active companion (Violin I if busier than Cello, else Cello).
+ */
+function buildRhythmInheritedFill(
+  fillMidi: number,
+  donorEvents: EventLike[],
+  fillOnset: number,
+  fillDur: number,
+  instrumentId: string
+): Array<{ t: number; dur: number; midi: number; pitch: any }> {
+  const eps  = 1e-6;
+  const end  = fillOnset + fillDur;
+  const clamped = clampMidiToAbsoluteRange(fillMidi, instrumentId);
+  const pitch   = midiToPitch(clamped);
+
+  // Unique donor onset times within the fill window
+  const rawTimes = donorEvents
+    .filter(ev => ev.type === "note" && !(ev as any).isRest)
+    .map(ev => Number(ev.t))
+    .filter(t => t >= fillOnset - eps && t < end - eps);
+  const grid = 64; // 1/64 beat quantisation
+  const uniqueTimes = [
+    ...new Set(rawTimes.map(t => Math.round(t * grid) / grid))
+  ].sort((a, b) => a - b);
+
+  // Always include fill onset as the first attack
+  if (uniqueTimes.length === 0 || uniqueTimes[0]! > fillOnset + eps) {
+    uniqueTimes.unshift(Math.round(fillOnset * grid) / grid);
+  }
+
+  if (uniqueTimes.length <= 1) {
+    // No useful subdivision — single note
+    return [{ t: fillOnset, dur: fillDur, midi: clamped, pitch }];
+  }
+
+  return uniqueTimes.map((t, i) => {
+    const nextT = i + 1 < uniqueTimes.length ? uniqueTimes[i + 1]! : end;
+    const dur   = Math.max(nextT - t, eps * 10);
+    return { t, dur, midi: clamped, pitch };
+  });
+}
+
 export function arrangeStringQuartetFromPianoInstrumentation(
   score: ScoreModel,
   options: ArrangeOptions = {}
@@ -570,74 +705,192 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     const vam = viola.measures[mi];
     const vcm = cello.measures[mi];
 
-    // ── Unified routing rules ────────────────────────────────────────────────
+    // ── Two-phase routing ─────────────────────────────────────────────────────
     //
-    // RH (per onset, sorted low→high):
-    //   1 note  : V1 = that note; V2 = engine-fill (diatonic 3rd below V1)
-    //   2 notes : V1 = top;        V2 = bottom
-    //   3 notes : V1 = top;        V2 = bottom + middle as chord addition
-    //   4+ notes: V1 = top;        V2 = bottom + ALL inner notes as chord additions
-    //             (extra inner notes beyond the 1st are added to V2 so no piano
-    //              note is dropped when the chord is larger than 4 voices)
+    // Phase 1 — map explicit piano notes:
+    //   V1  ← top  RH note at every onset
+    //   V2  ← bottom RH note when 2+ notes; inner notes as chord additions
+    //   VC  ← bottom LH note at every onset
+    //   VA  ← 2nd LH note when 2+ notes; extra LH notes as chord additions
+    //   Single-note onsets queue a "fill request" instead of pushing immediately.
     //
-    // LH (per onset, sorted low→high):
-    //   1 note  : VC = that note;  VA = engine-fill (diatonic 3rd above VC)
-    //   2 notes : VC = bottom;     VA = 2nd from bottom
-    //   3+ notes: VC = bottom;     VA = 2nd from bottom + ALL remaining notes
-    //             as chord additions (so a full LH chord is preserved in VA)
+    // Phase 2 — chord-aware fills with rhythm inheritance:
+    //   Collect all placed MIDIs across V1/V2/VC at each fill onset.
+    //   Infer the implied chord; find the most important MISSING chord tone
+    //   (3rd → 5th → root priority) in the target voice's comfortable range.
+    //   Subdivide the fill into sub-notes that mirror the companion voice's
+    //   rhythmic pulse (V1 donors V2 fills; V1-or-VC donors VA fills).
+    //   Falls back to the old diatonic-3rd heuristic when chord inference fails.
 
-    // RH → V1 + V2
+    // Tracking maps for cross-voice chord inference (Phase 2)
+    type PlacedInfo = { midi: number; t: number; dur: number };
+    const v1AtOnset = new Map<string, PlacedInfo>();
+    const v2AtOnset = new Map<string, { midi: number }>();
+    const vcAtOnset = new Map<string, PlacedInfo>();
+
+    // Fill queues
+    type FillReq = { t: number; dur: number; anchorMidi: number };
+    const v2Fills = new Map<string, FillReq>(); // onset-key → V1 anchor info
+    const vaFills = new Map<string, FillReq>(); // onset-key → VC anchor info
+
+    // ── Phase 1: map explicit notes ──────────────────────────────────────────
+
+    // RH → V1 (always) + V2 (when 2+ notes; else queue fill)
     for (const key of Array.from(rhByOnset.keys()).sort()) {
       const selected = selectNotesForOnset(rhByOnset.get(key) ?? []);
       if (!selected.length) continue;
       const top    = selected[selected.length - 1]!;
       const bottom = selected[0]!;
 
-      // V1 = top note (always)
       pushMappedNote(v1m, top, "violin_1", "v1", ++seq);
+      v1AtOnset.set(key, {
+        midi: clampMidiToAbsoluteRange(top.midi, "violin_1"),
+        t:   Number(top.ev?.t   ?? 0),
+        dur: Number(top.ev?.dur ?? 1),
+      });
 
       if (selected.length >= 3) {
-        // V2 = bottom note as primary; all inner notes (between bottom and top) as chord additions
         pushMappedNote(v2m, bottom, "violin_2", "v2-lo", ++seq);
+        v2AtOnset.set(key, { midi: clampMidiToAbsoluteRange(bottom.midi, "violin_2") });
         for (let i = 1; i <= selected.length - 2; i++) {
           pushMappedNote(v2m, selected[i]!, "violin_2", "v2-inner", ++seq, { chord: true });
         }
       } else if (selected.length === 2) {
-        // V2 = bottom note
         pushMappedNote(v2m, bottom, "violin_2", "v2", ++seq);
+        v2AtOnset.set(key, { midi: clampMidiToAbsoluteRange(bottom.midi, "violin_2") });
       } else {
-        // Single RH note: V2 = engine-fill, diatonic 3rd below V1
-        const fillMidi = diatonicStepsBelow(top.midi, 2, currentKeyFifths);
-        if (fillMidi !== top.midi) {
-          pushMappedNote(v2m, { ev: top.ev, midi: fillMidi }, "violin_2", "v2-fill", ++seq);
-        }
+        // Single RH note → queue chord-aware V2 fill
+        v2Fills.set(key, {
+          t:           Number(top.ev?.t   ?? 0),
+          dur:         Number(top.ev?.dur ?? 1),
+          anchorMidi:  clampMidiToAbsoluteRange(top.midi, "violin_1"),
+        });
       }
     }
 
-    // LH → VC + VA
+    // LH → VC (always) + VA (when 2+ notes; else queue fill)
     for (const key of Array.from(lhByOnset.keys()).sort()) {
       const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
       if (!selected.length) continue;
       const bottom = selected[0]!;
 
-      // VC = bottom note (always)
       pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
+      vcAtOnset.set(key, {
+        midi: clampMidiToAbsoluteRange(bottom.midi, "cello"),
+        t:   Number(bottom.ev?.t   ?? 0),
+        dur: Number(bottom.ev?.dur ?? 1),
+      });
 
       if (selected.length >= 2) {
-        // VA = 2nd note from bottom as primary; any additional LH notes as chord additions
         pushMappedNote(vam, selected[1]!, "viola", "va", ++seq);
         for (let i = 2; i < selected.length; i++) {
           pushMappedNote(vam, selected[i]!, "viola", "va-extra", ++seq, { chord: true });
         }
       } else {
-        // Single LH note: VA = engine-fill, diatonic 3rd above VC clamped to viola range
-        let fillMidi = diatonicStepsAbove(bottom.midi, 2, currentKeyFifths);
-        // Keep fill within comfortable viola range (G3=55 … C6=84)
-        while (fillMidi < 55) fillMidi += 12;
-        while (fillMidi > 84) fillMidi -= 12;
-        if (fillMidi !== bottom.midi) {
-          pushMappedNote(vam, { ev: bottom.ev, midi: fillMidi }, "viola", "va-fill", ++seq);
+        // Single LH note → queue chord-aware VA fill
+        vaFills.set(key, {
+          t:           Number(bottom.ev?.t   ?? 0),
+          dur:         Number(bottom.ev?.dur ?? 1),
+          anchorMidi:  clampMidiToAbsoluteRange(bottom.midi, "cello"),
+        });
+      }
+    }
+
+    // ── Phase 2: chord-aware fills with rhythm inheritance ───────────────────
+
+    // Comfortable ranges for fill voices
+    const V2_MIN = 55, V2_MAX = 84; // G3–C6  (Violin II)
+    const VA_MIN = 48, VA_MAX = 81; // C3–A5  (Viola)
+
+    // V2 fills — Violin II inherits rhythm from Violin I
+    for (const [key, { t: fillT, dur: fillDur, anchorMidi: v1Midi }] of v2Fills) {
+      const allMidis: number[] = [v1Midi];
+      const vcInfo = vcAtOnset.get(key);
+      if (vcInfo) allMidis.push(vcInfo.midi);
+
+      const presentPcs = new Set(allMidis.map(m => ((m % 12) + 12) % 12));
+      const chord      = allMidis.length >= 2 ? inferChordFromNotes(allMidis) : null;
+
+      let fillMidi: number;
+      if (chord) {
+        fillMidi = findMissingChordTone(presentPcs, chord, V2_MIN, V2_MAX)
+          ?? diatonicStepsBelow(v1Midi, 2, currentKeyFifths);
+      } else {
+        fillMidi = diatonicStepsBelow(v1Midi, 2, currentKeyFifths);
+      }
+
+      if (fillMidi === v1Midi) continue; // avoid unison with V1
+
+      // Rhythm donor: V1 events within the fill window
+      const donorV1 = v1m.events.filter(ev =>
+        ev.type === "note" && !(ev as any).isRest &&
+        Number(ev.t) >= fillT - 1e-6 && Number(ev.t) < fillT + fillDur - 1e-6
+      );
+      const subNotes = buildRhythmInheritedFill(fillMidi, donorV1, fillT, fillDur, "violin_2");
+      for (let sni = 0; sni < subNotes.length; sni++) {
+        const n = subNotes[sni]!;
+        v2m.events.push({
+          id: `v2-fill-${mi}-${key}-${sni}`,
+          t: n.t, dur: n.dur, type: "note", pitch: n.pitch, voice: 1, staff: 1,
+        });
+        seq++;
+      }
+    }
+
+    // VA fills — Viola inherits rhythm from whichever companion is busier
+    for (const [key, { t: fillT, dur: fillDur, anchorMidi: vcMidi }] of vaFills) {
+      const allMidis: number[] = [vcMidi];
+      const v1Info = v1AtOnset.get(key);
+      if (v1Info) allMidis.push(v1Info.midi);
+      const v2Info = v2AtOnset.get(key);
+      if (v2Info) allMidis.push(v2Info.midi);
+      // Also grab any V2 fills placed in Phase 2 at this onset
+      for (const ev of v2m.events) {
+        if (ev.type === "note" && !(ev as any).isRest && Math.abs(Number(ev.t) - fillT) < 1e-6) {
+          const m = eventMidi(ev);
+          if (typeof m === "number") allMidis.push(m);
         }
+      }
+
+      const presentPcs = new Set(allMidis.map(m => ((m % 12) + 12) % 12));
+      const chord      = allMidis.length >= 2 ? inferChordFromNotes(allMidis) : null;
+
+      let fillMidi: number;
+      if (chord) {
+        const chordFill = findMissingChordTone(presentPcs, chord, VA_MIN, VA_MAX);
+        if (chordFill !== null) {
+          fillMidi = chordFill;
+        } else {
+          fillMidi = diatonicStepsAbove(vcMidi, 2, currentKeyFifths);
+          while (fillMidi < VA_MIN) fillMidi += 12;
+          while (fillMidi > VA_MAX) fillMidi -= 12;
+        }
+      } else {
+        fillMidi = diatonicStepsAbove(vcMidi, 2, currentKeyFifths);
+        while (fillMidi < VA_MIN) fillMidi += 12;
+        while (fillMidi > VA_MAX) fillMidi -= 12;
+      }
+
+      if (fillMidi === vcMidi) continue; // avoid unison with VC
+
+      // Rhythm donor: prefer whichever of V1 / VC has more subdivisions in window
+      const inWindow = (evs: EventLike[]) =>
+        evs.filter(ev =>
+          ev.type === "note" && !(ev as any).isRest &&
+          Number(ev.t) >= fillT - 1e-6 && Number(ev.t) < fillT + fillDur - 1e-6
+        );
+      const donorV1 = inWindow(v1m.events);
+      const donorVC = inWindow(vcm.events);
+      const donorEvents = donorV1.length >= donorVC.length ? donorV1 : donorVC;
+
+      const subNotes = buildRhythmInheritedFill(fillMidi, donorEvents, fillT, fillDur, "viola");
+      for (let sni = 0; sni < subNotes.length; sni++) {
+        const n = subNotes[sni]!;
+        vam.events.push({
+          id: `va-fill-${mi}-${key}-${sni}`,
+          t: n.t, dur: n.dur, type: "note", pitch: n.pitch, voice: 1, staff: 1,
+        });
+        seq++;
       }
     }
 
@@ -649,7 +902,8 @@ export function arrangeStringQuartetFromPianoInstrumentation(
 
   warn(
     warnings,
-    "[strings] Instrumentation copy applied: V1=top-RH, V2=bottom-RH(+fill), VA=upper-LH(+fill), VC=bottom-LH."
+    "[strings] Instrumentation copy applied: V1=top-RH, V2=bottom-RH(+chord-fill), VA=upper-LH(+chord-fill), VC=bottom-LH. " +
+    "Fill voices use chord inference (missing 3rd/5th priority) + rhythm inheritance from companion voice."
   );
 
   return {
