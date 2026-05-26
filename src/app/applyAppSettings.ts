@@ -25,6 +25,7 @@ import { mapPianoToWoodwindEnsembleOpen } from "../arrange/mapToWoodwindEnsemble
 import { mapPianoToBrassEnsembleOpen } from "../arrange/mapToBrassEnsemble";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 import { resolveChoralProfile } from "../harmonize/satb/choralStyleProfiles";
+import { inferChordsFromAllVoices } from "../harmonize/satb/inferChordsFromMelody";
 import { preserveFinalMeasuresRhythm } from "../rhythm/preserveFinalMeasuresRhythm";
 
 export type AppSettings = {
@@ -1614,14 +1615,107 @@ export function applyAppSettings(
   }
 
   if (wantsPianoWithStrings) {
-    const finalScore = arrangePianoWithStrings(scoreModel, {
-      styleProfile: settings.styleProfile ?? (styleRaw || "classical"),
-      level: settings.level,
-      warnings
-    });
+    // ── Infer chords from all piano voices if none were supplied ─────────
+    const pianoChords = chords.length
+      ? chords
+      : inferChordsFromAllVoices(scoreModel);
+
+    if (!pianoChords.length) {
+      warnings.push("[piano+strings] Could not infer chords from piano score — string parts may be sparse.");
+    }
+
+    // ── Save original piano part (already key-transposed at this point) ─
+    const pianoPartRaw = ((scoreModel as any).parts ?? [])[0] ?? null;
+    const pianoPart = pianoPartRaw
+      ? {
+          ...JSON.parse(JSON.stringify(pianoPartRaw)),
+          part_id: "P_PNO",
+          name: "Piano",
+          instrument: "piano",
+          staves: 2
+        }
+      : null;
+
+    // ── Generate string arrangement — same engine as string_ensemble ─────
+    const profile = (usePolyphonic
+      ? "countermelody"
+      : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
+
+    const stringResult = usePolyphonic
+      ? arrangeStringPolyphonic(scoreModel, pianoChords, { level: settings.level })
+      : arrangeStringEnsemble(scoreModel, pianoChords, { profile });
+
+    warnings.push(...(stringResult.warnings ?? []));
+    const stringScore = stringResult.scoreModel;
+
+    // ── Apply polyphonic rhythm + Schoenberg density scaling if requested
+    if (usePolyphonic) {
+      const levelRaw  = String(settings.level ?? "").toLowerCase();
+      const melShift  = levelRaw === "intermediate" || levelRaw === "advanced" ? 12 : 0;
+      const melEvents = extractMelodyEventsForStrings(scoreModel, melShift);
+
+      const vln1SrcPart = (scoreModel.parts ?? []).find((p: any) => {
+        const n = String(p?.name ?? "").toLowerCase();
+        return n.includes("soprano") || n.includes("violin i") || n.includes("melody");
+      });
+      const rawVln2Act = promoteActivityForPolyphony(
+        (settings.vln2Activity ?? settings.altoActivity ?? "active") as Activity
+      );
+      const rawVlaAct = promoteActivityForPolyphony(
+        (settings.vlaActivity ?? settings.tenorActivity ?? "active") as Activity
+      );
+      const adaptedVln2Act = schoenbergScaleActivity(vln1SrcPart, rawVln2Act);
+      const adaptedVlaAct  = schoenbergScaleActivity(vln1SrcPart, rawVlaAct);
+      if (adaptedVln2Act !== rawVln2Act || adaptedVlaAct !== rawVlaAct) {
+        warnings.push(
+          `[strings] Schoenberg density scaling: ornate melody → ` +
+          `vln2 ${rawVln2Act}→${adaptedVln2Act}, vla ${rawVlaAct}→${adaptedVlaAct}.`
+        );
+      }
+      applyStringPolyphonicRhythm(stringScore, {
+        vln1Activity:          settings.vln1Activity ?? "grounded",
+        vln2Activity:          adaptedVln2Act,
+        vlaActivity:           adaptedVlaAct,
+        vcActivity:            settings.vcActivity ?? settings.bassActivity ?? "less_active",
+        cbActivity:            settings.cbActivity ?? settings.bassActivity ?? "less_active",
+        chordEvents:           pianoChords,
+        keyFifths:             detectedInputKeyFifths,
+        keyMode:               detectedMode,
+        syncopate:             true,
+        allowNonChordTones:    true,
+        preserveVln1Melody:    true,
+        enforceChordRootBass:  true,
+        level:                 settings.level,
+        warnings,
+        tempoBpm,
+        style:                 styleUsed,
+        composerKey:           composerKey || undefined
+      });
+      const vln1Out = (stringScore.parts ?? []).find(
+        (p: any) => String(p?.name ?? "").toLowerCase().includes("violin i")
+      );
+      if (vln1Out) {
+        vln1Out.measures = vln1Out.measures.map((m: any) => ({
+          ...m,
+          events: (melEvents[m.number] ?? m.events ?? []).sort(
+            (a: any, b: any) => Number(a.t) - Number(b.t)
+          )
+        }));
+      }
+    }
+
+    // ── Combine: Piano (grand staff) + string parts ──────────────────────
+    const stringParts: any[] = (stringScore as any).parts ?? [];
+    const combinedParts = pianoPart ? [pianoPart, ...stringParts] : stringParts;
+    const finalScore: any = {
+      ...(JSON.parse(JSON.stringify(stringScore)) as any),
+      meta: { ...(stringScore as any).meta, ensemble: "piano_with_strings" },
+      parts: combinedParts
+    };
+
     attachTextureAnalysis(finalScore, warnings);
     return {
-      scoreModel: finalScore,
+      scoreModel: finalScore as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,

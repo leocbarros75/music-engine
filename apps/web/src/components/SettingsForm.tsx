@@ -448,7 +448,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
   const cbActivityHelp =
     BASS_ACTIVITY_OPTIONS.find((opt) => opt.value === settings.cbActivity)?.help ?? "Choose activity level.";
   const isPiano = settings.ensemble === "piano" || settings.ensemble === "piano_with_melody";
-  const isStrings = settings.ensemble === "string_ensemble";
+  const isStrings = settings.ensemble === "string_ensemble" || settings.ensemble === "piano_with_strings";
   const isPianoStringQuartet = settings.ensemble === "piano_string_quartet";
   const isSatbStringQuartet  = settings.ensemble === "satb_string_quartet";
   const isWoodwinds = settings.ensemble === "woodwind_ensemble";
