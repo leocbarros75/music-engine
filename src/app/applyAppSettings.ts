@@ -15,6 +15,7 @@ import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
+import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
@@ -1463,6 +1464,7 @@ export function applyAppSettings(
   //   "string_ensemble"       → auto arranger: lead sheet + style → stylistic strings
   const wantsPianoStringQuartet = ensemble === "piano_string_quartet";
   const wantsSatbStringQuartet  = ensemble === "satb_string_quartet";
+  const wantsPianoWithStrings   = ensemble === "piano_with_strings";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
   const wantsWoodwinds = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
@@ -1600,6 +1602,23 @@ export function applyAppSettings(
 
   if (usePianoCopyWoodwindQuartetInstrumentation) {
     const finalScore = arrangeWoodwindQuartetFromPianoInstrumentation(scoreModel, { warnings });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsPianoWithStrings) {
+    const finalScore = arrangePianoWithStrings(scoreModel, {
+      styleProfile: settings.styleProfile ?? (styleRaw || "classical"),
+      level: settings.level,
+      warnings
+    });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,

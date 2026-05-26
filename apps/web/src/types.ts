@@ -7,6 +7,7 @@ export type Settings = {
     | "string_ensemble"
     | "piano_string_quartet"
     | "satb_string_quartet"
+    | "piano_with_strings"
     | "woodwind_ensemble"
     | "brass_ensemble"
     | "orchestra";

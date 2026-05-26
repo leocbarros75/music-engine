@@ -33,6 +33,7 @@ ensemble:
   "string_ensemble"      — String quartet (Violin I, II, Viola, Cello)
   "piano_string_quartet" — Convert piano to string quartet
   "satb_string_quartet"  — Convert SATB choir to string quartet
+  "piano_with_strings"   — Piano + complementary string quartet (piano quintet style; strings hold sustained harmony cushion)
   "woodwind_ensemble"    — Woodwind quartet
   "brass_ensemble"       — Brass ensemble
   "orchestra"            — Full orchestra

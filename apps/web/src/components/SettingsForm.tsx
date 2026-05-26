@@ -8,6 +8,7 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "string ensemble (auto)", value: "string_ensemble" },
   { label: "piano → string quartet", value: "piano_string_quartet" },
   { label: "SATB → string quartet", value: "satb_string_quartet" },
+  { label: "piano + strings (complement)", value: "piano_with_strings" },
   { label: "woodwind ensemble", value: "woodwind_ensemble" },
   { label: "brass ensemble", value: "brass_ensemble" },
   { label: "orchestra", value: "orchestra" }
