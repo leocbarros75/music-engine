@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import SettingsForm from "./components/SettingsForm";
-import PromptAssistant from "./components/PromptAssistant";
+import AISettingsHelper from "./components/AISettingsHelper";
 import ScoreViewer from "./components/ScoreViewer";
 import AudioPlayer from "./components/AudioPlayer";
 import PartsSelector from "./components/PartsSelector";
@@ -59,7 +59,6 @@ function validateXmlClient(text: string): string | null {
 export default function App() {
   const [view, setView] = useState<"landing" | "studio">("landing");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const [prompt, setPrompt] = useState("");
   const [inputMode, setInputMode] = useState<"file" | "chords">("file");
   const [chordText, setChordText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -417,18 +416,11 @@ export default function App() {
               </div>
             )}
 
-            {/* Prompt */}
-            <div className="prompt-block">
-              <h3>Prompt <span className="muted" style={{ fontWeight: 400, fontSize: "11px" }}>(optional)</span></h3>
-              <textarea
-                placeholder="Describe intent, voicing, or texture..."
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-              />
-            </div>
-            {inputMode === "file" && (
-              <PromptAssistant settings={settings} prompt={prompt} onApply={setPrompt} />
-            )}
+            {/* AI Settings Helper */}
+            <AISettingsHelper
+              settings={settings}
+              onSettingsChange={(updates) => setSettings((prev) => ({ ...prev, ...updates }))}
+            />
           </section>
 
           {/* ── Generate action ───────────────────────────────────── */}

@@ -432,6 +432,59 @@ code { background: var(--surface2); border: 1px solid var(--border); border-radi
 .bottom-cta-title { font-size: 32px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 10px; }
 .bottom-cta-sub   { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
 
+/* ─── AI Settings Helper ─── */
+.ai-helper {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; margin-top: 12px;
+}
+.ai-helper-header { margin-bottom: 10px; }
+.ai-helper-header h3 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.ai-helper-header p  { font-size: 11px; color: var(--muted); margin: 0; }
+
+.ai-helper-input-row { display: flex; gap: 8px; align-items: flex-start; }
+.ai-helper-textarea {
+  flex: 1; min-height: 68px; resize: vertical;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 10px; color: var(--text); font-family: var(--font); font-size: 13px;
+  line-height: 1.5;
+}
+.ai-helper-textarea:focus  { outline: none; border-color: var(--accent); }
+.ai-helper-textarea::placeholder { color: var(--muted); font-style: italic; }
+.ai-helper-ask-btn { align-self: flex-end; white-space: nowrap; }
+
+.ai-helper-error {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: #3d1c1c; border: 1px solid #7a2e2e; border-radius: 6px;
+  padding: 8px 12px; margin-top: 10px;
+  font-size: 12px; color: #f87171;
+}
+.ai-helper-dismiss { padding: 2px 6px; font-size: 12px; }
+
+.ai-helper-result {
+  background: var(--surface); border: 1px solid var(--accent);
+  border-radius: 6px; padding: 12px 14px; margin-top: 10px;
+}
+.ai-helper-explanation {
+  font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 10px;
+}
+
+.ai-helper-settings-preview,
+.ai-helper-suggestions { margin-bottom: 10px; }
+.ai-helper-preview-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--muted); margin-bottom: 6px;
+}
+.ai-helper-settings-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.ai-helper-settings-list li { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.ai-helper-key   { color: var(--muted); min-width: 130px; }
+.ai-helper-arrow { color: var(--accent); }
+.ai-helper-val   { color: var(--text); font-weight: 500; }
+
+.ai-helper-suggestions ul { list-style: disc; padding-left: 18px; margin: 0; }
+.ai-helper-suggestion-item { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+.ai-helper-actions { display: flex; gap: 8px; margin-top: 12px; }
+
 /* ─── Footer ─── */
 .landing-footer {
   padding: 20px 28px; text-align: center;

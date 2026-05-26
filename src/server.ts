@@ -27,6 +27,7 @@ import { pitchToMidi } from "./instruments/instrumentCatalog";
 import type { HarmonizeSatbFromChordsRequest } from "./harmonize/satb/harmonizeTypes";
 import { applyAppSettings, type AppSettings } from "./app/applyAppSettings";
 import { checkChoralRules } from "./rules/choral/checkChoralRules";
+import { parsePromptWithAI } from "./app/parsePromptWithAI";
 
 import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
@@ -1335,6 +1336,24 @@ const server = http.createServer(async (req, res) => {
       }
 
       sendJson(res, 200, { ok: true, chords });
+      return;
+    }
+
+    // ── AI Prompt Parser ─────────────────────────────────────────────────
+    if (url === "/parse_prompt") {
+      const prompt = typeof body.prompt === "string" ? body.prompt.trim() : null;
+      if (!prompt) {
+        sendJson(res, 400, { ok: false, error: "Provide 'prompt' as a non-empty string." });
+        return;
+      }
+      const currentSettingsSummary =
+        typeof body.currentSettingsSummary === "string" ? body.currentSettingsSummary : undefined;
+      try {
+        const result = await parsePromptWithAI(prompt, currentSettingsSummary);
+        sendJson(res, 200, { ok: true, ...result });
+      } catch (err: any) {
+        sendJson(res, 500, { ok: false, error: err?.message ?? "AI prompt parsing failed." });
+      }
       return;
     }
 
