@@ -1477,6 +1477,24 @@ export function applyAppSettings(
   const usePianoCopyWoodwindQuartetInstrumentation =
     wantsWoodwinds && (instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
 
+  // ── Piano+strings: capture the piano part RIGHT NOW, before anything touches scoreModel ──
+  // Key transposition, rhythm engines, etc. all modify scoreModel in-place below.
+  // This deep-clone is the only way to guarantee the output piano is a faithful
+  // copy of exactly what the user uploaded.
+  const frozenPianoPart: any | null = wantsPianoWithStrings
+    ? (() => {
+        const raw = ((scoreModel as any).parts ?? [])[0] ?? null;
+        if (!raw) return null;
+        return {
+          ...JSON.parse(JSON.stringify(raw)),
+          part_id: "P_PNO",
+          name: "Piano",
+          instrument: "piano",
+          staves: 2
+        };
+      })()
+    : null;
+
   const detectedKey = getKeyInfo(scoreModel);
   const detectedInputKeyFifths = detectedKey.value;
   const detectedMode: "major" | "minor" = detectedKey.mode ?? "major";
@@ -1624,17 +1642,10 @@ export function applyAppSettings(
       warnings.push("[piano+strings] Could not infer chords from piano score — string parts may be sparse.");
     }
 
-    // ── Save original piano part (already key-transposed at this point) ─
-    const pianoPartRaw = ((scoreModel as any).parts ?? [])[0] ?? null;
-    const pianoPart = pianoPartRaw
-      ? {
-          ...JSON.parse(JSON.stringify(pianoPartRaw)),
-          part_id: "P_PNO",
-          name: "Piano",
-          instrument: "piano",
-          staves: 2
-        }
-      : null;
+    // ── Use the frozen piano part captured before any processing ────────
+    // frozenPianoPart is a deep-clone taken at the very start of applyAppSettings,
+    // before key transposition, rhythm engines, or any other mutation.
+    const pianoPart = frozenPianoPart;
 
     // ── Generate string arrangement — same engine as string_ensemble ─────
     const profile = (usePolyphonic
