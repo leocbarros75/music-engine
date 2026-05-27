@@ -1641,9 +1641,11 @@ export function applyAppSettings(
       ? "countermelody"
       : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
 
-    const stringResult = usePolyphonic
-      ? arrangeStringPolyphonic(scoreModel, pianoChords, { level: settings.level })
-      : arrangeStringEnsemble(scoreModel, pianoChords, { profile });
+    // NOTE: arrangeStringPolyphonic expects SATB parts (soprano/alto/tenor/bass)
+    // and will hang indefinitely on a piano score. Always use arrangeStringEnsemble
+    // here; polyphonic/Bach texture is achieved via the "countermelody" profile
+    // which is already set in `profile` when usePolyphonic is true.
+    const stringResult = arrangeStringEnsemble(scoreModel, pianoChords, { profile });
 
     warnings.push(...(stringResult.warnings ?? []));
     const stringScore = stringResult.scoreModel;
