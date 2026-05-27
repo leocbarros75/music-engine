@@ -80,6 +80,7 @@ export default function App() {
     settings.ensemble === "string_ensemble" ||
     settings.ensemble === "piano_string_quartet" ||
     settings.ensemble === "satb_string_quartet" ||
+    settings.ensemble === "piano_with_strings" ||
     settings.ensemble === "woodwind_ensemble" ||
     settings.ensemble === "brass_ensemble" ||
     settings.ensemble === "orchestra";
