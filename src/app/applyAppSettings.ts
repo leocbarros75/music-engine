@@ -271,6 +271,74 @@ function extractMelodyEventsForStrings(score: ScoreModel, octaveShift = 0): Reco
   return out;
 }
 
+/**
+ * Extracts the melody (highest note at each onset from piano voice 1 / RH)
+ * as a new single-part "Soprano" ScoreModel.
+ *
+ * When the string arranger receives a full piano score it has no way to
+ * identify a single melody line and dumps all chord tones into Violin I as
+ * block chords.  Passing this stripped-down melody score instead gives the
+ * arranger exactly one melodic line so Violin I plays a proper melody.
+ *
+ * The pianoChords argument (from inferChordsFromAllVoices) continues to
+ * drive harmony for Vln II / Viola / Cello — only the melody source changes.
+ */
+function extractMelodyScoreFromPiano(pianoScore: ScoreModel): ScoreModel {
+  const parts = (pianoScore as any).parts ?? [];
+  const pianoPart = parts[0];
+  if (!pianoPart) return pianoScore;
+
+  const measures = (pianoPart.measures ?? []).map((m: any) => {
+    const allEvents: any[] = m.events ?? [];
+
+    // ── Voice 1 (RH) notes only ──────────────────────────────────────────
+    const voice1Notes = allEvents.filter(
+      (e: any) => Number(e.voice ?? 1) === 1 && e.type === "note" && !e.isRest
+    );
+
+    // ── At each onset keep only the highest MIDI pitch ───────────────────
+    const byOnset = new Map<number, any>();
+    for (const ev of voice1Notes) {
+      const midi =
+        typeof ev.midi === "number"
+          ? ev.midi
+          : ev.pitch
+          ? pitchToMidi(ev.pitch)
+          : 0;
+      const onset = Number(ev.t ?? 0);
+      const existing = byOnset.get(onset);
+      if (!existing || midi > (typeof existing.midi === "number" ? existing.midi : pitchToMidi(existing.pitch ?? "C4"))) {
+        byOnset.set(onset, { ...ev, midi });
+      }
+    }
+
+    // ── Voice 1 rests (keep so timing / measure lengths stay valid) ──────
+    const voice1Rests = allEvents.filter(
+      (e: any) => Number(e.voice ?? 1) === 1 && (e.isRest || e.type === "rest")
+    );
+
+    const melodyEvents = [...byOnset.values(), ...voice1Rests].sort(
+      (a: any, b: any) => Number(a.t) - Number(b.t)
+    );
+
+    return { ...m, events: melodyEvents };
+  });
+
+  return {
+    ...pianoScore,
+    parts: [
+      {
+        ...pianoPart,
+        part_id: "P_S",
+        name: "Soprano",
+        instrument: "soprano",
+        staves: 1,
+        measures,
+      },
+    ],
+  } as any;
+}
+
 function setKeyFifths(score: ScoreModel, fifths: number, mode?: "major" | "minor"): void {
   for (const part of score.parts ?? []) {
     const m0 = part.measures?.[0];
@@ -1656,7 +1724,14 @@ export function applyAppSettings(
     // and will hang indefinitely on a piano score. Always use arrangeStringEnsemble
     // here; polyphonic/Bach texture is achieved via the "countermelody" profile
     // which is already set in `profile` when usePolyphonic is true.
-    const stringResult = arrangeStringEnsemble(scoreModel, pianoChords, { profile });
+    //
+    // We pass a "melody score" (single Soprano part = highest note per onset
+    // from piano RH voice 1) so the arranger sees a clean melodic line for
+    // Violin I instead of dumping all chord tones as block chords.
+    // pianoChords (from inferChordsFromAllVoices) still drives harmony for
+    // Vln II / Viola / Cello — only the melody source changes.
+    const melodyScore = extractMelodyScoreFromPiano(scoreModel);
+    const stringResult = arrangeStringEnsemble(melodyScore, pianoChords, { profile });
 
     warnings.push(...(stringResult.warnings ?? []));
     const stringScore = stringResult.scoreModel;
@@ -1665,9 +1740,11 @@ export function applyAppSettings(
     if (usePolyphonic) {
       const levelRaw  = String(settings.level ?? "").toLowerCase();
       const melShift  = levelRaw === "intermediate" || levelRaw === "advanced" ? 12 : 0;
-      const melEvents = extractMelodyEventsForStrings(scoreModel, melShift);
+      // Use melodyScore (single Soprano part) for melody events — it already
+      // contains the highest-note-per-onset extraction from piano voice 1.
+      const melEvents = extractMelodyEventsForStrings(melodyScore, melShift);
 
-      const vln1SrcPart = (scoreModel.parts ?? []).find((p: any) => {
+      const vln1SrcPart = (melodyScore.parts ?? []).find((p: any) => {
         const n = String(p?.name ?? "").toLowerCase();
         return n.includes("soprano") || n.includes("violin i") || n.includes("melody");
       });
