@@ -77,17 +77,33 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
     const measureLen = measureLengthBeats(m);
     const melEvents = (m?.events ?? []).filter(isNoteOrRest).sort((a: any, b: any) => Number(a.t) - Number(b.t));
     const times = new Set<number>();
-    for (const ev of melEvents) times.add(Number(ev.t ?? 0));
+    // Only add time points within the measure — values beyond measureLen would
+    // create extra slices after the barline, producing "17/16" MuseScore errors.
+    for (const ev of melEvents) {
+      const et = Number(ev.t ?? 0);
+      if (et >= 0 && et <= measureLen) times.add(et);
+    }
     for (const c of chords) {
-      if (Number(c.measure) === mNum) times.add(Number(c.t));
+      if (Number(c.measure) === mNum) {
+        const ct = Number(c.t);
+        // Strict < measureLen: a chord landing exactly on the barline belongs
+        // to the next measure and must not be added to this one's grid.
+        if (ct >= 0 && ct < measureLen) times.add(ct);
+      }
     }
     times.add(0);
     times.add(measureLen);
-    const ordered = Array.from(times).sort((a, b) => a - b);
+    // Re-filter after the forced adds to keep the set clean, then sort.
+    const ordered = Array.from(times).filter(t => t >= 0 && t <= measureLen).sort((a, b) => a - b);
     for (let tIdx = 0; tIdx < ordered.length - 1; tIdx++) {
       const t = ordered[tIdx]!;
       const next = ordered[tIdx + 1]!;
-      const dur = Math.max(0.25, next - t);
+      // Cap at (measureLen - t) so the minimum-duration floor can never push
+      // a note past the barline (e.g. last 16th-grid slot → 0.125 raw →
+      // Math.max(0.25, 0.125) = 0.25 would overflow by 0.125 beats).
+      const capDur = measureLen - t;
+      if (capDur <= 0) continue;
+      const dur = Math.min(capDur, Math.max(0.25, next - t));
       const active = melEvents.find((e: any) => e.type === "note" && Number(e.t) <= t && t < Number(e.t) + Number(e.dur));
       const melodyMidi = active ? eventMidi(active) : null;
       slices.push({
