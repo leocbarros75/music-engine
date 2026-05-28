@@ -1534,9 +1534,25 @@ export function applyAppSettings(
   // Key transposition, rhythm engines, etc. all modify scoreModel in-place below.
   // This deep-clone is the only way to guarantee the output piano is a faithful
   // copy of exactly what the user uploaded.
+  //
+  // IMPORTANT: search for the piano part by name/instrument, not by position.
+  // Sources like "shout.musicxml" have parts ordered [Violin I, Violin II, ..., Piano],
+  // so blindly taking parts[0] would capture the Violin I melody instead of the full
+  // piano grand staff (1679 notes, 147 backups). We find the Piano part explicitly,
+  // and only fall back to parts[0] if no piano-named/instrumented part exists.
   const frozenPianoPart: any | null = wantsPianoWithStrings
     ? (() => {
-        const raw = ((scoreModel as any).parts ?? [])[0] ?? null;
+        const allParts: any[] = (scoreModel as any).parts ?? [];
+        const isPianoPart = (p: any): boolean => {
+          const n = String(p?.name ?? "").toLowerCase();
+          const inst = String(p?.instrument ?? "").toLowerCase();
+          return (
+            n.includes("piano") || n.includes("keyboard") ||
+            inst.includes("piano") || inst === "grand_piano" ||
+            inst === "acoustic_piano" || inst === "keyboard"
+          );
+        };
+        const raw = allParts.find(isPianoPart) ?? allParts[0] ?? null;
         if (!raw) return null;
         return {
           ...JSON.parse(JSON.stringify(raw)),
