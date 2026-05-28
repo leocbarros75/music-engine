@@ -341,9 +341,19 @@ function orchestraGroupRank(p: { instrument?: string; part_id?: string; name?: s
     s.includes("double bass") ||
     s.includes("string");
 
+  // Piano/keyboard: appears just before strings (rank 35) so that in a
+  // piano_with_strings score the piano is listed at the top, above the strings.
+  const isPiano =
+    s.includes("piano") ||
+    s.includes("keyboard") ||
+    s.includes("harpsichord") ||
+    s.includes("organ") ||
+    s.includes("celesta");
+
   if (isWoodwind) return 10;
   if (isBrass) return 20;
   if (isPerc) return 30;
+  if (isPiano) return 35;
   if (isString) return 40;
   return 90;
 }

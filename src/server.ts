@@ -883,7 +883,11 @@ const server = http.createServer(async (req, res) => {
       const wantsBrass =
         String(settings.ensemble ?? "").toLowerCase() === "brass_ensemble" ||
         String(settings.ensemble ?? "").toLowerCase() === "brass";
-      const wantsDirectSourceArrangement = wantsStrings || wantsWoodwinds || wantsBrass;
+      // piano_with_strings: source piano must be passed as-is — bypass harmonizeSatbFromChords
+      // so the frozen piano part captures the FULL original piano score (not an SATB reduction).
+      const wantsPianoWithStrings =
+        String(settings.ensemble ?? "").toLowerCase() === "piano_with_strings";
+      const wantsDirectSourceArrangement = wantsStrings || wantsWoodwinds || wantsBrass || wantsPianoWithStrings;
       if (wantsDirectSourceArrangement && !musicxml && filePath) {
         try {
           musicxml = fs.readFileSync(filePath, "utf8");
