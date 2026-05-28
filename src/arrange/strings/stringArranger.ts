@@ -68,6 +68,26 @@ function pickChordForTime(chords: ChordEvent[], measure: number, t: number): str
   return best?.symbol ?? events[0]?.symbol ?? null;
 }
 
+/**
+ * Snap a duration (in beats) DOWN to the nearest standard note value so the
+ * exporter can always assign a valid <type> element.  Non-standard values such
+ * as 3.25 (dotted-half + 16th) or 1.25 (quarter + 16th) produce a <duration>
+ * with no matching <type>, which causes MuseScore to add an implicit rest and
+ * report an "Incomplete measure: Found 17/16" error.
+ *
+ * Standard values at a 16th-note grid (sorted descending):
+ *   whole=4.0, dotted-half=3.0, half=2.0, dotted-quarter=1.5,
+ *   quarter=1.0, dotted-eighth=0.75, eighth=0.5, 16th=0.25
+ */
+const STANDARD_BEAT_DURATIONS = [4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.25] as const;
+
+function snapToStandardDuration(dur: number): number {
+  for (const s of STANDARD_BEAT_DURATIONS) {
+    if (s <= dur + 1e-9) return s;
+  }
+  return 0.25; // minimum floor
+}
+
 function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
   const slices: Slice[] = [];
   const measures = melodyPart?.measures ?? [];
@@ -103,7 +123,12 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
       // Math.max(0.25, 0.125) = 0.25 would overflow by 0.125 beats).
       const capDur = measureLen - t;
       if (capDur <= 0) continue;
-      const dur = Math.min(capDur, Math.max(0.25, next - t));
+      // Snap to a standard rhythmic value so the exporter can always write a
+      // valid <type> element.  Non-standard values (e.g. 3.25 beats = 13
+      // divisions) produce type-less notes that MuseScore misinterprets as
+      // whole notes and then adds a ghost rest → "Found 17/16" error.
+      const rawDur = Math.min(capDur, Math.max(0.25, next - t));
+      const dur = snapToStandardDuration(rawDur);
       const active = melEvents.find((e: any) => e.type === "note" && Number(e.t) <= t && t < Number(e.t) + Number(e.dur));
       const melodyMidi = active ? eventMidi(active) : null;
       slices.push({
