@@ -282,3 +282,141 @@ export function arrangeStringEnsemble(
 
   return { scoreModel, arrangement, warnings };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Piano-bass rhythm overlay for Cello + Double Bass
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Post-process the Cello and Double Bass parts of an already-arranged
+ * stringScore so that their note onsets match the piano source's left-hand
+ * rhythm.  Pitches are re-chosen from chord tones (root / bass-note preferred
+ * for CB, full chord set for VC) so harmony is always respected.
+ *
+ * @param stringScore   Output of arrangeStringEnsemble — modified in place.
+ * @param pianoPart     The frozen piano part (deep-clone of the uploaded score).
+ * @param chords        Chord events driving the harmony.
+ * @param key           Detected key (fifths + mode).
+ */
+export function applyPianoBassRhythm(
+  stringScore: ScoreModel,
+  pianoPart: any,
+  chords: ChordEvent[],
+  key: { fifths: number; mode: "major" | "minor" }
+): void {
+  if (!pianoPart) return;
+
+  const parts: any[] = (stringScore as any).parts ?? [];
+  const vcPart = parts.find((p: any) => {
+    const n = String(p?.name ?? "").toLowerCase();
+    return n.includes("cello") || n.includes("violoncello");
+  });
+  const cbPart = parts.find((p: any) => {
+    const n = String(p?.name ?? "").toLowerCase();
+    return n.includes("double bass") || n.includes("double_bass") || n.includes("contrabass");
+  });
+
+  if (!vcPart && !cbPart) return;
+
+  const pianoMeasures: any[] = pianoPart.measures ?? [];
+
+  for (const part of [vcPart, cbPart]) {
+    if (!part) continue;
+    const n = String(part?.name ?? "").toLowerCase();
+    const voiceId: VoiceId = n.includes("bass") || n.includes("contrabass") ? "cb" : "vc";
+    const range = STRING_RANGES[voiceId];
+
+    // Persist the previous MIDI so voice-leading stays smooth across measures.
+    let prevMidi: number | null = null;
+
+    part.measures = (part.measures ?? []).map((m: any) => {
+      const mnum = Number(m.number);
+      const attrs = m.attributes ?? {};
+      const beats    = Number(attrs?.time?.beats    ?? 4);
+      const beatType = Number(attrs?.time?.beat_type ?? 4);
+      const measureLen = beats * (4 / beatType);
+
+      // ── 1. Collect left-hand onset times from the piano source ───────────
+      // "Left hand" = staff 2 OR voice 3/4 (covers both parser conventions).
+      const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
+      const seenT = new Set<number>();
+      if (pianoM) {
+        for (const ev of (pianoM.events ?? [])) {
+          if (ev.type !== "note") continue;
+          const staff = Number(ev.staff ?? 1);
+          const voice = Number(ev.voice ?? 1);
+          if (staff === 2 || voice >= 3) {
+            const t = Number(ev.t ?? 0);
+            if (t >= 0 && t < measureLen) seenT.add(t);
+          }
+        }
+      }
+
+      // Fall back to quarter-note grid when piano has no left-hand data.
+      if (!seenT.size) {
+        for (let t = 0; t < measureLen; t += 1.0) seenT.add(t);
+      }
+
+      const times = Array.from(seenT).sort((a, b) => a - b);
+      times.push(measureLen); // sentinel barline
+
+      // ── 2. Build note events at those onset times with chord-tone pitches ─
+      const events: NoteEvent[] = [];
+      for (let i = 0; i < times.length - 1; i++) {
+        const t     = times[i]!;
+        const next  = times[i + 1]!;
+        const capDur = measureLen - t;
+        if (capDur <= 0) continue;
+        const rawDur = Math.min(capDur, next - t);
+        const dur    = snapToStandardDuration(rawDur);
+        if (dur <= 0) continue;
+
+        const slice: Slice = {
+          measure: mnum,
+          t,
+          dur,
+          melodyMidi: null,
+          chordSymbol: pickChordForTime(chords, mnum, t)
+        };
+
+        // Reuse the existing candidate machinery — respects chord tones,
+        // prefers root/bass-note for CB, stays close to previous pitch.
+        const prevVoicing: Voicing | null = prevMidi !== null
+          ? { vln1: null, vln2: null, vla: null, vc: null, cb: null, [voiceId]: prevMidi } as any
+          : null;
+
+        const candidateMap = buildCandidatesForSlice({
+          slice,
+          prevVoicing,
+          keyFifths: key.fifths,
+          keyMode:   key.mode
+        });
+        const candidates = candidateMap[voiceId];
+        const midi = candidates.length ? candidates[0]! : null;
+
+        if (midi === null) {
+          events.push({
+            id:     `${voiceId}-bass-${mnum}-${t}`,
+            t, dur,
+            type:   "rest",
+            voice:  1,
+            staff:  1,
+            isRest: true
+          } as any);
+        } else {
+          const clamped = clampMidiToRangeByOctave(midi, range);
+          prevMidi = clamped;
+          events.push({
+            id:    `${voiceId}-bass-${mnum}-${t}`,
+            t, dur,
+            type:  "note",
+            pitch: midiToPitch(clamped),
+            voice: 1,
+            staff: 1
+          });
+        }
+      }
+
+      return { ...m, events };
+    });
+  }
+}

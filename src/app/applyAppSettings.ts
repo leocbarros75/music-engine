@@ -16,7 +16,7 @@ import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleF
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
-import { arrangeStringEnsemble } from "../arrange/strings/stringArranger";
+import { arrangeStringEnsemble, applyPianoBassRhythm } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
@@ -321,6 +321,83 @@ function buildPianoTemplateScore(pianoScore: ScoreModel): ScoreModel {
         measures,
       },
     ],
+  } as any;
+}
+
+/**
+ * Build a template score from the piano source that seeds the string arranger's
+ * time grid with the piano's RIGHT-HAND rhythm (unique note-onset times per
+ * measure, deduplicated across stacked chord tones).
+ *
+ * Unlike buildPianoTemplateScore (which produces a single whole-measure rest),
+ * this gives the DP many more time-points to work with → Violin I (and all
+ * other voices) play a denser, more active arrangement that tracks the
+ * rhythmic character of the piano's melody/chords.
+ *
+ * All events are RESTS, so melodyMidi stays null and every voice picks chord
+ * tones freely — the piano melody is never literally copied.
+ */
+function buildPianoRhythmTemplateScore(pianoScore: ScoreModel): ScoreModel {
+  const allParts = (pianoScore as any).parts ?? [];
+  const isPianoPart = (p: any): boolean => {
+    const n    = String(p?.name       ?? "").toLowerCase();
+    const inst = String(p?.instrument ?? "").toLowerCase();
+    return n.includes("piano") || inst.includes("piano") || inst === "grand_piano";
+  };
+  const pianoPart = allParts.find(isPianoPart) ?? allParts[0];
+  if (!pianoPart) return pianoScore;
+
+  const measures = (pianoPart.measures ?? []).map((m: any) => {
+    const attrs    = m.attributes ?? {};
+    const beats    = Number(attrs?.time?.beats    ?? 4);
+    const beatType = Number(attrs?.time?.beat_type ?? 4);
+    const measureLen = beats * (4 / beatType);
+
+    // Collect unique onset times from the right hand (staff=1 or voice<=2).
+    const rhOnsets = new Set<number>();
+    for (const ev of (m.events ?? [])) {
+      if (ev.type !== "note") continue;
+      const staff = Number(ev.staff ?? 1);
+      const voice = Number(ev.voice ?? 1);
+      if (staff === 1 || voice <= 2) {
+        const t = Number(ev.t ?? 0);
+        if (t >= 0 && t < measureLen) rhOnsets.add(t);
+      }
+    }
+
+    // Fall back to a quarter-note grid for moderate activity when the source
+    // part has no explicit right-hand note data.
+    if (!rhOnsets.size) {
+      for (let t = 0; t < measureLen; t += 1.0) rhOnsets.add(t);
+    }
+
+    // Emit rest events at each onset — dur=0.25 minimum (actual slice dur is
+    // computed from the spacing between consecutive time-points in buildSlices).
+    const events = Array.from(rhOnsets)
+      .sort((a, b) => a - b)
+      .map((t) => ({
+        id:     `tmpl-rh-${m.number}-${t}`,
+        t,
+        dur:    0.25,
+        type:   "rest" as const,
+        voice:  1,
+        staff:  1,
+        isRest: true,
+      }));
+
+    return { ...m, events };
+  });
+
+  return {
+    ...pianoScore,
+    parts: [{
+      ...pianoPart,
+      part_id:    "P_S",
+      name:       "Soprano",
+      instrument: "soprano",
+      staves:     1,
+      measures,
+    }],
   } as any;
 }
 
@@ -1726,12 +1803,12 @@ export function applyAppSettings(
     // here; polyphonic/Bach texture is achieved via the "countermelody" profile
     // which is already set in `profile` when usePolyphonic is true.
     //
-    // We pass a rest-only template score (same measure structure as the piano but
-    // no melody notes).  When melodyMidi is null for every slice, the DP freely
-    // generates chord-tone content for Violin I — a genuine complementary line
-    // instead of copying the piano's top note.
-    // pianoChords (from inferChordsFromAllVoices) drives harmony for all voices.
-    const templateScore = buildPianoTemplateScore(scoreModel);
+    // Use the piano's RIGHT-HAND rhythm as the time grid (one rest event per
+    // unique onset, staff=1/voice<=2).  This makes Violin I (and all voices)
+    // more active — they follow the rhythmic density of the piano's melody/chords
+    // rather than just changing on chord-root beats.  All events are rests so
+    // melodyMidi stays null and every voice picks chord tones freely.
+    const templateScore = buildPianoRhythmTemplateScore(scoreModel);
     const stringResult = arrangeStringEnsemble(templateScore, pianoChords, { profile });
 
     warnings.push(...(stringResult.warnings ?? []));
@@ -1782,6 +1859,21 @@ export function applyAppSettings(
       });
       // Violin I is NOT overridden with the piano melody — the DP-generated
       // chord-tone line is kept as the complementary string arrangement.
+    }
+
+    // ── Overlay piano bass rhythm on Cello + Double Bass ─────────────────
+    // Replace the DP-generated cello/bass events with events timed to the
+    // piano source's left-hand (staff=2 / voice>=3) note onsets.  Pitches
+    // are re-selected from chord tones via the same candidate machinery, so
+    // harmony is always respected.  If the piano has no left-hand data for a
+    // measure, a quarter-note grid is used as a fallback.
+    if (pianoPart) {
+      applyPianoBassRhythm(
+        stringScore,
+        pianoPart,
+        pianoChords,
+        { fifths: detectedInputKeyFifths, mode: detectedMode }
+      );
     }
 
     // ── Output: strings only (piano used as harmony source, not in output) ──
