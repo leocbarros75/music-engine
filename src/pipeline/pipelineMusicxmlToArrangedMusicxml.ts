@@ -187,7 +187,9 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const isPiano = ensembleRaw === "piano" || ensembleRaw === "piano_with_melody" || ensembleRaw === "grand_piano";
     const isPianoStringQuartet = ensembleRaw === "piano_string_quartet";
     const isSatbStringQuartet  = ensembleRaw === "satb_string_quartet";
-    const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings" || isPianoStringQuartet || isSatbStringQuartet;
+    const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings" || isPianoStringQuartet || isSatbStringQuartet ||
+      // piano_with_strings uses the piano as a harmony source and outputs strings only
+      ensembleRaw === "piano_with_strings";
     const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds";
     const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass";
     const isOrchestra = ensembleRaw === "orchestra";

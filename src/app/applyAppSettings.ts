@@ -1784,13 +1784,12 @@ export function applyAppSettings(
       // chord-tone line is kept as the complementary string arrangement.
     }
 
-    // ── Combine: Piano (grand staff) + string parts ──────────────────────
+    // ── Output: strings only (piano used as harmony source, not in output) ──
     const stringParts: any[] = (stringScore as any).parts ?? [];
-    const combinedParts = pianoPart ? [pianoPart, ...stringParts] : stringParts;
     const finalScore: any = {
       ...(JSON.parse(JSON.stringify(stringScore)) as any),
-      meta: { ...(stringScore as any).meta, ensemble: "piano_with_strings" },
-      parts: combinedParts
+      meta: { ...(stringScore as any).meta, ensemble: "string_ensemble" },
+      parts: stringParts
     };
 
     attachTextureAnalysis(finalScore, warnings);
