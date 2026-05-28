@@ -147,6 +147,10 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const isCopyInstrumentation =
       ensembleLower === "piano_string_quartet" ||
       ensembleLower === "satb_string_quartet" ||
+      // piano_with_strings: the original piano is frozen as-is; bypassing
+      // harmonizeSatbFromChords ensures frozenPianoPart captures the full
+      // original piano score, not an SATB reduction of it.
+      ensembleLower === "piano_with_strings" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
