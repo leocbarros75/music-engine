@@ -114,6 +114,28 @@ function durToType(divisions: number, dur: number): string | null {
   return null;
 }
 
+/**
+ * Snap a duration (in divisions) DOWN to the nearest standard note value.
+ * Non-standard values (e.g. 13 divisions = 3.25 beats, 5 divisions = 1.25 beats)
+ * produce null from durToType, which means no <type> element is written.
+ * MuseScore then misinterprets the note and inserts a ghost rest → "17/16" error.
+ *
+ * By snapping here (at the exporter boundary), we guarantee every note that
+ * leaves the engine has a valid displayable type regardless of what any upstream
+ * generator produced.  The exporter's existing trailing-rest logic fills the
+ * small remaining gap at the barline.
+ */
+function snapDurToStandard(divisions: number, dur: number): number {
+  if (!divisions || divisions <= 0) return dur;
+  // Standard multiples in descending order
+  const mults = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.125];
+  for (const m of mults) {
+    const candidate = Math.round(divisions * m); // avoid float drift
+    if (candidate > 0 && candidate <= dur + 0.5) return candidate;
+  }
+  return Math.max(1, dur);
+}
+
 /** Returns true when the duration is a dotted note value (needs a <dot/> element). */
 function durHasDot(divisions: number, dur: number): boolean {
   if (!divisions || divisions <= 0) return false;
@@ -806,7 +828,12 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
             // so the exported <duration> value never exceeds measureBeats.
             const rawDurBeats = Number.isFinite(evAny.dur) ? Number(evAny.dur) : 1;
             const durBeats = Math.min(rawDurBeats, Math.max(1 / currentDivisions, measureBeats - t));
-            const dur = beatsToDivisionsDuration(durBeats, currentDivisions);
+            // Snap to nearest standard note value so durToType always returns a
+            // valid <type>. Non-standard values (e.g. 13 divisions = 3.25 beats)
+            // produce null → no <type> → MuseScore adds a ghost rest → "17/16".
+            const dur = snapDurToStandard(currentDivisions, beatsToDivisionsDuration(durBeats, currentDivisions));
+            // Cursor advances by the original (pre-snap) duration so the trailing-
+            // rest logic fills any gap the snap left at the barline.
             if (durBeats > groupMaxDur) groupMaxDur = durBeats;
             const staff = isGrandStaff ? (evAny.staff ?? 1) : 1;
             const type = durToType(currentDivisions, dur);
