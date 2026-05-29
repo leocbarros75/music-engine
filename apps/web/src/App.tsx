@@ -8,6 +8,21 @@ import LandingPage from "./components/LandingPage";
 import { downloadMidi } from "./utils/midiExporter";
 import type { JobResult, Settings } from "./types";
 
+// ── Safe JSON parser — gives a readable message when Render cold-starts ──────
+async function safeJson(res: Response): Promise<any> {
+  const text = await res.text();
+  if (text.trimStart().startsWith("<")) {
+    throw new Error(
+      "The server is waking up from sleep — please wait 30–60 seconds and try again."
+    );
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Server returned unexpected response (status ${res.status}).`);
+  }
+}
+
 const DEFAULT_SETTINGS: Settings = {
   title: "",
   ensemble: "choral",
@@ -160,7 +175,7 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ musicxml: musicxmlInput, partIds: ids }),
       });
-      const json = await res.json();
+      const json = await safeJson(res);
       if (!json.ok) { setWarnings([json.error ?? "Extraction failed."]); return; }
       const partNames = (json.extractedParts ?? []).map((p: any) => p.name || p.id).join("_");
       downloadXml(json.musicxml, `${partNames || "extracted"}.musicxml`);
@@ -194,7 +209,7 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pdfBase64: base64 }),
       });
-      const json = await res.json();
+      const json = await safeJson(res);
 
       if (!json.ok) {
         setWarnings([json.error ?? "Could not extract chords from PDF."]);
@@ -237,7 +252,7 @@ export default function App() {
         }),
       });
 
-      const json: JobResult = await res.json();
+      const json: JobResult = await safeJson(res);
       setJobResult(json);
       if (!json.ok) { setWarnings([json.error ?? "Unknown error"]); return; }
       if (json.warnings?.length) setWarnings(json.warnings);
@@ -271,7 +286,7 @@ export default function App() {
         }),
       });
 
-      const json: JobResult = await res.json();
+      const json: JobResult = await safeJson(res);
       setJobResult(json);
       if (!json.ok) { setWarnings([json.error ?? "Unknown error"]); return; }
       if (json.warnings?.length) setWarnings(json.warnings);
