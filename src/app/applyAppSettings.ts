@@ -16,7 +16,7 @@ import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleF
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
-import { arrangeStringEnsemble, applyPianoBassRhythm } from "../arrange/strings/stringArranger";
+import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
@@ -1803,12 +1803,15 @@ export function applyAppSettings(
     // here; polyphonic/Bach texture is achieved via the "countermelody" profile
     // which is already set in `profile` when usePolyphonic is true.
     //
-    // Use the piano's RIGHT-HAND rhythm as the time grid (one rest event per
-    // unique onset, staff=1/voice<=2).  This makes Violin I (and all voices)
-    // more active — they follow the rhythmic density of the piano's melody/chords
-    // rather than just changing on chord-root beats.  All events are rests so
-    // melodyMidi stays null and every voice picks chord tones freely.
-    const templateScore = buildPianoRhythmTemplateScore(scoreModel);
+    // IMPORTANT: Use the SIMPLE one-event-per-measure template (not the dense
+    // piano-RH-onset template) for the DP.  The DP stores all layers for
+    // backtracking: O(slices × states²) memory.  With 16th-note piano parts
+    // (~16 slices/measure × 88 measures × 7776 voicing states × 300 B/node)
+    // the dense template causes an OOM crash on Render's 512 MB free tier.
+    // Violin I activity is instead applied as a cheap O(measures × onsets)
+    // post-processor below (applyPianoMelodyRhythm), exactly as done for
+    // Cello/Bass (applyPianoBassRhythm).
+    const templateScore = buildPianoTemplateScore(scoreModel);
     const stringResult = arrangeStringEnsemble(templateScore, pianoChords, { profile });
 
     warnings.push(...(stringResult.warnings ?? []));
@@ -1859,6 +1862,19 @@ export function applyAppSettings(
       });
       // Violin I is NOT overridden with the piano melody — the DP-generated
       // chord-tone line is kept as the complementary string arrangement.
+    }
+
+    // ── Overlay piano RH rhythm on Violin I (post-DP, memory-safe) ──────────
+    // applyPianoMelodyRhythm is O(measures × onsets) — it never runs a DP so
+    // it has no quadratic memory cost.  Skip when usePolyphonic is active
+    // because applyStringPolyphonicRhythm has already set Violin I's rhythm.
+    if (pianoPart && !usePolyphonic) {
+      applyPianoMelodyRhythm(
+        stringScore,
+        pianoPart,
+        pianoChords,
+        { fifths: detectedInputKeyFifths, mode: detectedMode }
+      );
     }
 
     // ── Overlay piano bass rhythm on Cello + Double Bass ─────────────────

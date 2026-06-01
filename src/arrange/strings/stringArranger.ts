@@ -420,3 +420,124 @@ export function applyPianoBassRhythm(
     });
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Piano-melody rhythm overlay for Violin I
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Post-process Violin I so its note onsets match the piano's RIGHT-HAND rhythm
+ * (staff=1 / voice<=2).  Like applyPianoBassRhythm but for the top voice.
+ *
+ * This runs AFTER the DP-based arrangeStringEnsemble (which uses the simple
+ * one-event-per-measure template for memory safety).  The result gives Violin I
+ * much more rhythmic activity without blowing up the DP heap.
+ *
+ * Pitches are chosen from the vln1 chord-tone candidates (highest available
+ * chord tone in range, voice-led from the previous note).
+ */
+export function applyPianoMelodyRhythm(
+  stringScore: ScoreModel,
+  pianoPart: any,
+  chords: ChordEvent[],
+  key: { fifths: number; mode: "major" | "minor" }
+): void {
+  if (!pianoPart) return;
+
+  const parts: any[] = (stringScore as any).parts ?? [];
+  const vln1Part = parts.find((p: any) => {
+    const n = String(p?.name ?? "").toLowerCase();
+    return n.includes("violin i") || n.includes("violin 1") || n.includes("vln1") || n.includes("vln i");
+  });
+  if (!vln1Part) return;
+
+  const pianoMeasures: any[] = pianoPart.measures ?? [];
+  const range = STRING_RANGES["vln1"];
+  let prevMidi: number | null = null;
+
+  vln1Part.measures = (vln1Part.measures ?? []).map((m: any) => {
+    const mnum = Number(m.number);
+    const attrs = m.attributes ?? {};
+    const beats    = Number(attrs?.time?.beats    ?? 4);
+    const beatType = Number(attrs?.time?.beat_type ?? 4);
+    const measureLen = beats * (4 / beatType);
+
+    // Collect unique onset times from the piano right hand (staff=1 or voice<=2).
+    const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
+    const seenT = new Set<number>();
+    if (pianoM) {
+      for (const ev of (pianoM.events ?? [])) {
+        if (ev.type !== "note") continue;
+        const staff = Number(ev.staff ?? 1);
+        const voice = Number(ev.voice ?? 1);
+        if (staff === 1 || voice <= 2) {
+          const t = Number(ev.t ?? 0);
+          if (t >= 0 && t < measureLen) seenT.add(t);
+        }
+      }
+    }
+
+    // Fall back to a beat grid so Violin I always has some activity.
+    if (!seenT.size) {
+      for (let t = 0; t < measureLen; t += 1.0) seenT.add(t);
+    }
+
+    const times = Array.from(seenT).sort((a, b) => a - b);
+    times.push(measureLen); // sentinel barline
+
+    const events: NoteEvent[] = [];
+    for (let i = 0; i < times.length - 1; i++) {
+      const t     = times[i]!;
+      const next  = times[i + 1]!;
+      const capDur = measureLen - t;
+      if (capDur <= 0) continue;
+      const rawDur = Math.min(capDur, next - t);
+      const dur    = snapToStandardDuration(rawDur);
+      if (dur <= 0) continue;
+
+      const slice: Slice = {
+        measure: mnum,
+        t,
+        dur,
+        melodyMidi: null,
+        chordSymbol: pickChordForTime(chords, mnum, t)
+      };
+
+      const prevVoicing: Voicing | null = prevMidi !== null
+        ? { vln1: prevMidi, vln2: null, vla: null, vc: null, cb: null } as any
+        : null;
+
+      const candidateMap = buildCandidatesForSlice({
+        slice,
+        prevVoicing,
+        keyFifths: key.fifths,
+        keyMode:   key.mode
+      });
+      const candidates = candidateMap["vln1"];
+      const midi = candidates.length ? candidates[0]! : null;
+
+      if (midi === null) {
+        events.push({
+          id:     `vln1-mel-${mnum}-${t}`,
+          t, dur,
+          type:   "rest",
+          voice:  1,
+          staff:  1,
+          isRest: true
+        } as any);
+      } else {
+        const clamped = clampMidiToRangeByOctave(midi, range);
+        prevMidi = clamped;
+        events.push({
+          id:    `vln1-mel-${mnum}-${t}`,
+          t, dur,
+          type:  "note",
+          pitch: midiToPitch(clamped),
+          voice: 1,
+          staff: 1
+        });
+      }
+    }
+
+    return { ...m, events };
+  });
+}
