@@ -425,15 +425,18 @@ export function applyPianoBassRhythm(
 // Piano-melody rhythm overlay for Violin I
 // ─────────────────────────────────────────────────────────────────────────────
 /**
- * Post-process Violin I so its note onsets match the piano's RIGHT-HAND rhythm
- * (staff=1 / voice<=2).  Like applyPianoBassRhythm but for the top voice.
+ * Post-process Violin I so it plays the piano's RIGHT-HAND melody with the
+ * piano's RH rhythm (staff=1 / voice<=2).
  *
- * This runs AFTER the DP-based arrangeStringEnsemble (which uses the simple
- * one-event-per-measure template for memory safety).  The result gives Violin I
- * much more rhythmic activity without blowing up the DP heap.
+ * Strategy:
+ * 1. For every unique piano-RH onset time in the measure, find the HIGHEST
+ *    sounding MIDI pitch at that time — that is the melody note.
+ * 2. Transpose it into Violin I's comfortable range by octave shifts.
+ * 3. If no piano pitch is available at an onset (fallback), use the top
+ *    chord-tone candidate so the part is never silent.
  *
- * Pitches are chosen from the vln1 chord-tone candidates (highest available
- * chord tone in range, voice-led from the previous note).
+ * This runs after the DP (which uses the memory-safe one-event-per-measure
+ * template) so it adds rhythmic and melodic activity without touching the heap.
  */
 export function applyPianoMelodyRhythm(
   stringScore: ScoreModel,
@@ -452,7 +455,6 @@ export function applyPianoMelodyRhythm(
 
   const pianoMeasures: any[] = pianoPart.measures ?? [];
   const range = STRING_RANGES["vln1"];
-  let prevMidi: number | null = null;
 
   vln1Part.measures = (vln1Part.measures ?? []).map((m: any) => {
     const mnum = Number(m.number);
@@ -461,30 +463,39 @@ export function applyPianoMelodyRhythm(
     const beatType = Number(attrs?.time?.beat_type ?? 4);
     const measureLen = beats * (4 / beatType);
 
-    // Collect unique onset times from the piano right hand (staff=1 or voice<=2).
     const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
-    const seenT = new Set<number>();
+
+    // ── Build a map: onset-time → highest piano-RH MIDI pitch ────────────
+    // "Right hand" = staff 1 OR voice ≤ 2.
+    // Taking the highest pitch at each onset captures the melody line even
+    // when the RH plays full chords.
+    const onsetPitch = new Map<number, number>(); // t → highest midi
     if (pianoM) {
       for (const ev of (pianoM.events ?? [])) {
         if (ev.type !== "note") continue;
         const staff = Number(ev.staff ?? 1);
         const voice = Number(ev.voice ?? 1);
-        if (staff === 1 || voice <= 2) {
-          const t = Number(ev.t ?? 0);
-          if (t >= 0 && t < measureLen) seenT.add(t);
-        }
+        if (staff !== 1 && voice > 2) continue;
+        const t = Number(ev.t ?? 0);
+        if (t < 0 || t >= measureLen) continue;
+        const midi = eventMidi(ev);
+        if (midi === null) continue;
+        const prev = onsetPitch.get(t);
+        if (prev === undefined || midi > prev) onsetPitch.set(t, midi);
       }
     }
 
-    // Fall back to a beat grid so Violin I always has some activity.
-    if (!seenT.size) {
-      for (let t = 0; t < measureLen; t += 1.0) seenT.add(t);
+    // Fall back to beat grid when the piano measure is empty / missing.
+    if (!onsetPitch.size) {
+      for (let t = 0; t < measureLen; t += 1.0) onsetPitch.set(t, -1); // -1 = no pitch, use chord tone
     }
 
-    const times = Array.from(seenT).sort((a, b) => a - b);
+    const times = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
     times.push(measureLen); // sentinel barline
 
     const events: NoteEvent[] = [];
+    let prevMidi: number | null = null;
+
     for (let i = 0; i < times.length - 1; i++) {
       const t     = times[i]!;
       const next  = times[i + 1]!;
@@ -494,47 +505,35 @@ export function applyPianoMelodyRhythm(
       const dur    = snapToStandardDuration(rawDur);
       if (dur <= 0) continue;
 
-      const slice: Slice = {
-        measure: mnum,
-        t,
-        dur,
-        melodyMidi: null,
-        chordSymbol: pickChordForTime(chords, mnum, t)
-      };
+      // ── Resolve pitch ──────────────────────────────────────────────────
+      const rawMidi = onsetPitch.get(t) ?? -1;
+      let midi: number | null = null;
 
-      const prevVoicing: Voicing | null = prevMidi !== null
-        ? { vln1: prevMidi, vln2: null, vla: null, vc: null, cb: null } as any
-        : null;
-
-      const candidateMap = buildCandidatesForSlice({
-        slice,
-        prevVoicing,
-        keyFifths: key.fifths,
-        keyMode:   key.mode
-      });
-      const candidates = candidateMap["vln1"];
-      const midi = candidates.length ? candidates[0]! : null;
+      if (rawMidi > 0) {
+        // Transpose the piano melody into Violin I's range by octave shifts.
+        midi = clampMidiToRangeByOctave(rawMidi, range);
+      } else {
+        // No piano pitch available — fall back to highest chord-tone candidate.
+        const slice: Slice = {
+          measure: mnum, t, dur,
+          melodyMidi: null,
+          chordSymbol: pickChordForTime(chords, mnum, t)
+        };
+        const prevVoicing: Voicing | null = prevMidi !== null
+          ? { vln1: prevMidi, vln2: null, vla: null, vc: null, cb: null } as any
+          : null;
+        const candidateMap = buildCandidatesForSlice({
+          slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode
+        });
+        const cands = candidateMap["vln1"];
+        midi = cands.length ? clampMidiToRangeByOctave(cands[0]!, range) : null;
+      }
 
       if (midi === null) {
-        events.push({
-          id:     `vln1-mel-${mnum}-${t}`,
-          t, dur,
-          type:   "rest",
-          voice:  1,
-          staff:  1,
-          isRest: true
-        } as any);
+        events.push({ id: `vln1-mel-${mnum}-${t}`, t, dur, type: "rest", voice: 1, staff: 1, isRest: true } as any);
       } else {
-        const clamped = clampMidiToRangeByOctave(midi, range);
-        prevMidi = clamped;
-        events.push({
-          id:    `vln1-mel-${mnum}-${t}`,
-          t, dur,
-          type:  "note",
-          pitch: midiToPitch(clamped),
-          voice: 1,
-          staff: 1
-        });
+        prevMidi = midi;
+        events.push({ id: `vln1-mel-${mnum}-${t}`, t, dur, type: "note", pitch: midiToPitch(midi), voice: 1, staff: 1 });
       }
     }
 
