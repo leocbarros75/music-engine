@@ -500,6 +500,26 @@ export function applyPianoMelodyRhythm(
         for (let t = 0; t < measureLen; t += 1.0) onsetPitch.set(t, -1);
       }
 
+      // ── Minimum subdivision: fill gaps > 1 beat with a quarter-note grid ──
+      // If the piano plays whole notes or half notes, the upper string parts
+      // would inherit those long durations and sound static.  Any gap wider
+      // than one beat gets subdivided at quarter-note points so all three
+      // upper voices stay rhythmically active.  The fill points carry no piano
+      // pitch (-1) so they resolve to the nearest chord tone instead.
+      const FILL_STEP = 1.0; // quarter note
+      const existingTimes = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
+      const boundaries = [...existingTimes, measureLen];
+      for (let i = 0; i < boundaries.length - 1; i++) {
+        const gapStart = boundaries[i]!;
+        const gapEnd   = boundaries[i + 1]!;
+        if (gapEnd - gapStart > FILL_STEP + 1e-9) {
+          for (let ft = gapStart + FILL_STEP; ft < gapEnd - 1e-9; ft += FILL_STEP) {
+            const key = Math.round(ft * 1000) / 1000;
+            if (!onsetPitch.has(key)) onsetPitch.set(key, -1);
+          }
+        }
+      }
+
       const times = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
       times.push(measureLen);
 
