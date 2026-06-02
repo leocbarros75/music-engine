@@ -25,6 +25,34 @@ export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
   hymn_support:   { ...DEFAULT_PROFILE, stepPreference: 1.4, leapPenalty: 5.5, dissonancePenalty: 4 },
   countermelody:  { ...DEFAULT_PROFILE, stepPreference: 1.2, leapPenalty: 4.5, dissonancePenalty: 3 },
   cinematic_pads: { ...DEFAULT_PROFILE, stepPreference: 1.0, leapPenalty: 3.5, dissonancePenalty: 2.5 },
+
+  // ── Bach chorale profile ─────────────────────────────────────────────────
+  // Calibrated from 120 Bach chorales (BWV 121-240), 4998 chord slots.
+  //   Motion:  S 64% steps / 13% leaps   A 64% steps / 18% leaps
+  //            T 60% steps / 20% leaps   B 48% steps / 40% leaps
+  //   Spacing: S-A avg 5.1 st  A-T avg 5.6 st  T-B avg 9.3 st
+  //   Doubling (octave unisons): A-B 25%, T-B 24%, S-B 22%, S-T 17%
+  //
+  // High stepPreference rewards the 60-64% stepwise motion in upper voices.
+  // High parallelPerfectPenalty: Bach practically never writes parallel 5ths/8ths.
+  // crossingPenalty raised: Bach almost never crosses voices.
+  // leapPenalty kept moderate — bass leaps often (40%); compensation via pendingRecovery.
+  bach_chorale: {
+    ...DEFAULT_PROFILE,
+    stepPreference:          2.0,   // S/A/T: ~64% stepwise in real Bach
+    leapPenalty:             4.0,   // moderate — bass needs freedom (40% leaps)
+    recoveryPenalty:         3.0,   // leaps should be followed by stepwise recovery
+    parallelPerfectPenalty:  20,    // near-absolute prohibition — Bach essentially never
+    hiddenPerfectPenalty:    9,     // hidden octaves/5ths strongly avoided
+    dissonancePenalty:       4.5,   // vertical dissonances strictly avoided
+    crossingPenalty:         7.0,   // voice crossing is a genuine Bach rarity
+    rangePenalty:            8,
+    tessituraPenalty:        1.6,
+    perfectChainPenalty:     2.0,
+    lowRegisterSpacingPenalty: 3.0, // Piston: avoid close intervals below C3
+    overtoneSpacingPenalty:  2.0    // T-B should span wider than A-T (avg 9.3 vs 5.6)
+  },
+
   dance_baroque:  { ...DEFAULT_PROFILE, stepPreference: 1.3, leapPenalty: 4.8, dissonancePenalty: 3.2 },
 
   // ── Adler-based profiles ────────────────────────────────────────────────

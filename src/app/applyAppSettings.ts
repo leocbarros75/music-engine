@@ -2170,7 +2170,12 @@ export function applyAppSettings(
       : wantsStrings
         ? useStringEnsembleArranger
           ? (() => {
-              const profile = (usePolyphonic ? "countermelody" : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
+              // Bach chorales → use the chorale-calibrated profile automatically.
+              const profile = (usePolyphonic
+                ? "countermelody"
+                : styleRaw === "baroque"
+                  ? "bach_chorale"
+                  : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
               const stringResult = arrangeStringEnsemble(scoreModel, chords, { profile });
               warnings.push(...(stringResult.warnings ?? []));
               const stringScore = stringResult.scoreModel;
@@ -2342,7 +2347,11 @@ export function applyAppSettings(
     : wantsStrings
       ? useStringEnsembleArranger
         ? (() => {
-            const profile = (usePolyphonic ? "countermelody" : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
+            const profile = (usePolyphonic
+              ? "countermelody"
+              : styleRaw === "baroque"
+                ? "bach_chorale"
+                : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
             const stringResult = usePolyphonic
               ? arrangeStringPolyphonic(scoreModel, chords, { level: settings.level })
               : arrangeStringEnsemble(scoreModel, chords, { profile });

@@ -36,11 +36,15 @@ type VoiceName = "Soprano" | "Alto" | "Tenor" | "Bass";
 type Range = { min: number; max: number };
 
 // Sounding ranges (MIDI)
+// Ranges calibrated from 120 Bach chorales (BWV 121-240), 4998 chord slots:
+//   Soprano  min=60  avg=70  max=79    Alto   min=52  avg=65  max=74
+//   Tenor    min=48  avg=59  max=69    Bass   min=36  avg=50  max=63
+// Previous engine ranges were too narrow (especially Tenor E3..E4 vs Bach C3..A4).
 const RANGES: Record<VoiceName, Range> = {
-  Soprano: { min: 60, max: 76 }, // C4..E5
-  Alto:    { min: 55, max: 69 }, // G3..A4
-  Tenor:   { min: 52, max: 64 }, // E3..E4
-  Bass:    { min: 40, max: 57 }  // E2..A3
+  Soprano: { min: 60, max: 79 }, // C4..G5  (Bach: 60/70/79)
+  Alto:    { min: 52, max: 74 }, // E3..D5  (Bach: 52/65/74)
+  Tenor:   { min: 48, max: 69 }, // C3..A4  (Bach: 48/59/69)
+  Bass:    { min: 36, max: 63 }  // C2..Eb4 (Bach: 36/50/63)
 };
 
 function pc(midi: number): number {

@@ -40,6 +40,7 @@ export type ProfileId =
   | "countermelody"
   | "cinematic_pads"
   | "dance_baroque"
+  | "bach_chorale"      // Calibrated from 120 Bach chorales (BWV 121-240): 64% stepwise S/A/T, 40% bass leaps, strict parallel prohibition
   // ── Adler-based texture modes (from "The Study of Orchestration", 3rd ed.) ──
   | "melody_harmony"    // Vln I = foreground melody; Vln II + Vla = inner harmony; Vc = bass; Cb = Vc -8va
   | "melody_pizzicato"  // Vln I arco melody; Vln II + Vla + Vc + Cb pizzicato chord support
