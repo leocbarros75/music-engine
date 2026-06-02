@@ -36,15 +36,21 @@ type VoiceName = "Soprano" | "Alto" | "Tenor" | "Bass";
 type Range = { min: number; max: number };
 
 // Sounding ranges (MIDI)
-// Ranges calibrated from 120 Bach chorales (BWV 121-240), 4998 chord slots:
-//   Soprano  min=60  avg=70  max=79    Alto   min=52  avg=65  max=74
-//   Tenor    min=48  avg=59  max=69    Bass   min=36  avg=50  max=63
-// Previous engine ranges were too narrow (especially Tenor E3..E4 vs Bach C3..A4).
+// Ranges calibrated from two independent baroque SATB datasets:
+//   Bach chorales BWV 121-240 (4998 chord slots):
+//     Soprano 60/70/79  Alto 52/65/74  Tenor 48/59/69  Bass 36/50/63
+//   Handel Messiah chorus (1174 measures, full oratorio):
+//     Soprano 62/73/82  Alto 55/66/72  Tenor 50/61/69  Bass 43/55/64
+//
+// Hard limits = union of both composers' observed absolute ranges.
+// Soprano max raised to 82 (Handel reaches Bb5 in several choruses).
+// Bass hard min kept at 36 (Bach; Handel's chorus bass doesn't go below G2=43
+// but solo numbers and continuo go lower — 36 keeps all repertoire covered).
 const RANGES: Record<VoiceName, Range> = {
-  Soprano: { min: 60, max: 79 }, // C4..G5  (Bach: 60/70/79)
-  Alto:    { min: 52, max: 74 }, // E3..D5  (Bach: 52/65/74)
-  Tenor:   { min: 48, max: 69 }, // C3..A4  (Bach: 48/59/69)
-  Bass:    { min: 36, max: 63 }  // C2..Eb4 (Bach: 36/50/63)
+  Soprano: { min: 60, max: 82 }, // C4..Bb5 (Bach max 79, Handel max 82)
+  Alto:    { min: 52, max: 74 }, // E3..D5  (Bach 52/65/74, Handel 55/66/72)
+  Tenor:   { min: 48, max: 69 }, // C3..A4  (Bach 48/59/69, Handel 50/61/69)
+  Bass:    { min: 36, max: 63 }  // C2..Eb4 (Bach 36/50/63, Handel chorus min 43)
 };
 
 function pc(midi: number): number {

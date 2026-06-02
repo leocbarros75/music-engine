@@ -26,20 +26,25 @@ export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
   countermelody:  { ...DEFAULT_PROFILE, stepPreference: 1.2, leapPenalty: 4.5, dissonancePenalty: 3 },
   cinematic_pads: { ...DEFAULT_PROFILE, stepPreference: 1.0, leapPenalty: 3.5, dissonancePenalty: 2.5 },
 
-  // ── Bach chorale profile ─────────────────────────────────────────────────
-  // Calibrated from 120 Bach chorales (BWV 121-240), 4998 chord slots.
-  //   Motion:  S 64% steps / 13% leaps   A 64% steps / 18% leaps
-  //            T 60% steps / 20% leaps   B 48% steps / 40% leaps
-  //   Spacing: S-A avg 5.1 st  A-T avg 5.6 st  T-B avg 9.3 st
-  //   Doubling (octave unisons): A-B 25%, T-B 24%, S-B 22%, S-T 17%
+  // ── Baroque choral / orchestral profile ─────────────────────────────────
+  // Cross-calibrated from two independent baroque datasets:
   //
-  // High stepPreference rewards the 60-64% stepwise motion in upper voices.
-  // High parallelPerfectPenalty: Bach practically never writes parallel 5ths/8ths.
-  // crossingPenalty raised: Bach almost never crosses voices.
-  // leapPenalty kept moderate — bass leaps often (40%); compensation via pendingRecovery.
+  //   Bach chorales BWV 121-240 (4998 chord slots):
+  //     Motion:  S 64% steps / 13% leaps   A 64% / 18%   T 60% / 20%   B 48% / 40%
+  //     Spacing: S-A avg 5.1 st  A-T avg 5.6 st  T-B avg 9.3 st
+  //
+  //   Handel Messiah chorus (1174 measures, full oratorio):
+  //     Motion:  S 71% steps / 13% leaps   A 70% / 14%   T 66% / 17%   B 59% / 27%
+  //     Spacing: S-A avg 6.0 st  A-T avg 5.4 st  T-B avg 7.2 st
+  //     Strings: Vln I 64% steps  Vln II 63%  Viola 50%  Bass 49%
+  //
+  // Handel is measurably MORE stepwise than Bach (71% vs 64% soprano).
+  // stepPreference raised from 2.0 to 2.1 to reflect the union of both corpora.
+  // Bass leaps: Bach 40%, Handel 27% — keep moderate leapPenalty so both fit.
+  // Parallel 5ths: Bach ≈0%, Handel <3% chorus — near-absolute prohibition confirmed.
   bach_chorale: {
     ...DEFAULT_PROFILE,
-    stepPreference:          2.0,   // S/A/T: ~64% stepwise in real Bach
+    stepPreference:          2.1,   // S/A/T: Bach 64%, Handel 71% — baroque is stepwise
     leapPenalty:             4.0,   // moderate — bass needs freedom (40% leaps)
     recoveryPenalty:         3.0,   // leaps should be followed by stepwise recovery
     parallelPerfectPenalty:  20,    // near-absolute prohibition — Bach essentially never

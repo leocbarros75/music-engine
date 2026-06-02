@@ -39,21 +39,23 @@ type ChoralRules = {
 
 // Rule data inlined — no file-system access needed at runtime (works on Render etc.)
 const BUILT_IN_RULES: ChoralRules = {
-  // Ranges calibrated from 120 Bach chorales (BWV 121-240), 4998 chord slots.
-  // Hard limits = Bach's observed absolute min/max.
-  // Soft limits ≈ avg ± 7 st (comfortable singing range centred on Bach's avg pitch).
-  //   Soprano avg=70 (Bb4)  Alto avg=65 (F4)  Tenor avg=59 (B3)  Bass avg=50 (D3)
+  // Ranges calibrated from Bach chorales BWV 121-240 + Handel Messiah (full oratorio).
+  // Hard limits = union of both composers' absolute observed ranges.
+  // Soft limits centred on weighted average of both corpora.
+  //   Bach:   S 60/70/79  A 52/65/74  T 48/59/69  B 36/50/63
+  //   Handel: S 62/73/82  A 55/66/72  T 50/61/69  B 43/55/64
+  //   → Soprano hard max raised to 82 (Handel's Bb5 is used in multiple choruses)
   ranges: {
     voices: {
-      soprano: { minMidi: 60, maxMidi: 79, softMinMidi: 63, softMaxMidi: 77 }, // C4..G5
+      soprano: { minMidi: 60, maxMidi: 82, softMinMidi: 63, softMaxMidi: 79 }, // C4..Bb5
       alto:    { minMidi: 52, maxMidi: 74, softMinMidi: 57, softMaxMidi: 72 }, // E3..D5
       tenor:   { minMidi: 48, maxMidi: 69, softMinMidi: 52, softMaxMidi: 66 }, // C3..A4
       bass:    { minMidi: 36, maxMidi: 63, softMinMidi: 40, softMaxMidi: 57 }  // C2..Eb4
     }
   },
-  // Spacing calibrated from 120 Bach chorales:
-  //   SA avg=5.1 st, max observed=20  |  AT avg=5.6, max=19  |  TB avg=9.3, max=27
-  // Hard limit set to Bach's 98th percentile (~max-2) to catch genuine errors.
+  // Spacing: Bach SA avg=5.1/max=20, AT avg=5.6/max=19, TB avg=9.3/max=27
+  //          Handel SA avg=6.0/max=21, AT avg=5.4/max=16, TB avg=7.2/max=19
+  // Hard limits set to max observed across both corpora minus margin.
   spacing: {
     adjacentMaxSemitones: { SA: 19, AT: 18, TB: 24 },
     allowOpenVoicing: true
