@@ -438,17 +438,27 @@ function partNameToVoiceId(n: string): VoiceId | null {
 
 /**
  * Post-process Violin I, Violin II, and Viola so all three follow the piano's
- * RIGHT-HAND rhythm at the same density.
+ * RIGHT-HAND rhythm at the same density, while preserving the voice-register
+ * separation already established by the DP.
  *
- * Strategy — "melody-guided chord-tone" for each voice:
- * 1. Build onset-time → highest RH MIDI pitch map per measure (melody contour).
- * 2. For each onset, transpose the piano melody pitch into the voice's range,
- *    then pick the chord-tone candidate NEAREST to that transposed target.
- * 3. Fallback: nearest chord tone to the previous note (smooth voice-leading).
+ * ── Why this matters ────────────────────────────────────────────────────────
+ * The DP (arrangeStringEnsemble) assigns each voice a proper chord tone in its
+ * own register: e.g. Vln I = G5, Vln II = E4, Vla = C4 for a C major chord.
+ * If we then override every voice by targeting the SAME piano melody pitch, all
+ * three end up on the same note — the voice separation is destroyed.
  *
- * All three voices use the SAME onset-time grid (piano RH) so they are
- * rhythmically identical.  Each independently lands on the chord tone closest
- * to the melody in its own register, producing natural voice spread.
+ * ── Strategy — "DP-anchored rhythmicisation" ────────────────────────────────
+ * 1. Capture the DP-assigned pitch(es) for this voice-measure as an "anchor
+ *    schedule" (t → midi).  These represent the correct harmonic register.
+ * 2. Build the rhythm grid: piano RH unique onset times, plus quarter-note fill
+ *    for any gap > 1 beat so voices stay active even when the piano plays long
+ *    notes.
+ * 3. At each grid point, use buildCandidatesForSlice to get chord tones for
+ *    this voice, then pick the candidate NEAREST to the anchor pitch at that
+ *    time.  Because each voice has a different anchor, they naturally spread
+ *    across the chord without any extra logic.
+ * 4. When the chord changes mid-measure the anchor updates automatically
+ *    because we re-read pickChordForTime at each onset.
  */
 export function applyPianoMelodyRhythm(
   stringScore: ScoreModel,
@@ -465,7 +475,7 @@ export function applyPianoMelodyRhythm(
   for (const part of parts) {
     const n = String(part?.name ?? "").toLowerCase().trim();
     const voiceId = partNameToVoiceId(n);
-    if (!voiceId) continue; // skip Cello, Bass, or unrecognised parts
+    if (!voiceId) continue;
     if (voiceId === "vc" || voiceId === "cb") continue; // handled by applyPianoBassRhythm
 
     const range = STRING_RANGES[voiceId];
@@ -478,10 +488,26 @@ export function applyPianoMelodyRhythm(
       const beatType = Number(attrs?.time?.beat_type ?? 4);
       const measureLen = beats * (4 / beatType);
 
-      const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
+      // ── 1. Capture the DP anchor schedule for this voice ─────────────────
+      // The DP produced 1 (or more) notes per measure with proper register.
+      // Build a t→midi map; getDpAnchor(t) returns the pitch active at time t.
+      const dpSchedule = new Map<number, number>();
+      for (const ev of (m.events ?? [])) {
+        if (ev.type !== "note" || ev.isRest) continue;
+        const m2 = eventMidi(ev);
+        if (m2 !== null) dpSchedule.set(Number(ev.t ?? 0), m2);
+      }
+      const getDpAnchor = (t: number): number | null => {
+        let best: number | null = null;
+        for (const [st, pitch] of dpSchedule) {
+          if (st <= t + 1e-9) best = pitch;
+        }
+        return best;
+      };
 
-      // onset-time → highest piano-RH MIDI pitch (melody contour guide).
-      const onsetPitch = new Map<number, number>();
+      // ── 2. Build rhythm grid from piano RH onsets ─────────────────────────
+      const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
+      const onsetSet = new Set<number>();
       if (pianoM) {
         for (const ev of (pianoM.events ?? [])) {
           if (ev.type !== "note") continue;
@@ -489,40 +515,31 @@ export function applyPianoMelodyRhythm(
           const voice = Number(ev.voice ?? 1);
           if (staff !== 1 && voice > 2) continue; // right hand only
           const t = Number(ev.t ?? 0);
-          if (t < 0 || t >= measureLen) continue;
-          const midi = eventMidi(ev);
-          if (midi === null) continue;
-          const cur = onsetPitch.get(t);
-          if (cur === undefined || midi > cur) onsetPitch.set(t, midi);
+          if (t >= 0 && t < measureLen) onsetSet.add(Math.round(t * 1000) / 1000);
         }
       }
-      if (!onsetPitch.size) {
-        for (let t = 0; t < measureLen; t += 1.0) onsetPitch.set(t, -1);
+      if (!onsetSet.size) {
+        for (let t = 0; t < measureLen; t += 1.0) onsetSet.add(Math.round(t * 1000) / 1000);
       }
 
-      // ── Minimum subdivision: fill gaps > 1 beat with a quarter-note grid ──
-      // If the piano plays whole notes or half notes, the upper string parts
-      // would inherit those long durations and sound static.  Any gap wider
-      // than one beat gets subdivided at quarter-note points so all three
-      // upper voices stay rhythmically active.  The fill points carry no piano
-      // pitch (-1) so they resolve to the nearest chord tone instead.
-      const FILL_STEP = 1.0; // quarter note
-      const existingTimes = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
-      const boundaries = [...existingTimes, measureLen];
+      // Fill gaps > 1 beat with quarter-note grid so voices stay active
+      // even when the piano source plays long sustained notes.
+      const FILL_STEP = 1.0;
+      const sortedOnsets = Array.from(onsetSet).sort((a, b) => a - b);
+      const boundaries  = [...sortedOnsets, measureLen];
       for (let i = 0; i < boundaries.length - 1; i++) {
-        const gapStart = boundaries[i]!;
-        const gapEnd   = boundaries[i + 1]!;
-        if (gapEnd - gapStart > FILL_STEP + 1e-9) {
-          for (let ft = gapStart + FILL_STEP; ft < gapEnd - 1e-9; ft += FILL_STEP) {
-            const key = Math.round(ft * 1000) / 1000;
-            if (!onsetPitch.has(key)) onsetPitch.set(key, -1);
+        const gs = boundaries[i]!, ge = boundaries[i + 1]!;
+        if (ge - gs > FILL_STEP + 1e-9) {
+          for (let ft = gs + FILL_STEP; ft < ge - 1e-9; ft += FILL_STEP) {
+            onsetSet.add(Math.round(ft * 1000) / 1000);
           }
         }
       }
 
-      const times = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
+      const times = Array.from(onsetSet).sort((a, b) => a - b);
       times.push(measureLen);
 
+      // ── 3. Build events at each grid point ───────────────────────────────
       const events: NoteEvent[] = [];
 
       for (let i = 0; i < times.length - 1; i++) {
@@ -546,16 +563,19 @@ export function applyPianoMelodyRhythm(
         });
         const cands = candidateMap[voiceId];
 
-        // Pick chord tone nearest to the piano melody target in this voice's range.
-        const rawMidi = onsetPitch.get(t) ?? -1;
-        const target = rawMidi > 0
-          ? clampMidiToRangeByOctave(rawMidi, range)
+        // Anchor = the DP-assigned pitch for this voice at time t.
+        // Each voice has a DIFFERENT anchor → different chord tones → spread.
+        // Fall back to prevMidi (voice-leading) or range centre when DP has
+        // no assignment (e.g. the measure was a rest in the template).
+        const dpAnchor = getDpAnchor(t);
+        const anchor = dpAnchor !== null
+          ? dpAnchor
           : (prevMidi ?? Math.round((range.prefMin + range.prefMax) / 2));
 
         let midi: number | null = null;
         if (cands.length) {
           midi = cands.reduce((best, c) =>
-            Math.abs(c - target) < Math.abs(best - target) ? c : best
+            Math.abs(c - anchor) < Math.abs(best - anchor) ? c : best
           );
         }
 
