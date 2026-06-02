@@ -735,7 +735,11 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
     measureNumber,
     measureBeats,
     lhPattern,
-    bassMin = 43, // G2
+    // Hallelujah (Leonard Cohen) piano arrangement analysis: LH range 26–69,
+    // avg 49 (C#3). Pop/folk piano roots regularly reach C2–E2 (36–40).
+    // Classical default was G2 (43); lowered to C2 (36) so pop bass doesn't
+    // get octave-shifted up when the root naturally sits in the low register.
+    bassMin = 36, // C2  (was G2=43; Hallelujah LH min observed: D1=26, roots ~C2-D2)
     bassMax = 57, // A3
     warnings = [],
   } = options;

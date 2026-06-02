@@ -56,18 +56,26 @@ export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
   dance_baroque:  { ...DEFAULT_PROFILE, stepPreference: 1.3, leapPenalty: 4.8, dissonancePenalty: 3.2 },
 
   // ── Adler-based profiles ────────────────────────────────────────────────
-  // melody_harmony: Vln I = foreground; inner voices lean stepwise; bass firm.
-  // Strong dissonance/crossing penalties enforce clean SATB-like block texture.
+  // melody_harmony: Vln I = foreground; inner voices support; bass firm.
+  //
+  // Re-calibrated from Beethoven Op.18 No.3 (966 measures):
+  //   Violin I  66% steps / 16% leaps  →  melody voice, mostly stepwise
+  //   Violin II 58% steps / 25% leaps  →  harmony voice, more freedom
+  //   Viola     49% steps / 32% leaps  →  inner voice, considerable leap freedom
+  //   Cello     58% steps / 31% leaps  →  bass role, leaps often
+  //
+  // Previous leapPenalty 6.0 was too strict for Viola/Vln II (both >25% leaps).
+  // Parallel 5ths extremely rare in Beethoven (0.7% of similar-motion pairs).
   melody_harmony: {
     ...DEFAULT_PROFILE,
-    stepPreference: 1.6,
-    leapPenalty: 6.0,
-    dissonancePenalty: 4.5,
-    crossingPenalty: 5.5,
-    parallelPerfectPenalty: 14,
-    hiddenPerfectPenalty: 7,
-    rangePenalty: 7,
-    tessituraPenalty: 1.8
+    stepPreference:          1.5,  // Beethoven avg ~57% stepwise across all voices
+    leapPenalty:             4.8,  // inner voices leap often (V-II 25%, Vla 32%)
+    dissonancePenalty:       4.5,
+    crossingPenalty:         5.5,
+    parallelPerfectPenalty:  15,   // Beethoven: 0.7% parallel 5ths — near-absolute
+    hiddenPerfectPenalty:    7,
+    rangePenalty:            7,
+    tessituraPenalty:        1.6
   },
 
   // melody_pizzicato: same harmonic principles as melody_harmony; slightly
@@ -220,22 +228,24 @@ export function evaluateTransition(
   }
 
   // ── Violin I / II spacing ─────────────────────────────────────────────────
-  // Calibrated from real scores:
-  //   Haydn Emperor's Hymn m1 pickup:  Vln1 G4(67) – Vln2 B3(59) = 8 st  (m6th)
-  //   Haydn Emperor's Hymn m2 beat 1:  Vln1 B4(71) – Vln2 G4(67) = 4 st  (M3rd)
-  //   Haydn Emperor's Hymn m3 beat 1:  Vln1 A4(69) – Vln2 C4(60) = 9 st  (M6th)
-  //   Haydn Op.64 No.3 m1 beat 1:      Vln1 D5(74) – Vln2 Bb4(70)= 4 st  (M3rd)
-  //   Mozart K387 m1 beat 1:           Vln1 D5(74) – Vln2 B4(71) = 3 st  (m3rd)
-  //   Mozart K387 m2 beat 1:           Vln1 D5(74) – Vln2 A4(69) = 5 st  (P4th)
-  //   Mozart K421 m1 beat 1:           Vln1 D5(74) – Vln2 rest   = n/a
-  //   Mozart K465 m4 beat 1:           Vln1 G5(79) – Vln2 B4(71) = 8 st  (m6th)
-  // Classical range: 3–9 semitones typical. Soft nudge at >10 would be ideal;
-  // hard cap at 19 is never exceeded in any of these examples.
+  // Calibrated from Beethoven Op.18 No.3 (966 measures, 2090 simultaneous pairs):
+  //   avg=8.9 st  p75=12  p90=17  p95=20  max=36
+  //   >12: 17.7% of all pairs  |  >19: 6.5%  |  >24: ~2%
+  //
+  // Previous thresholds (soft>12, hard>19) fired on 17.7% and 6.5% of
+  // Beethoven's perfectly valid spacings.  Updated to p90/p95+margin:
+  //   Soft penalty fires at >17 (≈p90 — top 10% of Beethoven pairs)
+  //   Hard penalty fires at >24 (≈p97 — genuine outliers only)
+  //
+  // Individual examples confirming 3–17 st as the normal band:
+  //   Haydn Emperor's Hymn m1:  Vln1 G4(67)–Vln2 B3(59) = 8 st
+  //   Mozart K387 m1:           Vln1 D5(74)–Vln2 B4(71) = 3 st
+  //   Mozart K465 m4:           Vln1 G5(79)–Vln2 B4(71) = 8 st
   if (next.vln1 !== null && next.vln2 !== null) {
     const dist = next.vln1 - next.vln2;
-    if (dist > 19) {
+    if (dist > 24) {
       penalties.push({ id: "vln2_spacing_hard", cost: profile.crossingPenalty * 1.5, detail: String(dist) });
-    } else if (dist > 12) {
+    } else if (dist > 17) {
       penalties.push({ id: "vln2_spacing_soft", cost: profile.crossingPenalty * 0.5, detail: String(dist) });
     }
   }
