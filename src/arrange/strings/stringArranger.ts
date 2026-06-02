@@ -422,21 +422,33 @@ export function applyPianoBassRhythm(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Piano-melody rhythm overlay for Violin I
+// Piano-RH rhythm overlay for Violin I, Violin II, and Viola
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** Maps a lowercase part name to its string voice ID. */
+function partNameToVoiceId(n: string): VoiceId | null {
+  // Use exact/prefix matching to avoid "violin i" matching "violin ii".
+  if (n === "violin i" || n === "violin 1" || n === "vln i" || n === "vln1" ||
+      n.startsWith("violin i ") || n.startsWith("violin 1 ")) return "vln1";
+  if (n === "violin ii" || n === "violin 2" || n === "vln ii" || n === "vln2" ||
+      n.startsWith("violin ii ") || n.startsWith("violin 2 ")) return "vln2";
+  if (n === "viola" || n === "vla" || n.startsWith("viola ") || n.startsWith("vla ")) return "vla";
+  return null;
+}
+
 /**
- * Post-process Violin I so it plays the piano's RIGHT-HAND melody with the
- * piano's RH rhythm (staff=1 / voice<=2).
+ * Post-process Violin I, Violin II, and Viola so all three follow the piano's
+ * RIGHT-HAND rhythm at the same density.
  *
- * Strategy:
- * 1. For every unique piano-RH onset time in the measure, find the HIGHEST
- *    sounding MIDI pitch at that time — that is the melody note.
- * 2. Transpose it into Violin I's comfortable range by octave shifts.
- * 3. If no piano pitch is available at an onset (fallback), use the top
- *    chord-tone candidate so the part is never silent.
+ * Strategy — "melody-guided chord-tone" for each voice:
+ * 1. Build onset-time → highest RH MIDI pitch map per measure (melody contour).
+ * 2. For each onset, transpose the piano melody pitch into the voice's range,
+ *    then pick the chord-tone candidate NEAREST to that transposed target.
+ * 3. Fallback: nearest chord tone to the previous note (smooth voice-leading).
  *
- * This runs after the DP (which uses the memory-safe one-event-per-measure
- * template) so it adds rhythmic and melodic activity without touching the heap.
+ * All three voices use the SAME onset-time grid (piano RH) so they are
+ * rhythmically identical.  Each independently lands on the chord tone closest
+ * to the melody in its own register, producing natural voice spread.
  */
 export function applyPianoMelodyRhythm(
   stringScore: ScoreModel,
@@ -447,96 +459,95 @@ export function applyPianoMelodyRhythm(
   if (!pianoPart) return;
 
   const parts: any[] = (stringScore as any).parts ?? [];
-  const vln1Part = parts.find((p: any) => {
-    const n = String(p?.name ?? "").toLowerCase();
-    return n.includes("violin i") || n.includes("violin 1") || n.includes("vln1") || n.includes("vln i");
-  });
-  if (!vln1Part) return;
-
   const pianoMeasures: any[] = pianoPart.measures ?? [];
-  const range = STRING_RANGES["vln1"];
 
-  vln1Part.measures = (vln1Part.measures ?? []).map((m: any) => {
-    const mnum = Number(m.number);
-    const attrs = m.attributes ?? {};
-    const beats    = Number(attrs?.time?.beats    ?? 4);
-    const beatType = Number(attrs?.time?.beat_type ?? 4);
-    const measureLen = beats * (4 / beatType);
+  // Process each upper-string part that we can identify by name.
+  for (const part of parts) {
+    const n = String(part?.name ?? "").toLowerCase().trim();
+    const voiceId = partNameToVoiceId(n);
+    if (!voiceId) continue; // skip Cello, Bass, or unrecognised parts
+    if (voiceId === "vc" || voiceId === "cb") continue; // handled by applyPianoBassRhythm
 
-    const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
-
-    // ── Build a map: onset-time → highest piano-RH MIDI pitch ────────────
-    // "Right hand" = staff 1 OR voice ≤ 2.
-    // Taking the highest pitch at each onset captures the melody line even
-    // when the RH plays full chords.
-    const onsetPitch = new Map<number, number>(); // t → highest midi
-    if (pianoM) {
-      for (const ev of (pianoM.events ?? [])) {
-        if (ev.type !== "note") continue;
-        const staff = Number(ev.staff ?? 1);
-        const voice = Number(ev.voice ?? 1);
-        if (staff !== 1 && voice > 2) continue;
-        const t = Number(ev.t ?? 0);
-        if (t < 0 || t >= measureLen) continue;
-        const midi = eventMidi(ev);
-        if (midi === null) continue;
-        const prev = onsetPitch.get(t);
-        if (prev === undefined || midi > prev) onsetPitch.set(t, midi);
-      }
-    }
-
-    // Fall back to beat grid when the piano measure is empty / missing.
-    if (!onsetPitch.size) {
-      for (let t = 0; t < measureLen; t += 1.0) onsetPitch.set(t, -1); // -1 = no pitch, use chord tone
-    }
-
-    const times = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
-    times.push(measureLen); // sentinel barline
-
-    const events: NoteEvent[] = [];
+    const range = STRING_RANGES[voiceId];
     let prevMidi: number | null = null;
 
-    for (let i = 0; i < times.length - 1; i++) {
-      const t     = times[i]!;
-      const next  = times[i + 1]!;
-      const capDur = measureLen - t;
-      if (capDur <= 0) continue;
-      const rawDur = Math.min(capDur, next - t);
-      const dur    = snapToStandardDuration(rawDur);
-      if (dur <= 0) continue;
+    part.measures = (part.measures ?? []).map((m: any) => {
+      const mnum = Number(m.number);
+      const attrs = m.attributes ?? {};
+      const beats    = Number(attrs?.time?.beats    ?? 4);
+      const beatType = Number(attrs?.time?.beat_type ?? 4);
+      const measureLen = beats * (4 / beatType);
 
-      // ── Resolve pitch ──────────────────────────────────────────────────
-      const rawMidi = onsetPitch.get(t) ?? -1;
-      let midi: number | null = null;
+      const pianoM = pianoMeasures.find((pm: any) => Number(pm.number) === mnum);
 
-      if (rawMidi > 0) {
-        // Transpose the piano melody into Violin I's range by octave shifts.
-        midi = clampMidiToRangeByOctave(rawMidi, range);
-      } else {
-        // No piano pitch available — fall back to highest chord-tone candidate.
+      // onset-time → highest piano-RH MIDI pitch (melody contour guide).
+      const onsetPitch = new Map<number, number>();
+      if (pianoM) {
+        for (const ev of (pianoM.events ?? [])) {
+          if (ev.type !== "note") continue;
+          const staff = Number(ev.staff ?? 1);
+          const voice = Number(ev.voice ?? 1);
+          if (staff !== 1 && voice > 2) continue; // right hand only
+          const t = Number(ev.t ?? 0);
+          if (t < 0 || t >= measureLen) continue;
+          const midi = eventMidi(ev);
+          if (midi === null) continue;
+          const cur = onsetPitch.get(t);
+          if (cur === undefined || midi > cur) onsetPitch.set(t, midi);
+        }
+      }
+      if (!onsetPitch.size) {
+        for (let t = 0; t < measureLen; t += 1.0) onsetPitch.set(t, -1);
+      }
+
+      const times = Array.from(onsetPitch.keys()).sort((a, b) => a - b);
+      times.push(measureLen);
+
+      const events: NoteEvent[] = [];
+
+      for (let i = 0; i < times.length - 1; i++) {
+        const t     = times[i]!;
+        const next  = times[i + 1]!;
+        const capDur = measureLen - t;
+        if (capDur <= 0) continue;
+        const dur = snapToStandardDuration(Math.min(capDur, next - t));
+        if (dur <= 0) continue;
+
         const slice: Slice = {
           measure: mnum, t, dur,
           melodyMidi: null,
           chordSymbol: pickChordForTime(chords, mnum, t)
         };
         const prevVoicing: Voicing | null = prevMidi !== null
-          ? { vln1: prevMidi, vln2: null, vla: null, vc: null, cb: null } as any
+          ? { vln1: null, vln2: null, vla: null, vc: null, cb: null, [voiceId]: prevMidi } as any
           : null;
         const candidateMap = buildCandidatesForSlice({
           slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode
         });
-        const cands = candidateMap["vln1"];
-        midi = cands.length ? clampMidiToRangeByOctave(cands[0]!, range) : null;
+        const cands = candidateMap[voiceId];
+
+        // Pick chord tone nearest to the piano melody target in this voice's range.
+        const rawMidi = onsetPitch.get(t) ?? -1;
+        const target = rawMidi > 0
+          ? clampMidiToRangeByOctave(rawMidi, range)
+          : (prevMidi ?? Math.round((range.prefMin + range.prefMax) / 2));
+
+        let midi: number | null = null;
+        if (cands.length) {
+          midi = cands.reduce((best, c) =>
+            Math.abs(c - target) < Math.abs(best - target) ? c : best
+          );
+        }
+
+        if (midi === null) {
+          events.push({ id: `${voiceId}-rh-${mnum}-${t}`, t, dur, type: "rest", voice: 1, staff: 1, isRest: true } as any);
+        } else {
+          prevMidi = midi;
+          events.push({ id: `${voiceId}-rh-${mnum}-${t}`, t, dur, type: "note", pitch: midiToPitch(midi), voice: 1, staff: 1 });
+        }
       }
 
-      if (midi === null) {
-        events.push({ id: `vln1-mel-${mnum}-${t}`, t, dur, type: "rest", voice: 1, staff: 1, isRest: true } as any);
-      } else {
-        prevMidi = midi;
-        events.push({ id: `vln1-mel-${mnum}-${t}`, t, dur, type: "note", pitch: midiToPitch(midi), voice: 1, staff: 1 });
-      }
-    }
-
-    return { ...m, events };
-  });
+      return { ...m, events };
+    });
+  }
 }
