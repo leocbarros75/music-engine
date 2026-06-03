@@ -18,6 +18,7 @@ import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arran
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
+import { arrangeWoodwindEnsemble } from "../arrange/woodwinds/woodwindArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -1912,43 +1913,37 @@ export function applyAppSettings(
   }
 
   if (wantsWoodwinds) {
-    // ── Schoenberg density scaling for woodwind inner voices ─────────────────
-    // Flute carries the foreground melody. When the soprano/melody part is
-    // ornate (dense 8th-note or faster motion), scale down inner-voice activity
-    // so Oboe and Clarinet don't compete with the melodic line (Ch. IX).
-    const wwMelodyPart = (scoreModel.parts ?? []).find((p: any) => {
-      const n = String(p?.name ?? "").toLowerCase();
-      return n.includes("soprano") || n.includes("melody") || n.includes("voice");
-    }) ?? scoreModel.parts?.[0];
-    const rawOboeAct    = (settings.altoActivity  ?? "less_active") as Activity;
-    const rawClrAct     = (settings.tenorActivity ?? "less_active") as Activity;
-    const adaptedOboe   = schoenbergScaleActivity(wwMelodyPart, rawOboeAct);
-    const adaptedClr    = schoenbergScaleActivity(wwMelodyPart, rawClrAct);
-    if (adaptedOboe !== rawOboeAct || adaptedClr !== rawClrAct) {
-      warnings.push(
-        `[woodwinds] Schoenberg density scaling: ornate flute melody → ` +
-        `oboe ${rawOboeAct}→${adaptedOboe}, clarinet ${rawClrAct}→${adaptedClr}.`
-      );
-    }
-    const finalScore = mapPianoToWoodwindEnsembleOpen(scoreModel, {
-      level: settings.level,
-      accompaniment,
-      textureMode,
-      chords,
+    // ── Woodwind quartet (auto) — DP-based, same engine as string_ensemble ──
+    // Routes through arrangeWoodwindEnsemble which:
+    //   1. Runs the string DP → proper 4-voice chord-tone separation
+    //   2. Remaps Vln I/II/Vla/Vc → Flute/Oboe/Clarinet Bb/Bassoon
+    //   3. Clamps notes to each instrument's sounding range
+    //   4. Applies source melody rhythm for activity (quarter-note minimum)
+    //
+    // Clarinet in Bb: all pitches stored as concert/sounding.
+    // The general MusicXML exporter adds +2 semitones (written vs sounding)
+    // via getTransposeForInstrument("clarinet_bb").
+    const wwProfile: ProfileId = usePolyphonic
+      ? "countermelody"
+      : styleRaw === "baroque"
+        ? "bach_chorale"
+        : "melody_harmony";
+
+    const wwResult = arrangeWoodwindEnsemble(scoreModel, chords as any, {
+      profile: wwProfile,
+      chords:  chords as any,
+      key:     { fifths: detectedInputKeyFifths, mode: detectedMode },
       warnings,
-      fluteActivity: settings.sopranoActivity ?? "less_active",
-      oboeActivity: adaptedOboe,
-      clarinetActivity: adaptedClr,
-      bassoonActivity: settings.bassActivity ?? "less_active"
     });
-    attachTextureAnalysis(finalScore, warnings);
+
+    attachTextureAnalysis(wwResult.scoreModel, warnings);
     return {
-      scoreModel: finalScore,
+      scoreModel: wwResult.scoreModel as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,
       styleUsed,
-      cadenceMeasures: []
+      cadenceMeasures: [],
     };
   }
 
