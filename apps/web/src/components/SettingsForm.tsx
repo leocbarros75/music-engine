@@ -245,6 +245,56 @@ const STRING_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: Non
   }
 ];
 
+// ── Woodwind ensemble auto — texture + reference examples (parity with strings)
+const WIND_TEXTURE_OPTIONS: Array<{
+  label: string;
+  value: NonNullable<Settings["woodwindTexture"]>;
+  help: string;
+}> = [
+  {
+    label: "Melody + Harmony (default)",
+    value: "melody_harmony",
+    help: "Flute = foreground melody; Oboe/Clarinet = inner harmony; Bassoon = bass; Horn = sustained pad. Standard wind-choir texture."
+  },
+  {
+    label: "Chamber (balanced dialogue)",
+    value: "chamber",
+    help: "Conversational balance between the wind voices, as in a Mozart/Reicha wind quintet — moderate voice independence."
+  },
+  {
+    label: "Chorale (homophonic block)",
+    value: "chorale",
+    help: "All voices move together in balanced block chords with strict voice-leading (hymn / Bach-chorale style)."
+  },
+  {
+    label: "Counterpoint (independent voices)",
+    value: "contrapuntal",
+    help: "Each instrument has an independent imitative line — like Nielsen's wind quintet. Activates the counterpoint profile."
+  }
+];
+
+// Reference wind-ensemble pieces — each sets a composer/period style + texture.
+const WIND_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: NonNullable<Settings["woodwindTexture"]>; composer: string; help: string }> = [
+  { value: "mozart_k361_gran_partita", label: "Mozart — Gran Partita K.361", texture: "melody_harmony", composer: "mozart",
+    help: "Classical wind serenade — clear melody+harmony, light textures." },
+  { value: "mozart_k388_serenade", label: "Mozart — Serenade K.388", texture: "chamber", composer: "mozart",
+    help: "Darker C-minor wind octet — balanced chamber dialogue." },
+  { value: "mozart_k452_quintet", label: "Mozart — Quintet K.452", texture: "chamber", composer: "mozart",
+    help: "Conversational classical balance between the wind voices." },
+  { value: "beethoven_op16_quintet", label: "Beethoven — Quintet Op.16", texture: "melody_harmony", composer: "beethoven",
+    help: "Classical-dramatic: stronger contrast, more independent lines." },
+  { value: "reicha_quintet", label: "Reicha — Wind Quintet Op.88/91", texture: "chamber", composer: "haydn",
+    help: "Foundational wind-quintet idiom — equal, conversational voices." },
+  { value: "danzi_quintet", label: "Danzi — Wind Quintet Op.56/67", texture: "melody_harmony", composer: "mozart",
+    help: "Graceful early-Romantic quintet — singing flute/oboe over light support." },
+  { value: "nielsen_quintet", label: "Nielsen — Wind Quintet Op.43", texture: "contrapuntal", composer: "brahms",
+    help: "Each instrument strongly characterised — independent contrapuntal lines." },
+  { value: "bach_chorale_winds", label: "Bach — Chorale (winds)", texture: "chorale", composer: "bach",
+    help: "Strict 4/5-part chorale: balanced block voicing, no parallels." },
+  { value: "handel_winds", label: "Handel — Wind movement", texture: "melody_harmony", composer: "handel",
+    help: "Baroque clarity: walking bassoon bass, balanced upper voices." },
+];
+
 const STRING_INSTRUMENTATION_OPTIONS: Array<{ label: string; value: NonNullable<Settings["instrumentation"]>; help: string }> = [
   { label: "Auto arranger", value: "auto", help: "Use the current string arranging engine." },
   {
@@ -446,11 +496,15 @@ export default function SettingsForm({ settings, onChange }: Props) {
   const isStrings = settings.ensemble === "string_ensemble" || settings.ensemble === "piano_with_strings";
   const isPianoStringQuartet = settings.ensemble === "piano_string_quartet";
   const isSatbStringQuartet  = settings.ensemble === "satb_string_quartet";
+  // Wind auto = the two modes that GENERATE an arrangement (mirror string auto).
+  const isWindAuto = settings.ensemble === "woodwind_ensemble" || settings.ensemble === "piano_with_woodwinds";
   const isWoodwinds =
-    settings.ensemble === "woodwind_ensemble" ||
+    isWindAuto ||
     settings.ensemble === "piano_woodwind_quartet" ||
-    settings.ensemble === "satb_woodwind_quartet" ||
-    settings.ensemble === "piano_with_woodwinds";
+    settings.ensemble === "satb_woodwind_quartet";
+  // The shared auto-arranger panel (texture, examples, composer, style, level,
+  // accompaniment) is used by both string auto and wind auto.
+  const isAutoArranger = isStrings || isWindAuto;
   const isCopyInstrumentation = false; // legacy — routing now handled by ensemble value
   const instrumentationHelp =
     (isStrings ? STRING_INSTRUMENTATION_OPTIONS : isWoodwinds ? WOODWIND_INSTRUMENTATION_OPTIONS : []).find(
@@ -894,13 +948,131 @@ export default function SettingsForm({ settings, onChange }: Props) {
           </div>
         </>
 
-      ) : isStrings ? (
+      ) : isAutoArranger ? (
         /* ════════════════════════════════════════════════════════════════════
-           STRING ENSEMBLE (AUTO) — style-driven arranger for lead sheets
+           AUTO ARRANGER — string OR wind ensemble (style-driven, lead sheets)
            ════════════════════════════════════════════════════════════════════ */
         <>
-          {/* String Texture */}
-          {true && (() => {
+          {/* Woodwind quintet toggle (wind auto only) */}
+          {isWindAuto && (
+            <div className="field">
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={settings.woodwindQuintet === true}
+                  onChange={(e) => update("woodwindQuintet", e.target.checked)}
+                  style={{ width: "16px", height: "16px", cursor: "pointer" }}
+                />
+                Woodwind quintet (add Horn in F)
+              </label>
+              <div className="key-preview">
+                <span className="slider-help">Adds a French Horn in F as a 5th voice between Clarinet and Bassoon.</span>
+              </div>
+            </div>
+          )}
+
+          {/* ── Wind Texture (wind auto) ── */}
+          {isWindAuto && (() => {
+            const currentTexture = settings.woodwindTexture ?? "melody_harmony";
+            const textureOpt = WIND_TEXTURE_OPTIONS.find((o) => o.value === currentTexture);
+            return (
+              <div className="field">
+                <label>Wind Texture</label>
+                <select
+                  value={currentTexture}
+                  onChange={(e) => {
+                    const tex = e.target.value as NonNullable<Settings["woodwindTexture"]>;
+                    const next: Partial<Settings> = { woodwindTexture: tex };
+                    if (tex === "contrapuntal") { next.textureMode = "polyphony"; next.accompaniment = "polyphonic"; }
+                    else if (settings.accompaniment === "polyphonic") { next.textureMode = "homophony_homorhythmic"; next.accompaniment = "homophonic"; }
+                    onChange({ ...settings, ...next });
+                  }}
+                >
+                  {WIND_TEXTURE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <div className="key-preview">
+                  <span className="slider-help">{textureOpt?.help ?? ""}</span>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── Wind Examples + Composer (wind auto) ── */}
+          {isWindAuto && (() => {
+            const currentExample = settings.woodwindExample ?? "";
+            const exampleOpt = WIND_EXAMPLE_OPTIONS.find((o) => o.value === currentExample);
+            const detectedComposer = currentExample ? (WIND_EXAMPLE_OPTIONS.find(o => o.value === currentExample)?.composer ?? "") : "";
+            const currentComposer = settings.woodwindComposer ?? "";
+            const effectiveComposer = currentComposer && currentComposer !== "auto" ? currentComposer : detectedComposer;
+            const COMPOSER_OPTIONS = [
+              { label: "Bach", value: "bach", period: "baroque" },
+              { label: "Handel", value: "handel", period: "baroque" },
+              { label: "Haydn", value: "haydn", period: "classical" },
+              { label: "Mozart", value: "mozart", period: "classical" },
+              { label: "Beethoven", value: "beethoven", period: "classical" },
+              { label: "Schubert", value: "schubert", period: "romantic" },
+              { label: "Brahms", value: "brahms", period: "romantic" },
+              { label: "Dvořák", value: "dvorak", period: "romantic" },
+            ];
+            return (
+              <>
+                <div className="field">
+                  <label>Example</label>
+                  <select
+                    value={currentExample}
+                    onChange={(e) => {
+                      const ex = e.target.value;
+                      const next: Partial<Settings> = { woodwindExample: ex };
+                      const tex = WIND_EXAMPLE_OPTIONS.find(o => o.value === ex)?.texture;
+                      if (tex) next.woodwindTexture = tex;
+                      if (settings.woodwindComposer && settings.woodwindComposer !== "auto") next.woodwindComposer = undefined;
+                      onChange({ ...settings, ...next });
+                    }}
+                  >
+                    <option value="">— None —</option>
+                    {WIND_EXAMPLE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  {exampleOpt && (
+                    <div className="key-preview"><span className="slider-help">{exampleOpt.help}</span></div>
+                  )}
+                </div>
+                <div className="field">
+                  <label>
+                    Composer Style
+                    {effectiveComposer && effectiveComposer !== currentComposer && (
+                      <span className="slider-help"> (auto-detected from example)</span>
+                    )}
+                  </label>
+                  <select
+                    value={currentComposer || "auto"}
+                    onChange={(e) => update("woodwindComposer", e.target.value === "auto" ? undefined : e.target.value)}
+                  >
+                    <option value="auto">
+                      {detectedComposer
+                        ? `Auto — ${COMPOSER_OPTIONS.find(c => c.value === detectedComposer)?.label ?? detectedComposer}`
+                        : "Auto (from example or period style)"}
+                    </option>
+                    <optgroup label="Baroque">
+                      {COMPOSER_OPTIONS.filter(c => c.period === "baroque").map(c => (<option key={c.value} value={c.value}>{c.label}</option>))}
+                    </optgroup>
+                    <optgroup label="Classical">
+                      {COMPOSER_OPTIONS.filter(c => c.period === "classical").map(c => (<option key={c.value} value={c.value}>{c.label}</option>))}
+                    </optgroup>
+                    <optgroup label="Romantic">
+                      {COMPOSER_OPTIONS.filter(c => c.period === "romantic").map(c => (<option key={c.value} value={c.value}>{c.label}</option>))}
+                    </optgroup>
+                  </select>
+                </div>
+              </>
+            );
+          })()}
+
+          {/* String Texture (string auto only) */}
+          {isStrings && (() => {
             const currentTexture = settings.stringTexture ?? "melody_harmony";
             const textureOpt = STRING_TEXTURE_OPTIONS.find((o) => o.value === currentTexture);
             return (
@@ -934,8 +1106,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
             );
           })()}
 
-          {/* Examples — reference pieces grouped by texture mode */}
-          {true && (() => {
+          {/* Examples — reference pieces grouped by texture mode (string auto only) */}
+          {isStrings && (() => {
             const currentTexture = settings.stringTexture ?? "melody_harmony";
             // Counterpoint mode accepts any string quartet piece as a reference;
             // show all examples rather than returning an empty list.
@@ -1186,10 +1358,12 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 const next: Partial<Settings> = { accompaniment: acc };
                 if (acc === "polyphonic") {
                   next.textureMode = "polyphony";
-                  next.stringTexture = "counterpoint";
-                } else if (settings.stringTexture === "counterpoint") {
-                  next.stringTexture = "melody_harmony";
+                  if (isWindAuto) next.woodwindTexture = "contrapuntal";
+                  else            next.stringTexture = "counterpoint";
+                } else {
                   next.textureMode = "homophony_homorhythmic";
+                  if (isWindAuto && settings.woodwindTexture === "contrapuntal") next.woodwindTexture = "melody_harmony";
+                  else if (settings.stringTexture === "counterpoint")            next.stringTexture = "melody_harmony";
                 }
                 onChange({ ...settings, ...next });
               }}
@@ -1205,6 +1379,38 @@ export default function SettingsForm({ settings, onChange }: Props) {
               </span>
             </div>
           </div>}
+
+          {/* ── Wind per-instrument activity (wind auto) ── */}
+          {isWindAuto && (() => {
+            const voices: Array<{ label: string; key: keyof Settings; def: string }> = [
+              { label: "Flute activity",    key: "fluteActivity"    as keyof Settings, def: "active" },
+              { label: "Oboe activity",     key: "oboeActivity"     as keyof Settings, def: "active" },
+              { label: "Clarinet activity", key: "clarinetActivity" as keyof Settings, def: "active" },
+              ...(settings.woodwindQuintet ? [{ label: "Horn activity", key: "hornActivity" as keyof Settings, def: "grounded" }] : []),
+              { label: "Bassoon activity",  key: "bassoonActivity"  as keyof Settings, def: "active" },
+            ];
+            return (
+              <>
+                {voices.map(({ label, key, def }) => (
+                  <div className="field" key={String(key)}>
+                    <label>{label}</label>
+                    <select value={(settings[key] as string) ?? def} onChange={(e) => update(key, e.target.value as any)}>
+                      {STRING_ACTIVITY_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <div className="key-preview">
+                      <span className="slider-help">
+                        {def === "grounded"
+                          ? "Sustained (held) — idiomatic for the horn pad."
+                          : "Activity / rhythmic density for this instrument (overrides its idiomatic default)."}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </>
+            );
+          })()}
         </>
 
       ) : (
@@ -1212,24 +1418,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
            ALL OTHER ENSEMBLES — full settings panel (woodwinds · brass)
            ════════════════════════════════════════════════════════════════════ */
         <>
-          {isWoodwinds && (
-            <div className="field">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={settings.woodwindQuintet === true}
-                  onChange={(e) => update("woodwindQuintet", e.target.checked)}
-                />
-                {" "}Woodwind quintet (add Horn in F)
-              </label>
-              <div className="key-preview">
-                <span className="slider-help">
-                  Adds a French Horn in F as a 5th voice between Clarinet and Bassoon.
-                </span>
-              </div>
-            </div>
-          )}
-
+          {/* Wind auto (quintet, texture, examples, activity) is handled in the
+              auto-arranger branch above. This branch is the copy/brass panel. */}
           <div className="field">
             <label>Key Signature</label>
             <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>

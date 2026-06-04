@@ -138,7 +138,8 @@ function applyMelodyRhythmToWoodwinds(
   score: ScoreModel,
   sourcePart: any,            // melody/soprano source part from the input score
   chords: ChordEvent[],
-  key: { fifths: number; mode: "major" | "minor" }
+  key: { fifths: number; mode: "major" | "minor" },
+  activity?: Partial<Record<WoodwindVoiceId, WoodwindActivity>>
 ): void {
   if (!sourcePart) return;
 
@@ -159,8 +160,12 @@ function applyMelodyRhythmToWoodwinds(
     const stringVoice = WOODWIND_TO_STRING_VOICE[wvId];
     const range       = WOODWIND_RANGES[wvId];
     const character   = WOODWIND_CHARACTER[wvId];
-    // Flute is the top voice = melody carrier; it always keeps full activity.
-    const isMelody    = wvId === "fl";
+    // User activity override (if set) replaces the instrument's default agility.
+    const userActivity = activity?.[wvId];
+    const effAgility   = userActivity ? activityToAgility(userActivity) : character.agility;
+    // Flute is the top voice = melody carrier; it always keeps full activity
+    // unless the user explicitly grounds it.
+    const isMelody    = wvId === "fl" && userActivity !== "grounded" && userActivity !== "less_active";
     let prevMidi: number | null = null;
 
     part.measures = (part.measures ?? []).map((m: any) => {
@@ -214,7 +219,7 @@ function applyMelodyRhythmToWoodwinds(
       // Flute/Clarinet stay busy, Oboe/Bassoon move on beats, Horn sustains.
       const thinned = thinOnsetsByAgility(
         Array.from(onsetSet).sort((a, b) => a - b),
-        character.agility,
+        effAgility,
         measureLen,
         isMelody
       );
@@ -292,6 +297,8 @@ function applyMelodyRhythmToWoodwinds(
 // Main export
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type WoodwindActivity = "grounded" | "less_active" | "active" | "high_active";
+
 export type WoodwindArrangerOptions = {
   profile?:           ProfileId;
   chords?:            ChordEvent[];
@@ -306,7 +313,24 @@ export type WoodwindArrangerOptions = {
    * The function filters to RH notes (staff=1 or voice≤2) automatically.
    */
   rhythmSourcePart?:  any;
+  /**
+   * Per-instrument activity override. When set for a voice it replaces the
+   * instrument's idiomatic default agility (controls rhythmic density):
+   *   grounded → sustained pad   less_active → on-beat
+   *   active   → follow source   high_active → follow source (no thinning)
+   */
+  activity?: Partial<Record<WoodwindVoiceId, WoodwindActivity>>;
 };
+
+/** Map a user activity level to an effective agility for onset thinning. */
+function activityToAgility(a: WoodwindActivity): number {
+  switch (a) {
+    case "grounded":    return 0.2;  // sustained pad (half-measure)
+    case "less_active": return 0.6;  // on-beat (quarter grid)
+    case "active":      return 0.9;  // follow source rhythm
+    case "high_active": return 1.0;  // follow source rhythm, never thinned
+  }
+}
 
 /**
  * Arrange a score as a woodwind quartet or quintet using the string DP engine.
@@ -394,7 +418,7 @@ export function arrangeWoodwindEnsemble(
   }
 
   if (rhythmPart && chords.length) {
-    applyMelodyRhythmToWoodwinds(woodwindScore, rhythmPart, chords, key);
+    applyMelodyRhythmToWoodwinds(woodwindScore, rhythmPart, chords, key, options.activity);
   }
 
   return { scoreModel: woodwindScore, warnings };

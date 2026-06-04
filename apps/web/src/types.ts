@@ -66,6 +66,15 @@ export type Settings = {
   pianoStylePreset?: string;
   /** Woodwind quintet (adds Horn in F as a 5th voice) when true. */
   woodwindQuintet?: boolean;
+  /** Woodwind ensemble auto settings — parity with the string ensemble. */
+  woodwindTexture?: "melody_harmony" | "chorale" | "contrapuntal" | "chamber";
+  woodwindExample?: string;
+  woodwindComposer?: string;
+  fluteActivity?:    "grounded" | "less_active" | "active" | "high_active";
+  oboeActivity?:     "grounded" | "less_active" | "active" | "high_active";
+  clarinetActivity?: "grounded" | "less_active" | "active" | "high_active";
+  hornActivity?:     "grounded" | "less_active" | "active" | "high_active";
+  bassoonActivity?:  "grounded" | "less_active" | "active" | "high_active";
   /**
    * When true, the engine auto-generates chord harmony from the melody using
    * Krumhansl-Schmuckler key detection + scale-degree harmonization.

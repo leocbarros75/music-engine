@@ -18,8 +18,9 @@ import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arran
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
-import { arrangeWoodwindEnsemble } from "../arrange/woodwinds/woodwindArranger";
+import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
 import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrangeSatbToWoodwindQuartet";
+import { woodwindTextureToProfile, woodwindExampleToTexture, type WoodwindTexture } from "../arrange/woodwinds/woodwindStyle";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -109,6 +110,16 @@ export type AppSettings = {
   /** Woodwind quintet (adds Horn in F as 5th voice) when true or woodwindSize="quintet". */
   woodwindQuintet?: boolean;
   woodwindSize?: "quartet" | "quintet";
+  /** Woodwind ensemble auto settings — parity with the string ensemble. */
+  woodwindTexture?: "melody_harmony" | "chorale" | "contrapuntal" | "chamber";
+  woodwindExample?: string;
+  woodwindComposer?: string;
+  /** Per-instrument activity (overrides idiomatic agility defaults). */
+  fluteActivity?:    "grounded" | "less_active" | "active" | "high_active";
+  oboeActivity?:     "grounded" | "less_active" | "active" | "high_active";
+  clarinetActivity?: "grounded" | "less_active" | "active" | "high_active";
+  hornActivity?:     "grounded" | "less_active" | "active" | "high_active";
+  bassoonActivity?:  "grounded" | "less_active" | "active" | "high_active";
 };
 
 export type ApplySettingsResult = {
@@ -1821,17 +1832,24 @@ export function applyAppSettings(
     if (!pianoChords.length) {
       warnings.push("[piano+winds] Could not infer chords from piano score — wind parts may be sparse.");
     }
-    const wwProfile: ProfileId = usePolyphonic
-      ? "countermelody"
-      : styleRaw === "baroque"
-        ? "bach_chorale"
-        : "melody_harmony";
+    const wwTexture: WoodwindTexture | undefined =
+      (settings.woodwindTexture as WoodwindTexture | undefined) ??
+      (settings.woodwindExample ? (woodwindExampleToTexture(settings.woodwindExample) ?? undefined) : undefined);
+    const wwProfile = woodwindTextureToProfile(wwTexture, styleRaw, usePolyphonic);
+
+    const wwActivity: Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WoodwindActivity>> = {};
+    if (settings.fluteActivity)    wwActivity.fl = settings.fluteActivity as WoodwindActivity;
+    if (settings.oboeActivity)     wwActivity.ob = settings.oboeActivity as WoodwindActivity;
+    if (settings.clarinetActivity) wwActivity.cl = settings.clarinetActivity as WoodwindActivity;
+    if (settings.hornActivity)     wwActivity.hn = settings.hornActivity as WoodwindActivity;
+    if (settings.bassoonActivity)  wwActivity.bn = settings.bassoonActivity as WoodwindActivity;
 
     const wwResult = arrangeWoodwindEnsemble(scoreModel, pianoChords as any, {
       profile:          wwProfile,
       chords:           pianoChords as any,
       key:              { fifths: detectedInputKeyFifths, mode: detectedMode },
       quintet:          wantsWoodwindQuintet,
+      activity:         Object.keys(wwActivity).length ? wwActivity : undefined,
       rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
       warnings,
     });
@@ -1980,27 +1998,36 @@ export function applyAppSettings(
   }
 
   if (wantsWoodwinds) {
-    // ── Woodwind quartet (auto) — DP-based, same engine as string_ensemble ──
-    // Routes through arrangeWoodwindEnsemble which:
-    //   1. Runs the string DP → proper 4-voice chord-tone separation
-    //   2. Remaps Vln I/II/Vla/Vc → Flute/Oboe/Clarinet Bb/Bassoon
-    //   3. Clamps notes to each instrument's sounding range
-    //   4. Applies source melody rhythm for activity (quarter-note minimum)
+    // ── Woodwind ensemble (auto) — full parity with string ensemble auto ────
+    //   1. Runs the string DP → proper 4/5-voice chord-tone separation
+    //   2. Remaps Vln I/II/Vla/Vc(/Cb) → Flute/Oboe/Clarinet/(Horn)/Bassoon
+    //   3. Clamps notes to each instrument's sounding range (sweet-spot aware)
+    //   4. Applies source rhythm with per-instrument agility/activity
     //
-    // Clarinet in Bb: all pitches stored as concert/sounding.
-    // The general MusicXML exporter adds +2 semitones (written vs sounding)
-    // via getTransposeForInstrument("clarinet_bb").
-    const wwProfile: ProfileId = usePolyphonic
-      ? "countermelody"
-      : styleRaw === "baroque"
-        ? "bach_chorale"
-        : "melody_harmony";
+    // Clarinet in Bb / Horn in F: pitches stored as concert/sounding; the
+    // exporter adds the written transposition (+2 clarinet, +7 horn).
+    //
+    // Texture (woodwindTexture) and example/composer mirror the string settings.
+    // An example may set the default texture if the user hasn't chosen one.
+    const wwTexture: WoodwindTexture | undefined =
+      (settings.woodwindTexture as WoodwindTexture | undefined) ??
+      (settings.woodwindExample ? (woodwindExampleToTexture(settings.woodwindExample) ?? undefined) : undefined);
+    const wwProfile = woodwindTextureToProfile(wwTexture, styleRaw, usePolyphonic);
+
+    // Per-instrument activity overrides (undefined → idiomatic agility default).
+    const wwActivity: Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WoodwindActivity>> = {};
+    if (settings.fluteActivity)    wwActivity.fl = settings.fluteActivity as WoodwindActivity;
+    if (settings.oboeActivity)     wwActivity.ob = settings.oboeActivity as WoodwindActivity;
+    if (settings.clarinetActivity) wwActivity.cl = settings.clarinetActivity as WoodwindActivity;
+    if (settings.hornActivity)     wwActivity.hn = settings.hornActivity as WoodwindActivity;
+    if (settings.bassoonActivity)  wwActivity.bn = settings.bassoonActivity as WoodwindActivity;
 
     const wwResult = arrangeWoodwindEnsemble(scoreModel, chords as any, {
-      profile: wwProfile,
-      chords:  chords as any,
-      key:     { fifths: detectedInputKeyFifths, mode: detectedMode },
-      quintet: wantsWoodwindQuintet,
+      profile:  wwProfile,
+      chords:   chords as any,
+      key:      { fifths: detectedInputKeyFifths, mode: detectedMode },
+      quintet:  wantsWoodwindQuintet,
+      activity: Object.keys(wwActivity).length ? wwActivity : undefined,
       warnings,
     });
 

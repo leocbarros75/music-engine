@@ -524,6 +524,10 @@ function extractChordsFromPdfText(text: string): string | null {
   return chordLines.join(" | ");
 }
 
+function isActivity(v: unknown): v is "grounded" | "less_active" | "active" | "high_active" {
+  return v === "grounded" || v === "less_active" || v === "active" || v === "high_active";
+}
+
 function normalizeAppSettings(raw: unknown): AppSettings {
   if (!isObject(raw)) return {};
   const anyRaw = raw as Record<string, unknown>;
@@ -640,6 +644,18 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       anyRaw.woodwindSize === "quartet" || anyRaw.woodwindSize === "quintet"
         ? (anyRaw.woodwindSize as AppSettings["woodwindSize"])
         : undefined,
+    woodwindTexture:
+      anyRaw.woodwindTexture === "melody_harmony" || anyRaw.woodwindTexture === "chorale" ||
+      anyRaw.woodwindTexture === "contrapuntal" || anyRaw.woodwindTexture === "chamber"
+        ? (anyRaw.woodwindTexture as AppSettings["woodwindTexture"])
+        : undefined,
+    woodwindExample:  typeof anyRaw.woodwindExample === "string" ? anyRaw.woodwindExample : undefined,
+    woodwindComposer: typeof anyRaw.woodwindComposer === "string" ? anyRaw.woodwindComposer : undefined,
+    fluteActivity:    isActivity(anyRaw.fluteActivity)    ? anyRaw.fluteActivity    : undefined,
+    oboeActivity:     isActivity(anyRaw.oboeActivity)     ? anyRaw.oboeActivity     : undefined,
+    clarinetActivity: isActivity(anyRaw.clarinetActivity) ? anyRaw.clarinetActivity : undefined,
+    hornActivity:     isActivity(anyRaw.hornActivity)     ? anyRaw.hornActivity     : undefined,
+    bassoonActivity:  isActivity(anyRaw.bassoonActivity)  ? anyRaw.bassoonActivity  : undefined,
     sopranoMelodyShare:
       typeof anyRaw.sopranoMelodyShare === "number" && Number.isFinite(anyRaw.sopranoMelodyShare)
         ? anyRaw.sopranoMelodyShare
