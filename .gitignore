@@ -33,3 +33,8 @@ out_*.musicxml
 # ---- misc ----
 .env
 .env.*
+
+# Local test scripts and editor config
+_diag_*.ts
+_test_*.ts
+.claude/launch.json
