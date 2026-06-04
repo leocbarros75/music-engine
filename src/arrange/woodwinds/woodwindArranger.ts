@@ -78,12 +78,15 @@ function midpoint(r: { prefMin: number; prefMax: number }): number {
 }
 
 /**
- * Thin a measure's onset-time grid according to an instrument's agility, so
- * each woodwind plays to its idiom (Adler/Rimsky-Korsakov):
- *   high agility (Flute, Clarinet ≥0.9): keep every onset — brilliant passagework
- *   mid  agility (Oboe, Bassoon 0.5–0.9): keep on-beat onsets — lyrical/foundation
- *   low  agility (Horn <0.5): keep half-measure onsets only — sustained pad
- * The melody voice (isMelody) is never thinned — it always carries full activity.
+ * Thin a measure's onset-time grid according to an instrument's agility.
+ *
+ * Calibrated against real woodwind ensemble scores, where Flute/Oboe/Clarinet/
+ * Bassoon ALL play 85–97% fast notes — so those voices (agility ≥0.8) follow the
+ * source rhythm in full. Only the Horn (agility <0.5) is the idiomatic sustained
+ * pad and gets thinned to half-measure onsets (Adler/Forsyth).
+ *   agility ≥0.8 OR melody : keep every onset — full activity
+ *   agility 0.5–0.8        : keep on-beat (quarter-note) onsets
+ *   agility <0.5 (Horn)    : keep half-measure onsets — sustained pad
  */
 function thinOnsetsByAgility(
   times: number[],
@@ -91,7 +94,7 @@ function thinOnsetsByAgility(
   measureLen: number,
   isMelody: boolean
 ): number[] {
-  if (isMelody || agility >= 0.9) return times;
+  if (isMelody || agility >= 0.8) return times;
   const keepHalfOnly = agility < 0.5;
   const step = keepHalfOnly ? measureLen / 2 : 1.0; // half-measure pad vs quarter-note
   const kept = times.filter((t) => {

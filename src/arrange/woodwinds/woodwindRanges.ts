@@ -28,12 +28,15 @@ export type WoodwindRange = {
 // Clarinet Bb: D3–Bb6  pref D3–C6   (versatile: chalumeau + clarion both excellent)
 // Horn in F:   B1–F5   pref C3–C5   (noble middle register; low B1–B2 risky, high tiring)
 // Bassoon:     Bb1–E5  pref C2–C4   (foundation + warm tenor singing register)
+// pref ranges validated against two real woodwind ensembles (Elgar clarinet
+// quartet arr. + string-quartet-arr.-for-wind-quintet), p10–p90 working ranges:
+//   Flute 65–84  Oboe 61–76  Clarinet 58–76  Bassoon 36–62
 export const WOODWIND_RANGES: Record<WoodwindVoiceId, WoodwindRange> = {
-  fl: { absMin: 60, absMax: 98, prefMin: 67, prefMax: 88 }, // C4..D7   pref G4..E6
-  ob: { absMin: 58, absMax: 93, prefMin: 62, prefMax: 76 }, // Bb3..A6  pref D4..E5
-  cl: { absMin: 50, absMax: 90, prefMin: 50, prefMax: 84 }, // D3..Bb6  pref D3..C6 (concert)
-  hn: { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5   pref C3..C5 (concert)
-  bn: { absMin: 34, absMax: 74, prefMin: 36, prefMax: 60 }, // Bb1..D5  pref C2..C4
+  fl: { absMin: 60, absMax: 98, prefMin: 65, prefMax: 86 }, // C4..D7   pref F4..D6  (real p10=65 p90=84)
+  ob: { absMin: 58, absMax: 93, prefMin: 61, prefMax: 76 }, // Bb3..A6  pref Db4..E5 (real p10=61 p90=76)
+  cl: { absMin: 50, absMax: 90, prefMin: 55, prefMax: 79 }, // D3..Bb6  pref G3..G5  (real p10=58 p90=76; allow chalumeau down to G3)
+  hn: { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5   pref C3..C5  (noble middle register, Adler)
+  bn: { absMin: 34, absMax: 74, prefMin: 36, prefMax: 62 }, // Bb1..D5  pref C2..D4  (real p10=36 p90=62)
 };
 
 // ── Per-instrument playing characteristics (from the orchestration texts) ────
@@ -49,12 +52,18 @@ export type WoodwindCharacter = {
   sweetSpot: string;
 };
 
+// Agility calibrated against real woodwind ensemble scores, where EVERY voice
+// (including bassoon) plays 85–97% notes shorter than a quarter. The flute,
+// oboe, clarinet and bassoon are all highly active in real writing; only the
+// Horn is idiomatically a sustained pad. So only the Horn is rhythmically
+// thinned — the others follow the source rhythm fully.
+//   Real motion data: bassoon leaps 38–65% (foundation), upper voices step more.
 export const WOODWIND_CHARACTER: Record<WoodwindVoiceId, WoodwindCharacter> = {
-  fl: { agility: 1.0,  defaultActivity: "active",      role: "agile melody / brilliant passagework", sweetSpot: "D5–A6" },
-  ob: { agility: 0.55, defaultActivity: "less_active", role: "lyrical cantabile melody",              sweetSpot: "Eb4–D5" },
-  cl: { agility: 0.95, defaultActivity: "active",      role: "flexible — agile lines or warm color",  sweetSpot: "B4–C6 clarion / D3–F4 chalumeau" },
-  hn: { agility: 0.30, defaultActivity: "grounded",    role: "sustained harmony pad / noble tune",    sweetSpot: "C3–G4" },
-  bn: { agility: 0.70, defaultActivity: "less_active", role: "harmonic foundation / staccato / tenor", sweetSpot: "G2–C4" },
+  fl: { agility: 1.0,  defaultActivity: "active",      role: "agile melody / brilliant passagework",   sweetSpot: "D5–A6" },
+  ob: { agility: 0.85, defaultActivity: "active",      role: "lyrical melody / active inner voice",     sweetSpot: "Eb4–D5" },
+  cl: { agility: 0.95, defaultActivity: "active",      role: "flexible — agile lines or warm color",    sweetSpot: "B4–C6 clarion / D3–F4 chalumeau" },
+  hn: { agility: 0.30, defaultActivity: "grounded",    role: "sustained harmony pad / noble tune",      sweetSpot: "C3–G4" },
+  bn: { agility: 0.85, defaultActivity: "active",      role: "active foundation / staccato / tenor",    sweetSpot: "G2–C4" },
 };
 
 // Maps woodwind voices onto string DP voice IDs (used by buildCandidatesForSlice).
