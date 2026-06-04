@@ -1850,6 +1850,8 @@ export function applyAppSettings(
       key:              { fifths: detectedInputKeyFifths, mode: detectedMode },
       quintet:          wantsWoodwindQuintet,
       activity:         Object.keys(wwActivity).length ? wwActivity : undefined,
+      polyphonic:       usePolyphonic || wwTexture === "contrapuntal",
+      level:            settings.level,
       rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
       warnings,
     });
@@ -2022,12 +2024,15 @@ export function applyAppSettings(
     if (settings.hornActivity)     wwActivity.hn = settings.hornActivity as WoodwindActivity;
     if (settings.bassoonActivity)  wwActivity.bn = settings.bassoonActivity as WoodwindActivity;
 
+    const wwIsContrapuntal = usePolyphonic || wwTexture === "contrapuntal";
     const wwResult = arrangeWoodwindEnsemble(scoreModel, chords as any, {
-      profile:  wwProfile,
-      chords:   chords as any,
-      key:      { fifths: detectedInputKeyFifths, mode: detectedMode },
-      quintet:  wantsWoodwindQuintet,
-      activity: Object.keys(wwActivity).length ? wwActivity : undefined,
+      profile:    wwProfile,
+      chords:     chords as any,
+      key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
+      quintet:    wantsWoodwindQuintet,
+      activity:   Object.keys(wwActivity).length ? wwActivity : undefined,
+      polyphonic: wwIsContrapuntal,
+      level:      settings.level,
       warnings,
     });
 
