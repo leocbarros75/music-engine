@@ -28,15 +28,16 @@ export type WoodwindRange = {
 // Clarinet Bb: D3–Bb6  pref D3–C6   (versatile: chalumeau + clarion both excellent)
 // Horn in F:   B1–F5   pref C3–C5   (noble middle register; low B1–B2 risky, high tiring)
 // Bassoon:     Bb1–E5  pref C2–C4   (foundation + warm tenor singing register)
-// pref ranges validated against two real woodwind ensembles (Elgar clarinet
-// quartet arr. + string-quartet-arr.-for-wind-quintet), p10–p90 working ranges:
-//   Flute 65–84  Oboe 61–76  Clarinet 58–76  Bassoon 36–62
+// pref ranges validated against THREE real scores — Elgar clarinet quartet,
+// string-quartet-arr.-for-wind-quintet, and Tchaikovsky 1812 Overture (422 mm).
+// p10–p90 working ranges (union across all three):
+//   Flute 65–89  Oboe 61–81  Clarinet 58–79  Bassoon 36–62
 export const WOODWIND_RANGES: Record<WoodwindVoiceId, WoodwindRange> = {
-  fl: { absMin: 60, absMax: 98, prefMin: 65, prefMax: 86 }, // C4..D7   pref F4..D6  (real p10=65 p90=84)
-  ob: { absMin: 58, absMax: 93, prefMin: 61, prefMax: 76 }, // Bb3..A6  pref Db4..E5 (real p10=61 p90=76)
-  cl: { absMin: 50, absMax: 90, prefMin: 55, prefMax: 79 }, // D3..Bb6  pref G3..G5  (real p10=58 p90=76; allow chalumeau down to G3)
+  fl: { absMin: 60, absMax: 98, prefMin: 65, prefMax: 88 }, // C4..D7   pref F4..E6  (3-source p10=65 p90=89)
+  ob: { absMin: 58, absMax: 93, prefMin: 61, prefMax: 79 }, // Bb3..A6  pref Db4..G5 (3-source p10=61 p90=81)
+  cl: { absMin: 50, absMax: 90, prefMin: 55, prefMax: 79 }, // D3..Bb6  pref G3..G5  (3-source p10=58 p90=79)
   hn: { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5   pref C3..C5  (noble middle register, Adler)
-  bn: { absMin: 34, absMax: 74, prefMin: 36, prefMax: 62 }, // Bb1..D5  pref C2..D4  (real p10=36 p90=62)
+  bn: { absMin: 34, absMax: 74, prefMin: 36, prefMax: 62 }, // Bb1..D5  pref C2..D4  (3-source p10=36 p90=62)
 };
 
 // ── Per-instrument playing characteristics (from the orchestration texts) ────
