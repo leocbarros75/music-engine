@@ -143,6 +143,38 @@ function durHasDot(divisions: number, dur: number): boolean {
   return dur === d * 3 || dur === d * 3 / 2 || dur === d * 3 / 4;
 }
 
+/**
+ * Decompose an arbitrary duration (in divisions) into a sequence of STANDARD
+ * note values that sum to it — the readable rhythm vocabulary:
+ *   whole, dotted-half, half, dotted-quarter, quarter, dotted-eighth, eighth,
+ *   16th, 32nd. (From the user's "Rhythm examples" reference.)
+ *
+ * A non-standard duration like 1.25 beats (quarter + 16th) becomes two values
+ * [quarter, 16th] which the caller renders as TIED notes (for pitches) or as
+ * separate rests. This guarantees every emitted note/rest has a valid <type>,
+ * eliminating the type-less notes that MuseScore turns into ghost rests, and
+ * never silently drops or overflows beats.
+ *
+ * Greedy largest-first; each component is guaranteed to have a valid durToType.
+ */
+function decomposeToStandardDivs(divisions: number, totalDivs: number): number[] {
+  if (!divisions || divisions <= 0 || totalDivs <= 0) return [];
+  // Standard multiples of a quarter (divisions), descending. Dotted values
+  // included so e.g. 3 beats → one dotted-half, not half+quarter.
+  const mults = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.125];
+  const standard = mults.map((m) => Math.round(divisions * m)).filter((v) => v > 0);
+  const out: number[] = [];
+  let remaining = Math.round(totalDivs);
+  let guard = 0;
+  while (remaining > 0 && guard++ < 64) {
+    const next = standard.find((v) => v <= remaining);
+    if (next === undefined) break; // remaining smaller than a 32nd — drop the sliver
+    out.push(next);
+    remaining -= next;
+  }
+  return out.length ? out : [Math.max(1, Math.round(totalDivs))];
+}
+
 function beatsToDivisionsDuration(durBeats: number, divisions: number): number {
   if (!Number.isFinite(durBeats) || durBeats <= 0) return Math.max(1, divisions);
   if (!Number.isFinite(divisions) || divisions <= 0) return Math.max(1, Math.round(durBeats));
@@ -818,6 +850,10 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
           const notes = group.filter((g) => g?.type === "note" || g?.type === "unpitched");
           const rests = group.filter((g) => g?.type === "rest");
           const useGroup = notes.length ? notes : rests;
+          // Chord = multiple simultaneous noteheads sharing one duration. Chord
+          // durations stay as a single snapped value (decomposing tied chords is
+          // unsafe); single notes/rests are decomposed into readable tied values.
+          const isChordGroup = useGroup.length > 1;
 
           let groupMaxDur = 0;
           for (let gi = 0; gi < useGroup.length; gi++) {
@@ -840,10 +876,17 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
             const dot  = durHasDot(currentDivisions, dur);
 
             if (evAny.type === "rest") {
-              out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
-              if (type) out += `<type>${type}</type>`;
-              if (dot)  out += `<dot/>`;
-              out += `<staff>${staff}</staff></note>`;
+              // Decompose into standard-valued rests so each has a valid <type>
+              // (no type-less rests → no MuseScore ghost rests) and the measure
+              // stays exactly filled.
+              const totalDivs = beatsToDivisionsDuration(durBeats, currentDivisions);
+              for (const cd of decomposeToStandardDivs(currentDivisions, totalDivs)) {
+                const ct = durToType(currentDivisions, cd);
+                out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
+                if (ct) out += `<type>${ct}</type>`;
+                if (durHasDot(currentDivisions, cd)) out += `<dot/>`;
+                out += `<staff>${staff}</staff></note>`;
+              }
               continue;
             }
 
@@ -880,44 +923,67 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
               const expectedAlter = keySignatureAlter(wp.step, fifthsToWrite);
               const accidental =
                 alterVal === expectedAlter ? null : accidentalFromAlterForDisplay(alterVal);
-              const tieStart = evAny.tieStart === true;
-              const tieStop = evAny.tieStop === true;
-              out += `<note>`;
-              if (gi > 0 || evAny.chord === true) out += `<chord/>`;
-              out += `<pitch><step>${xmlEscape(wp.step)}</step>`;
-              if (typeof wp.alter === "number" && wp.alter !== 0) out += `<alter>${wp.alter}</alter>`;
-              out += `<octave>${wp.octave}</octave></pitch>`;
-              if (tieStart) out += `<tie type="start"/>`;
-              if (tieStop) out += `<tie type="stop"/>`;
-              out += `<duration>${dur}</duration><voice>${voice}</voice>`;
-              if (type) out += `<type>${type}</type>`;
-              if (dot)  out += `<dot/>`;
-              if (accidental) out += `<accidental>${accidental}</accidental>`;
-              if (tieStart || tieStop) {
-                out += `<notations>`;
-                if (tieStart) out += `<tied type="start"/>`;
-                if (tieStop) out += `<tied type="stop"/>`;
-                out += `</notations>`;
+              const origTieStart = evAny.tieStart === true;
+              const origTieStop = evAny.tieStop === true;
+              const pitchXml =
+                `<pitch><step>${xmlEscape(wp.step)}</step>` +
+                (typeof wp.alter === "number" && wp.alter !== 0 ? `<alter>${wp.alter}</alter>` : "") +
+                `<octave>${wp.octave}</octave></pitch>`;
+
+              // Single notes: decompose a non-standard / multi-value duration into
+              // TIED standard note values (readable rhythm vocabulary). Chord
+              // members keep one snapped duration.
+              const comps = isChordGroup
+                ? [dur]
+                : decomposeToStandardDivs(currentDivisions, beatsToDivisionsDuration(durBeats, currentDivisions));
+
+              for (let ci = 0; ci < comps.length; ci++) {
+                const cd = comps[ci]!;
+                const ct = durToType(currentDivisions, cd);
+                const cdot = durHasDot(currentDivisions, cd);
+                const firstPiece = ci === 0;
+                const lastPiece  = ci === comps.length - 1;
+                // Internal ties bind the pieces together; preserve the event's
+                // original tie state on the outer edges.
+                const tieStart = (!lastPiece)  || (origTieStart && lastPiece);
+                const tieStop  = (!firstPiece) || (origTieStop && firstPiece);
+
+                out += `<note>`;
+                if ((gi > 0 || evAny.chord === true) && firstPiece) out += `<chord/>`;
+                out += pitchXml;
+                if (tieStart) out += `<tie type="start"/>`;
+                if (tieStop) out += `<tie type="stop"/>`;
+                out += `<duration>${cd}</duration><voice>${voice}</voice>`;
+                if (ct) out += `<type>${ct}</type>`;
+                if (cdot) out += `<dot/>`;
+                if (accidental && firstPiece) out += `<accidental>${accidental}</accidental>`;
+                if (tieStart || tieStop) {
+                  out += `<notations>`;
+                  if (tieStart) out += `<tied type="start"/>`;
+                  if (tieStop) out += `<tied type="stop"/>`;
+                  out += `</notations>`;
+                }
+                out += `<staff>${staff}</staff></note>`;
               }
-              out += `<staff>${staff}</staff></note>`;
               continue;
             }
           }
           cursor = Math.max(cursor, t + groupMaxDur);
         }
 
-        // Trailing rest: fill any gap between the last note and the barline.
-        // Without this, notes whose collective duration falls short of measureBeats
-        // produce an invalid total (MusicXML players reject the file).
+        // Trailing rest: fill any gap between the last note and the barline,
+        // decomposed into standard-valued rests so each has a valid <type> and
+        // the measure is exactly complete (no missing beats, no ghost rests).
         if (cursor < measureBeats - EPS) {
           const tailBeats = measureBeats - cursor;
           const tailDur   = beatsToDivisionsDuration(tailBeats, currentDivisions);
-          const tailType  = durToType(currentDivisions, tailDur);
-          const tailDot   = durHasDot(currentDivisions, tailDur);
-          out += `<note><rest/><duration>${tailDur}</duration><voice>${voice}</voice>`;
-          if (tailType) out += `<type>${tailType}</type>`;
-          if (tailDot)  out += `<dot/>`;
-          out += `<staff>1</staff></note>`;
+          for (const cd of decomposeToStandardDivs(currentDivisions, tailDur)) {
+            const ct = durToType(currentDivisions, cd);
+            out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
+            if (ct) out += `<type>${ct}</type>`;
+            if (durHasDot(currentDivisions, cd)) out += `<dot/>`;
+            out += `<staff>1</staff></note>`;
+          }
         }
       }
 
