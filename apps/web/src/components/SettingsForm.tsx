@@ -9,7 +9,10 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "piano → string quartet", value: "piano_string_quartet" },
   { label: "SATB → string quartet", value: "satb_string_quartet" },
   { label: "piano + strings (complement)", value: "piano_with_strings" },
-  { label: "woodwind ensemble", value: "woodwind_ensemble" },
+  { label: "wind ensemble (auto)", value: "woodwind_ensemble" },
+  { label: "piano → wind quartet", value: "piano_woodwind_quartet" },
+  { label: "choral → wind (SATB)", value: "satb_woodwind_quartet" },
+  { label: "piano + winds (complement)", value: "piano_with_woodwinds" },
   { label: "brass ensemble", value: "brass_ensemble" },
   { label: "orchestra", value: "orchestra" }
 ];
@@ -385,21 +388,13 @@ export default function SettingsForm({ settings, onChange }: Props) {
     } else if (nextEnsemble === "choral" && next.textureMode === "homophony_melody_accompaniment") {
       next.textureMode = "homophony_homorhythmic";
     }
-    // piano_string_quartet has its own ensemble value — no instrumentation needed.
-    // string_ensemble (auto) and woodwind_ensemble keep their own instrumentation dropdowns.
+    // Each ensemble now carries its own routing via the ensemble value
+    // (mirroring the string family). Instrumentation defaults to "auto".
     if (nextEnsemble === "piano_string_quartet") {
       next.instrumentation = "piano_copy_to_string_quartet"; // kept for back-compat; routing is by ensemble
       next.level = "advanced";
     } else {
-      const validInstrumentation =
-        nextEnsemble === "woodwind_ensemble"
-          ? new Set(WOODWIND_INSTRUMENTATION_OPTIONS.map((opt) => opt.value))
-          : new Set(["auto"]);
-      if (!validInstrumentation.has(next.instrumentation ?? "auto")) {
-        next.instrumentation = nextEnsemble === "woodwind_ensemble"
-          ? "piano_copy_to_woodwind_quartet"
-          : "auto";
-      }
+      next.instrumentation = "auto";
     }
     onChange(next);
   }
@@ -451,7 +446,11 @@ export default function SettingsForm({ settings, onChange }: Props) {
   const isStrings = settings.ensemble === "string_ensemble" || settings.ensemble === "piano_with_strings";
   const isPianoStringQuartet = settings.ensemble === "piano_string_quartet";
   const isSatbStringQuartet  = settings.ensemble === "satb_string_quartet";
-  const isWoodwinds = settings.ensemble === "woodwind_ensemble";
+  const isWoodwinds =
+    settings.ensemble === "woodwind_ensemble" ||
+    settings.ensemble === "piano_woodwind_quartet" ||
+    settings.ensemble === "satb_woodwind_quartet" ||
+    settings.ensemble === "piano_with_woodwinds";
   const isCopyInstrumentation = false; // legacy — routing now handled by ensemble value
   const instrumentationHelp =
     (isStrings ? STRING_INSTRUMENTATION_OPTIONS : isWoodwinds ? WOODWIND_INSTRUMENTATION_OPTIONS : []).find(
@@ -1213,21 +1212,20 @@ export default function SettingsForm({ settings, onChange }: Props) {
            ALL OTHER ENSEMBLES — full settings panel (woodwinds · brass)
            ════════════════════════════════════════════════════════════════════ */
         <>
-          {settings.ensemble === "woodwind_ensemble" && (
+          {isWoodwinds && (
             <div className="field">
-              <label>Instrumentation</label>
-              <select
-                value={settings.instrumentation ?? "auto"}
-                onChange={(e) => update("instrumentation", e.target.value as Settings["instrumentation"])}
-              >
-                {WOODWIND_INSTRUMENTATION_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={settings.woodwindQuintet === true}
+                  onChange={(e) => update("woodwindQuintet", e.target.checked)}
+                />
+                {" "}Woodwind quintet (add Horn in F)
+              </label>
               <div className="key-preview">
-                <span className="slider-help">{instrumentationHelp}</span>
+                <span className="slider-help">
+                  Adds a French Horn in F as a 5th voice between Clarinet and Bassoon.
+                </span>
               </div>
             </div>
           )}

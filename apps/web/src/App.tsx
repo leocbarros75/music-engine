@@ -97,6 +97,9 @@ export default function App() {
     settings.ensemble === "satb_string_quartet" ||
     settings.ensemble === "piano_with_strings" ||
     settings.ensemble === "woodwind_ensemble" ||
+    settings.ensemble === "piano_woodwind_quartet" ||
+    settings.ensemble === "satb_woodwind_quartet" ||
+    settings.ensemble === "piano_with_woodwinds" ||
     settings.ensemble === "brass_ensemble" ||
     settings.ensemble === "orchestra";
 

@@ -24,6 +24,8 @@ import {
   WOODWIND_RANGES,
   WOODWIND_TO_STRING_VOICE,
   WOODWIND_PART_META,
+  QUARTET_VOICES,
+  QUINTET_VOICES,
   type WoodwindVoiceId,
 } from "./woodwindRanges";
 import { buildCandidatesForSlice } from "../strings/candidates";
@@ -218,21 +220,29 @@ function applyMelodyRhythmToWoodwinds(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type WoodwindArrangerOptions = {
-  profile?: ProfileId;
-  chords?: ChordEvent[];
-  key?: { fifths: number; mode: "major" | "minor" };
-  warnings?: string[];
+  profile?:           ProfileId;
+  chords?:            ChordEvent[];
+  key?:               { fifths: number; mode: "major" | "minor" };
+  warnings?:          string[];
+  /** true = Flute/Oboe/Clarinet/Horn/Bassoon quintet; false (default) = quartet without horn */
+  quintet?:           boolean;
+  /**
+   * Optional override for the rhythm-template part.  When set (e.g. the frozen
+   * piano part in piano_with_woodwinds mode) it is used as the onset-time grid
+   * for all upper voices instead of the auto-detected melody part.
+   * The function filters to RH notes (staff=1 or voice≤2) automatically.
+   */
+  rhythmSourcePart?:  any;
 };
 
 /**
- * Arrange a score as a woodwind quartet (Flute, Oboe, Clarinet in Bb, Bassoon).
+ * Arrange a score as a woodwind quartet or quintet using the string DP engine.
  *
- * Uses the same DP voice-separation engine as the string ensemble:
- *   1. Run arrangeStringEnsemble → 5-voice SATB-like arrangement.
- *   2. Drop Double Bass; remap Vln I/II, Vla, Vc to Fl/Ob/Cl/Bn.
- *   3. Clamp any notes outside each instrument's sounding range by octave.
- *   4. Apply source melody rhythm to all four voices (quarter-note minimum),
- *      keeping each voice's DP-assigned register for proper voice separation.
+ *   1. Run arrangeStringEnsemble → 5-voice chord-tone arrangement.
+ *   2. Remap string parts → woodwind instruments (quartet: 4 parts, quintet: 5).
+ *   3. Clamp any notes outside each instrument's sounding range.
+ *   4. Apply rhythm grid from source melody (or rhythmSourcePart if provided)
+ *      with quarter-note fill so voices stay active even on sparse sources.
  */
 export function arrangeWoodwindEnsemble(
   score: ScoreModel,
@@ -241,21 +251,22 @@ export function arrangeWoodwindEnsemble(
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const profile  = options.profile ?? "melody_harmony";
+  const quintet  = options.quintet ?? false;
+  const voices   = quintet ? QUINTET_VOICES : QUARTET_VOICES;
 
   // ── 1. Run the string DP ─────────────────────────────────────────────────
   const stringResult = arrangeStringEnsemble(score, chords, { profile });
   warnings.push(...(stringResult.warnings ?? []));
 
-  // ── 2. Take the 4 upper parts (Vln I, II, Vla, Vc); drop Double Bass ────
-  const stringParts = (stringResult.scoreModel.parts ?? []).slice(0, 4);
+  // For quartet: take first 4 string parts (Vln I/II/Vla/Vc), drop CB.
+  // For quintet: take all 5 (Vln I/II/Vla/Vc/CB = Fl/Ob/Cl/Hn/Bn).
+  const stringParts = (stringResult.scoreModel.parts ?? []).slice(0, voices.length);
 
-  const wvOrder: WoodwindVoiceId[] = ["fl", "ob", "cl", "bn"];
   const woodwindParts = stringParts.map((part: any, idx: number) => {
-    const wvId  = wvOrder[idx]!;
+    const wvId  = voices[idx]!;
     const meta  = WOODWIND_PART_META[wvId];
     const range = WOODWIND_RANGES[wvId];
 
-    // Clamp every note into the woodwind's sounding range
     const measures = (part.measures ?? []).map((m: any) => {
       const events = (m.events ?? []).map((ev: any) => {
         if (ev.type !== "note" || !ev.pitch) return ev;
@@ -280,23 +291,37 @@ export function arrangeWoodwindEnsemble(
 
   const woodwindScore: ScoreModel = {
     ...(stringResult.scoreModel as any),
-    parts:     woodwindParts,
-    meta: {
-      ...(stringResult.scoreModel as any).meta,
-      ensemble: "woodwind_ensemble",
-    },
+    parts: woodwindParts,
+    meta:  { ...(stringResult.scoreModel as any).meta, ensemble: "woodwind_ensemble" },
   } as any;
 
-  // ── 3. Apply source melody rhythm so voices have rhythmic activity ────────
-  const melodyPart = (score.parts ?? []).find((p: any) => {
-    const n = String(p?.name ?? "").toLowerCase();
-    return n.includes("soprano") || n.includes("melody") || n.includes("voice");
-  }) ?? score.parts?.[0] ?? null;
-
+  // ── 3. Rhythm post-processing ────────────────────────────────────────────
   const key = options.key ?? { fifths: 0, mode: "major" as const };
 
-  if (melodyPart && chords.length) {
-    applyMelodyRhythmToWoodwinds(woodwindScore, melodyPart, chords, key);
+  // When a piano source is provided, filter to RH notes only so the rhythm
+  // matches the piano melody rather than both hands combined.
+  let rhythmPart: any = options.rhythmSourcePart ?? null;
+  if (!rhythmPart) {
+    rhythmPart = (score.parts ?? []).find((p: any) => {
+      const n = String(p?.name ?? "").toLowerCase();
+      return n.includes("soprano") || n.includes("melody") || n.includes("voice");
+    }) ?? score.parts?.[0] ?? null;
+  } else {
+    // Build a filtered version of the piano source containing only RH notes
+    const pianoMeasures: any[] = (rhythmPart.measures ?? []).map((m: any) => {
+      const events = (m.events ?? []).filter((ev: any) => {
+        if (ev.type !== "note") return false;
+        const staff = Number(ev.staff ?? 1);
+        const voice = Number(ev.voice ?? 1);
+        return staff === 1 || voice <= 2; // right hand only
+      });
+      return { ...m, events };
+    });
+    rhythmPart = { ...rhythmPart, measures: pianoMeasures };
+  }
+
+  if (rhythmPart && chords.length) {
+    applyMelodyRhythmToWoodwinds(woodwindScore, rhythmPart, chords, key);
   }
 
   return { scoreModel: woodwindScore, warnings };

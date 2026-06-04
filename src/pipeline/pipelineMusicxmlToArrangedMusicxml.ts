@@ -151,6 +151,13 @@ export function pipelineMusicxmlToArrangedMusicxml(
       // harmonizeSatbFromChords ensures frozenPianoPart captures the full
       // original piano score, not an SATB reduction of it.
       ensembleLower === "piano_with_strings" ||
+      // Woodwind ensembles — mirror the string family:
+      //   piano_woodwind_quartet  = direct piano copy → winds
+      //   satb_woodwind_quartet   = Choral-wind (SATB transcription)
+      //   piano_with_woodwinds    = piano as harmony source → wind arrangement
+      ensembleLower === "piano_woodwind_quartet" ||
+      ensembleLower === "satb_woodwind_quartet" ||
+      ensembleLower === "piano_with_woodwinds" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
@@ -190,7 +197,10 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const isStrings = ensembleRaw === "string_ensemble" || ensembleRaw === "strings" || isPianoStringQuartet || isSatbStringQuartet ||
       // piano_with_strings uses the piano as a harmony source and outputs strings only
       ensembleRaw === "piano_with_strings";
-    const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds";
+    const isWoodwinds = ensembleRaw === "woodwind_ensemble" || ensembleRaw === "woodwinds" ||
+      ensembleRaw === "piano_woodwind_quartet" ||
+      ensembleRaw === "satb_woodwind_quartet" ||
+      ensembleRaw === "piano_with_woodwinds";
     const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass";
     const isOrchestra = ensembleRaw === "orchestra";
 

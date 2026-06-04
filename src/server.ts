@@ -635,6 +635,11 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       anyRaw.instrumentation === "satb_to_woodwind_quartet"
         ? (anyRaw.instrumentation as AppSettings["instrumentation"])
         : undefined,
+    woodwindQuintet: typeof anyRaw.woodwindQuintet === "boolean" ? anyRaw.woodwindQuintet : undefined,
+    woodwindSize:
+      anyRaw.woodwindSize === "quartet" || anyRaw.woodwindSize === "quintet"
+        ? (anyRaw.woodwindSize as AppSettings["woodwindSize"])
+        : undefined,
     sopranoMelodyShare:
       typeof anyRaw.sopranoMelodyShare === "number" && Number.isFinite(anyRaw.sopranoMelodyShare)
         ? anyRaw.sopranoMelodyShare

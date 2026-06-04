@@ -9,6 +9,9 @@ export type Settings = {
     | "satb_string_quartet"
     | "piano_with_strings"
     | "woodwind_ensemble"
+    | "piano_woodwind_quartet"
+    | "satb_woodwind_quartet"
+    | "piano_with_woodwinds"
     | "brass_ensemble"
     | "orchestra";
   keySignature: string;
@@ -61,6 +64,8 @@ export type Settings = {
   sopranoMelodyShare?: number;
   randomizeOffsets?: boolean;
   pianoStylePreset?: string;
+  /** Woodwind quintet (adds Horn in F as a 5th voice) when true. */
+  woodwindQuintet?: boolean;
   /**
    * When true, the engine auto-generates chord harmony from the melody using
    * Krumhansl-Schmuckler key detection + scale-degree harmonization.

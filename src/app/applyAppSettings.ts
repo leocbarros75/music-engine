@@ -19,6 +19,7 @@ import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble } from "../arrange/woodwinds/woodwindArranger";
+import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrangeSatbToWoodwindQuartet";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -105,6 +106,9 @@ export type AppSettings = {
     | "satb_to_string_quartet"
     | "piano_copy_to_woodwind_quartet"
     | "satb_to_woodwind_quartet";
+  /** Woodwind quintet (adds Horn in F as 5th voice) when true or woodwindSize="quintet". */
+  woodwindQuintet?: boolean;
+  woodwindSize?: "quartet" | "quintet";
 };
 
 export type ApplySettingsResult = {
@@ -1598,15 +1602,31 @@ export function applyAppSettings(
   const wantsSatbStringQuartet  = ensemble === "satb_string_quartet";
   const wantsPianoWithStrings   = ensemble === "piano_with_strings";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
-  const wantsWoodwinds = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
     wantsPianoStringQuartet ||
     (wantsStrings && (instrumentation === "piano_copy_to_string_quartet" || instrumentation === "satb_to_string_quartet"));
+
+  // ── Woodwind family — mirrors the string family ───────────────────────────
+  //   woodwind_ensemble        → auto arranger (lead sheet + style → DP winds)
+  //   piano_woodwind_quartet   → direct piano copy → winds (RH→Fl/Ob, LH→Cl/Bn)
+  //   satb_woodwind_quartet    → Choral-wind (S→Fl, A→Ob, T→Cl, B→Bn)
+  //   piano_with_woodwinds     → piano as harmony source → wind arrangement (complement)
+  const wantsWoodwinds        = ensemble === "woodwind_ensemble" || ensemble === "woodwinds";
+  const wantsPianoWoodwindCopy = ensemble === "piano_woodwind_quartet";
+  const wantsChoralWind       = ensemble === "satb_woodwind_quartet";
+  const wantsPianoWithWoodwinds = ensemble === "piano_with_woodwinds";
   const usePianoCopyWoodwindQuartetInstrumentation =
-    wantsWoodwinds && (instrumentation === "piano_copy_to_woodwind_quartet" || instrumentation === "satb_to_woodwind_quartet");
+    wantsPianoWoodwindCopy ||
+    (wantsWoodwinds && instrumentation === "piano_copy_to_woodwind_quartet");
+  const useSatbToWoodwindInstrumentation =
+    wantsChoralWind ||
+    (wantsWoodwinds && instrumentation === "satb_to_woodwind_quartet");
+  // Optional 5th voice (Horn in F → woodwind quintet)
+  const wantsWoodwindQuintet =
+    settings.woodwindQuintet === true || String(settings.woodwindSize ?? "").toLowerCase() === "quintet";
 
   // ── Piano+strings: capture the piano part RIGHT NOW, before anything touches scoreModel ──
   // Key transposition, rhythm engines, etc. all modify scoreModel in-place below.
@@ -1618,7 +1638,7 @@ export function applyAppSettings(
   // so blindly taking parts[0] would capture the Violin I melody instead of the full
   // piano grand staff (1679 notes, 147 backups). We find the Piano part explicitly,
   // and only fall back to parts[0] if no piano-named/instrumented part exists.
-  const frozenPianoPart: any | null = wantsPianoWithStrings
+  const frozenPianoPart: any | null = (wantsPianoWithStrings || wantsPianoWithWoodwinds)
     ? (() => {
         const allParts: any[] = (scoreModel as any).parts ?? [];
         const isPianoPart = (p: any): boolean => {
@@ -1767,10 +1787,57 @@ export function applyAppSettings(
   }
 
   if (usePianoCopyWoodwindQuartetInstrumentation) {
+    // Piano-wind (copy): RH top→Flute, RH inner→Oboe, LH top→Clarinet, LH bottom→Bassoon
     const finalScore = arrangeWoodwindQuartetFromPianoInstrumentation(scoreModel, { warnings });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (useSatbToWoodwindInstrumentation) {
+    // Choral-wind: SATB transcription → Soprano→Flute, Alto→Oboe, Tenor→Clarinet, Bass→Bassoon
+    const finalScore = arrangeSatbToWoodwindQuartetDirect(scoreModel, { warnings });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsPianoWithWoodwinds) {
+    // Piano-wind (complement): piano as harmony source → DP wind arrangement.
+    // Mirrors piano_with_strings — the piano is NOT in the output.
+    const pianoChords = chords.length ? chords : inferChordsFromAllVoices(scoreModel);
+    if (!pianoChords.length) {
+      warnings.push("[piano+winds] Could not infer chords from piano score — wind parts may be sparse.");
+    }
+    const wwProfile: ProfileId = usePolyphonic
+      ? "countermelody"
+      : styleRaw === "baroque"
+        ? "bach_chorale"
+        : "melody_harmony";
+
+    const wwResult = arrangeWoodwindEnsemble(scoreModel, pianoChords as any, {
+      profile:          wwProfile,
+      chords:           pianoChords as any,
+      key:              { fifths: detectedInputKeyFifths, mode: detectedMode },
+      quintet:          wantsWoodwindQuintet,
+      rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
+      warnings,
+    });
+    attachTextureAnalysis(wwResult.scoreModel, warnings);
+    return {
+      scoreModel: wwResult.scoreModel as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,
@@ -1933,6 +2000,7 @@ export function applyAppSettings(
       profile: wwProfile,
       chords:  chords as any,
       key:     { fifths: detectedInputKeyFifths, mode: detectedMode },
+      quintet: wantsWoodwindQuintet,
       warnings,
     });
 
