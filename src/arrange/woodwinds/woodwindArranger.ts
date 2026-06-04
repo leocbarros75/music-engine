@@ -24,6 +24,7 @@ import {
   WOODWIND_RANGES,
   WOODWIND_TO_STRING_VOICE,
   WOODWIND_PART_META,
+  WOODWIND_CHARACTER,
   QUARTET_VOICES,
   QUINTET_VOICES,
   type WoodwindVoiceId,
@@ -43,6 +44,63 @@ function clampMidiByOctave(
   while (out < range.absMin) out += 12;
   while (out > range.absMax) out -= 12;
   return out;
+}
+
+/**
+ * Octave-fit into the absolute range, then nudge toward the instrument's
+ * sweet-spot (preferred) register when an octave shift keeps it in range.
+ * This steers each woodwind into its best-sounding tessitura per Adler/Forsyth
+ * (e.g. flute melodies sit in G4–E6, not the weak low octave; oboe in its
+ * plaintive middle; horn in the noble C3–C5 register).
+ */
+function clampToSweetSpot(
+  midi: number,
+  range: { absMin: number; absMax: number; prefMin: number; prefMax: number }
+): number {
+  let m = clampMidiByOctave(midi, range);
+  // Already in sweet spot → done.
+  if (m >= range.prefMin && m <= range.prefMax) return m;
+  // Too low: try up an octave if it lands within absolute range.
+  if (m < range.prefMin) {
+    const up = m + 12;
+    if (up <= range.absMax && Math.abs(up - midpoint(range)) <= Math.abs(m - midpoint(range))) return up;
+  }
+  // Too high: try down an octave.
+  if (m > range.prefMax) {
+    const down = m - 12;
+    if (down >= range.absMin && Math.abs(down - midpoint(range)) <= Math.abs(m - midpoint(range))) return down;
+  }
+  return m;
+}
+
+function midpoint(r: { prefMin: number; prefMax: number }): number {
+  return (r.prefMin + r.prefMax) / 2;
+}
+
+/**
+ * Thin a measure's onset-time grid according to an instrument's agility, so
+ * each woodwind plays to its idiom (Adler/Rimsky-Korsakov):
+ *   high agility (Flute, Clarinet ≥0.9): keep every onset — brilliant passagework
+ *   mid  agility (Oboe, Bassoon 0.5–0.9): keep on-beat onsets — lyrical/foundation
+ *   low  agility (Horn <0.5): keep half-measure onsets only — sustained pad
+ * The melody voice (isMelody) is never thinned — it always carries full activity.
+ */
+function thinOnsetsByAgility(
+  times: number[],
+  agility: number,
+  measureLen: number,
+  isMelody: boolean
+): number[] {
+  if (isMelody || agility >= 0.9) return times;
+  const keepHalfOnly = agility < 0.5;
+  const step = keepHalfOnly ? measureLen / 2 : 1.0; // half-measure pad vs quarter-note
+  const kept = times.filter((t) => {
+    const r = Math.round(t / step) * step;
+    return Math.abs(t - r) < 1e-6;
+  });
+  // Always keep the downbeat so the voice never drops out entirely.
+  if (!kept.length || Math.abs(kept[0]! - 0) > 1e-6) kept.unshift(0);
+  return Array.from(new Set(kept)).sort((a, b) => a - b);
 }
 
 function eventMidi(ev: any): number | null {
@@ -91,11 +149,15 @@ function applyMelodyRhythmToWoodwinds(
     if (nameLC === "flute")                         wvId = "fl";
     else if (nameLC === "oboe")                     wvId = "ob";
     else if (nameLC === "clarinet in bb" || nameLC === "clarinet") wvId = "cl";
+    else if (nameLC === "horn in f" || nameLC === "horn") wvId = "hn";
     else if (nameLC === "bassoon")                  wvId = "bn";
     if (!wvId) continue;
 
     const stringVoice = WOODWIND_TO_STRING_VOICE[wvId];
     const range       = WOODWIND_RANGES[wvId];
+    const character   = WOODWIND_CHARACTER[wvId];
+    // Flute is the top voice = melody carrier; it always keeps full activity.
+    const isMelody    = wvId === "fl";
     let prevMidi: number | null = null;
 
     part.measures = (part.measures ?? []).map((m: any) => {
@@ -145,7 +207,15 @@ function applyMelodyRhythmToWoodwinds(
         }
       }
 
-      const times = Array.from(onsetSet).sort((a, b) => a - b);
+      // Thin onsets by the instrument's agility so each plays to its idiom:
+      // Flute/Clarinet stay busy, Oboe/Bassoon move on beats, Horn sustains.
+      const thinned = thinOnsetsByAgility(
+        Array.from(onsetSet).sort((a, b) => a - b),
+        character.agility,
+        measureLen,
+        isMelody
+      );
+      const times = [...thinned];
       times.push(measureLen);
 
       // ── Build events ──────────────────────────────────────────────────────
@@ -191,8 +261,8 @@ function applyMelodyRhythmToWoodwinds(
           midi = cands.reduce((best, c) =>
             Math.abs(c - anchor) < Math.abs(best - anchor) ? c : best
           );
-          // Clamp to woodwind range
-          midi = clampMidiByOctave(midi, range);
+          // Steer into the instrument's sweet-spot register (Adler/Forsyth).
+          midi = clampToSweetSpot(midi, range);
         }
 
         if (midi === null) {
@@ -272,7 +342,7 @@ export function arrangeWoodwindEnsemble(
         if (ev.type !== "note" || !ev.pitch) return ev;
         const midi = eventMidi(ev);
         if (midi === null) return ev;
-        const clamped = clampMidiByOctave(midi, range);
+        const clamped = clampToSweetSpot(midi, range);
         if (clamped === midi) return ev;
         return { ...ev, pitch: midiToPitch(clamped) };
       });

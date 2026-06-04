@@ -18,17 +18,43 @@ export type WoodwindRange = {
 };
 
 // Ranges represent sounding (concert) pitches.
-// Flute:        C4–D7   pref D4–C6    (lower octave is the warm register)
-// Oboe:         Bb3–A6  pref C4–F5    (sweet spot; extreme upper avoided)
-// Clarinet Bb:  D3–Bb6  pref E3–G5    (concert sounding; whole step below written)
-// Horn in F:    B1–F5   pref G2–C5    (concert sounding; P5 below written)
-// Bassoon:      Bb1–E5  pref C2–Eb4   (practical limit)
+// Preferred (pref) ranges = each instrument's reliable, best-sounding register
+// per Adler/Forsyth/Rimsky-Korsakov. The DP applies a tessitura penalty outside
+// pref, steering melodic content into the sweet spot while still allowing the
+// full absolute range for color.
+//
+// Flute:       C4–D7   pref G4–E6   (low C4–F#4 weak/breathy → penalised; strong from G4 up)
+// Oboe:        Bb3–A6  pref D4–E5   (plaintive singing register; extreme high pinched)
+// Clarinet Bb: D3–Bb6  pref D3–C6   (versatile: chalumeau + clarion both excellent)
+// Horn in F:   B1–F5   pref C3–C5   (noble middle register; low B1–B2 risky, high tiring)
+// Bassoon:     Bb1–E5  pref C2–C4   (foundation + warm tenor singing register)
 export const WOODWIND_RANGES: Record<WoodwindVoiceId, WoodwindRange> = {
-  fl: { absMin: 60, absMax: 98, prefMin: 62, prefMax: 84 }, // C4..D7   pref D4..C6
-  ob: { absMin: 58, absMax: 93, prefMin: 60, prefMax: 77 }, // Bb3..A6  pref C4..F5
-  cl: { absMin: 50, absMax: 90, prefMin: 52, prefMax: 79 }, // D3..Bb6  pref E3..G5 (concert)
-  hn: { absMin: 35, absMax: 77, prefMin: 43, prefMax: 72 }, // B1..F5   pref G2..C5 (concert)
-  bn: { absMin: 34, absMax: 74, prefMin: 36, prefMax: 63 }, // Bb1..D5  pref C2..Eb4
+  fl: { absMin: 60, absMax: 98, prefMin: 67, prefMax: 88 }, // C4..D7   pref G4..E6
+  ob: { absMin: 58, absMax: 93, prefMin: 62, prefMax: 76 }, // Bb3..A6  pref D4..E5
+  cl: { absMin: 50, absMax: 90, prefMin: 50, prefMax: 84 }, // D3..Bb6  pref D3..C6 (concert)
+  hn: { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5   pref C3..C5 (concert)
+  bn: { absMin: 34, absMax: 74, prefMin: 36, prefMax: 60 }, // Bb1..D5  pref C2..C4
+};
+
+// ── Per-instrument playing characteristics (from the orchestration texts) ────
+// Used to assign idiomatic roles & default activity in the auto arranger.
+export type WoodwindCharacter = {
+  /** 0–1 technical agility for fast passagework (Flute/Clarinet highest, Horn lowest). */
+  agility: number;
+  /** Default melodic activity level matching the instrument's idiom. */
+  defaultActivity: "grounded" | "less_active" | "active" | "high_active";
+  /** One-line idiomatic role. */
+  role: string;
+  /** Sweet-spot register description (concert pitch). */
+  sweetSpot: string;
+};
+
+export const WOODWIND_CHARACTER: Record<WoodwindVoiceId, WoodwindCharacter> = {
+  fl: { agility: 1.0,  defaultActivity: "active",      role: "agile melody / brilliant passagework", sweetSpot: "D5–A6" },
+  ob: { agility: 0.55, defaultActivity: "less_active", role: "lyrical cantabile melody",              sweetSpot: "Eb4–D5" },
+  cl: { agility: 0.95, defaultActivity: "active",      role: "flexible — agile lines or warm color",  sweetSpot: "B4–C6 clarion / D3–F4 chalumeau" },
+  hn: { agility: 0.30, defaultActivity: "grounded",    role: "sustained harmony pad / noble tune",    sweetSpot: "C3–G4" },
+  bn: { agility: 0.70, defaultActivity: "less_active", role: "harmonic foundation / staccato / tenor", sweetSpot: "G2–C4" },
 };
 
 // Maps woodwind voices onto string DP voice IDs (used by buildCandidatesForSlice).
