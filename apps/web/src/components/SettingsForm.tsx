@@ -1380,37 +1380,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           </div>}
 
-          {/* ── Wind per-instrument activity (wind auto) ── */}
-          {isWindAuto && (() => {
-            const voices: Array<{ label: string; key: keyof Settings; def: string }> = [
-              { label: "Flute activity",    key: "fluteActivity"    as keyof Settings, def: "active" },
-              { label: "Oboe activity",     key: "oboeActivity"     as keyof Settings, def: "active" },
-              { label: "Clarinet activity", key: "clarinetActivity" as keyof Settings, def: "active" },
-              ...(settings.woodwindQuintet ? [{ label: "Horn activity", key: "hornActivity" as keyof Settings, def: "grounded" }] : []),
-              { label: "Bassoon activity",  key: "bassoonActivity"  as keyof Settings, def: "active" },
-            ];
-            return (
-              <>
-                {voices.map(({ label, key, def }) => (
-                  <div className="field" key={String(key)}>
-                    <label>{label}</label>
-                    <select value={(settings[key] as string) ?? def} onChange={(e) => update(key, e.target.value as any)}>
-                      {STRING_ACTIVITY_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                    <div className="key-preview">
-                      <span className="slider-help">
-                        {def === "grounded"
-                          ? "Sustained (held) — idiomatic for the horn pad."
-                          : "Activity / rhythmic density for this instrument (overrides its idiomatic default)."}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </>
-            );
-          })()}
+          {/* Per-instrument activity is now driven automatically by the chosen
+              Wind Texture (block chorale / melody+harmony / chamber / counterpoint),
+              so no per-instrument sliders are shown. */}
         </>
 
       ) : (

@@ -20,7 +20,7 @@ import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } f
 import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
 import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrangeSatbToWoodwindQuartet";
-import { woodwindTextureToProfile, woodwindExampleToTexture, type WoodwindTexture } from "../arrange/woodwinds/woodwindStyle";
+import { woodwindTextureToProfile, woodwindTextureToActivity, woodwindExampleToTexture, type WoodwindTexture } from "../arrange/woodwinds/woodwindStyle";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -1836,20 +1836,14 @@ export function applyAppSettings(
       (settings.woodwindTexture as WoodwindTexture | undefined) ??
       (settings.woodwindExample ? (woodwindExampleToTexture(settings.woodwindExample) ?? undefined) : undefined);
     const wwProfile = woodwindTextureToProfile(wwTexture, styleRaw, usePolyphonic);
-
-    const wwActivity: Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WoodwindActivity>> = {};
-    if (settings.fluteActivity)    wwActivity.fl = settings.fluteActivity as WoodwindActivity;
-    if (settings.oboeActivity)     wwActivity.ob = settings.oboeActivity as WoodwindActivity;
-    if (settings.clarinetActivity) wwActivity.cl = settings.clarinetActivity as WoodwindActivity;
-    if (settings.hornActivity)     wwActivity.hn = settings.hornActivity as WoodwindActivity;
-    if (settings.bassoonActivity)  wwActivity.bn = settings.bassoonActivity as WoodwindActivity;
+    const wwActivity = woodwindTextureToActivity(wwTexture) as Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WoodwindActivity>>;
 
     const wwResult = arrangeWoodwindEnsemble(scoreModel, pianoChords as any, {
       profile:          wwProfile,
       chords:           pianoChords as any,
       key:              { fifths: detectedInputKeyFifths, mode: detectedMode },
       quintet:          wantsWoodwindQuintet,
-      activity:         Object.keys(wwActivity).length ? wwActivity : undefined,
+      activity:         wwActivity,
       polyphonic:       usePolyphonic || wwTexture === "contrapuntal",
       level:            settings.level,
       rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
@@ -2016,13 +2010,9 @@ export function applyAppSettings(
       (settings.woodwindExample ? (woodwindExampleToTexture(settings.woodwindExample) ?? undefined) : undefined);
     const wwProfile = woodwindTextureToProfile(wwTexture, styleRaw, usePolyphonic);
 
-    // Per-instrument activity overrides (undefined → idiomatic agility default).
-    const wwActivity: Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WoodwindActivity>> = {};
-    if (settings.fluteActivity)    wwActivity.fl = settings.fluteActivity as WoodwindActivity;
-    if (settings.oboeActivity)     wwActivity.ob = settings.oboeActivity as WoodwindActivity;
-    if (settings.clarinetActivity) wwActivity.cl = settings.clarinetActivity as WoodwindActivity;
-    if (settings.hornActivity)     wwActivity.hn = settings.hornActivity as WoodwindActivity;
-    if (settings.bassoonActivity)  wwActivity.bn = settings.bassoonActivity as WoodwindActivity;
+    // Activity is driven by the chosen texture so each texture sounds distinct
+    // (block chorale vs melody+accompaniment vs chamber dialogue).
+    const wwActivity = woodwindTextureToActivity(wwTexture) as Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WoodwindActivity>>;
 
     const wwIsContrapuntal = usePolyphonic || wwTexture === "contrapuntal";
     const wwResult = arrangeWoodwindEnsemble(scoreModel, chords as any, {
@@ -2030,7 +2020,7 @@ export function applyAppSettings(
       chords:     chords as any,
       key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
       quintet:    wantsWoodwindQuintet,
-      activity:   Object.keys(wwActivity).length ? wwActivity : undefined,
+      activity:   wwActivity,
       polyphonic: wwIsContrapuntal,
       level:      settings.level,
       warnings,

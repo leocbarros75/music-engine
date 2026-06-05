@@ -27,6 +27,37 @@ export function woodwindTextureToProfile(
   return "melody_harmony";
 }
 
+export type WWActivity = "grounded" | "less_active" | "active" | "high_active";
+
+/**
+ * Per-instrument rhythmic activity for each texture. This is what makes the
+ * homophonic textures audibly DIFFERENT (the DP profile alone only nudges
+ * voice-leading). Activity controls how densely each voice follows the source
+ * rhythm in the rhythm post-processor:
+ *   grounded → sustained pad   less_active → on-beat   active → full source rhythm
+ *
+ *   chorale         — all voices move together on the full rhythm → block chords
+ *   melody_harmony  — Flute carries a busy melody over a calmer on-beat accompaniment
+ *   chamber         — Flute + Oboe trade active lines over light support
+ *   (contrapuntal is handled by the polyphonic engine; activity is ignored there)
+ */
+export function woodwindTextureToActivity(
+  texture: WoodwindTexture | undefined
+): Partial<Record<"fl" | "ob" | "cl" | "hn" | "bn", WWActivity>> {
+  switch (texture) {
+    case "chorale":
+      // Hymn-style block: every voice (incl. horn) moves on the same rhythm.
+      return { fl: "active", ob: "active", cl: "active", hn: "active", bn: "active" };
+    case "chamber":
+      // Two active upper voices in dialogue; clarinet/bassoon support; horn pad.
+      return { fl: "active", ob: "active", cl: "less_active", hn: "grounded", bn: "less_active" };
+    case "melody_harmony":
+    default:
+      // Melody floats over a calmer on-beat accompaniment.
+      return { fl: "active", ob: "less_active", cl: "less_active", hn: "grounded", bn: "less_active" };
+  }
+}
+
 // ── Reference wind-ensemble examples → composer/period style ──────────────────
 // Each example sets a composer profile (reusing the calibrated string composer
 // profiles — period voice-leading is instrument-agnostic) plus a default texture.
