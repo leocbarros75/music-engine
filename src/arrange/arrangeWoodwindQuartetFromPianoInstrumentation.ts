@@ -287,30 +287,31 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       const k = onsetKey(t); const b = map.get(k) ?? []; b.push(ev); map.set(k, b);
     }
 
-    // ── RH → Flute (top) + Oboe (2nd) ──────────────────────────────────────
+    // ── RH chord → Flute (top) / Oboe (mid) / Clarinet (bottom) ────────────
+    // The right-hand chord is spread across the three upper winds, all playing
+    // on every RH onset (when fewer than 3 RH notes, the nearest note is reused
+    // so each upper voice still sounds). Flute lifts to its bright register;
+    // Oboe/Clarinet are octave-placed into their sweet spots.
     for (const k of Array.from(rhByOnset.keys()).sort()) {
       const onset = Number(k);
-      const sel = selectNotesForOnset(rhByOnset.get(k) ?? []);
+      const sel = selectNotesForOnset(rhByOnset.get(k) ?? []); // ascending by midi
       if (!sel.length) continue;
-      const top = sel[sel.length - 1]!;
-      pushMappedNote(flute.measures[mi], { ev: top.ev, midi: clampToWoodwindSweetSpot(top.midi, "fl") }, "flute", "fl", ++seq, { t: onset });
-      if (sel.length >= 2) {
-        const second = sel[sel.length - 2]!;
-        pushMappedNote(oboe.measures[mi], { ev: second.ev, midi: clampToWoodwindSweetSpot(second.midi, "ob") }, "oboe", "ob", ++seq, { t: onset });
-      }
+      const n = sel.length;
+      const topEv = sel[n - 1]!;                 // highest → Flute
+      const midEv = n >= 2 ? sel[n - 2]! : sel[n - 1]!; // 2nd  → Oboe
+      const botEv = n >= 3 ? sel[n - 3]! : (n >= 2 ? sel[n - 2]! : sel[n - 1]!); // 3rd → Clarinet
+      pushMappedNote(flute.measures[mi],    { ev: topEv.ev, midi: clampToWoodwindSweetSpot(topEv.midi, "fl") }, "flute",       "fl", ++seq, { t: onset });
+      pushMappedNote(oboe.measures[mi],     { ev: midEv.ev, midi: clampToWoodwindSweetSpot(midEv.midi, "ob") }, "oboe",        "ob", ++seq, { t: onset });
+      pushMappedNote(clarinet.measures[mi], { ev: botEv.ev, midi: clampToWoodwindSweetSpot(botEv.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: onset });
     }
 
-    // ── LH → Bassoon (bottom) + Clarinet (next-up) ─────────────────────────
+    // ── LH bass → Bassoon ──────────────────────────────────────────────────
     for (const k of Array.from(lhByOnset.keys()).sort()) {
       const onset = Number(k);
       const sel = selectNotesForOnset(lhByOnset.get(k) ?? []);
       if (!sel.length) continue;
       const bottom = sel[0]!;
       pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn") }, "bassoon", "bn", ++seq, { t: onset });
-      if (sel.length >= 2) {
-        const up = sel[1]!;
-        pushMappedNote(clarinet.measures[mi], { ev: up.ev, midi: clampToWoodwindSweetSpot(up.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: onset });
-      }
     }
 
     for (const d of voiceDefs) (d.part.measures[mi].events as any[]).sort(measureEventSort);
