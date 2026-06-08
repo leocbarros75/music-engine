@@ -49,8 +49,10 @@ export function woodwindTextureToActivity(
       // Hymn-style block: every voice (incl. horn) moves on the same rhythm.
       return { fl: "active", ob: "active", cl: "active", hn: "active", bn: "active" };
     case "chamber":
-      // Two active upper voices in dialogue; clarinet/bassoon support; horn pad.
-      return { fl: "active", ob: "active", cl: "less_active", hn: "grounded", bn: "less_active" };
+      // Calibrated from Mozart Gran Partita: in a classical wind quintet ALL
+      // voices are busy & stepwise, incl. the Horn (73% fast, 60% steps) — it is
+      // an active member here, not a sustained pad.
+      return { fl: "active", ob: "active", cl: "active", hn: "less_active", bn: "active" };
     case "melody_harmony":
     default:
       // Melody floats over a calmer on-beat accompaniment.
@@ -71,8 +73,8 @@ export type WoodwindExample = {
 
 export const WOODWIND_EXAMPLES: WoodwindExample[] = [
   // Classical wind serenades / quintets
-  { value: "mozart_k361_gran_partita", label: "Mozart — Gran Partita K.361", composer: "mozart", texture: "melody_harmony",
-    help: "Classical wind serenade — clear melody+harmony, light textures, Alberti-style inner motion." },
+  { value: "mozart_k361_gran_partita", label: "Mozart — Gran Partita K.361", composer: "mozart", texture: "chamber",
+    help: "Classical wind serenade (calibrated): all voices active & stepwise, incl. an active Horn — chamber-music independence." },
   { value: "mozart_k388_serenade",     label: "Mozart — Serenade K.388",      composer: "mozart", texture: "chamber",
     help: "Darker C-minor wind octet — balanced chamber dialogue." },
   { value: "mozart_k452_quintet",      label: "Mozart — Quintet K.452 (piano+winds)", composer: "mozart", texture: "chamber",

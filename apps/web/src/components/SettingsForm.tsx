@@ -275,8 +275,8 @@ const WIND_TEXTURE_OPTIONS: Array<{
 
 // Reference wind-ensemble pieces — each sets a composer/period style + texture.
 const WIND_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: NonNullable<Settings["woodwindTexture"]>; composer: string; help: string }> = [
-  { value: "mozart_k361_gran_partita", label: "Mozart — Gran Partita K.361", texture: "melody_harmony", composer: "mozart",
-    help: "Classical wind serenade — clear melody+harmony, light textures." },
+  { value: "mozart_k361_gran_partita", label: "Mozart — Gran Partita K.361", texture: "chamber", composer: "mozart",
+    help: "Classical wind serenade (calibrated): all voices active & stepwise, active Horn — chamber independence." },
   { value: "mozart_k388_serenade", label: "Mozart — Serenade K.388", texture: "chamber", composer: "mozart",
     help: "Darker C-minor wind octet — balanced chamber dialogue." },
   { value: "mozart_k452_quintet", label: "Mozart — Quintet K.452", texture: "chamber", composer: "mozart",
