@@ -219,73 +219,170 @@ function enforceWoodwindVoiceOrder(parts: PartLike[]): void {
 }
 
 /**
- * Piano → Woodwind quartet (faithful copy WITH chord completion).
+ * Piano → Woodwind quartet — FAITHFUL COPY (voices rest where the piano rests).
  *
- * Delegates to arrangeStringQuartetFromPianoInstrumentation — which already
- * does the proven two-phase routing: explicit piano notes are mapped by
- * register, and any voice missing a note at an onset is COMPLETED with the
- * most important missing chord tone (3rd→5th→root), inheriting the companion
- * voice's rhythm. We then remap the four string parts onto the woodwinds:
- *   Violin I  → Flute      Violin II → Oboe
- *   Viola     → Clarinet   Cello     → Bassoon
- * clamping every note into the woodwind instrument's sounding range.
+ *   Flute    ← RH top note          Oboe    ← RH 2nd-from-top (when present)
+ *   Clarinet ← LH top note          Bassoon ← LH bottom note
  *
- * Result: all four winds always have notes (no empty Clarinet), the harmony is
- * completed when the piano is sparse, and the piano's actual pitches are kept
- * where present.
+ * A voice with no source note at an onset simply RESTS (no per-beat chord
+ * completion). Each note is octave-placed into its instrument's sweet-spot
+ * register and voices are kept ordered top-to-bottom (no crossings).
+ *
+ * Sustained-gap fill: only when a voice would be SILENT for a whole measure (a
+ * long gap) does it receive a single sustained chord tone drawn from the other
+ * voices' harmony — so a voice is never absent for long stretches, without
+ * cluttering the faithful per-beat copy.
  */
 export function arrangeWoodwindQuartetFromPianoInstrumentation(
   score: ScoreModel,
   options: ArrangeOptions = {}
 ): ScoreModel {
   const warnings = options.warnings;
-
-  // Run the string-quartet copy (handles piano AND SATB sources + chord completion)
-  const stringScore = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
-  const stringParts: PartLike[] = Array.isArray((stringScore as any)?.parts) ? (stringScore as any).parts : [];
-
-  if (!stringParts.length) {
-    warn(warnings, "[woodwinds] Instrumentation copy: no parts produced; returning original score.");
-    return score;
+  const pianoPart = findPianoPart(score);
+  if (!pianoPart) {
+    // No piano staff → defer to the SATB→quartet path (choral sources)
+    const stringScore = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
+    const sp: PartLike[] = Array.isArray((stringScore as any)?.parts) ? (stringScore as any).parts : [];
+    if (!sp.length) { warn(warnings, "[woodwinds] copy: no piano/SATB parts; returning original."); return score; }
+    const remapped = WW_FROM_STRING.map((map, idx) => {
+      const src = sp.find((p) => String(p.part_id) === map.stringId) ?? sp[idx];
+      if (!src) return null;
+      const measures = (src.measures ?? []).map((m: any) => ({ ...m, events: (m.events ?? []).map((ev: any) => {
+        if (ev?.type !== "note" || !ev.pitch) return ev;
+        const mm = eventMidi(ev); if (typeof mm !== "number") return ev;
+        const placed = clampToWoodwindSweetSpot(mm, map.wvId);
+        return placed === mm ? ev : { ...ev, midi: placed, pitch: midiToPitch(placed) };
+      }) }));
+      return { ...src, part_id: map.partId, name: map.name, instrument: map.instrument, staves: 1, measures };
+    }).filter((p): p is PartLike => !!p);
+    enforceWoodwindVoiceOrder(remapped);
+    return { ...(score as any), meta: { ...(score.meta ?? {}), ensemble: "woodwind_ensemble" }, parts: remapped } as ScoreModel;
   }
 
-  const byId = new Map<string, PartLike>();
-  for (const p of stringParts) byId.set(String(p?.part_id ?? ""), p);
+  const sourceMeasures: MeasureLike[] = Array.isArray(pianoPart?.measures) ? pianoPart.measures : [];
+  const flute    = makePart("P_FL", "Flute",          "flute",       sourceMeasures);
+  const oboe     = makePart("P_OB", "Oboe",           "oboe",        sourceMeasures);
+  const clarinet = makePart("P_CL", "Clarinet in Bb", "clarinet_bb", sourceMeasures);
+  const bassoon  = makePart("P_BN", "Bassoon",        "bassoon",     sourceMeasures);
 
-  const woodwindParts: PartLike[] = WW_FROM_STRING.map((map, idx) => {
-    // Prefer matching by string part id; fall back to positional order.
-    const src = byId.get(map.stringId) ?? stringParts[idx];
-    if (!src) return null;
-    const measures = (src.measures ?? []).map((m: any) => ({
-      ...m,
-      events: (m.events ?? []).map((ev: any) => {
-        if (ev?.type !== "note" || !ev.pitch) return ev;
-        const midi = eventMidi(ev);
-        if (typeof midi !== "number") return ev;
-        // Place into the instrument's sweet-spot register (lifts low piano
-        // melody to the flute's bright octave; keeps voices in their bands).
-        const placed = clampToWoodwindSweetSpot(midi, map.wvId);
-        if (placed === midi) return ev;
-        return { ...ev, midi: placed, pitch: midiToPitch(placed) };
-      }),
-    }));
-    return { ...src, part_id: map.partId, name: map.name, instrument: map.instrument, staves: 1, measures };
-  }).filter((p): p is PartLike => !!p);
+  // Voice → (instrument id, woodwind range id, target part)
+  const voiceDefs = [
+    { part: flute,    instr: "flute",       wvId: "fl" as WoodwindVoiceId },
+    { part: oboe,     instr: "oboe",        wvId: "ob" as WoodwindVoiceId },
+    { part: clarinet, instr: "clarinet_bb", wvId: "cl" as WoodwindVoiceId },
+    { part: bassoon,  instr: "bassoon",     wvId: "bn" as WoodwindVoiceId },
+  ];
 
-  // ── Enforce top-to-bottom voice order (Fl ≥ Ob ≥ Cl ≥ Bn) ────────────────
-  // After octave placement a lower instrument can still sit above a higher one
-  // at a given onset. Drop the offending voice by an octave (within its range)
-  // so the chord reads cleanly with no crossings.
+  let seq = 0;
+  for (let mi = 0; mi < sourceMeasures.length; mi++) {
+    const srcMeasure = sourceMeasures[mi] ?? {};
+    const noteEvents = (Array.isArray(srcMeasure?.events) ? srcMeasure.events : [])
+      .filter((ev: any) => ev?.type === "note").sort(measureEventSort);
+
+    const rhByOnset = new Map<string, EventLike[]>();
+    const lhByOnset = new Map<string, EventLike[]>();
+    for (const ev of noteEvents) {
+      const t = Number(ev?.t); if (!Number.isFinite(t)) continue;
+      const map = resolveStaff(ev) === 2 ? lhByOnset : rhByOnset;
+      const k = onsetKey(t); const b = map.get(k) ?? []; b.push(ev); map.set(k, b);
+    }
+
+    // ── RH → Flute (top) + Oboe (2nd) ──────────────────────────────────────
+    for (const k of Array.from(rhByOnset.keys()).sort()) {
+      const onset = Number(k);
+      const sel = selectNotesForOnset(rhByOnset.get(k) ?? []);
+      if (!sel.length) continue;
+      const top = sel[sel.length - 1]!;
+      pushMappedNote(flute.measures[mi], { ev: top.ev, midi: clampToWoodwindSweetSpot(top.midi, "fl") }, "flute", "fl", ++seq, { t: onset });
+      if (sel.length >= 2) {
+        const second = sel[sel.length - 2]!;
+        pushMappedNote(oboe.measures[mi], { ev: second.ev, midi: clampToWoodwindSweetSpot(second.midi, "ob") }, "oboe", "ob", ++seq, { t: onset });
+      }
+    }
+
+    // ── LH → Bassoon (bottom) + Clarinet (next-up) ─────────────────────────
+    for (const k of Array.from(lhByOnset.keys()).sort()) {
+      const onset = Number(k);
+      const sel = selectNotesForOnset(lhByOnset.get(k) ?? []);
+      if (!sel.length) continue;
+      const bottom = sel[0]!;
+      pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn") }, "bassoon", "bn", ++seq, { t: onset });
+      if (sel.length >= 2) {
+        const up = sel[1]!;
+        pushMappedNote(clarinet.measures[mi], { ev: up.ev, midi: clampToWoodwindSweetSpot(up.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: onset });
+      }
+    }
+
+    for (const d of voiceDefs) (d.part.measures[mi].events as any[]).sort(measureEventSort);
+  }
+
+  const woodwindParts = voiceDefs.map((d) => d.part);
+
+  // Keep voices ordered top-to-bottom (no crossings) at shared onsets.
   enforceWoodwindVoiceOrder(woodwindParts);
 
-  warn(
-    warnings,
-    "[woodwinds] Instrumentation copy applied (chord-completed): RH→Flute/Oboe, LH→Clarinet/Bassoon; missing voices filled with chord tones."
-  );
+  // ── Sustained-gap fill ───────────────────────────────────────────────────
+  // Only a voice that is SILENT for an entire measure (long gap) receives a
+  // single sustained chord tone, drawn from the harmony of the other voices.
+  fillSustainedGaps(woodwindParts, sourceMeasures);
+
+  warn(warnings, "[woodwinds] Faithful copy: RH→Flute/Oboe, LH→Clarinet/Bassoon; voices rest where the piano rests; long gaps get a sustained chord tone.");
 
   return {
     ...(score as any),
     meta: { ...(score.meta ?? {}), ensemble: "woodwind_ensemble" },
     parts: woodwindParts,
   } as ScoreModel;
+}
+
+/**
+ * For each voice, any measure where it has NO notes (and the ensemble does have
+ * harmony) gets a single sustained chord tone in the voice's sweet-spot. Keeps
+ * a voice from disappearing for long stretches without cluttering faithful rests.
+ */
+function fillSustainedGaps(parts: PartLike[], sourceMeasures: MeasureLike[]): void {
+  const wvIds: WoodwindVoiceId[] = ["fl", "ob", "cl", "bn"];
+  const measureCount = Math.max(...parts.map((p) => (p.measures ?? []).length), 0);
+  let beats = 4, beatType = 4;
+  for (let mi = 0; mi < measureCount; mi++) {
+    const attrs = (sourceMeasures[mi] as any)?.attributes;
+    if (Number.isFinite(attrs?.time?.beats)) beats = Number(attrs.time.beats);
+    if (Number.isFinite(attrs?.time?.beat_type)) beatType = Number(attrs.time.beat_type);
+    const measureLen = beats * (4 / beatType);
+
+    // Harmony pitch-classes sounding in this measure (from all voices)
+    const pcs = new Set<number>();
+    for (const p of parts) {
+      for (const ev of (p.measures?.[mi]?.events ?? [])) {
+        if (ev?.type === "note" && ev.pitch) {
+          const m = eventMidi(ev); if (typeof m === "number") pcs.add(((m % 12) + 12) % 12);
+        }
+      }
+    }
+    if (!pcs.size) continue; // whole ensemble tacet → leave it silent
+
+    for (let vi = 0; vi < parts.length; vi++) {
+      const meas = parts[vi]?.measures?.[mi];
+      if (!meas) continue;
+      const hasNote = (meas.events ?? []).some((e: any) => e?.type === "note" && e.pitch);
+      if (hasNote) continue; // voice already plays this measure — leave faithful
+      // Pick the chord pc nearest this voice's preferred centre
+      const r = WOODWIND_RANGES[wvIds[vi]!];
+      const centre = (r.prefMin + r.prefMax) / 2;
+      let bestMidi: number | null = null, bestDist = Infinity;
+      for (const pc of pcs) {
+        let m = pc; while (m < r.absMin) m += 12; while (m > r.absMax) m -= 12;
+        for (const cand of [m, m + 12, m - 12]) {
+          if (cand < r.absMin || cand > r.absMax) continue;
+          const d = Math.abs(cand - centre);
+          if (d < bestDist) { bestDist = d; bestMidi = cand; }
+        }
+      }
+      if (bestMidi === null) continue;
+      meas.events = [{
+        id: `${wvIds[vi]}-gap-${mi}`, t: 0, dur: measureLen,
+        type: "note", pitch: midiToPitch(bestMidi), voice: 1, staff: 1,
+      }];
+    }
+  }
 }
