@@ -1,6 +1,24 @@
 import type { ScoreModel } from "../score/types";
 import { getInstrumentSpec, midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { arrangeStringQuartetFromPianoInstrumentation } from "./arrangeStringQuartetFromPianoInstrumentation";
+import { WOODWIND_RANGES, type WoodwindVoiceId } from "./woodwinds/woodwindRanges";
+
+/**
+ * Place a pitch in a woodwind's sweet-spot register by octave. Keeps the pitch
+ * class exactly (harmony preserved); only shifts octaves so each instrument
+ * sounds in its idiomatic register — lifting a low piano melody into the flute's
+ * bright octave, and keeping voices ordered top-to-bottom (Fl>Ob>Cl>Bn).
+ */
+function clampToWoodwindSweetSpot(midi: number, wvId: WoodwindVoiceId): number {
+  const r = WOODWIND_RANGES[wvId];
+  let m = midi;
+  while (m < r.absMin) m += 12;
+  while (m > r.absMax) m -= 12;
+  const mid = (r.prefMin + r.prefMax) / 2;
+  if (m < r.prefMin) { const up = m + 12; if (up <= r.absMax && Math.abs(up - mid) <= Math.abs(m - mid)) m = up; }
+  if (m > r.prefMax) { const dn = m - 12; if (dn >= r.absMin && Math.abs(dn - mid) <= Math.abs(m - mid)) m = dn; }
+  return m;
+}
 
 type PartLike = any;
 type MeasureLike = any;
@@ -146,12 +164,59 @@ function selectNotesForOnset(events: EventLike[]): Array<{ ev: EventLike; midi: 
 // Map each woodwind voice to the string-quartet part it is derived from, plus
 // its woodwind instrument id/name and part id. Register order top→bottom is
 // identical (V1>V2>VA>VC ≡ Flute>Oboe>Clarinet>Bassoon).
-const WW_FROM_STRING: Array<{ stringId: string; partId: string; name: string; instrument: string }> = [
-  { stringId: "P_V1", partId: "P_FL", name: "Flute",          instrument: "flute"        },
-  { stringId: "P_V2", partId: "P_OB", name: "Oboe",           instrument: "oboe"         },
-  { stringId: "P_VA", partId: "P_CL", name: "Clarinet in Bb", instrument: "clarinet_bb"  },
-  { stringId: "P_VC", partId: "P_BN", name: "Bassoon",        instrument: "bassoon"      },
+const WW_FROM_STRING: Array<{ stringId: string; partId: string; name: string; instrument: string; wvId: WoodwindVoiceId }> = [
+  { stringId: "P_V1", partId: "P_FL", name: "Flute",          instrument: "flute",       wvId: "fl" },
+  { stringId: "P_V2", partId: "P_OB", name: "Oboe",           instrument: "oboe",        wvId: "ob" },
+  { stringId: "P_VA", partId: "P_CL", name: "Clarinet in Bb", instrument: "clarinet_bb", wvId: "cl" },
+  { stringId: "P_VC", partId: "P_BN", name: "Bassoon",        instrument: "bassoon",     wvId: "bn" },
 ];
+
+/**
+ * Resolve voice crossings so the quartet reads top-to-bottom Fl ≥ Ob ≥ Cl ≥ Bn.
+ * At each shared onset, if a lower-ordered instrument sounds ABOVE the one above
+ * it, drop the lower instrument by an octave (while it stays in range). Pitch
+ * class is preserved, so harmony is unchanged.
+ */
+function enforceWoodwindVoiceOrder(parts: PartLike[]): void {
+  if (parts.length < 2) return;
+  const wvIds: WoodwindVoiceId[] = ["fl", "ob", "cl", "bn"];
+  // Build onset → midi maps per part for quick lookup
+  const measureCount = Math.max(...parts.map((p) => (p.measures ?? []).length));
+  for (let mi = 0; mi < measureCount; mi++) {
+    // Collect each part's events at this measure keyed by onset
+    const perPart = parts.map((p) => {
+      const m = p.measures?.[mi];
+      const map = new Map<string, any>();
+      for (const ev of (m?.events ?? [])) {
+        if (ev?.type === "note" && ev.pitch) map.set(onsetKey(Number(ev.t)), ev);
+      }
+      return map;
+    });
+    // Union of all onsets in this measure
+    const onsets = new Set<string>();
+    perPart.forEach((mp) => mp.forEach((_v, k) => onsets.add(k)));
+    for (const k of onsets) {
+      // From top voice down, ensure each voice ≤ the voice above it
+      for (let vi = 1; vi < parts.length; vi++) {
+        const above = perPart[vi - 1]?.get(k);
+        const cur = perPart[vi]?.get(k);
+        if (!above || !cur) continue;
+        const aMidi = eventMidi(above);
+        let cMidi = eventMidi(cur);
+        if (typeof aMidi !== "number" || typeof cMidi !== "number") continue;
+        const range = WOODWIND_RANGES[wvIds[vi]!];
+        let guard = 0;
+        while (cMidi > aMidi && cMidi - 12 >= range.absMin && guard++ < 4) {
+          cMidi -= 12;
+        }
+        if (cMidi !== eventMidi(cur)) {
+          cur.midi = cMidi;
+          cur.pitch = midiToPitch(cMidi);
+        }
+      }
+    }
+  }
+}
 
 /**
  * Piano → Woodwind quartet (faithful copy WITH chord completion).
@@ -197,13 +262,21 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
         if (ev?.type !== "note" || !ev.pitch) return ev;
         const midi = eventMidi(ev);
         if (typeof midi !== "number") return ev;
-        const clamped = clampMidiToAbsoluteRange(midi, map.instrument);
-        if (clamped === midi) return ev;
-        return { ...ev, midi: clamped, pitch: midiToPitch(clamped) };
+        // Place into the instrument's sweet-spot register (lifts low piano
+        // melody to the flute's bright octave; keeps voices in their bands).
+        const placed = clampToWoodwindSweetSpot(midi, map.wvId);
+        if (placed === midi) return ev;
+        return { ...ev, midi: placed, pitch: midiToPitch(placed) };
       }),
     }));
     return { ...src, part_id: map.partId, name: map.name, instrument: map.instrument, staves: 1, measures };
   }).filter((p): p is PartLike => !!p);
+
+  // ── Enforce top-to-bottom voice order (Fl ≥ Ob ≥ Cl ≥ Bn) ────────────────
+  // After octave placement a lower instrument can still sit above a higher one
+  // at a given onset. Drop the offending voice by an octave (within its range)
+  // so the chord reads cleanly with no crossings.
+  enforceWoodwindVoiceOrder(woodwindParts);
 
   warn(
     warnings,
