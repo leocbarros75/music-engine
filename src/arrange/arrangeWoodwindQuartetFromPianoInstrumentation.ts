@@ -1,5 +1,6 @@
 import type { ScoreModel } from "../score/types";
 import { getInstrumentSpec, midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
+import { arrangeStringQuartetFromPianoInstrumentation } from "./arrangeStringQuartetFromPianoInstrumentation";
 
 type PartLike = any;
 type MeasureLike = any;
@@ -142,106 +143,76 @@ function selectNotesForOnset(events: EventLike[]): Array<{ ev: EventLike; midi: 
     });
 }
 
+// Map each woodwind voice to the string-quartet part it is derived from, plus
+// its woodwind instrument id/name and part id. Register order top→bottom is
+// identical (V1>V2>VA>VC ≡ Flute>Oboe>Clarinet>Bassoon).
+const WW_FROM_STRING: Array<{ stringId: string; partId: string; name: string; instrument: string }> = [
+  { stringId: "P_V1", partId: "P_FL", name: "Flute",          instrument: "flute"        },
+  { stringId: "P_V2", partId: "P_OB", name: "Oboe",           instrument: "oboe"         },
+  { stringId: "P_VA", partId: "P_CL", name: "Clarinet in Bb", instrument: "clarinet_bb"  },
+  { stringId: "P_VC", partId: "P_BN", name: "Bassoon",        instrument: "bassoon"      },
+];
+
+/**
+ * Piano → Woodwind quartet (faithful copy WITH chord completion).
+ *
+ * Delegates to arrangeStringQuartetFromPianoInstrumentation — which already
+ * does the proven two-phase routing: explicit piano notes are mapped by
+ * register, and any voice missing a note at an onset is COMPLETED with the
+ * most important missing chord tone (3rd→5th→root), inheriting the companion
+ * voice's rhythm. We then remap the four string parts onto the woodwinds:
+ *   Violin I  → Flute      Violin II → Oboe
+ *   Viola     → Clarinet   Cello     → Bassoon
+ * clamping every note into the woodwind instrument's sounding range.
+ *
+ * Result: all four winds always have notes (no empty Clarinet), the harmony is
+ * completed when the piano is sparse, and the piano's actual pitches are kept
+ * where present.
+ */
 export function arrangeWoodwindQuartetFromPianoInstrumentation(
   score: ScoreModel,
   options: ArrangeOptions = {}
 ): ScoreModel {
   const warnings = options.warnings;
-  const pianoPart = findPianoPart(score);
-  if (!pianoPart) {
-    warn(warnings, "[woodwinds] Instrumentation copy: piano part not found; returning original score.");
+
+  // Run the string-quartet copy (handles piano AND SATB sources + chord completion)
+  const stringScore = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
+  const stringParts: PartLike[] = Array.isArray((stringScore as any)?.parts) ? (stringScore as any).parts : [];
+
+  if (!stringParts.length) {
+    warn(warnings, "[woodwinds] Instrumentation copy: no parts produced; returning original score.");
     return score;
   }
 
-  const sourceMeasures = Array.isArray(pianoPart?.measures) ? pianoPart.measures : [];
-  const flute = makePart("P_FL", "Flute", "flute", sourceMeasures);
-  const oboe = makePart("P_OB", "Oboe", "oboe", sourceMeasures);
-  const clarinet = makePart("P_CL", "Clarinet in Bb", "clarinet_bb", sourceMeasures);
-  const bassoon = makePart("P_BN", "Bassoon", "bassoon", sourceMeasures);
+  const byId = new Map<string, PartLike>();
+  for (const p of stringParts) byId.set(String(p?.part_id ?? ""), p);
 
-  let seq = 0;
-  for (let mi = 0; mi < sourceMeasures.length; mi++) {
-    const srcMeasure = sourceMeasures[mi] ?? {};
-    const srcEvents = Array.isArray(srcMeasure?.events) ? srcMeasure.events : [];
-    const noteEvents = srcEvents.filter((ev: any) => ev?.type === "note").sort(measureEventSort);
-
-    const rhByOnset = new Map<string, EventLike[]>();
-    const lhByOnset = new Map<string, EventLike[]>();
-    for (const ev of noteEvents) {
-      const t = Number(ev?.t);
-      if (!Number.isFinite(t)) continue;
-      const key = onsetKey(t);
-      const staff = resolveStaff(ev);
-      const map = staff === 2 ? lhByOnset : rhByOnset;
-      const bucket = map.get(key) ?? [];
-      bucket.push(ev);
-      map.set(key, bucket);
-    }
-
-    const flMeasure = flute.measures[mi];
-    const obMeasure = oboe.measures[mi];
-    const clMeasure = clarinet.measures[mi];
-    const bnMeasure = bassoon.measures[mi];
-    const clarinetFallbackByOnset = new Map<string, { ev: EventLike; midi: number }>();
-
-    for (const key of Array.from(rhByOnset.keys()).sort()) {
-      const onset = Number(key);
-      const selected = selectNotesForOnset(rhByOnset.get(key) ?? []);
-      if (!selected.length) continue;
-
-      const top = selected[selected.length - 1]!;
-      const second = selected.length > 1 ? selected[selected.length - 2]! : null;
-      const bottom = selected[0]!;
-
-      pushMappedNote(flMeasure, top, "flute", "fl", ++seq, { t: onset });
-      if (second) {
-        pushMappedNote(obMeasure, second, "oboe", "ob", ++seq, { t: onset });
-      } else {
-        pushMappedNote(obMeasure, top, "oboe", "ob-unison", ++seq, { t: onset });
-      }
-
-      if (selected.length >= 3) {
-        clarinetFallbackByOnset.set(key, bottom);
-      }
-    }
-
-    for (const key of Array.from(lhByOnset.keys()).sort()) {
-      const onset = Number(key);
-      const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
-      if (!selected.length) continue;
-      const bottom = selected[0]!;
-      const top = selected[selected.length - 1]!;
-
-      pushMappedNote(bnMeasure, bottom, "bassoon", "bn", ++seq, { t: onset });
-      if (selected.length >= 2) {
-        pushMappedNote(clMeasure, top, "clarinet_bb", "cl", ++seq, { t: onset });
-      } else {
-        const fallback = clarinetFallbackByOnset.get(key);
-        if (fallback) {
-          pushMappedNote(clMeasure, fallback, "clarinet_bb", "cl-rh-fallback", ++seq, { t: onset });
-        }
-      }
-    }
-
-    for (const [key, clarinetSource] of clarinetFallbackByOnset) {
-      if (lhByOnset.has(key)) continue;
-      pushMappedNote(clMeasure, clarinetSource, "clarinet_bb", "cl-rh-only", ++seq, { t: Number(key) });
-    }
-
-    flMeasure.events.sort(measureEventSort);
-    obMeasure.events.sort(measureEventSort);
-    clMeasure.events.sort(measureEventSort);
-    bnMeasure.events.sort(measureEventSort);
-  }
+  const woodwindParts: PartLike[] = WW_FROM_STRING.map((map, idx) => {
+    // Prefer matching by string part id; fall back to positional order.
+    const src = byId.get(map.stringId) ?? stringParts[idx];
+    if (!src) return null;
+    const measures = (src.measures ?? []).map((m: any) => ({
+      ...m,
+      events: (m.events ?? []).map((ev: any) => {
+        if (ev?.type !== "note" || !ev.pitch) return ev;
+        const midi = eventMidi(ev);
+        if (typeof midi !== "number") return ev;
+        const clamped = clampMidiToAbsoluteRange(midi, map.instrument);
+        if (clamped === midi) return ev;
+        return { ...ev, midi: clamped, pitch: midiToPitch(clamped) };
+      }),
+    }));
+    return { ...src, part_id: map.partId, name: map.name, instrument: map.instrument, staves: 1, measures };
+  }).filter((p): p is PartLike => !!p);
 
   warn(
     warnings,
-    "[woodwinds] Instrumentation copy applied: RH top->Flute, RH inner->Oboe, LH top->Clarinet, LH bottom->Bassoon."
+    "[woodwinds] Instrumentation copy applied (chord-completed): RH→Flute/Oboe, LH→Clarinet/Bassoon; missing voices filled with chord tones."
   );
 
   return {
     ...(score as any),
     meta: { ...(score.meta ?? {}), ensemble: "woodwind_ensemble" },
-    parts: [flute, oboe, clarinet, bassoon]
+    parts: woodwindParts,
   } as ScoreModel;
 }
