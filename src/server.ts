@@ -649,6 +649,10 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       anyRaw.woodwindTexture === "contrapuntal" || anyRaw.woodwindTexture === "chamber"
         ? (anyRaw.woodwindTexture as AppSettings["woodwindTexture"])
         : undefined,
+    bassoonEntryMeasure:
+      typeof anyRaw.bassoonEntryMeasure === "number" && Number.isFinite(anyRaw.bassoonEntryMeasure)
+        ? anyRaw.bassoonEntryMeasure
+        : undefined,
     woodwindExample:  typeof anyRaw.woodwindExample === "string" ? anyRaw.woodwindExample : undefined,
     woodwindComposer: typeof anyRaw.woodwindComposer === "string" ? anyRaw.woodwindComposer : undefined,
     fluteActivity:    isActivity(anyRaw.fluteActivity)    ? anyRaw.fluteActivity    : undefined,

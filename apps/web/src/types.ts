@@ -66,6 +66,11 @@ export type Settings = {
   pianoStylePreset?: string;
   /** Woodwind quintet (adds Horn in F as a 5th voice) when true. */
   woodwindQuintet?: boolean;
+  /**
+   * Piano→Wind copy: measure (1-based) where the Bassoon enters (rests before).
+   * 0 = always play; undefined = auto-detect the thin intro.
+   */
+  bassoonEntryMeasure?: number;
   /** Woodwind ensemble auto settings — parity with the string ensemble. */
   woodwindTexture?: "melody_harmony" | "chorale" | "contrapuntal" | "chamber";
   woodwindExample?: string;

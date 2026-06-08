@@ -1395,6 +1395,29 @@ export default function SettingsForm({ settings, onChange }: Props) {
         <>
           {/* Wind auto (quintet, texture, examples, activity) is handled in the
               auto-arranger branch above. This branch is the copy/brass panel. */}
+
+          {/* Bassoon entry rule — Piano→Wind quartet only */}
+          {settings.ensemble === "piano_woodwind_quartet" && (
+            <div className="field">
+              <label>Bassoon enters at measure</label>
+              <input
+                type="number"
+                min={0}
+                placeholder="auto"
+                value={settings.bassoonEntryMeasure ?? ""}
+                onChange={(e) => {
+                  const v = e.target.value.trim();
+                  update("bassoonEntryMeasure", v === "" ? undefined : Math.max(0, Number(v)) as any);
+                }}
+              />
+              <div className="key-preview">
+                <span className="slider-help">
+                  Bassoon rests before this measure (the soft intro). Blank = auto-detect the thin intro; 0 = play from the start.
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="field">
             <label>Key Signature</label>
             <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>

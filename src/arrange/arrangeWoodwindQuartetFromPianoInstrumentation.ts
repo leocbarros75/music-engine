@@ -26,7 +26,50 @@ type EventLike = any;
 
 type ArrangeOptions = {
   warnings?: string[];
+  /**
+   * Bassoon entry rule (Piano→Wind copy). The bassoon (heaviest voice) rests
+   * during the intro and enters when the texture builds:
+   *   - number (1-based measure): bassoon rests before this measure (manual).
+   *   - "auto" (default): rest the leading run of thin/quiet measures, then enter.
+   *   - "always": bassoon plays the bass from the start (no intro rest).
+   */
+  bassoonEntry?: number | "auto" | "always";
 };
+
+/**
+ * Decide which measures the bassoon should be tacet (intro rest).
+ * Manual: explicit entry measure. Auto: the LEADING run of measures whose note
+ * density is below 70% of the piece median (a thin intro), capped so we never
+ * silence more than the first third of the piece.
+ */
+function computeBassoonTacet(
+  sourceMeasures: MeasureLike[],
+  rule: number | "auto" | "always" | undefined
+): Set<number> {
+  const tacet = new Set<number>();
+  const n = sourceMeasures.length;
+  if (n === 0 || rule === "always") return tacet;
+
+  if (typeof rule === "number" && rule >= 1) {
+    for (let mi = 0; mi < Math.min(rule - 1, n); mi++) tacet.add(mi);
+    return tacet;
+  }
+
+  // Auto: density per measure
+  const dens = sourceMeasures.map((m: any) =>
+    (m?.events ?? []).filter((e: any) => e?.type === "note" && !e.isRest).length
+  );
+  const sorted = [...dens].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)] ?? 0;
+  if (median <= 0) return tacet;
+  const threshold = median * 0.7;
+  const cap = Math.floor(n / 3); // never mute more than the first third
+  for (let mi = 0; mi < n; mi++) {
+    if (dens[mi]! < threshold && mi < cap) tacet.add(mi);
+    else break; // only the LEADING run
+  }
+  return tacet;
+}
 
 function warn(warnings: string[] | undefined, msg: string): void {
   if (!warnings) return;
@@ -319,15 +362,27 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
 
   const woodwindParts = voiceDefs.map((d) => d.part);
 
+  // ── Bassoon entry rule: rest the intro, enter when the texture builds ────
+  const bassoonTacet = computeBassoonTacet(sourceMeasures, options.bassoonEntry ?? "auto");
+  if (bassoonTacet.size) {
+    for (const mi of bassoonTacet) {
+      const bm = bassoon.measures[mi];
+      if (bm) bm.events = [];
+    }
+    const entryNum = Math.max(...Array.from(bassoonTacet)) + 2; // 1-based measure of entry
+    warn(warnings, `[woodwinds] Bassoon tacet for the intro; enters at measure ${entryNum}.`);
+  }
+
   // Keep voices ordered top-to-bottom (no crossings) at shared onsets.
   enforceWoodwindVoiceOrder(woodwindParts);
 
   // ── Sustained-gap fill ───────────────────────────────────────────────────
   // Only a voice that is SILENT for an entire measure (long gap) receives a
   // single sustained chord tone, drawn from the harmony of the other voices.
-  fillSustainedGaps(woodwindParts, sourceMeasures);
+  // The bassoon's intentional intro-rest measures are skipped (kept tacet).
+  fillSustainedGaps(woodwindParts, sourceMeasures, { bassoonTacet });
 
-  warn(warnings, "[woodwinds] Faithful copy: RH→Flute/Oboe, LH→Clarinet/Bassoon; voices rest where the piano rests; long gaps get a sustained chord tone.");
+  warn(warnings, "[woodwinds] Faithful copy: RH chord→Flute/Oboe/Clarinet, LH bass→Bassoon; voices rest where the piano rests.");
 
   return {
     ...(score as any),
@@ -341,8 +396,13 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
  * harmony) gets a single sustained chord tone in the voice's sweet-spot. Keeps
  * a voice from disappearing for long stretches without cluttering faithful rests.
  */
-function fillSustainedGaps(parts: PartLike[], sourceMeasures: MeasureLike[]): void {
+function fillSustainedGaps(
+  parts: PartLike[],
+  sourceMeasures: MeasureLike[],
+  opts?: { bassoonTacet?: Set<number> }
+): void {
   const wvIds: WoodwindVoiceId[] = ["fl", "ob", "cl", "bn"];
+  const bassoonTacet = opts?.bassoonTacet ?? new Set<number>();
   const measureCount = Math.max(...parts.map((p) => (p.measures ?? []).length), 0);
   let beats = 4, beatType = 4;
   for (let mi = 0; mi < measureCount; mi++) {
@@ -363,6 +423,8 @@ function fillSustainedGaps(parts: PartLike[], sourceMeasures: MeasureLike[]): vo
     if (!pcs.size) continue; // whole ensemble tacet → leave it silent
 
     for (let vi = 0; vi < parts.length; vi++) {
+      // Bassoon (last voice) keeps its intentional intro-rest measures silent.
+      if (wvIds[vi] === "bn" && bassoonTacet.has(mi)) continue;
       const meas = parts[vi]?.measures?.[mi];
       if (!meas) continue;
       const hasNote = (meas.events ?? []).some((e: any) => e?.type === "note" && e.pitch);

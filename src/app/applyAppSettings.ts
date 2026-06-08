@@ -110,6 +110,12 @@ export type AppSettings = {
   /** Woodwind quintet (adds Horn in F as 5th voice) when true or woodwindSize="quintet". */
   woodwindQuintet?: boolean;
   woodwindSize?: "quartet" | "quintet";
+  /**
+   * Piano→Wind copy: bassoon entry. Measure number (1-based) where the bassoon
+   * enters (it rests before). 0 = always play. Undefined = auto-detect the
+   * thin intro and rest the bassoon there.
+   */
+  bassoonEntryMeasure?: number;
   /** Woodwind ensemble auto settings — parity with the string ensemble. */
   woodwindTexture?: "melody_harmony" | "chorale" | "contrapuntal" | "chamber";
   woodwindExample?: string;
@@ -1798,8 +1804,15 @@ export function applyAppSettings(
   }
 
   if (usePianoCopyWoodwindQuartetInstrumentation) {
-    // Piano-wind (copy): RH top→Flute, RH inner→Oboe, LH top→Clarinet, LH bottom→Bassoon
-    const finalScore = arrangeWoodwindQuartetFromPianoInstrumentation(scoreModel, { warnings });
+    // Piano-wind (copy): RH chord→Flute/Oboe/Clarinet, LH bass→Bassoon.
+    // Bassoon entry rule: manual measure if set, else auto-detect the thin intro.
+    const bassoonEntry: number | "auto" | "always" =
+      typeof settings.bassoonEntryMeasure === "number" && settings.bassoonEntryMeasure >= 1
+        ? settings.bassoonEntryMeasure
+        : (settings.bassoonEntryMeasure as any) === 0
+          ? "always"
+          : "auto";
+    const finalScore = arrangeWoodwindQuartetFromPianoInstrumentation(scoreModel, { warnings, bassoonEntry });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
