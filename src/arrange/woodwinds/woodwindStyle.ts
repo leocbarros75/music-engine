@@ -87,7 +87,7 @@ export const WOODWIND_EXAMPLES: WoodwindExample[] = [
   { value: "danzi_quintet",            label: "Danzi — Wind Quintet Op.56/67",  composer: "mozart", texture: "melody_harmony",
     help: "Graceful early-Romantic wind quintet — singing flute/oboe over light support." },
   { value: "nielsen_quintet",          label: "Nielsen — Wind Quintet Op.43",   composer: "brahms", texture: "contrapuntal",
-    help: "Each instrument strongly characterised — independent, contrapuntal lines." },
+    help: "Romantic/modern (calibrated): smooth stepwise lines, melodic bassoon, strong individual entrances — independent counterpoint." },
   // Baroque (transcriptions)
   { value: "bach_chorale_winds",       label: "Bach — Chorale (wind transcription)", composer: "bach", texture: "chorale",
     help: "Strict 4/5-part chorale: balanced block voicing, no parallels." },
