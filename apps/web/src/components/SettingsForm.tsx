@@ -289,6 +289,8 @@ const WIND_EXAMPLE_OPTIONS: Array<{ label: string; value: string; texture: NonNu
     help: "Graceful early-Romantic quintet — singing flute/oboe over light support." },
   { value: "nielsen_quintet", label: "Nielsen — Wind Quintet Op.43", texture: "contrapuntal", composer: "brahms",
     help: "Romantic/modern (calibrated): smooth stepwise lines, melodic bassoon, strong individual entrances — independent counterpoint." },
+  { value: "sousa_march", label: "Sousa — Concert band march", texture: "melody_harmony", composer: "haydn",
+    help: "Concert-band march (calibrated): very stepwise melody over an oom-pah accompaniment." },
   { value: "bach_chorale_winds", label: "Bach — Chorale (winds)", texture: "chorale", composer: "bach",
     help: "Strict 4/5-part chorale: balanced block voicing, no parallels." },
   { value: "handel_winds", label: "Handel — Wind movement", texture: "melody_harmony", composer: "handel",

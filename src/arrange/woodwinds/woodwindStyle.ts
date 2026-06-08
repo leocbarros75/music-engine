@@ -88,6 +88,9 @@ export const WOODWIND_EXAMPLES: WoodwindExample[] = [
     help: "Graceful early-Romantic wind quintet — singing flute/oboe over light support." },
   { value: "nielsen_quintet",          label: "Nielsen — Wind Quintet Op.43",   composer: "brahms", texture: "contrapuntal",
     help: "Romantic/modern (calibrated): smooth stepwise lines, melodic bassoon, strong individual entrances — independent counterpoint." },
+  // Concert band / march
+  { value: "sousa_march",              label: "Sousa — Concert band march",     composer: "haydn", texture: "melody_harmony",
+    help: "Concert-band march (calibrated): very stepwise upper-voice melody over an oom-pah accompaniment." },
   // Baroque (transcriptions)
   { value: "bach_chorale_winds",       label: "Bach — Chorale (wind transcription)", composer: "bach", texture: "chorale",
     help: "Strict 4/5-part chorale: balanced block voicing, no parallels." },
