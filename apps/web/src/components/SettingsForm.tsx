@@ -661,6 +661,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "satb_string_quartet" &&
           settings.ensemble !== "piano_with_strings" &&
           settings.ensemble !== "woodwind_ensemble" &&
+          settings.ensemble !== "piano_woodwind_quartet" &&
+          settings.ensemble !== "satb_woodwind_quartet" &&
+          settings.ensemble !== "piano_with_woodwinds" &&
           settings.ensemble !== "brass_ensemble" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
           )}
