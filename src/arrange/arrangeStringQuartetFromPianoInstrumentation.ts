@@ -873,15 +873,19 @@ export function arrangeStringQuartetFromPianoInstrumentation(
 
       if (fillMidi === vcMidi) continue; // avoid unison with VC
 
-      // Rhythm donor: prefer whichever of V1 / VC has more subdivisions in window
+      // Rhythm donor: the Viola is an inner-harmony voice that moves with the
+      // BASS/harmonic rhythm (Cello), not the busy melodic figuration of Violin I.
+      // Inheriting the Cello keeps the viola calm and idiomatic (matches how real
+      // quartet arrangements voice the inner part). Fall back to V1 only if the
+      // cello is silent in this window.
       const inWindow = (evs: EventLike[]) =>
         evs.filter(ev =>
           ev.type === "note" && !(ev as any).isRest &&
           Number(ev.t) >= fillT - 1e-6 && Number(ev.t) < fillT + fillDur - 1e-6
         );
-      const donorV1 = inWindow(v1m.events);
       const donorVC = inWindow(vcm.events);
-      const donorEvents = donorV1.length >= donorVC.length ? donorV1 : donorVC;
+      const donorV1 = inWindow(v1m.events);
+      const donorEvents = donorVC.length ? donorVC : donorV1;
 
       const subNotes = buildRhythmInheritedFill(fillMidi, donorEvents, fillT, fillDur, "viola");
       for (let sni = 0; sni < subNotes.length; sni++) {
