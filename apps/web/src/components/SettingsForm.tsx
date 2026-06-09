@@ -1424,12 +1424,14 @@ export default function SettingsForm({ settings, onChange }: Props) {
           {settings.ensemble === "brass_ensemble" && (() => {
             const BRASS_TEX = [
               { value: "melody_harmony", label: "Melody + Harmony", help: "Trumpet 1 leads; Horn/Trombone/Tuba accompany." },
+              { value: "chamber",        label: "Chamber (balanced)", help: "All five voices equally active — pop/jazz quintet, walking tuba (calibrated)." },
               { value: "chorale",        label: "Chorale (block)",  help: "Hymn-style block voicing — the core brass-choir sound." },
               { value: "fanfare",        label: "Fanfare",          help: "Bright ceremonial brass — active trumpets/horns, grounded tuba." },
               { value: "contrapuntal",   label: "Counterpoint",     help: "Independent imitative lines (Gabrieli/fugal)." },
             ];
             const BRASS_EX = [
               { value: "", label: "— None —" },
+              { value: "popjazz_quintet",  label: "Pop / Jazz brass quintet",        texture: "chamber" },
               { value: "gabrieli_canzona", label: "Gabrieli — Canzona (antiphonal)", texture: "contrapuntal" },
               { value: "brass_chorale",    label: "Brass chorale (hymn)",            texture: "chorale" },
               { value: "fanfare",          label: "Ceremonial fanfare",              texture: "fanfare" },

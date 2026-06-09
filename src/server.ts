@@ -654,8 +654,9 @@ function normalizeAppSettings(raw: unknown): AppSettings {
         ? anyRaw.bassoonEntryMeasure
         : undefined,
     brassTexture:
-      anyRaw.brassTexture === "melody_harmony" || anyRaw.brassTexture === "chorale" ||
-      anyRaw.brassTexture === "fanfare" || anyRaw.brassTexture === "contrapuntal"
+      anyRaw.brassTexture === "melody_harmony" || anyRaw.brassTexture === "chamber" ||
+      anyRaw.brassTexture === "chorale" || anyRaw.brassTexture === "fanfare" ||
+      anyRaw.brassTexture === "contrapuntal"
         ? (anyRaw.brassTexture as AppSettings["brassTexture"])
         : undefined,
     brassExample: typeof anyRaw.brassExample === "string" ? anyRaw.brassExample : undefined,

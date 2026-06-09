@@ -67,7 +67,7 @@ export type Settings = {
   /** Woodwind quintet (adds Horn in F as a 5th voice) when true. */
   woodwindQuintet?: boolean;
   /** Brass ensemble auto settings. */
-  brassTexture?: "melody_harmony" | "chorale" | "fanfare" | "contrapuntal";
+  brassTexture?: "melody_harmony" | "chamber" | "chorale" | "fanfare" | "contrapuntal";
   brassExample?: string;
   brassQuintet?: boolean;  // default true (Tpt1/Tpt2/Horn/Trombone/Tuba); false = quartet (no Horn)
   /**

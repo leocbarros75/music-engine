@@ -9,10 +9,13 @@
 // written-pitch transposition (Trumpet/Bb +2, Horn in F +7; Trombone/Tuba read
 // in concert bass clef).
 //
-// Calibration (concert, p10–p90 working ranges across the 3 sources):
-//   Trumpet(Bb) G3–Bb5 (lead 61–73), Horn(F) G3–C5, Trombone G2–F4,
-//   Tuba Ab1–Eb3.  Motion is CONTEXT-DEPENDENT: trumpets/horns are stepwise on a
-//   march tune (65–79%) but leap-heavy in fanfares (74–87%).
+// Calibration (concert, p10–p90 working ranges across the 3 orchestral/band
+// sources + 3 real brass QUINTETS — Godfather, Chattanooga, St. Louis Blues):
+//   Trumpet 1 63–77, Trumpet 2 60–74, Horn 56–69, Trombone 51–63, Tuba 31–45
+//   (quintet, chamber). Orchestral/band confirm the same with wider extremes.
+//   Motion: chamber quintet voices are balanced & moderately stepwise (43–49%);
+//   march trumpets stepwise (65–79%); fanfares leap-heavy (74–87%) — derive
+//   from the melody/harmony. The pref ranges below bracket all sources.
 
 export type BrassVoiceId = "tpt1" | "tpt2" | "hn" | "tbn" | "tuba";
 

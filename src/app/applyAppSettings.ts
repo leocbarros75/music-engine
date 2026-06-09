@@ -123,7 +123,7 @@ export type AppSettings = {
   woodwindExample?: string;
   woodwindComposer?: string;
   /** Brass ensemble auto settings — parity with the woodwind ensemble. */
-  brassTexture?: "melody_harmony" | "chorale" | "fanfare" | "contrapuntal";
+  brassTexture?: "melody_harmony" | "chamber" | "chorale" | "fanfare" | "contrapuntal";
   brassExample?: string;
   brassQuintet?: boolean;  // default true (with Horn); false = quartet
   /** Per-instrument activity (overrides idiomatic agility defaults). */
