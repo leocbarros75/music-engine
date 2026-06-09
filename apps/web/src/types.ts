@@ -66,6 +66,10 @@ export type Settings = {
   pianoStylePreset?: string;
   /** Woodwind quintet (adds Horn in F as a 5th voice) when true. */
   woodwindQuintet?: boolean;
+  /** Brass ensemble auto settings. */
+  brassTexture?: "melody_harmony" | "chorale" | "fanfare" | "contrapuntal";
+  brassExample?: string;
+  brassQuintet?: boolean;  // default true (Tpt1/Tpt2/Horn/Trombone/Tuba); false = quartet (no Horn)
   /**
    * Piano→Wind copy: measure (1-based) where the Bassoon enters (rests before).
    * 0 = always play; undefined = auto-detect the thin intro.

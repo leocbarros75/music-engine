@@ -1,61 +1,64 @@
 // src/arrange/brass/brassRanges.ts
 //
-// Brass ensemble ranges & playing characteristics, CALIBRATED from three real
-// scores: Sousa "The Crusader March" (concert band), Strauss "Also Sprach
-// Zarathustra", and Tchaikovsky "1812 Overture".
+// Brass quintet ranges, characteristics and DP voice mapping — calibrated from
+// three real scores: Sousa "The Crusader March" (concert band), Strauss
+// "Also Sprach Zarathustra", and Tchaikovsky "1812 Overture".
 //
-// All MIDI values are CONCERT (sounding) pitch. The MusicXML exporter applies
-// written-pitch transposition: Trumpet/Bb +2, Horn in F +7, Euphonium/Trombone/
-// Tuba are read in concert (bass clef).
+// Standard brass quintet: Trumpet 1, Trumpet 2, Horn in F, Trombone, Tuba.
+// All MIDI values are CONCERT (sounding) pitch — the MusicXML exporter applies
+// written-pitch transposition (Trumpet/Bb +2, Horn in F +7; Trombone/Tuba read
+// in concert bass clef).
 //
-// Calibration data (concert, p10–p90 working ranges across the 3 sources):
-//   Trumpet (Bb): Sousa Ab3–Gb5 (61–73 lead), 1812 G3–Bb5, Zara C4–C6
-//   Horn (F):     Sousa G3–Bb4 (56–66),        1812 Eb2–Db5, Zara G3–C5
-//   Trombone:     Sousa Ab2–F4 (49–61),        1812 G2–A4
-//   Euphonium:    Sousa Ab2–F4 (49–59) — lyrical tenor brass (73% stepwise)
-//   Tuba:         Sousa Ab1–Eb3 (36–46),       1812/Zara C2–C3
-//
-// Motion is CONTEXT-DEPENDENT (same as woodwinds): trumpets/horns are stepwise
-// when carrying a march tune (65–79% steps) but leap heavily in fanfares
-// (1812/Zarathustra: 74–87% leaps). The arranger should derive this from the
-// melody/harmony, not fix it per instrument.
+// Calibration (concert, p10–p90 working ranges across the 3 sources):
+//   Trumpet(Bb) G3–Bb5 (lead 61–73), Horn(F) G3–C5, Trombone G2–F4,
+//   Tuba Ab1–Eb3.  Motion is CONTEXT-DEPENDENT: trumpets/horns are stepwise on a
+//   march tune (65–79%) but leap-heavy in fanfares (74–87%).
 
-export type BrassVoiceId = "tpt" | "hn" | "tbn" | "euph" | "tuba";
+export type BrassVoiceId = "tpt1" | "tpt2" | "hn" | "tbn" | "tuba";
 
-export type BrassRange = {
-  absMin: number;
-  absMax: number;
-  prefMin: number;
-  prefMax: number;
-};
+export type BrassRange = { absMin: number; absMax: number; prefMin: number; prefMax: number };
 
-// pref = reliable, characteristic register; abs = full practical range.
+// pref = reliable/characteristic register; abs = full practical range (concert).
 export const BRASS_RANGES: Record<BrassVoiceId, BrassRange> = {
-  tpt:  { absMin: 52, absMax: 86, prefMin: 55, prefMax: 82 }, // E3..D6   pref G3..Bb5 (Bb trumpet, concert)
-  hn:   { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5   pref C3..C5  (Horn in F, concert)
-  tbn:  { absMin: 40, absMax: 72, prefMin: 43, prefMax: 67 }, // E2..C5   pref G2..G4  (tenor trombone)
-  euph: { absMin: 40, absMax: 70, prefMin: 45, prefMax: 65 }, // E2..Bb4  pref A2..F4  (euphonium — lyrical tenor)
-  tuba: { absMin: 24, absMax: 55, prefMin: 28, prefMax: 53 }, // C1..G3   pref E1..F3  (bass foundation)
+  tpt1: { absMin: 52, absMax: 86, prefMin: 57, prefMax: 82 }, // E3..D6  pref A3..Bb5
+  tpt2: { absMin: 52, absMax: 84, prefMin: 55, prefMax: 79 }, // E3..C6  pref G3..G5
+  hn:   { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5  pref C3..C5
+  tbn:  { absMin: 40, absMax: 72, prefMin: 43, prefMax: 67 }, // E2..C5  pref G2..G4
+  tuba: { absMin: 26, absMax: 58, prefMin: 31, prefMax: 53 }, // D1..Bb3 pref G1..F3
 };
 
 export type BrassCharacter = {
-  /** 0–1 technical agility for fast passagework. */
-  agility: number;
+  agility: number;           // 0–1 technical agility for fast passagework
+  defaultActivity: "grounded" | "less_active" | "active" | "high_active";
   role: string;
   sweetSpot: string;
 };
 
-// Calibrated/Adler-informed. Trumpet & Euphonium most agile; Horn lyrical but
-// less nimble; Trombone moderate (slide); Tuba foundational.
 export const BRASS_CHARACTER: Record<BrassVoiceId, BrassCharacter> = {
-  tpt:  { agility: 0.9,  role: "lead melody / fanfare",            sweetSpot: "G4–G5" },
-  hn:   { agility: 0.55, role: "noble melody / harmonic fill",     sweetSpot: "C3–G4" },
-  tbn:  { agility: 0.5,  role: "harmony / tenor-bass (slide)",     sweetSpot: "G2–Bb3" },
-  euph: { agility: 0.8,  role: "lyrical tenor melody",             sweetSpot: "A2–F4" },
-  tuba: { agility: 0.45, role: "bass foundation",                  sweetSpot: "E1–D3" },
+  tpt1: { agility: 0.9,  defaultActivity: "active",      role: "lead melody / fanfare",        sweetSpot: "G4–G5" },
+  tpt2: { agility: 0.9,  defaultActivity: "active",      role: "2nd melody / harmony",          sweetSpot: "E4–E5" },
+  hn:   { agility: 0.55, defaultActivity: "less_active", role: "noble inner voice / harmony",   sweetSpot: "C3–G4" },
+  tbn:  { agility: 0.5,  defaultActivity: "less_active", role: "tenor-bass harmony (slide)",    sweetSpot: "G2–Bb3" },
+  tuba: { agility: 0.45, defaultActivity: "grounded",    role: "bass foundation",               sweetSpot: "G1–D3" },
 };
 
-// Brass quintet voice order (top→bottom) and the string-DP slot each maps to
-// (for when the brass arranger reuses the string/woodwind DP machinery).
-//   Trumpet1 → vln1, Trumpet2/Horn → vln2/vla, Trombone → vc, Tuba → cb
-export const BRASS_QUINTET_VOICES: BrassVoiceId[] = ["tpt", "hn", "tbn", "euph", "tuba"];
+// Brass voice → string-DP slot (the brass arranger reuses the string/woodwind DP).
+export const BRASS_TO_STRING_VOICE: Record<BrassVoiceId, "vln1" | "vln2" | "vla" | "vc" | "cb"> = {
+  tpt1: "vln1",
+  tpt2: "vln2",
+  hn:   "vla",
+  tbn:  "vc",
+  tuba: "cb",
+};
+
+export const BRASS_PART_META: Record<BrassVoiceId, { part_id: string; name: string; instrument: string }> = {
+  tpt1: { part_id: "P_TP1", name: "Trumpet 1",   instrument: "trumpet_bb_1" },
+  tpt2: { part_id: "P_TP2", name: "Trumpet 2",   instrument: "trumpet_bb_2" },
+  hn:   { part_id: "P_HN",  name: "Horn in F",   instrument: "horn_f"       },
+  tbn:  { part_id: "P_TBN", name: "Trombone",    instrument: "trombone"     },
+  tuba: { part_id: "P_TUBA",name: "Tuba",        instrument: "tuba_c"       },
+};
+
+/** Brass quartet (Tpt1/Tpt2/Trombone/Tuba — no horn) and quintet (with horn). */
+export const BRASS_QUARTET_VOICES: BrassVoiceId[] = ["tpt1", "tpt2", "tbn", "tuba"];
+export const BRASS_QUINTET_VOICES: BrassVoiceId[] = ["tpt1", "tpt2", "hn", "tbn", "tuba"];

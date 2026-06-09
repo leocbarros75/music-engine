@@ -1420,6 +1420,63 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
+          {/* Brass ensemble (auto) controls */}
+          {settings.ensemble === "brass_ensemble" && (() => {
+            const BRASS_TEX = [
+              { value: "melody_harmony", label: "Melody + Harmony", help: "Trumpet 1 leads; Horn/Trombone/Tuba accompany." },
+              { value: "chorale",        label: "Chorale (block)",  help: "Hymn-style block voicing — the core brass-choir sound." },
+              { value: "fanfare",        label: "Fanfare",          help: "Bright ceremonial brass — active trumpets/horns, grounded tuba." },
+              { value: "contrapuntal",   label: "Counterpoint",     help: "Independent imitative lines (Gabrieli/fugal)." },
+            ];
+            const BRASS_EX = [
+              { value: "", label: "— None —" },
+              { value: "gabrieli_canzona", label: "Gabrieli — Canzona (antiphonal)", texture: "contrapuntal" },
+              { value: "brass_chorale",    label: "Brass chorale (hymn)",            texture: "chorale" },
+              { value: "fanfare",          label: "Ceremonial fanfare",              texture: "fanfare" },
+              { value: "sousa_brass",      label: "Sousa — March brass",             texture: "melody_harmony" },
+            ];
+            const tex = settings.brassTexture ?? "melody_harmony";
+            const texHelp = BRASS_TEX.find(t => t.value === tex)?.help ?? "";
+            return (
+              <>
+                <div className="field">
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                    <input type="checkbox" checked={settings.brassQuintet !== false}
+                      onChange={(e) => update("brassQuintet", e.target.checked)}
+                      style={{ width: "16px", height: "16px", cursor: "pointer" }} />
+                    Brass quintet (include Horn in F)
+                  </label>
+                  <div className="key-preview"><span className="slider-help">Quintet = Tpt 1, Tpt 2, Horn, Trombone, Tuba. Unchecked = quartet (no Horn).</span></div>
+                </div>
+                <div className="field">
+                  <label>Brass Texture</label>
+                  <select value={tex} onChange={(e) => {
+                    const t = e.target.value as NonNullable<Settings["brassTexture"]>;
+                    const next: Partial<Settings> = { brassTexture: t };
+                    if (t === "contrapuntal") { next.textureMode = "polyphony"; next.accompaniment = "polyphonic"; }
+                    else if (settings.accompaniment === "polyphonic") { next.textureMode = "homophony_homorhythmic"; next.accompaniment = "homophonic"; }
+                    onChange({ ...settings, ...next });
+                  }}>
+                    {BRASS_TEX.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                  <div className="key-preview"><span className="slider-help">{texHelp}</span></div>
+                </div>
+                <div className="field">
+                  <label>Example</label>
+                  <select value={settings.brassExample ?? ""} onChange={(e) => {
+                    const ex = e.target.value;
+                    const next: Partial<Settings> = { brassExample: ex || undefined };
+                    const t = BRASS_EX.find(o => o.value === ex)?.texture;
+                    if (t) next.brassTexture = t as Settings["brassTexture"];
+                    onChange({ ...settings, ...next });
+                  }}>
+                    {BRASS_EX.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+              </>
+            );
+          })()}
+
           <div className="field">
             <label>Key Signature</label>
             <select value={settings.keySignature} onChange={(e) => update("keySignature", e.target.value)}>

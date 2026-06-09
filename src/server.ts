@@ -653,6 +653,13 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       typeof anyRaw.bassoonEntryMeasure === "number" && Number.isFinite(anyRaw.bassoonEntryMeasure)
         ? anyRaw.bassoonEntryMeasure
         : undefined,
+    brassTexture:
+      anyRaw.brassTexture === "melody_harmony" || anyRaw.brassTexture === "chorale" ||
+      anyRaw.brassTexture === "fanfare" || anyRaw.brassTexture === "contrapuntal"
+        ? (anyRaw.brassTexture as AppSettings["brassTexture"])
+        : undefined,
+    brassExample: typeof anyRaw.brassExample === "string" ? anyRaw.brassExample : undefined,
+    brassQuintet: typeof anyRaw.brassQuintet === "boolean" ? anyRaw.brassQuintet : undefined,
     woodwindExample:  typeof anyRaw.woodwindExample === "string" ? anyRaw.woodwindExample : undefined,
     woodwindComposer: typeof anyRaw.woodwindComposer === "string" ? anyRaw.woodwindComposer : undefined,
     fluteActivity:    isActivity(anyRaw.fluteActivity)    ? anyRaw.fluteActivity    : undefined,

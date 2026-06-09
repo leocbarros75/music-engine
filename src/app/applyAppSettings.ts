@@ -21,6 +21,8 @@ import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
 import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrangeSatbToWoodwindQuartet";
 import { woodwindTextureToProfile, woodwindTextureToActivity, woodwindExampleToTexture, type WoodwindTexture } from "../arrange/woodwinds/woodwindStyle";
+import { arrangeBrassEnsemble, type BrassActivity } from "../arrange/brass/brassArranger";
+import { brassTextureToProfile, brassTextureToActivity, brassExampleToTexture, type BrassTexture } from "../arrange/brass/brassStyle";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -120,6 +122,10 @@ export type AppSettings = {
   woodwindTexture?: "melody_harmony" | "chorale" | "contrapuntal" | "chamber";
   woodwindExample?: string;
   woodwindComposer?: string;
+  /** Brass ensemble auto settings — parity with the woodwind ensemble. */
+  brassTexture?: "melody_harmony" | "chorale" | "fanfare" | "contrapuntal";
+  brassExample?: string;
+  brassQuintet?: boolean;  // default true (with Horn); false = quartet
   /** Per-instrument activity (overrides idiomatic agility defaults). */
   fluteActivity?:    "grounded" | "less_active" | "active" | "high_active";
   oboeActivity?:     "grounded" | "less_active" | "active" | "high_active";
@@ -2051,16 +2057,29 @@ export function applyAppSettings(
   }
 
   if (wantsBrass) {
-    const finalScore = mapPianoToBrassEnsembleOpen(scoreModel, {
-      level: settings.level,
-      accompaniment,
-      textureMode,
-      chords,
-      warnings
+    // ── Brass ensemble (auto) — DP-based, mirrors the woodwind/string engine ──
+    //   Trumpet 1/2 ← top voices, Horn ← inner, Trombone ← tenor, Tuba ← bass.
+    //   Concert pitch; exporter writes transposition (Trumpet +2, Horn +7).
+    const brTexture: BrassTexture | undefined =
+      (settings.brassTexture as BrassTexture | undefined) ??
+      (settings.brassExample ? (brassExampleToTexture(settings.brassExample) ?? undefined) : undefined);
+    const brProfile = brassTextureToProfile(brTexture, styleRaw, usePolyphonic);
+    const brActivity = brassTextureToActivity(brTexture) as Partial<Record<"tpt1"|"tpt2"|"hn"|"tbn"|"tuba", BrassActivity>>;
+    const brQuintet = settings.brassQuintet !== false; // default quintet (with Horn)
+
+    const brResult = arrangeBrassEnsemble(scoreModel, chords as any, {
+      profile:    brProfile,
+      chords:     chords as any,
+      key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
+      quintet:    brQuintet,
+      activity:   brActivity,
+      polyphonic: usePolyphonic || brTexture === "contrapuntal",
+      level:      settings.level,
+      warnings,
     });
-    attachTextureAnalysis(finalScore, warnings);
+    attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
-      scoreModel: finalScore,
+      scoreModel: brResult.scoreModel as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,
