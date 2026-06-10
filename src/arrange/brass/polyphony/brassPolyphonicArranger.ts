@@ -121,6 +121,41 @@ function findMelodyPart(score: ScoreModel): any | null {
   return best ?? parts[0] ?? null;
 }
 
+// A piano grand staff is not a melody: feeding both hands to the engine makes
+// vln1 inherit every chord note (RH+LH stacked) and starves the inner voices
+// into rests. Derive a single line instead — staff 1 only, highest note per
+// onset — so the beam search gets a real tune to write counterpoint under.
+function isGrandStaffPart(p: any): boolean {
+  if (Number(p?.staves ?? 1) >= 2) return true;
+  return (p?.measures ?? []).some((m: any) =>
+    (m?.events ?? []).some((ev: any) => Number(ev?.staff) === 2)
+  );
+}
+
+function deriveMelodyLineFromGrandStaff(part: any): any {
+  const measures = (part?.measures ?? []).map((m: any) => {
+    const byOnset = new Map<number, any>();
+    for (const ev of m?.events ?? []) {
+      if (ev?.type !== "note" || Number(ev?.staff ?? 1) !== 1) continue;
+      const midi = eventMidi(ev);
+      if (midi === null) continue;
+      const t = Number(ev.t ?? 0);
+      const cur = byOnset.get(t);
+      if (!cur || midi > eventMidi(cur)!) byOnset.set(t, ev);
+    }
+    const events = Array.from(byOnset.values())
+      .sort((a: any, b: any) => Number(a.t) - Number(b.t))
+      .map((ev: any, i: number, arr: any[]) => {
+        // Trim each note at the next onset so the derived line is monophonic.
+        const next = arr[i + 1];
+        const dur = next ? Math.min(Number(ev.dur ?? 0), Number(next.t) - Number(ev.t)) : Number(ev.dur ?? 0);
+        return { ...ev, dur, voice: 1, staff: 1 };
+      });
+    return { ...m, events };
+  });
+  return { ...part, staves: 1, measures };
+}
+
 function pickChordForTime(chords: ChordEvent[], measure: number, t: number): string | null {
   const events = chords.filter((c) => Number(c.measure) === Number(measure));
   if (!events.length) return null;
@@ -178,7 +213,10 @@ function addRestsOnWeakBeats(candidateMap: Record<VoiceId, number[]>, slice: Sli
   for (const v of VOICES) {
     if (v === "vln1") continue;
     if (!candidateMap[v].includes(null as any)) {
-      candidateMap[v] = [null as any, ...candidateMap[v]];
+      // Append (not prepend): notes must be tried before rests, otherwise the
+      // combo cap in buildVoicingCombos silences a voice before the beam ever
+      // scores a note for it.
+      candidateMap[v] = [...candidateMap[v], null as any];
     }
   }
 }
@@ -190,11 +228,17 @@ function buildVoicingCombos(candidateMap: Record<VoiceId, number[]>, cap = 120):
   const vc = candidateMap.vc.length ? candidateMap.vc : [null];
   const cb = candidateMap.cb.length ? candidateMap.cb : [null];
   const out: Voicing[] = [];
+  // vln2 is the INNERMOST loop: with the combo cap, the outermost dimensions
+  // are explored least, so the upper voices must vary fastest. (With vln2
+  // outermost-but-one, vla×vc×cb alone exceeded the cap and vln2 was frozen on
+  // its first candidate — a rest on every weak beat → a one-note-per-measure
+  // voice.) cb varies slowest, which suits a stable bass: its first candidate
+  // is already the nearest chord-bass tone.
   for (const a of v1) {
-    for (const b of v2) {
-      for (const c of va) {
-        for (const d of vc) {
-          for (const e of cb) {
+    for (const e of cb) {
+      for (const d of vc) {
+        for (const c of va) {
+          for (const b of v2) {
             out.push({ vln1: a, vln2: b, vla: c, vc: d, cb: e });
             if (out.length >= cap) return out;
           }
@@ -287,10 +331,14 @@ export function arrangeBrassPolyphonic(
   options: { level?: string } = {}
 ): StringPolyphonicResult {
   const warnings: string[] = [];
-  const melodyPart = findMelodyPart(score);
+  let melodyPart = findMelodyPart(score);
   if (!melodyPart) {
-    warnings.push("[strings-poly] Missing melody part; returning original score.");
+    warnings.push("[brass-poly] Missing melody part; returning original score.");
     return { scoreModel: score as any, warnings, debug: { ruleHits: [], motifEvents: [], rhythmDecisions: [] } };
+  }
+  if (isGrandStaffPart(melodyPart)) {
+    melodyPart = deriveMelodyLineFromGrandStaff(melodyPart);
+    warnings.push("[brass-poly] Piano grand-staff source: melody derived from staff 1 top line.");
   }
 
   const level = String(options.level ?? "").toLowerCase();
@@ -370,7 +418,17 @@ export function arrangeBrassPolyphonic(
           state.pendingResolution,
           state.parallelPerfectCounts
         );
-        const total = state.cost + scoreResult.cost + crossingRes.cost;
+        // Resting must not be free: every counterpoint rule skips null voices,
+        // so without this a silent voice always beats a playing one and the
+        // beam reduces inner voices to strong-beat-only attacks. A modest cost
+        // per resting voice (that had a real note available) lets clean lines
+        // win on weak beats while genuinely bad voicings still prefer to rest.
+        let restCost = 0;
+        for (const rv of VOICES) {
+          if (rv === "vln1") continue;
+          if (fixed[rv] === null && candidates[rv].some((c) => c !== null)) restCost += 2;
+        }
+        const total = state.cost + scoreResult.cost + crossingRes.cost + restCost;
         nextBeam.push({
           voicing: fixed,
           history: [...state.history, fixed],
