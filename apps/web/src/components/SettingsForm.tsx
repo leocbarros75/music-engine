@@ -877,8 +877,11 @@ export default function SettingsForm({ settings, onChange }: Props) {
         <>
           <div className="field">
             <div className="pill info" style={{ marginBottom: 4 }}>
-              Copies piano notes directly: RH → Violin I &amp; II · LH → Viola &amp; Cello.
-              Upload a piano score and the engine will preserve every chord note.
+              Faithful copy: RH → Violin I &amp; II · LH → Viola &amp; Cello.
+              Priority is Rhythm → Notes → Harmony; every chord note is preserved.
+              This mode does not restyle, so there are no texture / style / composer
+              controls — for a styled arrangement use <b>string ensemble (auto)</b> or
+              <b> piano + strings (complement)</b>.
             </div>
           </div>
 
