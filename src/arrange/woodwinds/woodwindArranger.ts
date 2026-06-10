@@ -18,7 +18,7 @@
 
 import type { ScoreModel, NoteEvent } from "../../score/types";
 import { arrangeStringEnsemble } from "../strings/stringArranger";
-import { arrangeStringPolyphonic } from "../stringsPolyphony/stringsPolyphonicArranger";
+import { arrangeWoodwindPolyphonic } from "./polyphony/woodwindPolyphonicArranger";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId } from "../strings/types";
 import {
@@ -322,7 +322,7 @@ export type WoodwindArrangerOptions = {
    */
   activity?: Partial<Record<WoodwindVoiceId, WoodwindActivity>>;
   /**
-   * Real counterpoint mode. When true, routes through arrangeStringPolyphonic
+   * Real counterpoint mode. When true, routes through arrangeWoodwindPolyphonic
    * (motif imitation, staggered entries, rhythm stratification, suspensions)
    * instead of the block-chord DP — and SKIPS the uniform-rhythm post-processor
    * so each voice keeps its independent rhythm. Use for "contrapuntal" texture.
@@ -381,7 +381,7 @@ function remapStringPartsToWoodwinds(
  * Two engines, selected by `polyphonic`:
  *  • Block/homophonic (default): arrangeStringEnsemble DP → remap → apply a
  *    shared source-rhythm grid (each voice picks chord tones; voices align).
- *  • Counterpoint (polyphonic=true): arrangeStringPolyphonic → remap, KEEPING
+ *  • Counterpoint (polyphonic=true): arrangeWoodwindPolyphonic → remap, KEEPING
  *    the engine's independent rhythms (motif imitation, staggered entries,
  *    rhythm stratification, suspensions). The uniform-rhythm post-processor is
  *    skipped so the polyphony is preserved.
@@ -398,7 +398,7 @@ export function arrangeWoodwindEnsemble(
 
   // ── Counterpoint path: real polyphony, no rhythm flattening ──────────────
   if (options.polyphonic) {
-    const polyResult = arrangeStringPolyphonic(score, chords, { level: options.level });
+    const polyResult = arrangeWoodwindPolyphonic(score, chords, { level: options.level });
     warnings.push(...(polyResult.warnings ?? []));
     const woodwindScore = remapStringPartsToWoodwinds(polyResult.scoreModel as ScoreModel, voices);
     // NOTE: deliberately NOT calling applyMelodyRhythmToWoodwinds — that forces

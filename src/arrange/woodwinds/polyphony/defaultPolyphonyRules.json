@@ -1,0 +1,36 @@
+{
+  "polyphony": {
+    "motionPriorityWeights": {
+      "contrary": -2.5,
+      "oblique": -1.5,
+      "similar": 1.0,
+      "parallel": 2.5
+    },
+    "passingToneRules": {
+      "allowWeakBeatDissonance": true,
+      "requireStepApproach": true,
+      "requireStepResolve": true,
+      "strongBeatDissonancePenalty": 3.5,
+      "weakBeatDissonancePenalty": 0.5,
+      "suspensionPairs": ["4-3", "7-6"]
+    },
+    "imitation": {
+      "enabled": true,
+      "voices": ["vln2", "vla"],
+      "delayBeats": [4, 8],
+      "transposeSemitones": [7, -5],
+      "maxOverlaps": 1
+    },
+    "rhythmicStratification": {
+      "targetSubdivision": 0.5,
+      "maxVoiceDominance": 0.30,
+      "allAttackPenalty": 4.0,
+      "dominancePenalty": 3.0
+    },
+    "celloSinger": {
+      "bassAnchoringThreshold": 0.6,
+      "celloFreeRange": [60, 72],
+      "agilityNoteDensity": 3
+    }
+  }
+}

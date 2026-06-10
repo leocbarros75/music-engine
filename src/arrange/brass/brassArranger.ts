@@ -14,7 +14,7 @@
 
 import type { ScoreModel, NoteEvent } from "../../score/types";
 import { arrangeStringEnsemble } from "../strings/stringArranger";
-import { arrangeStringPolyphonic } from "../stringsPolyphony/stringsPolyphonicArranger";
+import { arrangeBrassPolyphonic } from "./polyphony/brassPolyphonicArranger";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId, Slice, Voicing, VoiceId } from "../strings/types";
 import { buildCandidatesForSlice } from "../strings/candidates";
@@ -200,7 +200,7 @@ export function arrangeBrassEnsemble(
 
   // Contrapuntal → polyphonic engine, keep independent rhythms (no flattening).
   if (options.polyphonic) {
-    const poly = arrangeStringPolyphonic(score, chords, { level: options.level });
+    const poly = arrangeBrassPolyphonic(score, chords, { level: options.level });
     warnings.push(...(poly.warnings ?? []));
     return { scoreModel: remapStringToBrass(poly.scoreModel as ScoreModel, voices), warnings };
   }
