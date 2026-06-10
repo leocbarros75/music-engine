@@ -2060,6 +2060,13 @@ export function applyAppSettings(
     // ── Brass ensemble (auto) — DP-based, mirrors the woodwind/string engine ──
     //   Trumpet 1/2 ← top voices, Horn ← inner, Trombone ← tenor, Tuba ← bass.
     //   Concert pitch; exporter writes transposition (Trumpet +2, Horn +7).
+    // Without chords the rhythm/texture stage cannot run (applyBrassRhythm
+    // requires a harmonic grid), so a chordless source — e.g. a piano score —
+    // would collapse every texture to the same DP block output.
+    const brChords = chords.length ? chords : inferChordsFromAllVoices(scoreModel);
+    if (!brChords.length) {
+      warnings.push("[brass] Could not infer chords from the source — textures may sound identical.");
+    }
     const brTexture: BrassTexture | undefined =
       (settings.brassTexture as BrassTexture | undefined) ??
       (settings.brassExample ? (brassExampleToTexture(settings.brassExample) ?? undefined) : undefined);
@@ -2067,9 +2074,9 @@ export function applyAppSettings(
     const brActivity = brassTextureToActivity(brTexture) as Partial<Record<"tpt1"|"tpt2"|"hn"|"tbn"|"tuba", BrassActivity>>;
     const brQuintet = settings.brassQuintet !== false; // default quintet (with Horn)
 
-    const brResult = arrangeBrassEnsemble(scoreModel, chords as any, {
+    const brResult = arrangeBrassEnsemble(scoreModel, brChords as any, {
       profile:    brProfile,
-      chords:     chords as any,
+      chords:     brChords as any,
       key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
       quintet:    brQuintet,
       activity:   brActivity,
