@@ -1258,10 +1258,27 @@ const server = http.createServer(async (req, res) => {
         try {
           const score: any = parseMusicXMLToScoreModel(musicxml);
           const filtered = (score.parts ?? []).filter((p: any) => partIds.includes(String(p.part_id ?? "")));
-          if (filtered.length) {
+          // A grand staff / piano part has its RH and LH on separate staves. Both
+          // MusicXML exporters FLATTEN that on a round-trip (staff 2 → staff 1),
+          // which destroys the LH and makes the piano-copy arrangers produce a
+          // sparse, broken result. So when a kept part is a grand staff, DO NOT
+          // re-export — use the original XML (it already has the right structure;
+          // the copy arrangers locate the piano part by name themselves).
+          const keepsGrandStaff = filtered.some((p: any) => {
+            const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
+            if (Number(p?.staves ?? 1) >= 2) return true;
+            if (s.includes("piano") || s.includes("keyboard") || s.includes("organ")) return true;
+            return (p?.measures ?? []).some((m: any) =>
+              (m?.events ?? []).some((ev: any) => Number(ev?.staff) === 2)
+            );
+          });
+          const selectsAllParts = filtered.length === (score.parts ?? []).length;
+          if (filtered.length && !keepsGrandStaff && !selectsAllParts) {
+            // Safe to filter+re-export (single-staff parts only, dropping some).
             const filteredScore = { ...score, parts: filtered };
             workingXml = exportSatbScoreModelToMusicXML(filteredScore);
           }
+          // else: keep the original musicxml (grand staff preserved / nothing dropped).
         } catch {
           // fall through — use original xml
         }
