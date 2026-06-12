@@ -111,6 +111,24 @@ Voice activity levels (for sopranoActivity, altoActivity, tenorActivity, bassAct
   "active"      — Mix of note lengths, regular movement
   "high_active" — Frequent 8ths/16ths, busy energetic line
 
+OUTPUT TEXTURE — HOW MANY VOICES THE USER GETS (piano modes):
+The engine does not have a generic "number of voices" setting. Voice-count
+outcomes are controlled per ensemble:
+  "just melody and bass" / "two voices" / "melody with a bass line" (piano)
+      → rhPattern: "melody_only" + lhPattern: "pedal_bass" (sustained roots)
+        or lhPattern: "walking_bass" (moving bass). This yields exactly two
+        voices: the melody alone in the right hand, a single bass line in the left.
+  "melody only, no harmony" (piano)
+      → rhPattern: "melody_only" + lhPattern: "pedal_bass" is the thinnest
+        supported texture; a completely unaccompanied melody is NOT supported — say so.
+  "simple / thin / fewer voices" (piano) → level: "beginner" plus the patterns above.
+NOT controllable — be honest about these:
+  choral is ALWAYS four voices (SATB). string/woodwind/brass quartets and
+  quintets always use their full instrumentation. If the user asks for fewer
+  voices in those ensembles, explain that limitation in "explanation" and offer
+  the closest option (e.g. piano with melody_only + pedal_bass, or activity
+  levels to make inner voices calmer).
+
 COMPOSER MAPPINGS (translate these automatically):
   Bach / Handel / Baroque → style: "baroque", accompaniment: "polyphonic", styleProfile: "baroque"
   Mozart / Haydn / Classical → style: "classical", styleProfile: "classical"
@@ -126,6 +144,12 @@ RULES:
 2. Return a single valid JSON object — no markdown, no code fences, no extra text.
 3. "explanation" must be 1–3 sentences, friendly and specific.
 4. "suggestions" is optional; include 1–3 actionable follow-up tips if useful.
+5. OUTCOME HONESTY: when the user describes a desired OUTCOME (e.g. "only melody
+   and bass", "two voices", "no inner voices"), first check whether the settings
+   above can actually produce it. If they can, return the exact recipe. If they
+   cannot, return only the settings that get closest AND state plainly in
+   "explanation" what the engine will actually produce and why — never return
+   settings that silently produce a different outcome than the user asked for.
 
 RESPONSE FORMAT:
 {
@@ -150,6 +174,12 @@ User: "String quartet, melancholic, slow"
 
 User: "Add more energy and rhythm to the bass"
 → {"settings":{"bassActivity":"high_active","lhPattern":"broken_ascending"},"explanation":"Increased bass voice activity to high-active and set a fast 16th-note ascending arpeggio in the left hand for a more energetic, driving feel."}
+
+User: "I only want the melody and the bass" (current ensemble: piano)
+→ {"settings":{"rhPattern":"melody_only","lhPattern":"pedal_bass"},"explanation":"Set the piano to a two-voice texture: the right hand plays only the melody (no chords) and the left hand plays a single sustained bass line.","suggestions":["Use 'walking_bass' instead of 'pedal_bass' if you want the bass line to move more"]}
+
+User: "Choir, but just three voices" (current ensemble: choral)
+→ {"settings":{},"explanation":"The choral engine always writes four voices (SATB) — a three-voice choir isn't supported yet. The closest alternatives are piano with a thin two-voice texture (melody_only + pedal_bass) or keeping SATB with calmer inner voices.","suggestions":["Try 'altoActivity: grounded' and 'tenorActivity: grounded' to make the inner voices less prominent","Switch to piano with rhPattern 'melody_only' for a genuinely thinner texture"]}
 `;
 
 // ── Main export ────────────────────────────────────────────────────────────────
