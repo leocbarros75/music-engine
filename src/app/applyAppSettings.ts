@@ -85,6 +85,10 @@ export type AppSettings = {
    * When set, overrides auto-selection.
    */
   rhPattern?: string;
+  /** spec_bass: note value of the instruction-driven bass line ("whole"|"half"|"quarter"). */
+  bassRhythm?: "whole" | "half" | "quarter";
+  /** spec_bass: "follow_melody" re-aligns the final bass note to the melody's last note. */
+  bassFinalNote?: "follow_melody" | "default";
   /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
@@ -2151,7 +2155,7 @@ export function applyAppSettings(
       "alberti", "block_beats", "boom_chick", "broken_ascending", "waltz_bass",
       "serenade_strum", "root_chord_stabs", "interval_oscillation",
       "jazz_shell", "octave_bass", "nocturne",
-      "pop_arpeggio", "walking_bass", "pedal_bass",
+      "pop_arpeggio", "walking_bass", "pedal_bass", "spec_bass",
     ]);
     const explicitPattern = settings.lhPattern && settings.lhPattern !== "auto"
       ? (VALID_LH_PATTERNS.has(settings.lhPattern as LhPatternId) ? settings.lhPattern as LhPatternId : null)
@@ -2247,6 +2251,8 @@ export function applyAppSettings(
       // forcePattern: when the user explicitly chose an LH or RH pattern, skip
       // the Schoenberg density-simplification override so their choice is honoured.
       forcePattern: !!(explicitPattern || userRhPattern),
+      bassRhythm: settings.bassRhythm,
+      bassFinalNote: settings.bassFinalNote,
     });
     attachTextureAnalysis(finalScore, warnings);
     return {

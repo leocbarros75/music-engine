@@ -53,6 +53,8 @@ function labelFor(key: string): string {
     ruleStrictness: "Rule strictness",
     lhPattern: "LH pattern",
     rhPattern: "RH pattern",
+    bassRhythm: "Bass note value",
+    bassFinalNote: "Bass final note",
     timeSignature: "Time signature",
     sopranoActivity: "Soprano activity",
     altoActivity: "Alto activity",

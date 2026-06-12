@@ -108,7 +108,15 @@ export type LhPatternId =
    *   (e.g., C → F/C → C with bass pedaling on C throughout).
    *   Creates the spacious, open quality of Elton John / gospel piano ballads.
    */
-  | "pedal_bass";
+  | "pedal_bass"
+  /**
+   * Instruction-driven bass line (AI settings helper / user spec):
+   *   A single bass voice playing the chord's PROPOSED bass — slash-aware, so
+   *   C/E sounds E — at a user-chosen note value (bassRhythm: whole/half/quarter).
+   *   No chord fill, no figuration: exactly one line, as a user would describe
+   *   "just the melody and a bass line in half notes".
+   */
+  | "spec_bass";
 
 export type LhPatternOptions = {
   chords: Array<{ measure: number; t: number; symbol: string }>;
@@ -120,6 +128,8 @@ export type LhPatternOptions = {
   bassMin?: number;
   /** Highest MIDI for the bass (root) note. Default: 57 = A3 */
   bassMax?: number;
+  /** spec_bass only: note value of the bass line. Default "half". */
+  bassRhythm?: "whole" | "half" | "quarter";
   warnings?: string[];
 };
 
@@ -718,6 +728,52 @@ function buildPedalBass(
   return [makeNote(v.bass, 0, measureBeats, voice, staff, `lh-ped-${mNum}-0`)];
 }
 
+/**
+ * SPEC BASS — instruction-driven single bass line.
+ *
+ * Plays the chord's PROPOSED bass (slash-aware: "C/E" sounds E, plain "C"
+ * sounds the root) at a fixed note value. Re-reads the chord at every onset so
+ * mid-measure chord changes are honoured. Exactly one voice, no fill.
+ */
+export function chordProposedBassMidi(
+  symbol: string,
+  bassMin: number,
+  bassMax: number
+): number | null {
+  const parts = symbol.split("/");
+  const slashPart = parts.length > 1 ? parts[1]!.trim() : null;
+  const parsed = (slashPart ? parseChordSymbol(slashPart) : null) ?? parseChordSymbol(parts[0]!.trim());
+  if (!parsed) return null;
+  let m = 12 + parsed.rootPc;
+  while (m < bassMin) m += 12;
+  while (m > bassMax) m -= 12;
+  if (m < bassMin) m = bassMin;
+  if (m > bassMax) m = bassMax;
+  return m;
+}
+
+function buildSpecBass(
+  chords: Array<{ measure: number; t: number; symbol: string }>,
+  mNum: number,
+  measureBeats: number,
+  rhythm: "whole" | "half" | "quarter",
+  bassMin: number,
+  bassMax: number,
+  voice: number,
+  staff: number
+): NoteEvent[] {
+  const step = rhythm === "whole" ? measureBeats : rhythm === "half" ? 2 : 1;
+  const out: NoteEvent[] = [];
+  for (let t = 0; t < measureBeats - 1e-6; t += step) {
+    const symbol = pickChordAt(chords, mNum, t);
+    if (!symbol) continue;
+    const midi = chordProposedBassMidi(symbol, bassMin, bassMax);
+    if (midi === null) continue;
+    out.push(makeNote(midi, t, Math.min(step, measureBeats - t), voice, staff, `lh-spec-${mNum}-${t}`));
+  }
+  return out;
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 /**
@@ -808,6 +864,13 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
 
     case "pedal_bass":
       return buildPedalBass(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
+
+    case "spec_bass":
+      return buildSpecBass(
+        chords, measureNumber, measureBeats,
+        options.bassRhythm ?? "half",
+        bassMin, bassMax, LH_VOICE, LH_STAFF
+      );
 
     default:
       warnings.push(`[accomp] Unknown LH pattern "${lhPattern as string}" — no notes generated`);

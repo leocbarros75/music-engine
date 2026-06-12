@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
-import { generateLhPattern, type LhPatternId, generateRhPattern, type RhPatternId, pickChordAt, chordVoicesInRange } from "./pianoAccompPatterns";
+import { generateLhPattern, type LhPatternId, generateRhPattern, type RhPatternId, pickChordAt, chordVoicesInRange, chordProposedBassMidi } from "./pianoAccompPatterns";
 
 type PianoLevel = "beginner" | "intermediate" | "advanced" | "professional";
 
@@ -56,6 +56,14 @@ type ArrangePianoOptions = {
    * Use when the user explicitly chose a pattern — honour it even in ornate measures.
    */
   forcePattern?: boolean;
+  /** spec_bass only: note value of the instruction-driven bass line. Default "half". */
+  bassRhythm?: "whole" | "half" | "quarter";
+  /**
+   * spec_bass only: when "follow_melody", the final bass note is re-aligned to
+   * the melody's last note — same onset, same duration — so both voices end
+   * together ("the last note will follow the melody").
+   */
+  bassFinalNote?: "follow_melody" | "default";
 };
 
 type VoiceMap = {
@@ -2850,6 +2858,7 @@ function buildPianoMelodyAccomp(
         measureNumber: mNum,
         measureBeats,
         lhPattern: activeLhPattern,
+        bassRhythm: options.bassRhythm,
         warnings,
       });
       evs.push(...lhEvents);
@@ -2858,6 +2867,48 @@ function buildPianoMelodyAccomp(
     pianoMeasures[i]!.events = evs.sort(
       (a, b) => Number(a.t) - Number(b.t) || Number(a.voice) - Number(b.voice)
     );
+  }
+
+  // ── "The last note will follow the melody" (spec_bass) ────────────────────
+  // Re-align the final bass note to the melody's last note: same onset, same
+  // duration, so the two voices end together instead of the bass grinding on
+  // through its half-note grid while the melody holds its final tone.
+  if (lhPattern === "spec_bass" && options.bassFinalNote === "follow_melody") {
+    // Find the melody's last sounding note (search backwards over measures).
+    let lastIdx = -1;
+    let lastNote: any = null;
+    for (let i = (melody.measures ?? []).length - 1; i >= 0 && !lastNote; i--) {
+      const notes = (melody.measures?.[i]?.events ?? [])
+        .filter((e: any) => e?.type === "note")
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      if (notes.length) { lastIdx = i; lastNote = notes[notes.length - 1]; }
+    }
+    if (lastNote && pianoMeasures[lastIdx]) {
+      const mNum = Number(pianoMeasures[lastIdx]!.number) || lastIdx + 1;
+      const tLast = Number(lastNote.t ?? 0);
+      const durLast = Number(lastNote.dur ?? 0) || 1;
+      const evs = (pianoMeasures[lastIdx]!.events ?? []).filter((e: any) => {
+        if (Number(e?.voice) !== 4) return true;       // keep non-bass events
+        return Number(e.t) < tLast - 1e-6;             // drop bass at/after the final onset
+      });
+      // Trim any kept bass note that would overlap the final onset.
+      for (const e of evs) {
+        if (Number(e?.voice) === 4 && Number(e.t) < tLast && Number(e.t) + Number(e.dur ?? 0) > tLast) {
+          e.dur = tLast - Number(e.t);
+        }
+      }
+      const symbol = pickChordAt(chordsForArrange, mNum, tLast);
+      const midi = symbol ? chordProposedBassMidi(symbol, 36, 57) : null;
+      if (midi !== null) {
+        evs.push({
+          type: "note", t: tLast, dur: durLast, voice: 4, staff: 2,
+          pitch: midiToPitch(midi), midi, id: `lh-spec-final-${mNum}`
+        } as any);
+        pianoMeasures[lastIdx]!.events = evs.sort(
+          (a: any, b: any) => Number(a.t) - Number(b.t) || Number(a.voice) - Number(b.voice)
+        );
+      }
+    }
   }
 
   return {

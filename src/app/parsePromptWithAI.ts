@@ -115,9 +115,20 @@ OUTPUT TEXTURE — HOW MANY VOICES THE USER GETS (piano modes):
 The engine does not have a generic "number of voices" setting. Voice-count
 outcomes are controlled per ensemble:
   "just melody and bass" / "two voices" / "melody with a bass line" (piano)
-      → rhPattern: "melody_only" + lhPattern: "pedal_bass" (sustained roots)
-        or lhPattern: "walking_bass" (moving bass). This yields exactly two
-        voices: the melody alone in the right hand, a single bass line in the left.
+      → textureMode: "homophony_melody_accompaniment" + rhPattern: "melody_only"
+        + lhPattern: "spec_bass". The textureMode is REQUIRED — without it the
+        engine routes to four-voice harmonization and ignores the patterns.
+        spec_bass is the
+        instruction-driven bass line: it plays the chord's PROPOSED bass
+        (slash-aware — C/E sounds E) and the user controls it with:
+          bassRhythm:    "whole" | "half" | "quarter" — the bass note value
+                         ("the bass in half notes" → "half"). Default "half".
+          bassFinalNote: "follow_melody" — the last bass note lands and ends
+                         together with the melody's final note
+                         ("the last note follows the melody"). Else "default".
+        Alternatives when the user wants a styled preset bass instead of an
+        instruction-driven one: lhPattern "pedal_bass" (sustained roots) or
+        "walking_bass" (moving line).
   "melody only, no harmony" (piano)
       → rhPattern: "melody_only" + lhPattern: "pedal_bass" is the thinnest
         supported texture; a completely unaccompanied melody is NOT supported — say so.
@@ -176,7 +187,10 @@ User: "Add more energy and rhythm to the bass"
 → {"settings":{"bassActivity":"high_active","lhPattern":"broken_ascending"},"explanation":"Increased bass voice activity to high-active and set a fast 16th-note ascending arpeggio in the left hand for a more energetic, driving feel."}
 
 User: "I only want the melody and the bass" (current ensemble: piano)
-→ {"settings":{"rhPattern":"melody_only","lhPattern":"pedal_bass"},"explanation":"Set the piano to a two-voice texture: the right hand plays only the melody (no chords) and the left hand plays a single sustained bass line.","suggestions":["Use 'walking_bass' instead of 'pedal_bass' if you want the bass line to move more"]}
+→ {"settings":{"textureMode":"homophony_melody_accompaniment","rhPattern":"melody_only","lhPattern":"spec_bass","bassRhythm":"half"},"explanation":"Set the piano to a two-voice texture: the right hand plays only the melody (no chords) and the left hand plays a single bass line in half notes following the chords.","suggestions":["Say 'bass in whole notes' or 'quarter notes' to change the bass rhythm","Add 'the last note should follow the melody' to end both voices together"]}
+
+User: "I want the melody only with the bass. The bass line will keep the bass proposed on the chords, and it will use half notes, and the last note will follow the melody."
+→ {"settings":{"textureMode":"homophony_melody_accompaniment","rhPattern":"melody_only","lhPattern":"spec_bass","bassRhythm":"half","bassFinalNote":"follow_melody"},"explanation":"Two voices exactly as described: the melody alone in the right hand, and a left-hand bass line that plays each chord's proposed bass (slash basses respected) in half notes — with the final bass note re-aligned to land and end together with the melody's last note."}
 
 User: "Choir, but just three voices" (current ensemble: choral)
 → {"settings":{},"explanation":"The choral engine always writes four voices (SATB) — a three-voice choir isn't supported yet. The closest alternatives are piano with a thin two-voice texture (melody_only + pedal_bass) or keeping SATB with calmer inner voices.","suggestions":["Try 'altoActivity: grounded' and 'tenorActivity: grounded' to make the inner voices less prominent","Switch to piano with rhPattern 'melody_only' for a genuinely thinner texture"]}

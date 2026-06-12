@@ -119,7 +119,12 @@ export type Settings = {
     | "nocturne"
     | "pop_arpeggio"
     | "walking_bass"
-    | "pedal_bass";
+    | "pedal_bass"
+    | "spec_bass";
+  /** spec_bass: note value of the instruction-driven bass line. */
+  bassRhythm?: "whole" | "half" | "quarter";
+  /** spec_bass: "follow_melody" ends the bass together with the melody's last note. */
+  bassFinalNote?: "follow_melody" | "default";
   /**
    * Explicit RH pattern for piano accompaniment mode.
    * "block_beats"        — full block chord every beat
