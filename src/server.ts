@@ -678,6 +678,10 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     useStringEnsembleArranger: typeof anyRaw.useStringEnsembleArranger === "boolean" ? anyRaw.useStringEnsembleArranger : undefined,
     lhPattern: typeof anyRaw.lhPattern === "string" ? anyRaw.lhPattern : undefined,
     rhPattern: typeof anyRaw.rhPattern === "string" ? anyRaw.rhPattern : undefined,
+    bassRhythm: anyRaw.bassRhythm === "whole" || anyRaw.bassRhythm === "half" || anyRaw.bassRhythm === "quarter"
+      ? anyRaw.bassRhythm : undefined,
+    bassFinalNote: anyRaw.bassFinalNote === "follow_melody" || anyRaw.bassFinalNote === "default"
+      ? anyRaw.bassFinalNote : undefined,
     suzukiVolume:
       typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
         ? (anyRaw.suzukiVolume as number)
@@ -740,7 +744,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-06-09-v18-brass-strings-rhythm" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-06-12-v19-spec-bass" });
       return;
     }
 
