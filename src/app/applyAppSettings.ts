@@ -23,6 +23,8 @@ import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrange
 import { woodwindTextureToProfile, woodwindTextureToActivity, woodwindExampleToTexture, type WoodwindTexture } from "../arrange/woodwinds/woodwindStyle";
 import { arrangeBrassEnsemble, type BrassActivity } from "../arrange/brass/brassArranger";
 import { brassTextureToProfile, brassTextureToActivity, brassExampleToTexture, type BrassTexture } from "../arrange/brass/brassStyle";
+import { arrangeBrassQuintetFromPianoInstrumentation } from "../arrange/arrangeBrassQuintetFromPianoInstrumentation";
+import { arrangeSatbToBrassQuartetDirect } from "../arrange/brass/arrangeSatbToBrassQuartet";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -1630,6 +1632,14 @@ export function applyAppSettings(
   const wantsPianoWithStrings   = ensemble === "piano_with_strings";
   const wantsStrings = ensemble === "string_ensemble" || ensemble === "strings";
   const wantsBrass = ensemble === "brass_ensemble" || ensemble === "brass";
+  // ── Brass family — mirrors the woodwind family ────────────────────────────
+  //   brass_ensemble       → auto arranger (lead sheet + style → DP brass)
+  //   piano_brass_quartet  → direct piano copy → brass (RH→Tpt1/2/Hn, LH→Tbn/Tuba)
+  //   satb_brass_quartet   → Choral-brass (S→Tpt1, A→Tpt2, T→Tbn, B→Tuba)
+  //   piano_with_brass     → piano as harmony source → brass arrangement (complement)
+  const wantsPianoBrassCopy   = ensemble === "piano_brass_quartet";
+  const wantsChoralBrass      = ensemble === "satb_brass_quartet";
+  const wantsPianoWithBrass   = ensemble === "piano_with_brass";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
@@ -1665,7 +1675,7 @@ export function applyAppSettings(
   // so blindly taking parts[0] would capture the Violin I melody instead of the full
   // piano grand staff (1679 notes, 147 backups). We find the Piano part explicitly,
   // and only fall back to parts[0] if no piano-named/instrumented part exists.
-  const frozenPianoPart: any | null = (wantsPianoWithStrings || wantsPianoWithWoodwinds)
+  const frozenPianoPart: any | null = (wantsPianoWithStrings || wantsPianoWithWoodwinds || wantsPianoWithBrass)
     ? (() => {
         const allParts: any[] = (scoreModel as any).parts ?? [];
         const isPianoPart = (p: any): boolean => {
@@ -2057,6 +2067,82 @@ export function applyAppSettings(
       appliedTransposeSemitones,
       styleUsed,
       cadenceMeasures: [],
+    };
+  }
+
+  if (wantsPianoBrassCopy) {
+    // Piano→brass (copy): RH chord→Trumpet 1/2/Horn, LH→Trombone/Tuba.
+    // Tuba entry rule: manual measure if set, else auto-detect the thin intro.
+    const tubaEntry: number | "auto" | "always" =
+      typeof settings.bassoonEntryMeasure === "number" && settings.bassoonEntryMeasure >= 1
+        ? settings.bassoonEntryMeasure
+        : (settings.bassoonEntryMeasure as any) === 0
+          ? "always"
+          : "auto";
+    const brQuintet = settings.brassQuintet !== false; // default quintet (with Horn)
+    const finalScore = arrangeBrassQuintetFromPianoInstrumentation(scoreModel, {
+      warnings,
+      quintet: brQuintet,
+      tubaEntry,
+    });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsChoralBrass) {
+    // Choral-brass: SATB → Soprano→Trumpet 1, Alto→Trumpet 2, Tenor→Trombone, Bass→Tuba.
+    const finalScore = arrangeSatbToBrassQuartetDirect(scoreModel, { warnings });
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsPianoWithBrass) {
+    // Piano+brass (complement): piano as harmony source → DP brass arrangement.
+    // Mirrors piano_with_woodwinds — the piano is NOT in the output.
+    const brChords = chords.length ? chords : inferChordsFromAllVoices(scoreModel);
+    if (!brChords.length) {
+      warnings.push("[piano+brass] Could not infer chords from piano score — brass parts may be sparse.");
+    }
+    const brTexture: BrassTexture | undefined =
+      (settings.brassTexture as BrassTexture | undefined) ??
+      (settings.brassExample ? (brassExampleToTexture(settings.brassExample) ?? undefined) : undefined);
+    const brProfile = brassTextureToProfile(brTexture, styleRaw, usePolyphonic);
+    const brActivity = brassTextureToActivity(brTexture) as Partial<Record<"tpt1"|"tpt2"|"hn"|"tbn"|"tuba", BrassActivity>>;
+    const brQuintet = settings.brassQuintet !== false;
+
+    const brResult = arrangeBrassEnsemble(scoreModel, brChords as any, {
+      profile:          brProfile,
+      chords:           brChords as any,
+      key:              { fifths: detectedInputKeyFifths, mode: detectedMode },
+      quintet:          brQuintet,
+      activity:         brActivity,
+      polyphonic:       usePolyphonic || brTexture === "contrapuntal",
+      level:            settings.level,
+      rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
+      warnings,
+    });
+    attachTextureAnalysis(brResult.scoreModel, warnings);
+    return {
+      scoreModel: brResult.scoreModel as ScoreModel,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
     };
   }
 

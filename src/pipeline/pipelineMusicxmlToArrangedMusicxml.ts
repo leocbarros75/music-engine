@@ -158,6 +158,13 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleLower === "piano_woodwind_quartet" ||
       ensembleLower === "satb_woodwind_quartet" ||
       ensembleLower === "piano_with_woodwinds" ||
+      // Brass ensembles — mirror the woodwind family:
+      //   piano_brass_quartet = direct piano copy → brass
+      //   satb_brass_quartet  = Choral-brass (SATB transcription)
+      //   piano_with_brass    = piano as harmony source → brass arrangement
+      ensembleLower === "piano_brass_quartet" ||
+      ensembleLower === "satb_brass_quartet" ||
+      ensembleLower === "piano_with_brass" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
@@ -201,7 +208,10 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleRaw === "piano_woodwind_quartet" ||
       ensembleRaw === "satb_woodwind_quartet" ||
       ensembleRaw === "piano_with_woodwinds";
-    const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass";
+    const isBrass = ensembleRaw === "brass_ensemble" || ensembleRaw === "brass" ||
+      ensembleRaw === "piano_brass_quartet" ||
+      ensembleRaw === "satb_brass_quartet" ||
+      ensembleRaw === "piano_with_brass";
     const isOrchestra = ensembleRaw === "orchestra";
 
     // 6a. Full orchestra expansion — run after SATB/string harmonization

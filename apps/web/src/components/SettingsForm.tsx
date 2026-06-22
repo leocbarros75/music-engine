@@ -13,7 +13,10 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "piano → wind quartet", value: "piano_woodwind_quartet" },
   { label: "choral → wind (SATB)", value: "satb_woodwind_quartet" },
   { label: "piano + winds (complement)", value: "piano_with_woodwinds" },
-  { label: "brass ensemble", value: "brass_ensemble" },
+  { label: "brass ensemble (auto)", value: "brass_ensemble" },
+  { label: "piano → brass quintet", value: "piano_brass_quartet" },
+  { label: "choral → brass (SATB)", value: "satb_brass_quartet" },
+  { label: "piano + brass (complement)", value: "piano_with_brass" },
   { label: "orchestra", value: "orchestra" }
 ];
 
@@ -666,7 +669,10 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "piano_woodwind_quartet" &&
           settings.ensemble !== "satb_woodwind_quartet" &&
           settings.ensemble !== "piano_with_woodwinds" &&
-          settings.ensemble !== "brass_ensemble" && (
+          settings.ensemble !== "brass_ensemble" &&
+          settings.ensemble !== "piano_brass_quartet" &&
+          settings.ensemble !== "satb_brass_quartet" &&
+          settings.ensemble !== "piano_with_brass" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
           )}
       </div>
@@ -1423,8 +1429,41 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {/* Brass ensemble (auto) controls */}
-          {settings.ensemble === "brass_ensemble" && (() => {
+          {/* Piano→Brass quintet (copy): Horn toggle + Tuba entry only (faithful copy, no restyle) */}
+          {settings.ensemble === "piano_brass_quartet" && (
+            <>
+              <div className="field">
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                  <input type="checkbox" checked={settings.brassQuintet !== false}
+                    onChange={(e) => update("brassQuintet", e.target.checked)}
+                    style={{ width: "16px", height: "16px", cursor: "pointer" }} />
+                  Brass quintet (include Horn in F)
+                </label>
+                <div className="key-preview"><span className="slider-help">Quintet = RH chord across Tpt 1 / Tpt 2 / Horn, LH across Trombone / Tuba. Unchecked = quartet (no Horn).</span></div>
+              </div>
+              <div className="field">
+                <label>Tuba enters at measure</label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="auto"
+                  value={settings.bassoonEntryMeasure ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    update("bassoonEntryMeasure", v === "" ? undefined : Math.max(0, Number(v)) as any);
+                  }}
+                />
+                <div className="key-preview">
+                  <span className="slider-help">
+                    Tuba rests before this measure (the soft intro). Blank = auto-detect the thin intro; 0 = play from the start.
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Brass ensemble (auto) + Piano+brass (complement) controls */}
+          {(settings.ensemble === "brass_ensemble" || settings.ensemble === "piano_with_brass") && (() => {
             const BRASS_TEX = [
               { value: "melody_harmony", label: "Melody + Harmony", help: "Trumpet 1 leads; Horn/Trombone/Tuba accompany." },
               { value: "chamber",        label: "Chamber (balanced)", help: "All five voices equally active — pop/jazz quintet, walking tuba (calibrated)." },

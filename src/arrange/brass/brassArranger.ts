@@ -182,6 +182,13 @@ export type BrassArrangerOptions = {
   polyphonic?: boolean;       // contrapuntal path
   level?: string;
   activity?: Partial<Record<BrassVoiceId, BrassActivity>>;
+  /**
+   * Optional override for the rhythm-template part. When set (e.g. the frozen
+   * piano part in piano_with_brass mode) it is used as the onset-time grid for
+   * all voices instead of the auto-detected melody part. RH notes (staff=1 or
+   * voice≤2) are filtered out automatically.
+   */
+  rhythmSourcePart?: any;
 };
 
 /**
@@ -210,10 +217,26 @@ export function arrangeBrassEnsemble(
   warnings.push(...(sr.warnings ?? []));
   const brassScore = remapStringToBrass(sr.scoreModel as ScoreModel, voices);
 
-  const melodyPart = (score.parts ?? []).find((p: any) => {
-    const n = String(p?.name ?? "").toLowerCase();
-    return n.includes("soprano") || n.includes("melody") || n.includes("voice");
-  }) ?? score.parts?.[0] ?? null;
+  // Rhythm-template part: an explicit override (e.g. the frozen piano part in
+  // piano_with_brass) filtered to RH onsets, else the auto-detected melody.
+  let melodyPart: any = options.rhythmSourcePart ?? null;
+  if (!melodyPart) {
+    melodyPart = (score.parts ?? []).find((p: any) => {
+      const n = String(p?.name ?? "").toLowerCase();
+      return n.includes("soprano") || n.includes("melody") || n.includes("voice");
+    }) ?? score.parts?.[0] ?? null;
+  } else {
+    const rhMeasures: any[] = (melodyPart.measures ?? []).map((m: any) => ({
+      ...m,
+      events: (m.events ?? []).filter((ev: any) => {
+        if (ev.type !== "note") return false;
+        const staff = Number(ev.staff ?? 1);
+        const voice = Number(ev.voice ?? 1);
+        return staff === 1 || voice <= 2; // right hand only
+      }),
+    }));
+    melodyPart = { ...melodyPart, measures: rhMeasures };
+  }
 
   if (melodyPart && chords.length) {
     applyBrassRhythm(brassScore, melodyPart, chords, key, options.activity ?? {});

@@ -13,6 +13,9 @@ export type Settings = {
     | "satb_woodwind_quartet"
     | "piano_with_woodwinds"
     | "brass_ensemble"
+    | "piano_brass_quartet"
+    | "satb_brass_quartet"
+    | "piano_with_brass"
     | "orchestra";
   keySignature: string;
   timeSignature: string;
