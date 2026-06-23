@@ -77,6 +77,23 @@ function writtenToSoundingSemis(t: { chromatic: number; octaveChange?: number } 
   return Number(t.chromatic ?? 0) + 12 * Number(t.octaveChange ?? 0);
 }
 
+function mod(n: number, m: number): number { return ((n % m) + m) % m; }
+
+/**
+ * Transpose a key signature (fifths) by a semitone shift, picking the spelling
+ * with the fewest accidentals. Same convention as the MusicXML exporter, so the
+ * concert key we store here round-trips cleanly to the target's written key.
+ */
+function transposeKeyFifths(fifths: number, semitoneShift: number): number {
+  const targetPc = mod(7 * fifths + semitoneShift, 12);
+  let best = 0, bestAbs = 999;
+  for (let f = -7; f <= 7; f++) {
+    if (mod(7 * f, 12) !== targetPc) continue;
+    if (Math.abs(f) < bestAbs) { best = f; bestAbs = Math.abs(f); }
+  }
+  return best;
+}
+
 /**
  * Octave-fit a sounding pitch into [lo, hi]. Notes already in range are kept
  * exactly; out-of-range notes jump by whole octaves toward the nearest edge,
@@ -140,7 +157,14 @@ export function applyReinstrumentation(
         if (fitted !== sounding) shiftedCount++;
         return { ...ev, midi: fitted, pitch: midiToPitch(fitted) };
       });
-      return { ...m, events };
+      // Convert the stored key signature from the source's WRITTEN key to concert,
+      // so the exporter re-keys correctly for the target instrument. Only needed
+      // for a transposing source (sourceOffset !== 0).
+      let attributes = m.attributes;
+      if (sourceOffset !== 0 && attributes && typeof attributes.key_fifths === "number") {
+        attributes = { ...attributes, key_fifths: transposeKeyFifths(attributes.key_fifths, sourceOffset) };
+      }
+      return { ...m, ...(attributes !== m.attributes ? { attributes } : {}), events };
     });
 
     const label = TARGET_LABEL[mapping.to] ?? spec.name ?? mapping.to;

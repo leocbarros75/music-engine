@@ -287,7 +287,10 @@ export function pipelineMusicxmlToArrangedMusicxml(
     });
 
     const useGeneralExporter =
-      isPiano || isWoodwinds || isBrass || isOrchestra || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart || hasDoubleBass;
+      isPiano || isWoodwinds || isBrass || isOrchestra || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart || hasDoubleBass ||
+      // Re-instrumentation relies on per-instrument written transposition, which
+      // only the general exporter applies (the SATB exporter ignores it).
+      isReinstrument;
 
     const outputXml = useGeneralExporter
       ? exportScoreModelToMusicXML(scoreModelOut)
