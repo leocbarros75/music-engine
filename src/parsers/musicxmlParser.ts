@@ -36,6 +36,7 @@ type Measure = {
 type Part = {
   part_id: string;
   name?: string;
+  transpose?: { diatonic: number; chromatic: number; octaveChange: number };
   measures: Measure[];
 };
 
@@ -266,6 +267,12 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
     const partId = String(partEl.getAttribute("id") ?? `P${pi + 1}`);
     const measures: Measure[] = [];
 
+    // Capture the part's <transpose> (transposing-instrument written→sounding
+    // offset). Stored as additive part metadata only — note pitches are kept
+    // exactly as written in the file, so existing flows are unaffected. The
+    // re-instrumentation step uses it to recover true concert pitch.
+    let partTranspose: { diatonic: number; chromatic: number; octaveChange: number } | null = null;
+
     const measureEls = elementsByTagName(partEl, "measure");
     let curDivisions = 480;
 
@@ -461,6 +468,24 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
             attributes.key_mode = modeRaw;
           }
         }
+
+        // <transpose> — first occurrence wins (it rarely changes mid-part).
+        if (!partTranspose) {
+          const transEl = firstChild(attrsEl, "transpose");
+          if (transEl) {
+            const chromEl = firstChild(transEl, "chromatic");
+            const diatEl = firstChild(transEl, "diatonic");
+            const octEl = firstChild(transEl, "octave-change");
+            const chromatic = chromEl ? Number.parseInt(textOf(chromEl), 10) : 0;
+            if (Number.isFinite(chromatic)) {
+              partTranspose = {
+                chromatic,
+                diatonic: diatEl ? (Number.parseInt(textOf(diatEl), 10) || 0) : 0,
+                octaveChange: octEl ? (Number.parseInt(textOf(octEl), 10) || 0) : 0,
+              };
+            }
+          }
+        }
       }
 
       measures.push({
@@ -473,7 +498,8 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
     parts.push({
       part_id: partId,
       name: partNames.get(partId) ?? undefined,
-      measures
+      measures,
+      ...(partTranspose ? { transpose: partTranspose } : {}),
     });
   }
 

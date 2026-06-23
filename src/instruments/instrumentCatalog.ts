@@ -19,6 +19,10 @@ export type InstrumentId =
   | "trombone"
   | "bass_trombone"
   | "tuba_c"
+  | "soprano_sax_bb"
+  | "alto_sax_eb"
+  | "tenor_sax_bb"
+  | "baritone_sax_eb"
   | "timpani"
   | "glockenspiel"
   | "tubular_bells"
@@ -225,6 +229,44 @@ export const InstrumentCatalog: Record<InstrumentId, InstrumentSpec> = {
     midi_high: 65, // F4
     preferred_low: 31, // G1
     preferred_high: 58 // Bb3
+  },
+
+  // ---- Saxophones (concert/sounding ranges; exporter writes the transposition) ----
+  soprano_sax_bb: {
+    id: "soprano_sax_bb",
+    name: "Soprano Sax (Bb, concert view)",
+    clef: "treble",
+    midi_low: 56, // Ab3 sounding (written Bb3)
+    midi_high: 87, // Eb6 sounding
+    preferred_low: 58, // Bb3
+    preferred_high: 82 // Bb5
+  },
+  alto_sax_eb: {
+    id: "alto_sax_eb",
+    name: "Alto Sax (Eb, concert view)",
+    clef: "treble",
+    midi_low: 49, // Db3 sounding (written Bb3)
+    midi_high: 80, // Ab5 sounding
+    preferred_low: 51, // Eb3
+    preferred_high: 75 // Eb5
+  },
+  tenor_sax_bb: {
+    id: "tenor_sax_bb",
+    name: "Tenor Sax (Bb, concert view)",
+    clef: "treble",
+    midi_low: 44, // Ab2 sounding (written Bb3)
+    midi_high: 75, // Eb5 sounding
+    preferred_low: 46, // Bb2
+    preferred_high: 70 // Bb4
+  },
+  baritone_sax_eb: {
+    id: "baritone_sax_eb",
+    name: "Baritone Sax (Eb, concert view)",
+    clef: "bass",
+    midi_low: 37, // Db2 sounding (written Bb3)
+    midi_high: 68, // Ab4 sounding
+    preferred_low: 39, // Eb2
+    preferred_high: 63 // Eb4
   },
 
   // ---- Pitched percussion (concert pitch) ----

@@ -25,6 +25,7 @@ import { arrangeBrassEnsemble, type BrassActivity } from "../arrange/brass/brass
 import { brassTextureToProfile, brassTextureToActivity, brassExampleToTexture, type BrassTexture } from "../arrange/brass/brassStyle";
 import { arrangeBrassQuintetFromPianoInstrumentation } from "../arrange/arrangeBrassQuintetFromPianoInstrumentation";
 import { arrangeSatbToBrassQuartetDirect } from "../arrange/brass/arrangeSatbToBrassQuartet";
+import { applyReinstrumentation } from "../arrange/reinstrument";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -91,6 +92,12 @@ export type AppSettings = {
   bassRhythm?: "whole" | "half" | "quarter";
   /** spec_bass: "follow_melody" re-aligns the final bass note to the melody's last note. */
   bassFinalNote?: "follow_melody" | "default";
+  /**
+   * Re-instrumentation remap table — reassign existing parts to new instruments
+   * while keeping the sounding pitch. Used by the "reinstrument" ensemble mode.
+   * Each row: { part: <part_id or name>, to: <instrument id> }.
+   */
+  reinstrument?: Array<{ part: string; to: string }>;
   /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
@@ -1640,6 +1647,8 @@ export function applyAppSettings(
   const wantsPianoBrassCopy   = ensemble === "piano_brass_quartet";
   const wantsChoralBrass      = ensemble === "satb_brass_quartet";
   const wantsPianoWithBrass   = ensemble === "piano_with_brass";
+  // Re-instrumentation: keep the score, swap chosen parts to new instruments.
+  const wantsReinstrument     = ensemble === "reinstrument";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
@@ -1732,6 +1741,26 @@ export function applyAppSettings(
     setKeyFifths(scoreModel, target.fifths, target.mode);
   } else if (keyMode === "original" && detectedKey.found) {
     setKeyFifths(scoreModel, detectedInputKeyFifths, detectedMode);
+  }
+
+  // ── Re-instrumentation: keep the score, swap chosen parts to new instruments ──
+  // Standalone mode — applied after any key change so the two compose, then we
+  // return the score as-is (no harmonization/arranging).
+  if (wantsReinstrument) {
+    const mappings = Array.isArray(settings.reinstrument) ? settings.reinstrument : [];
+    if (!mappings.length) {
+      warnings.push("[reinstrument] No instrument mappings provided — score returned unchanged.");
+    }
+    const finalScore = applyReinstrumentation(scoreModel, mappings, warnings);
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed: String(settings.style ?? "classical"),
+      cadenceMeasures: []
+    };
   }
 
   const styleRaw = String(settings.style ?? "").toLowerCase();

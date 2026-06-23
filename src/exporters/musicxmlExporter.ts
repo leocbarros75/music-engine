@@ -40,6 +40,14 @@ function getTransposeForInstrument(instrument: string | undefined): TransposeSpe
     return { diatonic: -5, chromatic: -9, octaveChange: 0 };
   }
 
+  if (id === "soprano_sax_bb" || id === "soprano_sax" || id === "soprano_saxophone_bb") {
+    return { diatonic: -1, chromatic: -2, octaveChange: 0 };
+  }
+
+  if (id === "baritone_sax_eb" || id === "bari_sax_eb" || id === "baritone_sax" || id === "baritone_saxophone_eb") {
+    return { diatonic: -5, chromatic: -9, octaveChange: -1 };
+  }
+
   if (id === "horn_f" || id === "f_horn" || id === "horn") {
     return { diatonic: -4, chromatic: -7, octaveChange: 0 };
   }

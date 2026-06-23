@@ -4,6 +4,7 @@ import AISettingsHelper from "./components/AISettingsHelper";
 import ScoreViewer from "./components/ScoreViewer";
 import AudioPlayer from "./components/AudioPlayer";
 import PartsSelector from "./components/PartsSelector";
+import ReinstrumentTable from "./components/ReinstrumentTable";
 import LandingPage from "./components/LandingPage";
 import { downloadMidi } from "./utils/midiExporter";
 import type { JobResult, Settings } from "./types";
@@ -104,6 +105,7 @@ export default function App() {
     settings.ensemble === "piano_brass_quartet" ||
     settings.ensemble === "satb_brass_quartet" ||
     settings.ensemble === "piano_with_brass" ||
+    settings.ensemble === "reinstrument" ||
     settings.ensemble === "orchestra";
 
   const canRunFile   = !!musicxmlInput && ensembleReady && !isRunning && !isExtracting;
@@ -388,6 +390,15 @@ export default function App() {
                   onExtract={extractParts}
                   onTitleDetected={handleTitleDetected}
                 />
+
+                {/* Re-instrumentation remap table */}
+                {settings.ensemble === "reinstrument" && (
+                  <ReinstrumentTable
+                    musicxml={musicxmlInput}
+                    mappings={settings.reinstrument ?? []}
+                    onChange={(reinstrument) => setSettings({ ...settings, reinstrument })}
+                  />
+                )}
               </div>
             )}
 

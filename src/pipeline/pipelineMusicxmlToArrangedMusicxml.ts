@@ -165,6 +165,8 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleLower === "piano_brass_quartet" ||
       ensembleLower === "satb_brass_quartet" ||
       ensembleLower === "piano_with_brass" ||
+      // Re-instrumentation passes the score through unharmonized — only swaps instruments.
+      ensembleLower === "reinstrument" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
@@ -213,6 +215,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleRaw === "satb_brass_quartet" ||
       ensembleRaw === "piano_with_brass";
     const isOrchestra = ensembleRaw === "orchestra";
+    const isReinstrument = ensembleRaw === "reinstrument";
 
     // 6a. Full orchestra expansion — run after SATB/string harmonization
     if (isOrchestra) {
@@ -224,7 +227,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
       }
     }
 
-    if (!isPiano && !isStrings && !isWoodwinds && !isBrass && !isOrchestra) {
+    if (!isPiano && !isStrings && !isWoodwinds && !isBrass && !isOrchestra && !isReinstrument) {
       try {
         const ruleCheck = checkChoralRules(scoreModelOut, finalChords as any, {
           strictness: settings.ruleStrictness,

@@ -17,6 +17,7 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "piano → brass quintet", value: "piano_brass_quartet" },
   { label: "choral → brass (SATB)", value: "satb_brass_quartet" },
   { label: "piano + brass (complement)", value: "piano_with_brass" },
+  { label: "re-instrument (swap instruments)", value: "reinstrument" },
   { label: "orchestra", value: "orchestra" }
 ];
 
@@ -672,7 +673,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "brass_ensemble" &&
           settings.ensemble !== "piano_brass_quartet" &&
           settings.ensemble !== "satb_brass_quartet" &&
-          settings.ensemble !== "piano_with_brass" && (
+          settings.ensemble !== "piano_with_brass" &&
+          settings.ensemble !== "reinstrument" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
           )}
       </div>
