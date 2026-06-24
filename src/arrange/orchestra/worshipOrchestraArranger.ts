@@ -109,12 +109,43 @@ function place(midi: number, reg: Reg, instrument: string): number {
   return m;
 }
 
+/**
+ * Orchestrate a string-voice core (4 or 5 parts in slot order V1/V2/Vla/Vc[/Cb])
+ * onto the worship-orchestra roster. Used by every source mode (auto DP core,
+ * piano→quartet core, SATB→quartet core). All orchestration/sound decisions live
+ * here, so changing the orchestra never touches the input machinery that built
+ * the core.
+ */
+export function orchestrateStringCore(stringScore: ScoreModel, warnings: string[] = []): ScoreModel {
+  warnings.push("[orchestra] Worship orchestra: Tpt 1-2-3, Horn 1-2, Tbn 1-2 + low brass, Flute/Oboe descant, strings cushion.");
+  return remapToWorship(stringScore);
+}
+
 /** Map the 5 string-DP parts (by slot order) onto the worship-orchestra roster. */
 function remapToWorship(stringScore: ScoreModel): ScoreModel {
   const parts: any[] = (stringScore as any).parts ?? [];
   const slotOrder: StringVoice[] = ["vln1", "vln2", "vla", "vc", "cb"];
   const bySlot: Record<string, any> = {};
   parts.slice(0, 5).forEach((p, i) => { bySlot[slotOrder[i]!] = p; });
+
+  // A 4-voice core (piano→quartet / SATB) has no double bass. Derive the cb
+  // voice from the cello an octave lower so the low brass / Cello-Bass foundation
+  // gets a real bass line.
+  if (!bySlot["cb"] && bySlot["vc"]) {
+    const vc = bySlot["vc"];
+    bySlot["cb"] = {
+      ...vc,
+      measures: (vc.measures ?? []).map((m: any) => ({
+        ...m,
+        events: (m.events ?? []).map((ev: any) => {
+          if (ev?.type !== "note" || !ev.pitch) return ev;
+          const midi = eventMidi(ev);
+          if (midi === null) return ev;
+          return { ...ev, pitch: midiToPitch(midi - 12) };
+        }),
+      })),
+    };
+  }
 
   const measureCount = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
 

@@ -166,6 +166,9 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleLower === "piano_with_brass" ||
       // Re-instrumentation passes the score through unharmonized — only swaps instruments.
       ensembleLower === "reinstrument" ||
+      // Piano/SATB → orchestra are direct transcriptions of existing harmony.
+      ensembleLower === "piano_orchestra" ||
+      ensembleLower === "satb_orchestra" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
       settings.instrumentation === "piano_copy_to_woodwind_quartet" ||
@@ -213,7 +216,8 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleRaw === "piano_brass_quartet" ||
       ensembleRaw === "satb_brass_quartet" ||
       ensembleRaw === "piano_with_brass";
-    const isOrchestra = ensembleRaw === "orchestra";
+    const isOrchestra = ensembleRaw === "orchestra" || ensembleRaw === "full_orchestra" ||
+      ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra";
     const isReinstrument = ensembleRaw === "reinstrument";
 
     // 6a. Orchestra is now produced inside applyAppSettings by the worship

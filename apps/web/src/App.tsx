@@ -106,7 +106,9 @@ export default function App() {
     settings.ensemble === "satb_brass_quartet" ||
     settings.ensemble === "piano_with_brass" ||
     settings.ensemble === "reinstrument" ||
-    settings.ensemble === "orchestra";
+    settings.ensemble === "orchestra" ||
+    settings.ensemble === "piano_orchestra" ||
+    settings.ensemble === "satb_orchestra";
 
   const canRunFile   = !!musicxmlInput && ensembleReady && !isRunning && !isExtracting;
   const canRunChords = !!chordText.trim() && ensembleReady && !isRunning;

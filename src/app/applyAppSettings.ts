@@ -26,7 +26,7 @@ import { brassTextureToProfile, brassTextureToActivity, brassExampleToTexture, t
 import { arrangeBrassQuintetFromPianoInstrumentation } from "../arrange/arrangeBrassQuintetFromPianoInstrumentation";
 import { arrangeSatbToBrassQuartetDirect } from "../arrange/brass/arrangeSatbToBrassQuartet";
 import { applyReinstrumentation } from "../arrange/reinstrument";
-import { arrangeWorshipOrchestra } from "../arrange/orchestra/worshipOrchestraArranger";
+import { arrangeWorshipOrchestra, orchestrateStringCore } from "../arrange/orchestra/worshipOrchestraArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -1650,8 +1650,10 @@ export function applyAppSettings(
   const wantsPianoWithBrass   = ensemble === "piano_with_brass";
   // Re-instrumentation: keep the score, swap chosen parts to new instruments.
   const wantsReinstrument     = ensemble === "reinstrument";
-  // Worship / church orchestra (auto): lead sheet + chords → full PraiseCharts orchestra.
+  // Worship / church orchestra: auto (lead sheet+chords), piano→orchestra, satb→orchestra.
   const wantsOrchestra        = ensemble === "orchestra" || ensemble === "full_orchestra";
+  const wantsPianoOrchestra   = ensemble === "piano_orchestra";
+  const wantsSatbOrchestra    = ensemble === "satb_orchestra";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
@@ -2170,6 +2172,38 @@ export function applyAppSettings(
     attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
       scoreModel: brResult.scoreModel as ScoreModel,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsPianoOrchestra) {
+    // Piano → worship orchestra: faithful piano→quartet voice core (RH→V1/V2,
+    // LH→Vla/Vc; Cb derived), then orchestrate onto the PraiseCharts roster.
+    const core = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
+    const finalScore = orchestrateStringCore(core, warnings);
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsSatbOrchestra) {
+    // SATB → worship orchestra: faithful S/A/T/B → V1/V2/Vla/Vc transcription
+    // (Cb derived from the cello), then orchestrate onto the PraiseCharts roster.
+    const core = arrangeSatbToStringQuartetDirect(scoreModel, { warnings });
+    const finalScore = orchestrateStringCore(core, warnings);
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,

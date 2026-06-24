@@ -17,7 +17,9 @@ export type Settings = {
     | "satb_brass_quartet"
     | "piano_with_brass"
     | "reinstrument"
-    | "orchestra";
+    | "orchestra"
+    | "piano_orchestra"
+    | "satb_orchestra";
   /** Re-instrumentation remap table: reassign parts to new instruments (sounding preserved). */
   reinstrument?: Array<{ part: string; to: string }>;
   keySignature: string;
