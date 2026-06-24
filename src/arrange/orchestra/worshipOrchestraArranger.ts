@@ -35,6 +35,7 @@ const REG: Record<string, Reg> = {
   tpt1:  { prefMin: 60, prefMax: 79 }, // C4..G5
   tpt2:  { prefMin: 57, prefMax: 74 }, // A3..D5
   tpt3:  { prefMin: 55, prefMax: 72 }, // G3..C5
+  cl:    { prefMin: 55, prefMax: 79 }, // G3..G5 — Clarinet (warm woodwind, below the flute)
   bsn:   { prefMin: 41, prefMax: 62 }, // F2..D4 — Bassoon (woodwind bass)
   hn:    { prefMin: 53, prefMax: 69 }, // F3..A4
   tbn1:  { prefMin: 48, prefMax: 65 }, // C3..F4
@@ -58,9 +59,11 @@ type PartDef = {
 // Order: woodwinds (Fl/Ob, Bassoon) → Horn (between winds and brass) → Trumpets,
 // Trombones, low brass → [Timpani + Percussion inserted here] → strings.
 const WORSHIP_PARTS: PartDef[] = [
-  // ── Woodwinds ──
-  { partId: "P_FLOB", name: "Flute/Oboe (Clarinet)", instrument: "flute",
+  // ── Woodwinds (Flute/Oboe descant, Clarinet a separate staff, Bassoon bass) ──
+  { partId: "P_FLOB", name: "Flute/Oboe", instrument: "flute",
     voices: [{ src: "vln1", reg: "fl", voice: 1 }] },
+  { partId: "P_CL", name: "Clarinet", instrument: "clarinet_bb",
+    voices: [{ src: "vln1", reg: "cl", voice: 1 }] },
   { partId: "P_BSN", name: "Bassoon", instrument: "bassoon",
     voices: [{ src: "vc", reg: "bsn", voice: 1 }] },
 
@@ -155,8 +158,9 @@ const SECTION_THRESHOLD: Record<string, number> = {
   P_VLN1: 0.10, P_VLN2: 0.12, P_VLA: 0.14, P_CELBS: 0.12, // strings — near-constant
   P_HN12: 0.30,                                            // horn — present inner glue
   P_BSN: 0.34,                                             // bassoon — woodwind bass, mostly present
+  P_CL: 0.40,                                              // clarinet — warm woodwind, fairly present
   P_TPT1: 0.42, P_TBN12: 0.50,                             // lead trumpet / trombones — build to lifts
-  P_TPT23: 0.50, P_FLOB: 0.50,                             // 2-3 trumpets + descant — for lifts
+  P_TPT23: 0.50, P_FLOB: 0.50,                             // 2-3 trumpets + flute descant — for lifts
   P_LOWBR: 0.62,                                           // low brass — biggest moments only
 };
 
