@@ -8,7 +8,6 @@ import { checkChoralRules } from "../rules/choral/checkChoralRules";
 import { exportScoreModelToMusicXML } from "../exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "../exporters/satbMusicxmlExporter";
 import { extractChordEventsFromMusicXml, type ChordEvent } from "../extract/chordEventsFromMusicXml";
-import { mapPianoToFullOrchestraOpen } from "../arrange/mapToFullOrchestra";
 import { scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 
 export type PipelineRequest = {
@@ -217,15 +216,9 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const isOrchestra = ensembleRaw === "orchestra";
     const isReinstrument = ensembleRaw === "reinstrument";
 
-    // 6a. Full orchestra expansion — run after SATB/string harmonization
-    if (isOrchestra) {
-      try {
-        const orchestraScore = mapPianoToFullOrchestraOpen(scoreModelOut, { profile: "classical" });
-        scoreModelOut = orchestraScore as any;
-      } catch (err: any) {
-        warnings.push(`[orchestra] Expansion failed, using SATB output: ${err?.message ?? String(err)}`);
-      }
-    }
+    // 6a. Orchestra is now produced inside applyAppSettings by the worship
+    // orchestra arranger (PraiseCharts layout). The old mapPianoToFullOrchestraOpen
+    // expansion is retired — scoreModelOut already holds the orchestra here.
 
     if (!isPiano && !isStrings && !isWoodwinds && !isBrass && !isOrchestra && !isReinstrument) {
       try {

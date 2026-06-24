@@ -26,6 +26,7 @@ import { brassTextureToProfile, brassTextureToActivity, brassExampleToTexture, t
 import { arrangeBrassQuintetFromPianoInstrumentation } from "../arrange/arrangeBrassQuintetFromPianoInstrumentation";
 import { arrangeSatbToBrassQuartetDirect } from "../arrange/brass/arrangeSatbToBrassQuartet";
 import { applyReinstrumentation } from "../arrange/reinstrument";
+import { arrangeWorshipOrchestra } from "../arrange/orchestra/worshipOrchestraArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -1649,6 +1650,8 @@ export function applyAppSettings(
   const wantsPianoWithBrass   = ensemble === "piano_with_brass";
   // Re-instrumentation: keep the score, swap chosen parts to new instruments.
   const wantsReinstrument     = ensemble === "reinstrument";
+  // Worship / church orchestra (auto): lead sheet + chords → full PraiseCharts orchestra.
+  const wantsOrchestra        = ensemble === "orchestra" || ensemble === "full_orchestra";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
@@ -2167,6 +2170,33 @@ export function applyAppSettings(
     attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
       scoreModel: brResult.scoreModel as ScoreModel,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsOrchestra) {
+    // ── Worship / church orchestra (auto) — PraiseCharts layout ──────────────
+    // Strong 5-voice DP core → Tpt 1-2-3, Horn 1-2, Tbn 1-2 + low brass,
+    // Flute/Oboe descant, strings cushion. Concert pitch; exporter transposes.
+    const orchChords = chords.length ? chords : inferChordsFromAllVoices(scoreModel);
+    if (!orchChords.length) {
+      warnings.push("[orchestra] Could not infer chords from the source — orchestra may be sparse.");
+    }
+    const orchResult = arrangeWorshipOrchestra(scoreModel, orchChords as any, {
+      profile:    "melody_harmony",
+      chords:     orchChords as any,
+      key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
+      polyphonic: usePolyphonic,
+      level:      settings.level,
+      warnings,
+    });
+    attachTextureAnalysis(orchResult.scoreModel, warnings);
+    return {
+      scoreModel: orchResult.scoreModel as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,

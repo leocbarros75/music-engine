@@ -18,7 +18,7 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "choral → brass (SATB)", value: "satb_brass_quartet" },
   { label: "piano + brass (complement)", value: "piano_with_brass" },
   { label: "re-instrument (swap instruments)", value: "reinstrument" },
-  { label: "orchestra", value: "orchestra" }
+  { label: "orchestra (worship, auto)", value: "orchestra" }
 ];
 
 // Period styles — used for strings, choral, woodwind, brass, orchestra.
@@ -674,7 +674,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "piano_brass_quartet" &&
           settings.ensemble !== "satb_brass_quartet" &&
           settings.ensemble !== "piano_with_brass" &&
-          settings.ensemble !== "reinstrument" && (
+          settings.ensemble !== "reinstrument" &&
+          settings.ensemble !== "orchestra" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
           )}
       </div>
