@@ -689,6 +689,8 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       : undefined,
     orchestraIntensity: anyRaw.orchestraIntensity === "build" || anyRaw.orchestraIntensity === "tutti"
       ? anyRaw.orchestraIntensity : undefined,
+    orchestraTexture: anyRaw.orchestraTexture === "melody_harmony" || anyRaw.orchestraTexture === "chorale" || anyRaw.orchestraTexture === "contrapuntal"
+      ? anyRaw.orchestraTexture : undefined,
     suzukiVolume:
       typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
         ? (anyRaw.suzukiVolume as number)

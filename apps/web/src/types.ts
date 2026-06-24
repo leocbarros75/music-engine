@@ -24,6 +24,8 @@ export type Settings = {
   reinstrument?: Array<{ part: string; to: string }>;
   /** Worship-orchestra intensity: "build" (light intro → climaxes) or "tutti" (full throughout). */
   orchestraIntensity?: "build" | "tutti";
+  /** Worship-orchestra texture (auto): melody+harmony, chorale block, or contrapuntal. */
+  orchestraTexture?: "melody_harmony" | "chorale" | "contrapuntal";
   keySignature: string;
   timeSignature: string;
   tempo: number;

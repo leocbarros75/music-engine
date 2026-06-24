@@ -1436,6 +1436,33 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
+          {/* Worship orchestra — texture (auto mode only; piano/SATB are faithful transcriptions) */}
+          {settings.ensemble === "orchestra" && (
+            <div className="field">
+              <label>Orchestra texture</label>
+              <select
+                value={settings.orchestraTexture ?? "melody_harmony"}
+                onChange={(e) => {
+                  const t = e.target.value as "melody_harmony" | "chorale" | "contrapuntal";
+                  const next: Partial<Settings> = { orchestraTexture: t };
+                  if (t === "contrapuntal") { next.textureMode = "polyphony"; next.accompaniment = "polyphonic"; }
+                  else if (settings.accompaniment === "polyphonic") { next.textureMode = "homophony_homorhythmic"; next.accompaniment = "homophonic"; }
+                  onChange({ ...settings, ...next });
+                }}
+              >
+                <option value="melody_harmony">Melody + Harmony (cushion)</option>
+                <option value="chorale">Chorale (hymn block)</option>
+                <option value="contrapuntal">Contrapuntal (independent lines)</option>
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  How the harmonic core is voiced. Melody + Harmony: tune on top over a cushion (default).
+                  Chorale: hymn-style block, all voices together. Contrapuntal: independent imitative lines.
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Worship orchestra — intensity control (auto / piano→ / SATB→) */}
           {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") && (
             <div className="field">

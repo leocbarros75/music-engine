@@ -105,6 +105,12 @@ export type AppSettings = {
    */
   orchestraIntensity?: "build" | "tutti";
   /**
+   * Worship-orchestra texture (auto mode) — how the harmonic core is voiced:
+   * "melody_harmony" (melody + cushion, default), "chorale" (hymn block), or
+   * "contrapuntal" (independent imitative lines).
+   */
+  orchestraTexture?: "melody_harmony" | "chorale" | "contrapuntal";
+  /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
    *   "melody_harmony"   — Vln I foreground melody; Vln II + Vla inner harmony; Vc bass; Cb -8va (default)
@@ -2225,11 +2231,16 @@ export function applyAppSettings(
     if (!orchChords.length) {
       warnings.push("[orchestra] Could not infer chords from the source — orchestra may be sparse.");
     }
+    // Texture → DP voicing profile (mirrors the brass/string texture system).
+    const orchTex = settings.orchestraTexture ?? "melody_harmony";
+    const orchProfile = orchTex === "chorale" ? "bach_chorale"
+      : orchTex === "contrapuntal" ? "countermelody"
+      : "melody_harmony";
     const orchResult = arrangeWorshipOrchestra(scoreModel, orchChords as any, {
-      profile:    "melody_harmony",
+      profile:    orchProfile as any,
       chords:     orchChords as any,
       key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
-      polyphonic: usePolyphonic,
+      polyphonic: usePolyphonic || orchTex === "contrapuntal",
       level:      settings.level,
       intensity:  settings.orchestraIntensity ?? "build",
       warnings,
