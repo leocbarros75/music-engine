@@ -35,6 +35,7 @@ const REG: Record<string, Reg> = {
   tpt1:  { prefMin: 60, prefMax: 79 }, // C4..G5
   tpt2:  { prefMin: 57, prefMax: 74 }, // A3..D5
   tpt3:  { prefMin: 55, prefMax: 72 }, // G3..C5
+  bsn:   { prefMin: 41, prefMax: 62 }, // F2..D4 — Bassoon (woodwind bass)
   hn:    { prefMin: 53, prefMax: 69 }, // F3..A4
   tbn1:  { prefMin: 48, prefMax: 65 }, // C3..F4
   tbn2:  { prefMin: 43, prefMax: 60 }, // G2..C4
@@ -54,24 +55,30 @@ type PartDef = {
   voices: Array<{ src: StringVoice; reg: string; voice: number }>;
 };
 
+// Order: woodwinds (Fl/Ob, Bassoon) → Horn (between winds and brass) → Trumpets,
+// Trombones, low brass → [Timpani + Percussion inserted here] → strings.
 const WORSHIP_PARTS: PartDef[] = [
-  // ── Woodwinds (one high melodic/descant line) ──
+  // ── Woodwinds ──
   { partId: "P_FLOB", name: "Flute/Oboe (Clarinet)", instrument: "flute",
     voices: [{ src: "vln1", reg: "fl", voice: 1 }] },
+  { partId: "P_BSN", name: "Bassoon", instrument: "bassoon",
+    voices: [{ src: "vc", reg: "bsn", voice: 1 }] },
 
-  // ── Brass (the core of the worship orchestra) ──
-  { partId: "P_TPT12", name: "Trumpet 1-2", instrument: "trumpet_bb_1",
-    voices: [{ src: "vln1", reg: "tpt1", voice: 1 }, { src: "vln2", reg: "tpt2", voice: 2 }] },
-  { partId: "P_TPT3", name: "Trumpet 3 (Alto Sax)", instrument: "trumpet_bb_2",
-    voices: [{ src: "vla", reg: "tpt3", voice: 1 }] },
+  // ── Horn — between woodwinds and brass ──
   { partId: "P_HN12", name: "Horn 1-2", instrument: "horn_f",
     voices: [{ src: "vla", reg: "hn", voice: 1 }, { src: "vc", reg: "hn", voice: 2 }] },
+
+  // ── Brass ──
+  { partId: "P_TPT1", name: "Trumpet 1", instrument: "trumpet_bb_1",
+    voices: [{ src: "vln1", reg: "tpt1", voice: 1 }] },
+  { partId: "P_TPT23", name: "Trumpet 2-3 (Alto Sax)", instrument: "trumpet_bb_2",
+    voices: [{ src: "vln2", reg: "tpt2", voice: 1 }, { src: "vla", reg: "tpt3", voice: 2 }] },
   { partId: "P_TBN12", name: "Trombone 1-2 (Tenor Sax)", instrument: "trombone",
     voices: [{ src: "vc", reg: "tbn1", voice: 1 }, { src: "vla", reg: "tbn2", voice: 2 }] },
   { partId: "P_LOWBR", name: "Trombone 3/Tuba (Bari Sax)", instrument: "tuba_c",
     voices: [{ src: "cb", reg: "lowbr", voice: 1 }] },
 
-  // ── Strings (the cushion) ──
+  // ── Strings (the cushion) — percussion is spliced in before these ──
   { partId: "P_VLN1", name: "Violin 1", instrument: "violin_1",
     voices: [{ src: "vln1", reg: "vln1", voice: 1 }] },
   { partId: "P_VLN2", name: "Violin 2", instrument: "violin_2",
@@ -125,12 +132,16 @@ export function orchestrateStringCore(
 ): ScoreModel {
   const orch = remapToWorship(stringScore);
   const intensity = options.intensity ?? "build";
+  const phraseLen = 4;
+  const phraseInt = computePhraseIntensities(orch, phraseLen);
   if (intensity === "build") {
-    applyWorshipIntensity(orch);
+    gateSections(orch, phraseInt, phraseLen);
     warnings.push("[orchestra] Worship orchestra (build): strings cushion throughout, brass/winds enter and build to the climaxes.");
   } else {
     warnings.push("[orchestra] Worship orchestra (tutti): full ensemble throughout.");
   }
+  // Percussion (Timpani + Crash/Triangle) — driven by the same intensity curve.
+  addPercussion(orch, phraseInt, phraseLen);
   return orch;
 }
 
@@ -143,8 +154,9 @@ export function orchestrateStringCore(
 const SECTION_THRESHOLD: Record<string, number> = {
   P_VLN1: 0.10, P_VLN2: 0.12, P_VLA: 0.14, P_CELBS: 0.12, // strings — near-constant
   P_HN12: 0.30,                                            // horn — present inner glue
-  P_TPT12: 0.46, P_TBN12: 0.50,                            // trumpets/trombones — build to lifts
-  P_TPT3: 0.55, P_FLOB: 0.50,                              // 3rd tpt + descant — for lifts
+  P_BSN: 0.34,                                             // bassoon — woodwind bass, mostly present
+  P_TPT1: 0.42, P_TBN12: 0.50,                             // lead trumpet / trombones — build to lifts
+  P_TPT23: 0.50, P_FLOB: 0.50,                             // 2-3 trumpets + descant — for lifts
   P_LOWBR: 0.62,                                           // low brass — biggest moments only
 };
 
@@ -155,19 +167,16 @@ function measureLenOf(m: any): number {
 }
 
 /**
- * Phrase-based participation. Builds a rising intensity arc across the piece
- * (light intro → peak at the final choruses), modulated per phrase by the
- * melody's local register + density, then rests each section's phrases that fall
- * below its entrance threshold. Sections enter/exit at phrase boundaries (4 bars)
- * — like real charts — not measure-to-measure flicker.
+ * Per-phrase intensity arc (light intro → peak at the final choruses), modulated
+ * by the melody's local register + density. In "tutti" mode every phrase is full
+ * (1) so all sections play, but the percussion still uses the underlying arc to
+ * decide crash/triangle accents.
  */
-function applyWorshipIntensity(orch: ScoreModel, phraseLen = 4): void {
+function computePhraseIntensities(orch: ScoreModel, phraseLen: number): number[] {
   const parts: any[] = (orch as any).parts ?? [];
   const nMeasures = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
-  if (nMeasures === 0) return;
+  if (nMeasures === 0) return [];
   const nPhrases = Math.ceil(nMeasures / phraseLen);
-
-  // Melody reference = Violin 1 (top line) for local-intensity modulation.
   const melody = parts.find((p) => p.part_id === "P_VLN1");
   const allMidis: number[] = [];
   for (const m of melody?.measures ?? []) for (const e of (m.events ?? [])) {
@@ -177,36 +186,35 @@ function applyWorshipIntensity(orch: ScoreModel, phraseLen = 4): void {
   const hiRef = allMidis.length ? Math.max(...allMidis) : 72;
   const span = Math.max(1, hiRef - loRef);
 
-  // Per-phrase intensity.
-  const phraseIntensity: number[] = [];
+  const out: number[] = [];
   for (let pi = 0; pi < nPhrases; pi++) {
     const progress = nPhrases > 1 ? pi / (nPhrases - 1) : 1;
-    // Concave rising arc: ~0.45 → ~0.92.
     const base = 0.45 + 0.47 * Math.pow(progress, 0.7);
-    // Local melody modulation: higher + busier phrase → more intense.
     let sum = 0, count = 0;
     for (let mi = pi * phraseLen; mi < Math.min((pi + 1) * phraseLen, nMeasures); mi++) {
       for (const e of (melody?.measures?.[mi]?.events ?? [])) {
         if (e?.type === "note" && e.pitch) { const v = eventMidi(e); if (v !== null) { sum += v; count++; } }
       }
     }
-    const meanReg = count ? (sum / count - loRef) / span : 0.5;       // 0..1
-    const density = Math.min(1, count / (phraseLen * 4));              // 0..1 (~4 notes/bar = busy)
-    const mod = 0.18 * meanReg + 0.10 * density - 0.10;               // −0.10..+0.18
-    phraseIntensity.push(Math.max(0, Math.min(1, base + mod)));
+    const meanReg = count ? (sum / count - loRef) / span : 0.5;
+    const density = Math.min(1, count / (phraseLen * 4));
+    const mod = 0.18 * meanReg + 0.10 * density - 0.10;
+    out.push(Math.max(0, Math.min(1, base + mod)));
   }
-  // Real worship almost always opens light — cap the first phrase to a
-  // strings + horn texture so the brass/winds clearly enter as the song builds.
-  if (nPhrases > 2) phraseIntensity[0] = Math.min(phraseIntensity[0]!, 0.40);
-  // The final phrase is the big finish — force it to full tutti.
-  phraseIntensity[nPhrases - 1] = 1;
+  if (nPhrases > 2) out[0] = Math.min(out[0]!, 0.40);  // open light
+  out[nPhrases - 1] = 1;                                // big finish
+  return out;
+}
 
+/** Rest each section's phrases that fall below its entrance threshold (build mode). */
+function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number): void {
+  const parts: any[] = (orch as any).parts ?? [];
+  const nMeasures = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
   for (const part of parts) {
     const thr = SECTION_THRESHOLD[part.part_id];
-    if (thr === undefined) continue; // unknown part → leave playing
-    for (let pi = 0; pi < nPhrases; pi++) {
-      if (phraseIntensity[pi]! >= thr) continue; // section plays this phrase
-      // Rest this section for the phrase (whole-measure rests).
+    if (thr === undefined) continue;
+    for (let pi = 0; pi < phraseIntensity.length; pi++) {
+      if (phraseIntensity[pi]! >= thr) continue;
       for (let mi = pi * phraseLen; mi < Math.min((pi + 1) * phraseLen, nMeasures); mi++) {
         const m = part.measures?.[mi];
         if (!m) continue;
@@ -214,6 +222,66 @@ function applyWorshipIntensity(orch: ScoreModel, phraseLen = 4): void {
       }
     }
   }
+}
+
+// ── Percussion: Timpani (pitched) + Crash/Triangle (unpitched) ───────────────
+// Two staves: a pitched timpani part (bass roots on downbeats + cadences, enters
+// for the fuller sections) and an unpitched percussion part (crash on the big
+// phrase climaxes, triangle on the lifts). Both follow the intensity curve.
+const TIMP_THRESHOLD = 0.50;   // timpani joins the fuller sections
+const TRIANGLE_THRESHOLD = 0.55;
+const CRASH_THRESHOLD = 0.72;
+
+function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number): void {
+  const parts: any[] = (orch as any).parts ?? [];
+  const cello = parts.find((p) => p.part_id === "P_CELBS");
+  if (!cello) return;
+  const nMeasures = (cello.measures ?? []).length;
+  if (nMeasures === 0) return;
+
+  const timpMeasures: any[] = [];
+  const percMeasures: any[] = [];
+  const TIMP_LO = 38, TIMP_HI = 57; // D2..A3
+  for (let mi = 0; mi < nMeasures; mi++) {
+    const srcM = cello.measures[mi];
+    const len = measureLenOf(srcM);
+    const pi = Math.floor(mi / phraseLen);
+    const intensity = phraseInt[pi] ?? 1;
+    const isPhraseStart = mi % phraseLen === 0;
+
+    // Timpani: bass root on beat 1 when the texture is full enough.
+    const timpEvents: any[] = [];
+    if (intensity >= TIMP_THRESHOLD) {
+      const firstNote = (srcM?.events ?? []).find((e: any) => e?.type === "note" && e.pitch);
+      const bassMidi = firstNote ? eventMidi(firstNote) : null;
+      if (bassMidi !== null) {
+        let m = bassMidi; while (m < TIMP_LO) m += 12; while (m > TIMP_HI) m -= 12;
+        timpEvents.push({ id: `TIMP-${mi}`, t: 0, dur: Math.min(len, 2), type: "note", pitch: midiToPitch(m), voice: 1, staff: 1 });
+      }
+    }
+    if (!timpEvents.length) timpEvents.push({ id: `TIMP-r-${mi}`, t: 0, dur: len, type: "rest", isRest: true, voice: 1, staff: 1 });
+    timpMeasures.push({ number: srcM?.number ?? mi + 1, ...(mi === 0 && srcM?.attributes ? { attributes: JSON.parse(JSON.stringify(srcM.attributes)) } : {}), events: timpEvents });
+
+    // Percussion (unpitched): crash on climax phrase starts; triangle on lifts.
+    const percEvents: any[] = [];
+    if (isPhraseStart && intensity >= CRASH_THRESHOLD) {
+      percEvents.push({ id: `CRASH-${mi}`, t: 0, dur: len, type: "unpitched", instrumentId: "crash", voice: 1, staff: 1 });
+    }
+    if (isPhraseStart && intensity >= TRIANGLE_THRESHOLD) {
+      percEvents.push({ id: `TRI-${mi}`, t: 0, dur: Math.min(len, 1), type: "unpitched", instrumentId: "triangle", voice: 1, staff: 1 });
+    }
+    if (!percEvents.length) percEvents.push({ id: `PERC-r-${mi}`, t: 0, dur: len, type: "rest", isRest: true, voice: 1, staff: 1 });
+    percMeasures.push({ number: srcM?.number ?? mi + 1, ...(mi === 0 && srcM?.attributes ? { attributes: JSON.parse(JSON.stringify(srcM.attributes)) } : {}), events: percEvents });
+  }
+
+  const timpPart = { part_id: "P_TIMP", name: "Timpani", instrument: "timpani", staves: 1, measures: timpMeasures };
+  const percPart = { part_id: "P_PERC", name: "Percussion (Crash/Triangle)", instrument: "drums", staves: 1, measures: percMeasures };
+
+  // Splice both in just before the strings (before Violin 1).
+  const vln1Idx = parts.findIndex((p) => p.part_id === "P_VLN1");
+  const at = vln1Idx >= 0 ? vln1Idx : parts.length;
+  parts.splice(at, 0, timpPart, percPart);
+  (orch as any).parts = parts;
 }
 
 /** Map the 5 string-DP parts (by slot order) onto the worship-orchestra roster. */
