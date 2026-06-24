@@ -19,7 +19,7 @@
 
 import type { ScoreModel, NoteEvent } from "../../score/types";
 import { arrangeStringEnsemble } from "../strings/stringArranger";
-import { arrangeStringPolyphonic } from "../stringsPolyphony/stringsPolyphonicArranger";
+import { arrangeOrchestraPolyphonic } from "./polyphony/orchestraPolyphonicArranger";
 import { midiToPitch, pitchToMidi, getInstrumentSpec } from "../../instruments/instrumentCatalog";
 import type { ProfileId } from "../strings/types";
 
@@ -185,7 +185,7 @@ export function arrangeWorshipOrchestra(
   const profile = options.profile ?? "melody_harmony";
 
   if (options.polyphonic) {
-    const poly = arrangeStringPolyphonic(score, chords, { level: options.level });
+    const poly = arrangeOrchestraPolyphonic(score, chords, { level: options.level });
     warnings.push(...(poly.warnings ?? []));
     warnings.push("[orchestra] Worship orchestra (contrapuntal core): brass+winds+strings on a 5-voice polyphonic core.");
     return { scoreModel: remapToWorship(poly.scoreModel as ScoreModel), warnings };
