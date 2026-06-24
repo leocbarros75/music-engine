@@ -22,6 +22,8 @@ export type Settings = {
     | "satb_orchestra";
   /** Re-instrumentation remap table: reassign parts to new instruments (sounding preserved). */
   reinstrument?: Array<{ part: string; to: string }>;
+  /** Worship-orchestra intensity: "build" (light intro → climaxes) or "tutti" (full throughout). */
+  orchestraIntensity?: "build" | "tutti";
   keySignature: string;
   timeSignature: string;
   tempo: number;

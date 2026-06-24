@@ -109,6 +109,8 @@ function place(midi: number, reg: Reg, instrument: string): number {
   return m;
 }
 
+export type IntensityMode = "tutti" | "build";
+
 /**
  * Orchestrate a string-voice core (4 or 5 parts in slot order V1/V2/Vla/Vc[/Cb])
  * onto the worship-orchestra roster. Used by every source mode (auto DP core,
@@ -116,9 +118,102 @@ function place(midi: number, reg: Reg, instrument: string): number {
  * here, so changing the orchestra never touches the input machinery that built
  * the core.
  */
-export function orchestrateStringCore(stringScore: ScoreModel, warnings: string[] = []): ScoreModel {
-  warnings.push("[orchestra] Worship orchestra: Tpt 1-2-3, Horn 1-2, Tbn 1-2 + low brass, Flute/Oboe descant, strings cushion.");
-  return remapToWorship(stringScore);
+export function orchestrateStringCore(
+  stringScore: ScoreModel,
+  warnings: string[] = [],
+  options: { intensity?: IntensityMode } = {}
+): ScoreModel {
+  const orch = remapToWorship(stringScore);
+  const intensity = options.intensity ?? "build";
+  if (intensity === "build") {
+    applyWorshipIntensity(orch);
+    warnings.push("[orchestra] Worship orchestra (build): strings cushion throughout, brass/winds enter and build to the climaxes.");
+  } else {
+    warnings.push("[orchestra] Worship orchestra (tutti): full ensemble throughout.");
+  }
+  return orch;
+}
+
+// ── Intensity / participation — calibrated from 5 PraiseCharts ───────────────
+// Each section enters at a different intensity threshold: strings cushion almost
+// always; horn is the present inner brass; trumpets/trombones build to the lifts;
+// the low brass (Tbn 3/Tuba) and woodwind descant save for the biggest moments.
+// Real charts measured: strings ~82–99%, horn ~54–83%, trumpets/tbn ~55–75%,
+// low brass lowest-start→highest-end, flute descant ~50%.
+const SECTION_THRESHOLD: Record<string, number> = {
+  P_VLN1: 0.10, P_VLN2: 0.12, P_VLA: 0.14, P_CELBS: 0.12, // strings — near-constant
+  P_HN12: 0.30,                                            // horn — present inner glue
+  P_TPT12: 0.46, P_TBN12: 0.50,                            // trumpets/trombones — build to lifts
+  P_TPT3: 0.55, P_FLOB: 0.50,                              // 3rd tpt + descant — for lifts
+  P_LOWBR: 0.62,                                           // low brass — biggest moments only
+};
+
+function measureLenOf(m: any): number {
+  const beats = Number(m?.attributes?.time?.beats ?? 4);
+  const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
+  return beats * (4 / beatType);
+}
+
+/**
+ * Phrase-based participation. Builds a rising intensity arc across the piece
+ * (light intro → peak at the final choruses), modulated per phrase by the
+ * melody's local register + density, then rests each section's phrases that fall
+ * below its entrance threshold. Sections enter/exit at phrase boundaries (4 bars)
+ * — like real charts — not measure-to-measure flicker.
+ */
+function applyWorshipIntensity(orch: ScoreModel, phraseLen = 4): void {
+  const parts: any[] = (orch as any).parts ?? [];
+  const nMeasures = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
+  if (nMeasures === 0) return;
+  const nPhrases = Math.ceil(nMeasures / phraseLen);
+
+  // Melody reference = Violin 1 (top line) for local-intensity modulation.
+  const melody = parts.find((p) => p.part_id === "P_VLN1");
+  const allMidis: number[] = [];
+  for (const m of melody?.measures ?? []) for (const e of (m.events ?? [])) {
+    if (e?.type === "note" && e.pitch) { const v = eventMidi(e); if (v !== null) allMidis.push(v); }
+  }
+  const loRef = allMidis.length ? Math.min(...allMidis) : 60;
+  const hiRef = allMidis.length ? Math.max(...allMidis) : 72;
+  const span = Math.max(1, hiRef - loRef);
+
+  // Per-phrase intensity.
+  const phraseIntensity: number[] = [];
+  for (let pi = 0; pi < nPhrases; pi++) {
+    const progress = nPhrases > 1 ? pi / (nPhrases - 1) : 1;
+    // Concave rising arc: ~0.45 → ~0.92.
+    const base = 0.45 + 0.47 * Math.pow(progress, 0.7);
+    // Local melody modulation: higher + busier phrase → more intense.
+    let sum = 0, count = 0;
+    for (let mi = pi * phraseLen; mi < Math.min((pi + 1) * phraseLen, nMeasures); mi++) {
+      for (const e of (melody?.measures?.[mi]?.events ?? [])) {
+        if (e?.type === "note" && e.pitch) { const v = eventMidi(e); if (v !== null) { sum += v; count++; } }
+      }
+    }
+    const meanReg = count ? (sum / count - loRef) / span : 0.5;       // 0..1
+    const density = Math.min(1, count / (phraseLen * 4));              // 0..1 (~4 notes/bar = busy)
+    const mod = 0.18 * meanReg + 0.10 * density - 0.10;               // −0.10..+0.18
+    phraseIntensity.push(Math.max(0, Math.min(1, base + mod)));
+  }
+  // Real worship almost always opens light — cap the first phrase to a
+  // strings + horn texture so the brass/winds clearly enter as the song builds.
+  if (nPhrases > 2) phraseIntensity[0] = Math.min(phraseIntensity[0]!, 0.40);
+  // The final phrase is the big finish — force it to full tutti.
+  phraseIntensity[nPhrases - 1] = 1;
+
+  for (const part of parts) {
+    const thr = SECTION_THRESHOLD[part.part_id];
+    if (thr === undefined) continue; // unknown part → leave playing
+    for (let pi = 0; pi < nPhrases; pi++) {
+      if (phraseIntensity[pi]! >= thr) continue; // section plays this phrase
+      // Rest this section for the phrase (whole-measure rests).
+      for (let mi = pi * phraseLen; mi < Math.min((pi + 1) * phraseLen, nMeasures); mi++) {
+        const m = part.measures?.[mi];
+        if (!m) continue;
+        m.events = [{ id: `${part.part_id}-rest-${mi}`, t: 0, dur: measureLenOf(m), type: "rest", isRest: true, voice: 1, staff: 1 } as any];
+      }
+    }
+  }
 }
 
 /** Map the 5 string-DP parts (by slot order) onto the worship-orchestra roster. */
@@ -200,12 +295,13 @@ export type WorshipOrchestraOptions = {
   warnings?: string[];
   polyphonic?: boolean;
   level?: string;
+  intensity?: IntensityMode;
 };
 
 /**
  * Arrange a score as a worship/church orchestra (PraiseCharts layout).
- * Runs the string DP for a strong 5-voice core, then maps it onto the worship
- * roster with authentic part names and concert-pitch range placement.
+ * Runs the string DP for a strong 5-voice core, then orchestrates it (with the
+ * intensity build) via the shared orchestrateStringCore path.
  */
 export function arrangeWorshipOrchestra(
   score: ScoreModel,
@@ -215,15 +311,10 @@ export function arrangeWorshipOrchestra(
   const warnings = options.warnings ?? [];
   const profile = options.profile ?? "melody_harmony";
 
-  if (options.polyphonic) {
-    const poly = arrangeOrchestraPolyphonic(score, chords, { level: options.level });
-    warnings.push(...(poly.warnings ?? []));
-    warnings.push("[orchestra] Worship orchestra (contrapuntal core): brass+winds+strings on a 5-voice polyphonic core.");
-    return { scoreModel: remapToWorship(poly.scoreModel as ScoreModel), warnings };
-  }
+  const core = options.polyphonic
+    ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
+    : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
-  const sr = arrangeStringEnsemble(score, chords, { profile });
-  warnings.push(...(sr.warnings ?? []));
-  warnings.push("[orchestra] Worship orchestra: Tpt 1-2-3, Horn 1-2, Tbn 1-2 + low brass, Flute/Oboe descant, strings cushion.");
-  return { scoreModel: remapToWorship(sr.scoreModel as ScoreModel), warnings };
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity });
+  return { scoreModel, warnings };
 }

@@ -687,6 +687,8 @@ function normalizeAppSettings(raw: unknown): AppSettings {
           .filter((r: any) => r && typeof r.part === "string" && typeof r.to === "string")
           .map((r: any) => ({ part: r.part, to: r.to }))
       : undefined,
+    orchestraIntensity: anyRaw.orchestraIntensity === "build" || anyRaw.orchestraIntensity === "tutti"
+      ? anyRaw.orchestraIntensity : undefined,
     suzukiVolume:
       typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
         ? (anyRaw.suzukiVolume as number)

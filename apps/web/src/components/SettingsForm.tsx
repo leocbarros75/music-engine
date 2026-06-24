@@ -1436,6 +1436,26 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
+          {/* Worship orchestra — intensity control (auto / piano→ / SATB→) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") && (
+            <div className="field">
+              <label>Orchestra intensity</label>
+              <select
+                value={settings.orchestraIntensity ?? "build"}
+                onChange={(e) => update("orchestraIntensity", e.target.value as "build" | "tutti")}
+              >
+                <option value="build">Build (light intro → climaxes)</option>
+                <option value="tutti">Tutti (full ensemble throughout)</option>
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  Build: strings cushion throughout; horn, trumpets, then the 3rd trumpet, woodwind descant
+                  and low brass enter and grow toward the final chorus — like a real worship chart. Tutti: everyone plays the whole time.
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Piano→Brass quintet (copy): Horn toggle + Tuba entry only (faithful copy, no restyle) */}
           {settings.ensemble === "piano_brass_quartet" && (
             <>
