@@ -26,6 +26,8 @@ export type Settings = {
   orchestraIntensity?: "build" | "tutti";
   /** Worship-orchestra texture (auto): melody+harmony, chorale block, or contrapuntal. */
   orchestraTexture?: "melody_harmony" | "chorale" | "contrapuntal";
+  /** Custom ensemble: worship-orchestra part ids to include (empty/undefined = all). */
+  orchestraParts?: string[];
   keySignature: string;
   timeSignature: string;
   tempo: number;

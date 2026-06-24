@@ -111,6 +111,11 @@ export type AppSettings = {
    */
   orchestraTexture?: "melody_harmony" | "chorale" | "contrapuntal";
   /**
+   * Custom ensemble — worship-orchestra part ids to include in the output
+   * (e.g. ["P_FLOB","P_TPT1","P_VLN1","P_VLN2","P_CELBS"]). Empty/undefined = all.
+   */
+  orchestraParts?: string[];
+  /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
    *   "melody_harmony"   — Vln I foreground melody; Vln II + Vla inner harmony; Vc bass; Cb -8va (default)
@@ -2195,7 +2200,7 @@ export function applyAppSettings(
     // Piano → worship orchestra: faithful piano→quartet voice core (RH→V1/V2,
     // LH→Vla/Vc; Cb derived), then orchestrate onto the PraiseCharts roster.
     const core = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
-    const finalScore = orchestrateStringCore(core, warnings, { intensity: settings.orchestraIntensity ?? "build" });
+    const finalScore = orchestrateStringCore(core, warnings, { intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2211,7 +2216,7 @@ export function applyAppSettings(
     // SATB → worship orchestra: faithful S/A/T/B → V1/V2/Vla/Vc transcription
     // (Cb derived from the cello), then orchestrate onto the PraiseCharts roster.
     const core = arrangeSatbToStringQuartetDirect(scoreModel, { warnings });
-    const finalScore = orchestrateStringCore(core, warnings, { intensity: settings.orchestraIntensity ?? "build" });
+    const finalScore = orchestrateStringCore(core, warnings, { intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts });
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2243,6 +2248,7 @@ export function applyAppSettings(
       polyphonic: usePolyphonic || orchTex === "contrapuntal",
       level:      settings.level,
       intensity:  settings.orchestraIntensity ?? "build",
+      parts:      settings.orchestraParts,
       warnings,
     });
     attachTextureAnalysis(orchResult.scoreModel, warnings);

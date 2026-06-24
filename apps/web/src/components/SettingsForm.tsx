@@ -1483,6 +1483,69 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
+          {/* Worship orchestra — custom ensemble part picker (auto / piano→ / SATB→) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") &&
+            (() => {
+              const ROSTER: Array<{ id: string; name: string; section: string }> = [
+                { id: "P_FLOB", name: "Flute/Oboe", section: "Woodwinds" },
+                { id: "P_CL", name: "Clarinet", section: "Woodwinds" },
+                { id: "P_BSN", name: "Bassoon", section: "Woodwinds" },
+                { id: "P_HN12", name: "Horn 1-2", section: "Brass" },
+                { id: "P_TPT1", name: "Trumpet 1", section: "Brass" },
+                { id: "P_TPT23", name: "Trumpet 2-3 (Alto Sax)", section: "Brass" },
+                { id: "P_TBN12", name: "Trombone 1-2 (Tenor Sax)", section: "Brass" },
+                { id: "P_LOWBR", name: "Trombone 3/Tuba (Bari Sax)", section: "Brass" },
+                { id: "P_TIMP", name: "Timpani", section: "Percussion" },
+                { id: "P_PERC", name: "Percussion (Crash/Triangle)", section: "Percussion" },
+                { id: "P_VLN1", name: "Violin 1", section: "Strings" },
+                { id: "P_VLN2", name: "Violin 2", section: "Strings" },
+                { id: "P_VLA", name: "Viola", section: "Strings" },
+                { id: "P_CELBS", name: "Cello-Bass", section: "Strings" },
+              ];
+              const allIds = ROSTER.map((r) => r.id);
+              const sel = settings.orchestraParts && settings.orchestraParts.length ? settings.orchestraParts : allIds;
+              const setSel = (ids: string[]) =>
+                update("orchestraParts", (ids.length >= allIds.length ? undefined : ids) as any);
+              const toggle = (id: string) =>
+                setSel(sel.includes(id) ? sel.filter((x) => x !== id) : [...sel, id]);
+              const PRESETS: Array<{ label: string; ids: string[] }> = [
+                { label: "Full", ids: allIds },
+                { label: "Strings only", ids: ["P_VLN1", "P_VLN2", "P_VLA", "P_CELBS"] },
+                { label: "Brass + rhythm", ids: ["P_HN12", "P_TPT1", "P_TPT23", "P_TBN12", "P_LOWBR", "P_TIMP", "P_PERC"] },
+                { label: "Winds + strings", ids: ["P_FLOB", "P_CL", "P_BSN", "P_VLN1", "P_VLN2", "P_VLA", "P_CELBS"] },
+              ];
+              const sections = ["Woodwinds", "Brass", "Percussion", "Strings"];
+              return (
+                <div className="field">
+                  <label>Custom ensemble ({sel.length}/{allIds.length} parts)</label>
+                  <div className="key-preview" style={{ marginBottom: 6 }}>
+                    <span className="slider-help">
+                      Pick the instruments you have players for. The engine still builds the full harmony,
+                      so even a small ensemble gets correct parts. Swap any part to its sax substitute with the re-instrument tool.
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+                    {PRESETS.map((p) => (
+                      <button key={p.label} type="button" className="ghost" style={{ fontSize: 12, padding: "2px 8px" }}
+                        onClick={() => setSel(p.ids)}>{p.label}</button>
+                    ))}
+                  </div>
+                  {sections.map((sec) => (
+                    <div key={sec} style={{ marginBottom: 6 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.6, marginBottom: 2 }}>{sec}</div>
+                      {ROSTER.filter((r) => r.section === sec).map((r) => (
+                        <label key={r.id} style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontWeight: 400, fontSize: 13 }}>
+                          <input type="checkbox" checked={sel.includes(r.id)} onChange={() => toggle(r.id)}
+                            style={{ width: 14, height: 14, cursor: "pointer" }} />
+                          {r.name}
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
           {/* Piano→Brass quintet (copy): Horn toggle + Tuba entry only (faithful copy, no restyle) */}
           {settings.ensemble === "piano_brass_quartet" && (
             <>

@@ -122,16 +122,44 @@ function place(midi: number, reg: Reg, instrument: string): number {
 export type IntensityMode = "tutti" | "build";
 
 /**
+ * The full worship-orchestra roster (for the custom-ensemble part picker), in
+ * score order. Percussion parts (Timpani, Crash/Triangle) are generated in
+ * addPercussion but are listed here so the UI can offer them.
+ */
+export const WORSHIP_ROSTER: Array<{ id: string; name: string; section: "Woodwinds" | "Brass" | "Percussion" | "Strings" }> = [
+  { id: "P_FLOB", name: "Flute/Oboe", section: "Woodwinds" },
+  { id: "P_CL", name: "Clarinet", section: "Woodwinds" },
+  { id: "P_BSN", name: "Bassoon", section: "Woodwinds" },
+  { id: "P_HN12", name: "Horn 1-2", section: "Brass" },
+  { id: "P_TPT1", name: "Trumpet 1", section: "Brass" },
+  { id: "P_TPT23", name: "Trumpet 2-3 (Alto Sax)", section: "Brass" },
+  { id: "P_TBN12", name: "Trombone 1-2 (Tenor Sax)", section: "Brass" },
+  { id: "P_LOWBR", name: "Trombone 3/Tuba (Bari Sax)", section: "Brass" },
+  { id: "P_TIMP", name: "Timpani", section: "Percussion" },
+  { id: "P_PERC", name: "Percussion (Crash/Triangle)", section: "Percussion" },
+  { id: "P_VLN1", name: "Violin 1", section: "Strings" },
+  { id: "P_VLN2", name: "Violin 2", section: "Strings" },
+  { id: "P_VLA", name: "Viola", section: "Strings" },
+  { id: "P_CELBS", name: "Cello-Bass", section: "Strings" },
+];
+
+/**
  * Orchestrate a string-voice core (4 or 5 parts in slot order V1/V2/Vla/Vc[/Cb])
  * onto the worship-orchestra roster. Used by every source mode (auto DP core,
  * piano→quartet core, SATB→quartet core). All orchestration/sound decisions live
  * here, so changing the orchestra never touches the input machinery that built
  * the core.
+ *
+ * `parts` (custom ensemble): when provided, only those part ids are kept in the
+ * output. The full harmonic core is always computed first, so even a small custom
+ * ensemble gets correct voice assignments and registers — we just render fewer
+ * instruments. Intensity + percussion are computed on the full roster, then the
+ * filter is applied last.
  */
 export function orchestrateStringCore(
   stringScore: ScoreModel,
   warnings: string[] = [],
-  options: { intensity?: IntensityMode } = {}
+  options: { intensity?: IntensityMode; parts?: string[] } = {}
 ): ScoreModel {
   const orch = remapToWorship(stringScore);
   const intensity = options.intensity ?? "build";
@@ -145,7 +173,31 @@ export function orchestrateStringCore(
   }
   // Percussion (Timpani + Crash/Triangle) — driven by the same intensity curve.
   addPercussion(orch, phraseInt, phraseLen);
+
+  // Custom ensemble: keep only the selected parts (default = all).
+  if (Array.isArray(options.parts) && options.parts.length) {
+    const keep = new Set(options.parts);
+    const before = (orch as any).parts.length;
+    (orch as any).parts = (orch as any).parts.filter((p: any) => keep.has(p.part_id));
+    const kept = (orch as any).parts.length;
+    if (kept === 0) {
+      // Safety: an empty selection would yield an empty score — fall back to all.
+      (orch as any).parts = remapAndRebuildFallback(stringScore, intensity, phraseLen);
+      warnings.push("[orchestra] Custom ensemble had no valid parts — using the full roster.");
+    } else if (kept < before) {
+      warnings.push(`[orchestra] Custom ensemble: ${kept} of ${before} parts selected.`);
+    }
+  }
   return orch;
+}
+
+// Rebuild the full orchestra (used only as the empty-selection fallback).
+function remapAndRebuildFallback(stringScore: ScoreModel, intensity: IntensityMode, phraseLen: number): any[] {
+  const orch = remapToWorship(stringScore);
+  const phraseInt = computePhraseIntensities(orch, phraseLen);
+  if (intensity === "build") gateSections(orch, phraseInt, phraseLen);
+  addPercussion(orch, phraseInt, phraseLen);
+  return (orch as any).parts;
 }
 
 // ── Intensity / participation — calibrated from 5 PraiseCharts ───────────────
@@ -368,6 +420,7 @@ export type WorshipOrchestraOptions = {
   polyphonic?: boolean;
   level?: string;
   intensity?: IntensityMode;
+  parts?: string[];
 };
 
 /**
@@ -387,6 +440,6 @@ export function arrangeWorshipOrchestra(
     ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
     : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
   return { scoreModel, warnings };
 }
