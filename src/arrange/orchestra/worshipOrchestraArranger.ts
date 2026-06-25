@@ -163,18 +163,25 @@ export const WORSHIP_ROSTER: Array<{ id: string; name: string; section: "Woodwin
 export function orchestrateStringCore(
   stringScore: ScoreModel,
   warnings: string[] = [],
-  options: { intensity?: IntensityMode; parts?: string[] } = {}
+  options: { intensity?: IntensityMode; parts?: string[]; melodyRests?: boolean[] } = {}
 ): ScoreModel {
   const orch = remapToWorship(stringScore);
   const intensity = options.intensity ?? "build";
   const phraseLen = 4;
   const phraseInt = computePhraseIntensities(orch, phraseLen);
+  // Ritornello: measures where the melody rests but there's harmony = instrumental
+  // intros/turnarounds/tags where the orchestra should come FORWARD (Tovey).
+  const gaps = detectInstrumentalGaps(orch, options.melodyRests);
   if (intensity === "build") {
-    gateSections(orch, phraseInt, phraseLen);
+    gateSections(orch, phraseInt, phraseLen, gaps);
     warnings.push("[orchestra] Worship orchestra (build): strings cushion throughout, brass/winds enter and build to the climaxes.");
   } else {
     warnings.push("[orchestra] Worship orchestra (tutti): full ensemble throughout.");
   }
+  // Ritornello fills: in instrumental gaps the top voices take the lead so the
+  // orchestra has a melodic top where the vocal would be (both build + tutti).
+  fillGapTops(orch, gaps);
+  if (gaps.some(Boolean)) warnings.push(`[orchestra] Ritornello: orchestra comes forward in ${gaps.filter(Boolean).length} instrumental gap measure(s).`);
   // Percussion (Timpani + Crash/Triangle) — driven by the same intensity curve.
   addPercussion(orch, phraseInt, phraseLen);
 
@@ -199,7 +206,9 @@ export function orchestrateStringCore(
 function remapAndRebuildFallback(stringScore: ScoreModel, intensity: IntensityMode, phraseLen: number): any[] {
   const orch = remapToWorship(stringScore);
   const phraseInt = computePhraseIntensities(orch, phraseLen);
-  if (intensity === "build") gateSections(orch, phraseInt, phraseLen);
+  const gaps = detectInstrumentalGaps(orch);
+  if (intensity === "build") gateSections(orch, phraseInt, phraseLen, gaps);
+  fillGapTops(orch, gaps);
   addPercussion(orch, phraseInt, phraseLen);
   return (orch as any).parts;
 }
@@ -269,20 +278,125 @@ function computePhraseIntensities(orch: ScoreModel, phraseLen: number): number[]
   return out;
 }
 
-/** Rest each section's phrases that fall below its entrance threshold (build mode). */
-function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number): void {
+// Tovey's ritornello: in an instrumental gap (the vocal/melody rests), the
+// orchestra comes FORWARD — even in a light intro. Treat such measures as
+// near-full intensity so the harmony sections all play.
+const RITORNELLO_INTENSITY = 0.9;
+
+/**
+ * Rest each section's measures that fall below its entrance threshold (build).
+ * Per-measure (not per-phrase) so the ritornello boost can lift individual
+ * instrumental-gap measures to full while sung measures follow the build arc.
+ */
+function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number, gaps: boolean[]): void {
   const parts: any[] = (orch as any).parts ?? [];
   const nMeasures = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
   for (const part of parts) {
     const thr = SECTION_THRESHOLD[part.part_id];
     if (thr === undefined) continue;
-    for (let pi = 0; pi < phraseIntensity.length; pi++) {
-      if (phraseIntensity[pi]! >= thr) continue;
-      for (let mi = pi * phraseLen; mi < Math.min((pi + 1) * phraseLen, nMeasures); mi++) {
-        const m = part.measures?.[mi];
-        if (!m) continue;
-        m.events = [{ id: `${part.part_id}-rest-${mi}`, t: 0, dur: measureLenOf(m), type: "rest", isRest: true, voice: 1, staff: 1 } as any];
+    for (let mi = 0; mi < nMeasures; mi++) {
+      const pi = Math.floor(mi / phraseLen);
+      let eff = phraseIntensity[pi] ?? 1;
+      if (gaps[mi]) eff = Math.max(eff, RITORNELLO_INTENSITY); // orchestra forward in the gap
+      if (eff >= thr) continue;
+      const m = part.measures?.[mi];
+      if (!m) continue;
+      m.events = [{ id: `${part.part_id}-rest-${mi}`, t: 0, dur: measureLenOf(m), type: "rest", isRest: true, voice: 1, staff: 1 } as any];
+    }
+  }
+}
+
+/**
+ * Per-measure "instrumental gap": the melody (Violin 1) is mostly resting but
+ * there is harmony to play (a chord). These are intros / turnarounds / tags
+ * where the orchestra takes the lead instead of cushioning under a sung melody.
+ */
+function detectInstrumentalGaps(orch: ScoreModel, melodyRests?: boolean[]): boolean[] {
+  const parts: any[] = (orch as any).parts ?? [];
+  const harmonyIds = new Set(["P_VLN2", "P_VLA", "P_CELBS", "P_HN12"]);
+  const harmony = parts.filter((p) => harmonyIds.has(p.part_id));
+  const n = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
+  const melody = parts.find((p) => p.part_id === "P_VLN1");
+  const gaps: boolean[] = [];
+  for (let mi = 0; mi < n; mi++) {
+    // A gap needs harmony to play (otherwise it's silence, not a ritornello).
+    const harmHas = harmony.some((p) => (p.measures?.[mi]?.events ?? []).some((e: any) => e?.type === "note" && e.pitch));
+    // The melody must be RESTING. Prefer the source-melody signal (the DP fills
+    // the orchestrated melody voice even where the source rests); fall back to
+    // the orchestrated Violin 1 if no source signal was supplied.
+    let melResting: boolean;
+    if (melodyRests && mi < melodyRests.length) {
+      melResting = melodyRests[mi]!;
+    } else {
+      const m = melody?.measures?.[mi];
+      const len = measureLenOf(m);
+      let melDur = 0;
+      for (const e of (m?.events ?? [])) if (e?.type === "note" && e.pitch) melDur += Number(e.dur ?? 0);
+      melResting = melDur < 0.4 * len;
+    }
+    gaps[mi] = melResting && harmHas;
+  }
+  return gaps;
+}
+
+/**
+ * Per-measure "is the source melody mostly resting here?" — drives the ritornello.
+ * Finds the melody/soprano/top part of the source and measures its staff-1
+ * sounding fraction.
+ */
+export function sourceMelodyRestMeasures(score: ScoreModel): boolean[] {
+  const parts: any[] = (score as any).parts ?? [];
+  if (!parts.length) return [];
+  let mp = parts.find((p) => /soprano|melody|voice|lead/i.test(String(p?.name ?? "")));
+  if (!mp) {
+    let best: any = null, bestAvg = -Infinity;
+    for (const p of parts) {
+      const ms: number[] = [];
+      for (const m of p.measures ?? []) for (const e of (m.events ?? [])) {
+        if (e?.type === "note" && e.pitch) { const v = eventMidi(e); if (v !== null) ms.push(v); }
       }
+      if (ms.length) { const avg = ms.reduce((a, b) => a + b, 0) / ms.length; if (avg > bestAvg) { bestAvg = avg; best = p; } }
+    }
+    mp = best ?? parts[0];
+  }
+  const n = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
+  const rests: boolean[] = [];
+  for (let mi = 0; mi < n; mi++) {
+    const m = mp?.measures?.[mi];
+    const len = measureLenOf(m);
+    let dur = 0;
+    for (const e of (m?.events ?? [])) if (e?.type === "note" && e.pitch && Number(e.staff ?? 1) === 1) dur += Number(e.dur ?? 0);
+    rests[mi] = dur < 0.4 * len;
+  }
+  return rests;
+}
+
+/**
+ * In instrumental gaps, give the lyrical top voices (Flute/Oboe + Violin 1) the
+ * top harmony line (from Violin 2) so the orchestra's ritornello has a real
+ * melodic top where the vocal would otherwise be — instead of a bottom-heavy pad.
+ */
+function fillGapTops(orch: ScoreModel, gaps: boolean[]): void {
+  const parts: any[] = (orch as any).parts ?? [];
+  const topSrc = parts.find((p) => p.part_id === "P_VLN2");
+  if (!topSrc) return;
+  const targets: Array<[string, string]> = [["P_FLOB", "fl"], ["P_VLN1", "vln1"]];
+  for (let mi = 0; mi < gaps.length; mi++) {
+    if (!gaps[mi]) continue;
+    const srcNotes = (topSrc.measures?.[mi]?.events ?? []).filter((e: any) => e?.type === "note" && e.pitch);
+    if (!srcNotes.length) continue;
+    for (const [pid, regKey] of targets) {
+      const p = parts.find((x) => x.part_id === pid);
+      const m = p?.measures?.[mi];
+      if (!m) continue;
+      const hasNote = (m.events ?? []).some((e: any) => e?.type === "note" && e.pitch);
+      if (hasNote) continue; // the melody voice already plays here — leave it
+      m.events = srcNotes.map((e: any, i: number) => {
+        const midi = eventMidi(e);
+        if (midi === null) return e;
+        const placed = place(midi, REG[regKey]!, p.instrument);
+        return { id: `${pid}-fill-${mi}-${i}`, t: e.t, dur: e.dur, type: "note", pitch: midiToPitch(placed), voice: 1, staff: 1 };
+      });
     }
   }
 }
@@ -447,7 +561,7 @@ export function arrangeWorshipOrchestra(
     ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
     : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts , melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
 
@@ -461,7 +575,7 @@ export function arrangeWorshipOrchestraFromPiano(
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const core = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts , melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
 
@@ -475,6 +589,6 @@ export function arrangeWorshipOrchestraFromSatb(
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const core = arrangeSatbToStringQuartetDirect(score, { warnings });
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts , melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
