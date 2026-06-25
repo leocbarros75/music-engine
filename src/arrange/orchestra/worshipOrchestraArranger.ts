@@ -47,7 +47,8 @@ const REG: Record<string, Reg> = {
   vln1:  { prefMin: 62, prefMax: 84 }, // D4..C6
   vln2:  { prefMin: 57, prefMax: 79 }, // A3..G5
   vla:   { prefMin: 50, prefMax: 69 }, // D3..A4
-  celbs: { prefMin: 36, prefMax: 60 }, // C2..C4 — Cello-Bass
+  celbs: { prefMin: 40, prefMax: 60 }, // E2..C4 — Cello (upper voice of Cello-Bass)
+  cbass: { prefMin: 28, prefMax: 45 }, // E1..A2 — Double Bass (lower voice, 8vb)
 };
 
 // The worship-orchestra part roster. `voices` lists which string-DP voice feeds
@@ -92,7 +93,7 @@ const WORSHIP_PARTS: PartDef[] = [
   { partId: "P_VLA", name: "Viola", instrument: "viola",
     voices: [{ src: "vla", reg: "vla", voice: 1 }] },
   { partId: "P_CELBS", name: "Cello-Bass", instrument: "cello",
-    voices: [{ src: "vc", reg: "celbs", voice: 1 }] },
+    voices: [{ src: "vc", reg: "celbs", voice: 1 }, { src: "cb", reg: "cbass", voice: 2 }] },
 ];
 
 function eventMidi(ev: any): number | null {
@@ -212,8 +213,11 @@ function remapAndRebuildFallback(stringScore: ScoreModel, intensity: IntensityMo
 const SECTION_THRESHOLD: Record<string, number> = {
   P_VLN1: 0.10, P_VLN2: 0.12, P_VLA: 0.14, P_CELBS: 0.12, // strings — near-constant
   P_HN12: 0.30,                                            // horn — present inner glue
-  P_BSN: 0.34,                                             // bassoon — woodwind bass, mostly present
-  P_CL: 0.40,                                              // clarinet — warm woodwind, fairly present
+  // Clarinet/Bassoon pulled back (was 0.40/0.34) to hit the pro family balance —
+  // 3 doubling wind parts were over-weighting winds (21% vs 16% target). Reserving
+  // them drops winds toward 16% and lifts strings' relative share toward 36%.
+  P_BSN: 0.52,                                             // bassoon — woodwind bass, reserved for fuller sections
+  P_CL: 0.55,                                              // clarinet — warm woodwind, comes in for lifts
   P_TPT1: 0.42, P_TBN12: 0.50,                             // lead trumpet / trombones — build to lifts
   P_TPT23: 0.50, P_FLOB: 0.50,                             // 2-3 trumpets + flute descant — for lifts
   P_LOWBR: 0.62,                                           // low brass — biggest moments only
