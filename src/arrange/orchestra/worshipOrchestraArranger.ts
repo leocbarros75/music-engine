@@ -18,10 +18,13 @@
 // staff (voice 1 = upper, voice 2 = lower).
 
 import type { ScoreModel, NoteEvent } from "../../score/types";
-import { arrangeStringEnsemble } from "../strings/stringArranger";
+// Orchestra owns its entire core — forked from the string engine so tuning the
+// orchestra can never affect strings/winds/brass (see src/arrange/orchestra/core).
+import { arrangeStringEnsemble } from "./core/stringArranger";
+import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect } from "./core/pianoSatbCore";
 import { arrangeOrchestraPolyphonic } from "./polyphony/orchestraPolyphonicArranger";
 import { midiToPitch, pitchToMidi, getInstrumentSpec } from "../../instruments/instrumentCatalog";
-import type { ProfileId } from "../strings/types";
+import type { ProfileId } from "./core/types";
 
 type ChordEvent = { measure: number; t: number; symbol: string };
 type StringVoice = "vln1" | "vln2" | "vla" | "vc" | "cb";
@@ -440,6 +443,34 @@ export function arrangeWorshipOrchestra(
     ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
     : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
+  return { scoreModel, warnings };
+}
+
+/**
+ * Piano → worship orchestra. Faithful piano→quartet voice core (orchestra's own
+ * forked transcription), then orchestrate. Self-contained — no shared deps.
+ */
+export function arrangeWorshipOrchestraFromPiano(
+  score: ScoreModel,
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[] } = {}
+): { scoreModel: ScoreModel; warnings: string[] } {
+  const warnings = options.warnings ?? [];
+  const core = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
+  return { scoreModel, warnings };
+}
+
+/**
+ * SATB → worship orchestra. Faithful S/A/T/B → V1/V2/Vla/Vc transcription
+ * (orchestra's own forked copy), then orchestrate. Self-contained.
+ */
+export function arrangeWorshipOrchestraFromSatb(
+  score: ScoreModel,
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[] } = {}
+): { scoreModel: ScoreModel; warnings: string[] } {
+  const warnings = options.warnings ?? [];
+  const core = arrangeSatbToStringQuartetDirect(score, { warnings });
   const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts });
   return { scoreModel, warnings };
 }

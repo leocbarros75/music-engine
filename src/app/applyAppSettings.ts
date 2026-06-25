@@ -26,7 +26,7 @@ import { brassTextureToProfile, brassTextureToActivity, brassExampleToTexture, t
 import { arrangeBrassQuintetFromPianoInstrumentation } from "../arrange/arrangeBrassQuintetFromPianoInstrumentation";
 import { arrangeSatbToBrassQuartetDirect } from "../arrange/brass/arrangeSatbToBrassQuartet";
 import { applyReinstrumentation } from "../arrange/reinstrument";
-import { arrangeWorshipOrchestra, orchestrateStringCore } from "../arrange/orchestra/worshipOrchestraArranger";
+import { arrangeWorshipOrchestra, arrangeWorshipOrchestraFromPiano, arrangeWorshipOrchestraFromSatb } from "../arrange/orchestra/worshipOrchestraArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -2197,10 +2197,10 @@ export function applyAppSettings(
   }
 
   if (wantsPianoOrchestra) {
-    // Piano → worship orchestra: faithful piano→quartet voice core (RH→V1/V2,
-    // LH→Vla/Vc; Cb derived), then orchestrate onto the PraiseCharts roster.
-    const core = arrangeStringQuartetFromPianoInstrumentation(scoreModel, { warnings });
-    const finalScore = orchestrateStringCore(core, warnings, { intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts });
+    // Piano → worship orchestra (orchestra's own forked piano→quartet core).
+    const finalScore = arrangeWorshipOrchestraFromPiano(scoreModel, {
+      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts,
+    }).scoreModel;
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2213,10 +2213,10 @@ export function applyAppSettings(
   }
 
   if (wantsSatbOrchestra) {
-    // SATB → worship orchestra: faithful S/A/T/B → V1/V2/Vla/Vc transcription
-    // (Cb derived from the cello), then orchestrate onto the PraiseCharts roster.
-    const core = arrangeSatbToStringQuartetDirect(scoreModel, { warnings });
-    const finalScore = orchestrateStringCore(core, warnings, { intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts });
+    // SATB → worship orchestra (orchestra's own forked SATB→quartet core).
+    const finalScore = arrangeWorshipOrchestraFromSatb(scoreModel, {
+      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts,
+    }).scoreModel;
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
