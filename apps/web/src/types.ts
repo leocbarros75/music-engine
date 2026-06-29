@@ -30,6 +30,8 @@ export type Settings = {
   orchestraParts?: string[];
   /** Family balance bias: default (pro) or favour strings/winds/brass. */
   orchestraBalance?: "default" | "more_strings" | "more_winds" | "more_brass";
+  /** Advanced: manual per-instrument measure ranges (overrides the auto build). */
+  orchestraPartRanges?: Array<{ part: string; ranges: Array<[number, number]> }>;
   keySignature: string;
   timeSignature: string;
   tempo: number;

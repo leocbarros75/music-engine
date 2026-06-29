@@ -121,6 +121,11 @@ export type AppSettings = {
    */
   orchestraBalance?: "default" | "more_strings" | "more_winds" | "more_brass";
   /**
+   * Advanced: manual per-instrument measure ranges. A listed part plays ONLY in
+   * those (1-based, inclusive) measures, overriding the automatic build.
+   */
+  orchestraPartRanges?: Array<{ part: string; ranges: Array<[number, number]> }>;
+  /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
    *   "melody_harmony"   — Vln I foreground melody; Vln II + Vla inner harmony; Vc bass; Cb -8va (default)
@@ -2204,7 +2209,7 @@ export function applyAppSettings(
   if (wantsPianoOrchestra) {
     // Piano → worship orchestra (orchestra's own forked piano→quartet core).
     const finalScore = arrangeWorshipOrchestraFromPiano(scoreModel, {
-      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default",
+      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default", partRanges: settings.orchestraPartRanges,
     }).scoreModel;
     attachTextureAnalysis(finalScore, warnings);
     return {
@@ -2220,7 +2225,7 @@ export function applyAppSettings(
   if (wantsSatbOrchestra) {
     // SATB → worship orchestra (orchestra's own forked SATB→quartet core).
     const finalScore = arrangeWorshipOrchestraFromSatb(scoreModel, {
-      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default",
+      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default", partRanges: settings.orchestraPartRanges,
     }).scoreModel;
     attachTextureAnalysis(finalScore, warnings);
     return {
@@ -2255,6 +2260,7 @@ export function applyAppSettings(
       intensity:  settings.orchestraIntensity ?? "build",
       parts:      settings.orchestraParts,
       balance:    settings.orchestraBalance ?? "default",
+      partRanges: settings.orchestraPartRanges,
       warnings,
     });
     attachTextureAnalysis(orchResult.scoreModel, warnings);

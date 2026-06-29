@@ -1505,6 +1505,52 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
+          {/* Worship orchestra — ADVANCED: per-instrument measure ranges */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") &&
+            (() => {
+              const ROSTER: Array<{ id: string; name: string }> = [
+                { id: "P_FLOB", name: "Flute/Oboe" }, { id: "P_CL", name: "Clarinet" }, { id: "P_BSN", name: "Bassoon" },
+                { id: "P_HN12", name: "Horn 1-2" }, { id: "P_TPT1", name: "Trumpet 1" }, { id: "P_TPT23", name: "Trumpet 2-3" },
+                { id: "P_TBN12", name: "Trombone 1-2" }, { id: "P_LOWBR", name: "Trombone 3/Tuba" },
+                { id: "P_TIMP", name: "Timpani" }, { id: "P_PERC", name: "Percussion" },
+                { id: "P_VLN1", name: "Violin 1" }, { id: "P_VLN2", name: "Violin 2" }, { id: "P_VLA", name: "Viola" }, { id: "P_CELBS", name: "Cello-Bass" },
+              ];
+              const rangesFor = (id: string): string => {
+                const e = (settings.orchestraPartRanges ?? []).find((r) => r.part === id);
+                return e ? e.ranges.map(([a, b]) => `${a}-${b}`).join(", ") : "";
+              };
+              const setRanges = (id: string, text: string) => {
+                const ranges = text.split(",").map((s) => s.trim()).filter(Boolean).map((s) => {
+                  const m = s.match(/^(\d+)\s*-\s*(\d+)$/);
+                  return m ? [Number(m[1]), Number(m[2])] as [number, number] : null;
+                }).filter((x): x is [number, number] => !!x);
+                const others = (settings.orchestraPartRanges ?? []).filter((r) => r.part !== id);
+                update("orchestraPartRanges", (ranges.length ? [...others, { part: id, ranges }] : others) as any);
+              };
+              const count = (settings.orchestraPartRanges ?? []).length;
+              return (
+                <details className="field" style={{ border: "1px solid var(--border, #ccc)", borderRadius: 6, padding: 8 }}>
+                  <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+                    Advanced — per-instrument measure ranges{count ? ` (${count} set)` : ""}
+                  </summary>
+                  <div className="key-preview" style={{ margin: "6px 0" }}>
+                    <span className="slider-help">
+                      Type the measures each instrument should play, e.g. <code>17-32, 49-64</code>. A part with
+                      ranges plays ONLY there (overrides the automatic build). Leave blank for automatic.
+                    </span>
+                  </div>
+                  {ROSTER.map((r) => (
+                    <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                      <label style={{ width: 120, fontWeight: 400, fontSize: 13 }}>{r.name}</label>
+                      <input type="text" placeholder="auto" defaultValue={rangesFor(r.id)}
+                        onBlur={(e) => setRanges(r.id, e.target.value)}
+                        style={{ flex: 1, fontSize: 13 }} />
+                    </div>
+                  ))}
+                </details>
+              );
+            })()}
+
           {/* Worship orchestra — custom ensemble part picker (auto / piano→ / SATB→) */}
           {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") &&
             (() => {

@@ -696,6 +696,17 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       : undefined,
     orchestraBalance: ["default", "more_strings", "more_winds", "more_brass"].includes(anyRaw.orchestraBalance)
       ? anyRaw.orchestraBalance : undefined,
+    orchestraPartRanges: Array.isArray(anyRaw.orchestraPartRanges)
+      ? anyRaw.orchestraPartRanges
+          .filter((r: any) => r && typeof r.part === "string" && Array.isArray(r.ranges))
+          .map((r: any) => ({
+            part: r.part,
+            ranges: r.ranges
+              .filter((x: any) => Array.isArray(x) && x.length === 2 && Number.isFinite(Number(x[0])) && Number.isFinite(Number(x[1])))
+              .map((x: any) => [Number(x[0]), Number(x[1])] as [number, number]),
+          }))
+          .filter((r: any) => r.ranges.length)
+      : undefined,
     suzukiVolume:
       typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
         ? (anyRaw.suzukiVolume as number)
