@@ -116,6 +116,11 @@ export type AppSettings = {
    */
   orchestraParts?: string[];
   /**
+   * Family balance bias: "default" (pro 48/36/16), or "more_strings" /
+   * "more_winds" / "more_brass" to favour a family in this arrangement.
+   */
+  orchestraBalance?: "default" | "more_strings" | "more_winds" | "more_brass";
+  /**
    * Adler-based string texture mode (only applies when ensemble = "string_ensemble"
    * and instrumentation = "auto").
    *   "melody_harmony"   — Vln I foreground melody; Vln II + Vla inner harmony; Vc bass; Cb -8va (default)
@@ -2199,7 +2204,7 @@ export function applyAppSettings(
   if (wantsPianoOrchestra) {
     // Piano → worship orchestra (orchestra's own forked piano→quartet core).
     const finalScore = arrangeWorshipOrchestraFromPiano(scoreModel, {
-      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts,
+      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default",
     }).scoreModel;
     attachTextureAnalysis(finalScore, warnings);
     return {
@@ -2215,7 +2220,7 @@ export function applyAppSettings(
   if (wantsSatbOrchestra) {
     // SATB → worship orchestra (orchestra's own forked SATB→quartet core).
     const finalScore = arrangeWorshipOrchestraFromSatb(scoreModel, {
-      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts,
+      warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default",
     }).scoreModel;
     attachTextureAnalysis(finalScore, warnings);
     return {
@@ -2249,6 +2254,7 @@ export function applyAppSettings(
       level:      settings.level,
       intensity:  settings.orchestraIntensity ?? "build",
       parts:      settings.orchestraParts,
+      balance:    settings.orchestraBalance ?? "default",
       warnings,
     });
     attachTextureAnalysis(orchResult.scoreModel, warnings);

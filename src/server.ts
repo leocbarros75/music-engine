@@ -694,6 +694,8 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     orchestraParts: Array.isArray(anyRaw.orchestraParts)
       ? anyRaw.orchestraParts.filter((s: any) => typeof s === "string")
       : undefined,
+    orchestraBalance: ["default", "more_strings", "more_winds", "more_brass"].includes(anyRaw.orchestraBalance)
+      ? anyRaw.orchestraBalance : undefined,
     suzukiVolume:
       typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
         ? (anyRaw.suzukiVolume as number)

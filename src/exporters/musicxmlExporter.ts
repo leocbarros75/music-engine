@@ -607,7 +607,12 @@ function buildCadenceTextByMeasure(scoreModel: ScoreModel): Record<number, strin
 export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
   const workTitle = xmlEscape((scoreModel as any)?.meta?.ensemble ?? "ensemble");
   const partsRaw = scoreModel?.parts ?? [];
-  const parts = sortPartsOrchestrally(partsRaw);
+  // The worship orchestra already emits its parts in deliberate score order
+  // (woodwinds → horn → brass → percussion → strings); preserve it. The generic
+  // orchestral sort is for scores assembled in arbitrary order.
+  const ensembleTag = String((scoreModel as any)?.meta?.ensemble ?? "").toLowerCase();
+  const preserveOrder = ensembleTag === "orchestra" || ensembleTag === "full_orchestra";
+  const parts = preserveOrder ? partsRaw : sortPartsOrchestrally(partsRaw);
 
   const cadenceTextByMeasure = buildCadenceTextByMeasure(scoreModel);
   const fallbackKeyFifths =

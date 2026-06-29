@@ -163,17 +163,18 @@ export const WORSHIP_ROSTER: Array<{ id: string; name: string; section: "Woodwin
 export function orchestrateStringCore(
   stringScore: ScoreModel,
   warnings: string[] = [],
-  options: { intensity?: IntensityMode; parts?: string[]; melodyRests?: boolean[] } = {}
+  options: { intensity?: IntensityMode; parts?: string[]; melodyRests?: boolean[]; balance?: OrchestraBalance } = {}
 ): ScoreModel {
   const orch = remapToWorship(stringScore);
   const intensity = options.intensity ?? "build";
+  const balance = options.balance ?? "default";
   const phraseLen = 4;
   const phraseInt = computePhraseIntensities(orch, phraseLen);
   // Ritornello: measures where the melody rests but there's harmony = instrumental
   // intros/turnarounds/tags where the orchestra should come FORWARD (Tovey).
   const gaps = detectInstrumentalGaps(orch, options.melodyRests);
   if (intensity === "build") {
-    gateSections(orch, phraseInt, phraseLen, gaps);
+    gateSections(orch, phraseInt, phraseLen, gaps, balance);
     warnings.push("[orchestra] Worship orchestra (build): strings cushion throughout, brass/winds enter and build to the climaxes.");
   } else {
     warnings.push("[orchestra] Worship orchestra (tutti): full ensemble throughout.");
@@ -232,6 +233,33 @@ const SECTION_THRESHOLD: Record<string, number> = {
   P_LOWBR: 0.62,                                           // low brass — biggest moments only
 };
 
+// ── User-controllable family balance ─────────────────────────────────────────
+// The engine default targets the pro balance (Brass 48 / Strings 36 / Winds 16).
+// The user can bias it: lowering a family's entrance thresholds makes it play
+// more (bigger share); raising makes it recede.
+export type OrchestraBalance = "default" | "more_strings" | "more_winds" | "more_brass";
+const FAMILY_OF: Record<string, "wind" | "brass" | "strings"> = {
+  P_FLOB: "wind", P_CL: "wind", P_BSN: "wind",
+  P_HN12: "brass", P_TPT1: "brass", P_TPT23: "brass", P_TBN12: "brass", P_LOWBR: "brass",
+  P_VLN1: "strings", P_VLN2: "strings", P_VLA: "strings", P_CELBS: "strings",
+};
+const BALANCE_ADJ: Record<OrchestraBalance, { wind: number; brass: number; strings: number }> = {
+  default:      { wind:  0.00, brass:  0.00, strings:  0.00 },
+  // Strings are already near-constant (saturated), so "more strings" works by
+  // making winds + brass recede strongly enough to clear the intensity arc,
+  // which raises the strings' relative share.
+  more_strings: { wind: +0.24, brass: +0.18, strings: -0.10 },
+  more_winds:   { wind: -0.25, brass: +0.10, strings: +0.08 },
+  more_brass:   { wind: +0.12, brass: -0.15, strings: +0.06 },
+};
+function adjustedThreshold(partId: string, balance: OrchestraBalance): number | undefined {
+  const base = SECTION_THRESHOLD[partId];
+  if (base === undefined) return undefined;
+  const fam = FAMILY_OF[partId];
+  if (!fam) return base;
+  return Math.max(0, Math.min(1, base + BALANCE_ADJ[balance][fam]));
+}
+
 function measureLenOf(m: any): number {
   const beats = Number(m?.attributes?.time?.beats ?? 4);
   const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
@@ -288,11 +316,11 @@ const RITORNELLO_INTENSITY = 0.9;
  * Per-measure (not per-phrase) so the ritornello boost can lift individual
  * instrumental-gap measures to full while sung measures follow the build arc.
  */
-function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number, gaps: boolean[]): void {
+function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number, gaps: boolean[], balance: OrchestraBalance = "default"): void {
   const parts: any[] = (orch as any).parts ?? [];
   const nMeasures = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
   for (const part of parts) {
-    const thr = SECTION_THRESHOLD[part.part_id];
+    const thr = adjustedThreshold(part.part_id, balance);
     if (thr === undefined) continue;
     for (let mi = 0; mi < nMeasures; mi++) {
       const pi = Math.floor(mi / phraseLen);
@@ -542,6 +570,7 @@ export type WorshipOrchestraOptions = {
   level?: string;
   intensity?: IntensityMode;
   parts?: string[];
+  balance?: OrchestraBalance;
 };
 
 /**
@@ -561,7 +590,7 @@ export function arrangeWorshipOrchestra(
     ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
     : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts , melodyRests: sourceMelodyRestMeasures(score) });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
 
@@ -571,11 +600,11 @@ export function arrangeWorshipOrchestra(
  */
 export function arrangeWorshipOrchestraFromPiano(
   score: ScoreModel,
-  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[] } = {}
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance } = {}
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const core = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts , melodyRests: sourceMelodyRestMeasures(score) });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
 
@@ -585,10 +614,10 @@ export function arrangeWorshipOrchestraFromPiano(
  */
 export function arrangeWorshipOrchestraFromSatb(
   score: ScoreModel,
-  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[] } = {}
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance } = {}
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const core = arrangeSatbToStringQuartetDirect(score, { warnings });
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts , melodyRests: sourceMelodyRestMeasures(score) });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }

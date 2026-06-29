@@ -1483,6 +1483,28 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
+          {/* Worship orchestra — family balance bias */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") && (
+            <div className="field">
+              <label>Family balance</label>
+              <select
+                value={settings.orchestraBalance ?? "default"}
+                onChange={(e) => update("orchestraBalance", e.target.value as "default" | "more_strings" | "more_winds" | "more_brass")}
+              >
+                <option value="default">Default (pro: Brass 48 · Strings 36 · Winds 16)</option>
+                <option value="more_strings">More strings</option>
+                <option value="more_winds">More winds</option>
+                <option value="more_brass">More brass</option>
+              </select>
+              <div className="key-preview">
+                <span className="slider-help">
+                  The engine default matches professional worship charts. Bias it for this arrangement —
+                  favouring a family makes it play more of the time (a bigger share of the texture).
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Worship orchestra — custom ensemble part picker (auto / piano→ / SATB→) */}
           {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") &&
             (() => {

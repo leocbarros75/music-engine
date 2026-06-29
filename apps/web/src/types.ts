@@ -28,6 +28,8 @@ export type Settings = {
   orchestraTexture?: "melody_harmony" | "chorale" | "contrapuntal";
   /** Custom ensemble: worship-orchestra part ids to include (empty/undefined = all). */
   orchestraParts?: string[];
+  /** Family balance bias: default (pro) or favour strings/winds/brass. */
+  orchestraBalance?: "default" | "more_strings" | "more_winds" | "more_brass";
   keySignature: string;
   timeSignature: string;
   tempo: number;
