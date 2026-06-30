@@ -181,6 +181,9 @@ export function orchestrateStringCore(
   } else {
     warnings.push("[orchestra] Worship orchestra (tutti): full ensemble throughout.");
   }
+  // Open spacing: widen muddy low intervals + spread excessive unison piles
+  // (overtone-series principle — wide at the bottom, closer at the top).
+  refineSpacing(orch);
   // Ritornello fills: in instrumental gaps the top voices take the lead so the
   // orchestra has a melodic top where the vocal would be (both build + tutti).
   fillGapTops(orch, gaps);
@@ -264,6 +267,52 @@ function adjustedThreshold(partId: string, balance: OrchestraBalance): number | 
   const fam = FAMILY_OF[partId];
   if (!fam) return base;
   return Math.max(0, Math.min(1, base + BALANCE_ADJ[balance][fam]));
+}
+
+// ── Open spacing — low-interval limit (Forsyth/Adler) ────────────────────────
+// Below C3 (MIDI 48) no interval tighter than a 5th: low thirds/seconds are
+// muddy. When two low voices are closer than a 5th, drop the lower an octave if
+// it stays in range and the slot is free. (Unison doublings are left alone —
+// they're normal reinforcement, not mud.)
+const LOW_LIMIT_MIDI = 48; // C3
+function refineSpacing(orch: ScoreModel): void {
+  const parts: any[] = (orch as any).parts ?? [];
+  const pitched = parts.filter((p) => p.part_id !== "P_TIMP" && p.part_id !== "P_PERC");
+  const loOf = new Map<string, number>();
+  for (const p of pitched) {
+    const spec = getInstrumentSpec(p.instrument);
+    loOf.set(p.part_id, spec ? Number((spec as any).midi_low) : 0);
+  }
+  const nM = Math.max(0, ...pitched.map((p) => (p.measures ?? []).length));
+  for (let mi = 0; mi < nM; mi++) {
+    const byOnset = new Map<string, Array<{ ev: any; lo: number }>>();
+    for (const p of pitched) {
+      const lo = loOf.get(p.part_id) ?? 0;
+      for (const ev of (p.measures?.[mi]?.events ?? [])) {
+        if (ev?.type !== "note" || !ev.pitch) continue;
+        const k = String(Math.round(Number(ev.t ?? 0) * 1000));
+        const arr = byOnset.get(k) ?? [];
+        arr.push({ ev, lo });
+        byOnset.set(k, arr);
+      }
+    }
+    for (const grp of byOnset.values()) {
+      const occ = new Map<number, number>();
+      for (const g of grp) { const m = eventMidi(g.ev); if (m !== null) occ.set(m, (occ.get(m) ?? 0) + 1); }
+      const sorted = grp.map((g) => ({ g, m: eventMidi(g.ev) ?? 0 })).sort((a, b) => a.m - b.m);
+      for (let i = 1; i < sorted.length; i++) {
+        const lo = sorted[i - 1]!, hi = sorted[i]!;
+        const gap = hi.m - lo.m;
+        if (hi.m < LOW_LIMIT_MIDI && gap > 0 && gap < 7) {
+          const down = lo.m - 12;
+          if (down >= lo.g.lo && (occ.get(down) ?? 0) === 0) {
+            occ.set(lo.m, (occ.get(lo.m) ?? 1) - 1); occ.set(down, 1);
+            lo.g.ev.midi = down; lo.g.ev.pitch = midiToPitch(down); lo.m = down;
+          }
+        }
+      }
+    }
+  }
 }
 
 // ── Advanced: manual per-instrument measure ranges ───────────────────────────
