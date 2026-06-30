@@ -694,7 +694,8 @@ function normalizeAppSettings(raw: unknown): AppSettings {
     orchestraParts: Array.isArray(anyRaw.orchestraParts)
       ? anyRaw.orchestraParts.filter((s: any) => typeof s === "string")
       : undefined,
-    orchestraBalance: ["default", "more_strings", "more_winds", "more_brass"].includes(anyRaw.orchestraBalance)
+    orchestraBalance: (anyRaw.orchestraBalance === "default" || anyRaw.orchestraBalance === "more_strings" ||
+      anyRaw.orchestraBalance === "more_winds" || anyRaw.orchestraBalance === "more_brass")
       ? anyRaw.orchestraBalance : undefined,
     orchestraPartRanges: Array.isArray(anyRaw.orchestraPartRanges)
       ? anyRaw.orchestraPartRanges
