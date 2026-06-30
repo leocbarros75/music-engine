@@ -245,6 +245,17 @@ function enrichVoicingsWithColor(slices: Slice[], voicings: Voicing[]): void {
     const wanted: number[] = [];
     if (seventh !== null) wanted.push(seventh);
     for (const c of (parsed.colorPcs ?? [])) if (!wanted.includes(c)) wanted.push(c);
+    // Tasteful enrichment of a PLAIN triad (no 7th, ≤3 tones): major → add9,
+    // minor → m7. Only adds the colour where a redundant inner voice can carry
+    // it (the swap below), so a fully-spread triad is left clean. sus/dim/aug are
+    // left as written.
+    if (seventh === null && parsed.pcs.length <= 3) {
+      const hasMaj3 = parsed.pcs.includes(clampPc(root + 4));
+      const hasMin3 = parsed.pcs.includes(clampPc(root + 3));
+      const has5 = parsed.pcs.includes(clampPc(root + 7));
+      if (has5 && hasMaj3) wanted.push(clampPc(root + 2));       // major triad → add9
+      else if (has5 && hasMin3) wanted.push(clampPc(root + 10)); // minor triad → m7
+    }
     if (!wanted.length) continue;
 
     const fifthPc = clampPc(root + 7);
