@@ -4,6 +4,7 @@ import { buildCandidatesForSlice, buildVoicingStates } from "./candidates";
 import { runDp } from "./dp";
 import { STRING_RANGES } from "./ranges";
 import { midiToPitch, pitchToMidi } from "../../../instruments/instrumentCatalog";
+import { parseChordSymbol } from "../../../harmonize/satb/chordSymbol";
 
 type ChordEvent = { measure: number; t: number; symbol: string };
 
@@ -209,6 +210,68 @@ function buildPart(
   };
 }
 
+const clampPc = (n: number) => ((n % 12) + 12) % 12;
+
+function nearestMidiForPc(pc: number, near: number, range: { absMin: number; absMax: number }): number | null {
+  let best: number | null = null;
+  for (let m = range.absMin; m <= range.absMax; m++) {
+    if (clampPc(m) !== pc) continue;
+    if (best === null || Math.abs(m - near) < Math.abs(best - near)) best = m;
+  }
+  return best;
+}
+
+/**
+ * ORCHESTRA-SPECIFIC harmony enrichment. The DP picks chord tones purely by
+ * voice-leading proximity, so the characteristic colour tones — the 7th, then
+ * 9/11/13 extensions — get dropped (a Cmaj7 comes out a plain C triad). For the
+ * fuller orchestral sound, guarantee the colour tones appear: swap the most
+ * expendable inner voice (a doubled tone, or the 5th) for the missing tone at the
+ * nearest octave. The melody (vln1), bass (cb) and a lone 3rd are protected.
+ */
+function enrichVoicingsWithColor(slices: Slice[], voicings: Voicing[]): void {
+  const inner: VoiceId[] = ["vln2", "vla", "vc"];
+  for (let i = 0; i < slices.length; i++) {
+    const sym = slices[i]?.chordSymbol;
+    const v = voicings[i];
+    if (!sym || !v) continue;
+    const parsed = parseChordSymbol(String(sym).split("/")[0]!);
+    if (!parsed) continue;
+    const root = parsed.rootPc;
+    // Priority colour tones: the 7th (if the chord has one) first, then the
+    // parser's extension/alteration tones (9/11/13, b9, #11, …).
+    const seventh = parsed.pcs.includes(clampPc(root + 11)) ? clampPc(root + 11)
+      : parsed.pcs.includes(clampPc(root + 10)) ? clampPc(root + 10) : null;
+    const wanted: number[] = [];
+    if (seventh !== null) wanted.push(seventh);
+    for (const c of (parsed.colorPcs ?? [])) if (!wanted.includes(c)) wanted.push(c);
+    if (!wanted.length) continue;
+
+    const fifthPc = clampPc(root + 7);
+    let added = 0;
+    for (const colorPc of wanted) {
+      if (added >= 2) break; // keep it tasteful — at most two added colour tones
+      const midis = [v.vln1, v.vln2, v.vla, v.vc, v.cb].filter((m): m is number => m != null);
+      if (new Set(midis.map(clampPc)).has(colorPc)) continue; // already voiced
+      let pick: { voice: VoiceId; midi: number; score: number } | null = null;
+      for (const voice of inner) {
+        const cur = v[voice];
+        if (cur == null) continue;
+        const curPc = clampPc(cur);
+        const dup = midis.filter((m) => clampPc(m) === curPc).length > 1;
+        const isThird = curPc === clampPc(root + 3) || curPc === clampPc(root + 4);
+        let score = (dup ? 4 : 0) + (curPc === fifthPc ? 2 : 0) + (curPc === root ? 1 : 0);
+        if (isThird && !dup) score -= 5; // protect a lone 3rd (defines major/minor)
+        const target = nearestMidiForPc(colorPc, cur, STRING_RANGES[voice]);
+        if (target == null) continue;
+        score -= Math.abs(target - cur) / 12; // prefer minimal voice motion
+        if (!pick || score > pick.score) pick = { voice, midi: target, score };
+      }
+      if (pick && pick.score > 0) { v[pick.voice] = pick.midi; added++; }
+    }
+  }
+}
+
 export function arrangeStringEnsemble(
   score: ScoreModel,
   chords: ChordEvent[],
@@ -237,6 +300,9 @@ export function arrangeStringEnsemble(
   const dpResult = runDp({ slices, candidatesBySlice, profileId: profile });
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);
+
+  // Orchestra: ensure 7ths/extensions actually voice (the DP drops them).
+  enrichVoicingsWithColor(slices, bestVoicings);
 
   const vln1 = makeEventsFromVoicing(slices, bestVoicings, "vln1");
   const vln2 = makeEventsFromVoicing(slices, bestVoicings, "vln2");
