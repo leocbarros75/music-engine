@@ -60,13 +60,18 @@ function findMelodyPart(score: ScoreModel): any | null {
 }
 
 function pickChordForTime(chords: ChordEvent[], measure: number, t: number): string | null {
-  const events = chords.filter((c) => Number(c.measure) === Number(measure));
-  if (!events.length) return null;
+  // Carry forward the last chord that started at or before (measure, t). Charts
+  // put one event per chord CHANGE, so a chord held across bar lines has no event
+  // in the later measures — without carry-forward those slices get no chord and
+  // the harmony/bass drift onto scale tones.
   let best: ChordEvent | null = null;
-  for (const c of events) {
-    if (Number(c.t) <= t) best = c;
+  for (const c of chords) {
+    const cm = Number(c.measure), ct = Number(c.t);
+    if (cm < measure || (cm === measure && ct <= t + 1e-9)) {
+      if (!best || cm > Number(best.measure) || (cm === Number(best.measure) && ct >= Number(best.t))) best = c;
+    }
   }
-  return best?.symbol ?? events[0]?.symbol ?? null;
+  return best?.symbol ?? null;
 }
 
 /**
@@ -229,6 +234,30 @@ function nearestMidiForPc(pc: number, near: number, range: { absMin: number; abs
  * expendable inner voice (a doubled tone, or the 5th) for the missing tone at the
  * nearest octave. The melody (vln1), bass (cb) and a lone 3rd are protected.
  */
+/**
+ * ORCHESTRA-SPECIFIC bass rooting. The DP picks the bass by voice-leading
+ * proximity, so it drifts onto 3rds/5ths (or a passing tone). For a worship
+ * orchestra the foundation should sit on the chord ROOT (or the explicit slash
+ * bass). Force the cb voice onto that pitch class at the nearest octave in range.
+ */
+function forceBassRoot(slices: Slice[], voicings: Voicing[]): void {
+  const range = STRING_RANGES.cb;
+  for (let i = 0; i < slices.length; i++) {
+    const sym = slices[i]?.chordSymbol;
+    const v = voicings[i];
+    if (!sym || !v || v.cb == null) continue;
+    const parts = String(sym).split("/");
+    const parsed = parseChordSymbol(parts[0]!);
+    if (!parsed) continue;
+    // Slash chord (e.g. Bb/D) → use the written bass; else the root.
+    const slash = parts.length > 1 ? parseChordSymbol(parts[1]!.trim()) : null;
+    const targetPc = slash?.rootPc ?? parsed.rootPc;
+    if (clampPc(v.cb) === targetPc) continue; // already rooted
+    const placed = nearestMidiForPc(targetPc, v.cb, range);
+    if (placed !== null) v.cb = placed;
+  }
+}
+
 function enrichVoicingsWithColor(slices: Slice[], voicings: Voicing[]): void {
   const inner: VoiceId[] = ["vln2", "vla", "vc"];
   for (let i = 0; i < slices.length; i++) {
@@ -312,7 +341,9 @@ export function arrangeStringEnsemble(
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);
 
-  // Orchestra: ensure 7ths/extensions actually voice (the DP drops them).
+  // Orchestra: solid bass foundation — root the bass on the chord root (or the
+  // slash bass), then ensure 7ths/extensions voice.
+  forceBassRoot(slices, bestVoicings);
   enrichVoicingsWithColor(slices, bestVoicings);
 
   const vln1 = makeEventsFromVoicing(slices, bestVoicings, "vln1");
