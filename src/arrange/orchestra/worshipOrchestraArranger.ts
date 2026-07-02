@@ -43,7 +43,9 @@ const REG: Record<string, Reg> = {
   hn:    { prefMin: 53, prefMax: 69 }, // F3..A4
   tbn1:  { prefMin: 48, prefMax: 65 }, // C3..F4
   tbn2:  { prefMin: 43, prefMax: 60 }, // G2..C4
-  lowbr: { prefMin: 31, prefMax: 53 }, // G1..F3 — Trombone 3 / Tuba
+  // Trombone 3/Tuba: floor raised G1→Bb1. Real charts bottom at ~B1 typically;
+  // G1 is pure tuba territory and unplayable when a trombonist covers the part.
+  lowbr: { prefMin: 34, prefMax: 53 }, // Bb1..F3 — Trombone 3 / Tuba
   vln1:  { prefMin: 62, prefMax: 84 }, // D4..C6
   vln2:  { prefMin: 57, prefMax: 79 }, // A3..G5
   vla:   { prefMin: 50, prefMax: 69 }, // D3..A4
@@ -192,6 +194,9 @@ export function orchestrateStringCore(
   // orchestra has a melodic top where the vocal would be (both build + tutti).
   fillGapTops(orch, gaps);
   if (gaps.some(Boolean)) warnings.push(`[orchestra] Ritornello: orchestra comes forward in ${gaps.filter(Boolean).length} instrumental gap measure(s).`);
+  // Climaxes: the flute descant lifts an octave (its brilliant register) so the
+  // final choruses gain a true top instead of sitting in the narrow melody octave.
+  liftFluteAtClimaxes(orch, phraseInt, phraseLen);
   // Percussion (Timpani + Crash/Triangle) — driven by the same intensity curve.
   addPercussion(orch, phraseInt, phraseLen);
 
@@ -271,6 +276,29 @@ function adjustedThreshold(partId: string, balance: OrchestraBalance): number | 
   const fam = FAMILY_OF[partId];
   if (!fam) return base;
   return Math.max(0, Math.min(1, base + BALANCE_ADJ[balance][fam]));
+}
+
+// ── Flute climax lift ─────────────────────────────────────────────────────────
+// The Flute/Oboe line tracks the melody octave, which leaves the flute in a
+// narrow, dull band (~C5–Bb5) all piece. At climax phrases (the big choruses,
+// intensity ≥ 0.92 — includes the forced-tutti final phrase) lift it an octave
+// into the flute's brilliant register, capped at A6 so it stays tasteful.
+const FLUTE_LIFT_INTENSITY = 0.92;
+const FLUTE_LIFT_CEILING = 93; // A6
+function liftFluteAtClimaxes(orch: ScoreModel, phraseInt: number[], phraseLen: number): void {
+  const fl = ((orch as any).parts ?? []).find((p: any) => p.part_id === "P_FLOB");
+  if (!fl) return;
+  for (let mi = 0; mi < (fl.measures ?? []).length; mi++) {
+    const pi = Math.floor(mi / phraseLen);
+    if ((phraseInt[pi] ?? 0) < FLUTE_LIFT_INTENSITY) continue;
+    for (const ev of (fl.measures[mi]?.events ?? [])) {
+      if (ev?.type !== "note" || !ev.pitch) continue;
+      const m = eventMidi(ev);
+      if (m === null || m + 12 > FLUTE_LIFT_CEILING) continue;
+      ev.midi = m + 12;
+      ev.pitch = midiToPitch(m + 12);
+    }
+  }
 }
 
 // ── Open spacing — low-interval limit (Forsyth/Adler) ────────────────────────
