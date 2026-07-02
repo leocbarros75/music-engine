@@ -68,8 +68,10 @@ const WORSHIP_PARTS: PartDef[] = [
     voices: [{ src: "vln1", reg: "fl", voice: 1 }] },
   { partId: "P_CL", name: "Clarinet", instrument: "clarinet_bb",
     voices: [{ src: "vln1", reg: "cl", voice: 1 }] },
+  // Bassoon doubles the BASS LINE (chord root / slash bass) in its register —
+  // the whole low section carries the bass proposed by the source.
   { partId: "P_BSN", name: "Bassoon", instrument: "bassoon",
-    voices: [{ src: "vc", reg: "bsn", voice: 1 }] },
+    voices: [{ src: "cb", reg: "bsn", voice: 1 }] },
 
   // ── Horn — between woodwinds and brass ──
   { partId: "P_HN12", name: "Horn 1-2", instrument: "horn_f",
@@ -92,8 +94,10 @@ const WORSHIP_PARTS: PartDef[] = [
     voices: [{ src: "vln2", reg: "vln2", voice: 1 }] },
   { partId: "P_VLA", name: "Viola", instrument: "viola",
     voices: [{ src: "vla", reg: "vla", voice: 1 }] },
+  // Cello-Bass = the bass line in octaves (cello register + double bass 8vb),
+  // both from the rooted cb voice so the foundation is unmistakable.
   { partId: "P_CELBS", name: "Cello-Bass", instrument: "cello",
-    voices: [{ src: "vc", reg: "celbs", voice: 1 }, { src: "cb", reg: "cbass", voice: 2 }] },
+    voices: [{ src: "cb", reg: "celbs", voice: 1 }, { src: "cb", reg: "cbass", voice: 2 }] },
 ];
 
 function eventMidi(ev: any): number | null {
