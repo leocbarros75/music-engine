@@ -770,7 +770,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-01-v21-orch-harmony" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-02-v22-bass-section" });
       return;
     }
 
