@@ -685,6 +685,8 @@ export type WorshipOrchestraOptions = {
   parts?: string[];
   balance?: OrchestraBalance;
   partRanges?: PartRange[];
+  /** Override the per-measure "melody resting" signal (ritornello detection). */
+  melodyRests?: boolean[];
 };
 
 /**
@@ -704,8 +706,89 @@ export function arrangeWorshipOrchestra(
     ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
     : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, melodyRests: sourceMelodyRestMeasures(score) });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, melodyRests: options.melodyRests ?? sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
+}
+
+/**
+ * Rhythm chart (PDF) → worship orchestra. The chart supplies HARMONY (chords
+ * with beat positions) and RHYTHM (kick onsets + comping regions); there is no
+ * melody — the band/congregation carries it. We build a rhythm-grid part whose
+ * rest onsets define the slice grid: comping bars = one sustained pad slice,
+ * figure bars = a slice per kick so the whole orchestra articulates the hits
+ * together. The DP voices the chords over that grid; melodyRests is forced
+ * all-false so the accompaniment follows the normal intensity build instead of
+ * the ritornello "melody is resting" boost.
+ */
+export function arrangeWorshipOrchestraFromRhythmChart(
+  chart: { beats: number; beatType: number; keyFifths: number; measures: Array<{ number: number; chords: Array<{ t: number; symbol: string }>; kicks: number[] | null }> },
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance; partRanges?: PartRange[] } = {}
+): { scoreModel: ScoreModel; warnings: string[] } {
+  const warnings = options.warnings ?? [];
+  const beats = chart.beats || 4;
+  const measures: any[] = [];
+  const chordEvents: ChordEvent[] = [];
+  // Guide-tone top line: without a melody the DP's top voice would be free
+  // (combinatorial blow-up + aimless line). Synthesize the classic arranger's
+  // accompaniment top — the chord tone (3rd/root/5th) nearest the previous
+  // note, in a singable band — and lock the grid to it as NOTES.
+  const NOTE_PC: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  let lastChordPcs: number[] = [chart.keyFifths >= 0 ? ((chart.keyFifths * 7) % 12) : (((chart.keyFifths * 7) % 12) + 12) % 12];
+  let prevTop = 72;
+  const topFor = (symbol: string | null): number => {
+    if (symbol) {
+      const m = symbol.match(/^([A-G])([#b]?)(m(?![a-z]))?/);
+      if (m) {
+        let root = NOTE_PC[m[1]!]!;
+        if (m[2] === "#") root += 1; if (m[2] === "b") root -= 1;
+        root = ((root % 12) + 12) % 12;
+        const third = (root + (m[3] ? 3 : 4)) % 12;
+        lastChordPcs = [third, root, (root + 7) % 12]; // prefer the 3rd (guide tone)
+      }
+    }
+    let best = prevTop, bestD = Infinity;
+    for (const pc of lastChordPcs) {
+      for (let midi = 64; midi <= 81; midi++) {
+        if (midi % 12 !== pc) continue;
+        const d = Math.abs(midi - prevTop) + lastChordPcs.indexOf(pc) * 0.4;
+        if (d < bestD) { bestD = d; best = midi; }
+      }
+    }
+    prevTop = best;
+    return best;
+  };
+  chart.measures.forEach((m, i) => {
+    const num = i + 1; // sequential numbering (chart pickup becomes measure 1)
+    const chordAt = (t: number) => {
+      let sym: string | null = null;
+      for (const c of m.chords) if (c.t <= t + 1e-9) sym = c.symbol;
+      return sym;
+    };
+    const times = [0, ...(m.kicks ?? []), ...m.chords.map((c) => c.t)]
+      .filter((t, idx, a) => t >= 0 && t < beats && a.indexOf(t) === idx)
+      .sort((a, b) => a - b);
+    const events = times.map((t, ti) => ({
+      id: `grid-${num}-${t}`, t, dur: (ti + 1 < times.length ? times[ti + 1]! : beats) - t,
+      type: "note", pitch: midiToPitch(topFor(chordAt(t))), voice: 1, staff: 1,
+    }));
+    measures.push({
+      number: num,
+      ...(i === 0 ? { attributes: { divisions: 4, time: { beats, beat_type: chart.beatType || 4, beatType: chart.beatType || 4 }, key_fifths: chart.keyFifths, key_mode: "major" } } : {}),
+      events,
+    });
+    for (const c of m.chords) chordEvents.push({ measure: num, t: c.t, symbol: c.symbol });
+  });
+  const gridScore: any = {
+    score_id: "rhythm_chart",
+    meta: { title: "Rhythm chart", ensemble: "orchestra", inputKeyFifths: chart.keyFifths },
+    parts: [{ part_id: "P_GRID", name: "Rhythm", instrument: "piano", staves: 1, measures }],
+  };
+  warnings.push(`[orchestra] Rhythm chart: ${chart.measures.length} measures, ${chordEvents.length} chord events, ${chart.measures.filter((m) => m.kicks?.length).length} figure bars.`);
+  return arrangeWorshipOrchestra(gridScore as ScoreModel, chordEvents, {
+    ...options,
+    warnings,
+    melodyRests: new Array(chart.measures.length).fill(false),
+  });
 }
 
 /**

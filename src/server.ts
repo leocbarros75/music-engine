@@ -30,6 +30,8 @@ import { checkChoralRules } from "./rules/choral/checkChoralRules";
 import { parsePromptWithAI } from "./app/parsePromptWithAI";
 
 import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
+import { parseRhythmChartPdf } from "./import/rhythmChartPdf";
+import { arrangeWorshipOrchestraFromRhythmChart } from "./arrange/orchestra/worshipOrchestraArranger";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "./exporters/satbMusicxmlExporter";
 import { extractChordEventsFromMusicXml } from "./extract/chordEventsFromMusicXml";
@@ -770,7 +772,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-02-v23-lowbrass-flute" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-03-v24-rhythm-chart" });
       return;
     }
 
@@ -1385,6 +1387,51 @@ const server = http.createServer(async (req, res) => {
         warnings:   [...genWarnings, ...result.warnings],
         meta:       result.meta
       });
+      return;
+    }
+
+    // ── Rhythm chart (PDF) → worship orchestra ────────────────────────────
+    // The chart supplies harmony (chords@beats) + rhythm (kicks/comping); the
+    // orchestra plays the accompaniment. PDF is the source most users have.
+    if (url === "/generate_from_rhythm_pdf") {
+      const pdfBase64 = typeof body.pdfBase64 === "string" ? body.pdfBase64 : null;
+      if (!pdfBase64) {
+        sendJson(res, 400, { ok: false, error: "Provide 'pdfBase64' as a base64-encoded PDF string." });
+        return;
+      }
+      const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
+      try {
+        const chart = await parseRhythmChartPdf(Buffer.from(pdfBase64, "base64"));
+        if (!chart.measures.length || !chart.measures.some((m) => m.chords.length)) {
+          sendJson(res, 400, { ok: false, error: "Could not read chords from this PDF — it doesn't look like a rhythm chart with a text layer.", warnings: chart.warnings });
+          return;
+        }
+        const warnings: string[] = [...chart.warnings];
+        const result = arrangeWorshipOrchestraFromRhythmChart(chart, {
+          warnings,
+          intensity: (settings.orchestraIntensity as any) ?? "build",
+          parts: settings.orchestraParts,
+          balance: (settings.orchestraBalance as any) ?? "default",
+          partRanges: settings.orchestraPartRanges as any,
+        });
+        const musicxml = exportScoreModelToMusicXML(result.scoreModel);
+        sendJson(res, 200, {
+          ok: true,
+          musicxml,
+          meta: {
+            title: chart.title ?? "",
+            tempoBpm: chart.tempoBpm ?? null,
+            keyFifths: chart.keyFifths,
+            measures: chart.measures.length,
+            figureBars: chart.measures.filter((m) => m.kicks && m.kicks.length).length,
+            chords: chart.measures.reduce((a, m) => a + m.chords.length, 0),
+            sections: chart.measures.filter((m) => m.section).map((m) => `${m.section}@m${m.number}`),
+          },
+          warnings,
+        });
+      } catch (e: any) {
+        sendJson(res, 500, { ok: false, error: `Rhythm chart import failed: ${e?.message ?? String(e)}` });
+      }
       return;
     }
 

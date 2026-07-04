@@ -79,6 +79,7 @@ export default function App() {
   const [chordText, setChordText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [musicxmlInput, setMusicxmlInput] = useState<string | null>(null);
+  const [pdfInput, setPdfInput] = useState<string | null>(null);
   const [selectedPartIds, setSelectedPartIds] = useState<string[]>([]);
   const [outputMusicxml, setOutputMusicxml] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -110,7 +111,8 @@ export default function App() {
     settings.ensemble === "piano_orchestra" ||
     settings.ensemble === "satb_orchestra";
 
-  const canRunFile   = !!musicxmlInput && ensembleReady && !isRunning && !isExtracting;
+  const isOrchestraMode = settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra";
+  const canRunFile   = (!!musicxmlInput || (!!pdfInput && isOrchestraMode)) && ensembleReady && !isRunning && !isExtracting;
   const canRunChords = !!chordText.trim() && ensembleReady && !isRunning;
   const canRun = inputMode === "file" ? canRunFile : canRunChords;
 
@@ -137,6 +139,29 @@ export default function App() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Rhythm chart PDF → base64 (orchestra accompaniment source)
+    if (/\.pdf$/i.test(file.name)) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const buf = ev.target?.result;
+        if (!(buf instanceof ArrayBuffer)) return;
+        let bin = "";
+        const bytes = new Uint8Array(buf);
+        for (let i = 0; i < bytes.length; i += 0x8000) {
+          bin += String.fromCharCode(...Array.from(bytes.subarray(i, i + 0x8000)));
+        }
+        setPdfInput(btoa(bin));
+        setMusicxmlInput(null);
+        setFileName(file.name);
+        setOutputMusicxml(null);
+        setJobResult(null);
+        setWarnings([]);
+        setSelectedPartIds([]);
+      };
+      reader.readAsArrayBuffer(file);
+      e.target.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const text = ev.target?.result;
@@ -150,6 +175,7 @@ export default function App() {
       }
       setFileName(file.name);
       setMusicxmlInput(text);
+      setPdfInput(null);
       setOutputMusicxml(null);
       setJobResult(null);
       setWarnings([]);
@@ -239,9 +265,36 @@ export default function App() {
     }
   }
 
+  // ── Generate orchestra accompaniment from a Rhythm-chart PDF ──────────────
+  async function runRhythmPdf() {
+    if (!pdfInput) return;
+    if (!isOrchestraMode) { setWarnings(["Rhythm chart PDFs generate an ORCHESTRA accompaniment — choose an orchestra ensemble."]); return; }
+    setIsRunning(true);
+    setWarnings([]);
+    setJobResult(null);
+    setOutputMusicxml(null);
+    try {
+      const res = await fetch("/generate_from_rhythm_pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pdfBase64: pdfInput, settings }),
+      });
+      const json: JobResult = await safeJson(res);
+      setJobResult(json);
+      if (!json.ok) { setWarnings([json.error ?? "Unknown error"]); return; }
+      if (json.warnings?.length) setWarnings(json.warnings);
+      if (json.musicxml) setOutputMusicxml(json.musicxml);
+    } catch (err: any) {
+      setWarnings([err?.message ?? "Network error"]);
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
   // ── Generate from MusicXML file ───────────────────────────────────────────
   async function runPipeline() {
-    if (!musicxmlInput || !ensembleReady) return;
+    if ((!musicxmlInput && !pdfInput) || !ensembleReady) return;
+    if (pdfInput) return runRhythmPdf();
     setIsRunning(true);
     setWarnings([]);
     setJobResult(null);
@@ -361,7 +414,7 @@ export default function App() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".musicxml,.xml"
+                  accept=".musicxml,.xml,.pdf"
                   style={{ display: "none" }}
                   onChange={handleFileChange}
                 />
