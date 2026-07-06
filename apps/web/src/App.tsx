@@ -410,7 +410,12 @@ export default function App() {
             {/* File input */}
             {inputMode === "file" && (
               <div className="upload-card">
-                <p>Upload a <code>.musicxml</code> or <code>.xml</code> file exported from MuseScore, Finale, or Sibelius.</p>
+                <p>
+                  Upload a <code>.musicxml</code> or <code>.xml</code> file exported from MuseScore, Finale, or Sibelius.
+                  {isOrchestraMode && (
+                    <> Or upload a <b>Rhythm chart PDF</b> (PraiseCharts-style) — the orchestra plays its harmony and rhythm.</>
+                  )}
+                </p>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -419,8 +424,13 @@ export default function App() {
                   onChange={handleFileChange}
                 />
                 <button className="primary" onClick={() => fileInputRef.current?.click()}>
-                  Select MusicXML
+                  {isOrchestraMode ? "Select MusicXML or Rhythm PDF" : "Select MusicXML"}
                 </button>
+                {pdfInput && fileName && (
+                  <div className="pill info" style={{ marginTop: 6 }}>
+                    Rhythm chart PDF loaded: <b>{fileName}</b> — Generate creates the orchestra accompaniment (harmony + kicks from the chart).
+                  </div>
+                )}
                 {/* Load built-in example — shown when a string example is selected */}
                 {settings.ensemble === "string_ensemble" && settings.stringExample && (
                   <button
