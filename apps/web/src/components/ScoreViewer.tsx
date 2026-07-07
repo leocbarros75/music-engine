@@ -14,11 +14,28 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Rendering the whole score inline can crash the browser tab: OpenSheetMusicDisplay
+ * builds one giant SVG, and a 14-part × 99-measure orchestra score exhausts memory
+ * (the "screen goes black after 40s"). So for large scores we render only the first
+ * few measures as a preview — the full arrangement is always available via the
+ * MusicXML / MIDI download buttons above this panel.
+ */
+const PREVIEW_STAFF_BUDGET = 160; // ~ parts × measures the browser renders comfortably
+
+function measureScore(xml: string): { parts: number; measures: number } {
+  const parts = (xml.match(/<score-part\b/g) ?? []).length || 1;
+  const measureTags = (xml.match(/<measure\b/g) ?? []).length;
+  const measures = Math.max(1, Math.round(measureTags / parts));
+  return { parts, measures };
+}
+
 export default function ScoreViewer({ musicxml }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [truncated, setTruncated] = useState<{ shown: number; total: number; parts: number } | null>(null);
 
   useEffect(() => {
     if (!musicxml || !containerRef.current) return;
@@ -26,9 +43,15 @@ export default function ScoreViewer({ musicxml }: Props) {
     let cancelled = false;
     setLoading(true);
     setError(null);
+    setTruncated(null);
 
     async function render() {
       if (!containerRef.current) return;
+
+      const { parts, measures } = measureScore(musicxml!);
+      const budgetMeasures = Math.max(6, Math.floor(PREVIEW_STAFF_BUDGET / parts));
+      const isLarge = parts * measures > PREVIEW_STAFF_BUDGET;
+      const drawUpTo = isLarge ? Math.min(measures, budgetMeasures) : measures;
 
       if (!osmdRef.current) {
         osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
@@ -45,7 +68,10 @@ export default function ScoreViewer({ musicxml }: Props) {
       try {
         await osmdRef.current.load(musicxml!);
         if (cancelled) return;
+        // Always set explicitly — the instance is reused across renders.
+        osmdRef.current.setOptions({ drawUpToMeasureNumber: drawUpTo });
         osmdRef.current.render();
+        if (!cancelled && isLarge) setTruncated({ shown: drawUpTo, total: measures, parts });
       } catch (err: any) {
         if (!cancelled) setError(err?.message ?? "Failed to render score.");
       } finally {
@@ -113,6 +139,17 @@ export default function ScoreViewer({ musicxml }: Props) {
     <div className="score-viewer">
       {loading && <div className="score-loading">Rendering score...</div>}
       {error && <div className="score-error">{error}</div>}
+      {truncated && (
+        <div className="score-truncated" style={{
+          margin: "8px 0", padding: "10px 12px", borderRadius: 8,
+          background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.35)",
+          fontSize: "0.9rem", lineHeight: 1.4,
+        }}>
+          <b>Large arrangement</b> ({truncated.parts} parts × {truncated.total} measures).
+          Previewing the first {truncated.shown} measures to keep your browser responsive —
+          use the <b>↓ MusicXML</b> or <b>↓ MIDI</b> buttons above for the complete score.
+        </div>
+      )}
       {!loading && !error && (
         <div className="score-export-row">
           <button className="ghost" onClick={exportSvg} title="Download score as SVG vector image">
