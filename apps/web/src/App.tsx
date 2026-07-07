@@ -113,7 +113,9 @@ export default function App() {
     settings.ensemble === "satb_orchestra";
 
   const isOrchestraMode = settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra";
-  const canRunFile   = (!!musicxmlInput || (!!pdfInput && isOrchestraMode)) && ensembleReady && !isRunning && !isExtracting;
+  // A rhythm-chart PDF drives any generative ensemble; only re-instrument needs a real scored file.
+  const pdfCapable = settings.ensemble !== "reinstrument";
+  const canRunFile   = (!!musicxmlInput || (!!pdfInput && pdfCapable)) && ensembleReady && !isRunning && !isExtracting;
   const canRunChords = !!chordText.trim() && ensembleReady && !isRunning;
   const canRun = inputMode === "file" ? canRunFile : canRunChords;
 
@@ -266,10 +268,10 @@ export default function App() {
     }
   }
 
-  // ── Generate orchestra accompaniment from a Rhythm-chart PDF ──────────────
+  // ── Generate an arrangement from a Rhythm-chart PDF (any ensemble) ────────
   async function runRhythmPdf() {
     if (!pdfInput) return;
-    if (!isOrchestraMode) { setWarnings(["Rhythm chart PDFs generate an ORCHESTRA accompaniment — choose an orchestra ensemble."]); return; }
+    if (!pdfCapable) { setWarnings(["Rhythm chart PDFs can't drive the re-instrument mode (it needs an existing scored file). Pick choir, piano, strings, winds, brass, or orchestra."]); return; }
     setIsRunning(true);
     setWarnings([]);
     setJobResult(null);
@@ -413,8 +415,8 @@ export default function App() {
               <div className="upload-card">
                 <p>
                   Upload a <code>.musicxml</code> or <code>.xml</code> file exported from MuseScore, Finale, or Sibelius.
-                  {isOrchestraMode && (
-                    <> Or upload a <b>Rhythm chart PDF</b> (PraiseCharts-style) — the orchestra plays its harmony and rhythm.</>
+                  {pdfCapable && (
+                    <> Or upload a <b>Rhythm chart PDF</b> (PraiseCharts-style) — its harmony{isOrchestraMode ? " and rhythm are" : " is"} arranged for your ensemble.</>
                   )}
                 </p>
                 <input
@@ -425,11 +427,11 @@ export default function App() {
                   onChange={handleFileChange}
                 />
                 <button className="primary" onClick={() => fileInputRef.current?.click()}>
-                  {isOrchestraMode ? "Select MusicXML or Rhythm PDF" : "Select MusicXML"}
+                  {pdfCapable ? "Select MusicXML or Rhythm PDF" : "Select MusicXML"}
                 </button>
                 {pdfInput && fileName && (
                   <div className="pill info" style={{ marginTop: 6 }}>
-                    Rhythm chart PDF loaded: <b>{fileName}</b> — Generate creates the orchestra accompaniment (harmony + kicks from the chart).
+                    Rhythm chart PDF loaded: <b>{fileName}</b> — Generate arranges its harmony{isOrchestraMode ? " + kicks" : ""} for <b>{settings.ensemble.replace(/_/g, " ")}</b>.
                   </div>
                 )}
                 {/* Load built-in example — shown when a string example is selected */}

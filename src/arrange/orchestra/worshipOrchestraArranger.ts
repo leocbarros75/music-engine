@@ -710,21 +710,18 @@ export function arrangeWorshipOrchestra(
   return { scoreModel, warnings };
 }
 
+export type RhythmChartLike = { beats: number; beatType: number; keyFifths: number; measures: Array<{ number: number; chords: Array<{ t: number; symbol: string }>; kicks: number[] | null }> };
+
 /**
- * Rhythm chart (PDF) → worship orchestra. The chart supplies HARMONY (chords
- * with beat positions) and RHYTHM (kick onsets + comping regions); there is no
- * melody — the band/congregation carries it. We build a rhythm-grid part whose
- * rest onsets define the slice grid: comping bars = one sustained pad slice,
- * figure bars = a slice per kick so the whole orchestra articulates the hits
- * together. The DP voices the chords over that grid; melodyRests is forced
- * all-false so the accompaniment follows the normal intensity build instead of
- * the ritornello "melody is resting" boost.
+ * Build a HARMONY+RHYTHM skeleton from a parsed rhythm chart: one guide-tone
+ * melody part whose onsets are the chord changes + kicks (comping bars = one
+ * sustained slice, figure bars = a slice per kick), plus the chord events. The
+ * guide-tone top (chord 3rd/root/5th nearest the previous note) gives any
+ * arranger a real line to work from — without it the melody-less DP top voice
+ * blows up combinatorially. Shared by the orchestra path AND the general pipeline
+ * so a chart PDF can drive ANY ensemble.
  */
-export function arrangeWorshipOrchestraFromRhythmChart(
-  chart: { beats: number; beatType: number; keyFifths: number; measures: Array<{ number: number; chords: Array<{ t: number; symbol: string }>; kicks: number[] | null }> },
-  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance; partRanges?: PartRange[] } = {}
-): { scoreModel: ScoreModel; warnings: string[] } {
-  const warnings = options.warnings ?? [];
+export function buildRhythmChartSkeleton(chart: RhythmChartLike): { score: ScoreModel; chords: ChordEvent[] } {
   const beats = chart.beats || 4;
   const measures: any[] = [];
   const chordEvents: ChordEvent[] = [];
@@ -783,8 +780,22 @@ export function arrangeWorshipOrchestraFromRhythmChart(
     meta: { title: "Rhythm chart", ensemble: "orchestra", inputKeyFifths: chart.keyFifths },
     parts: [{ part_id: "P_GRID", name: "Rhythm", instrument: "piano", staves: 1, measures }],
   };
-  warnings.push(`[orchestra] Rhythm chart: ${chart.measures.length} measures, ${chordEvents.length} chord events, ${chart.measures.filter((m) => m.kicks?.length).length} figure bars.`);
-  return arrangeWorshipOrchestra(gridScore as ScoreModel, chordEvents, {
+  return { score: gridScore as ScoreModel, chords: chordEvents };
+}
+
+/**
+ * Rhythm chart (PDF) → worship orchestra. Rhythm-aware: comping = sustained pads,
+ * figure bars = ensemble hits (kicks), plus the full orchestra intensity build.
+ * melodyRests is forced all-false (accompaniment: the band carries the melody).
+ */
+export function arrangeWorshipOrchestraFromRhythmChart(
+  chart: RhythmChartLike,
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance; partRanges?: PartRange[] } = {}
+): { scoreModel: ScoreModel; warnings: string[] } {
+  const warnings = options.warnings ?? [];
+  const { score, chords } = buildRhythmChartSkeleton(chart);
+  warnings.push(`[orchestra] Rhythm chart: ${chart.measures.length} measures, ${chords.length} chord events, ${chart.measures.filter((m) => m.kicks?.length).length} figure bars.`);
+  return arrangeWorshipOrchestra(score, chords, {
     ...options,
     warnings,
     melodyRests: new Array(chart.measures.length).fill(false),

@@ -31,7 +31,7 @@ import { parsePromptWithAI } from "./app/parsePromptWithAI";
 
 import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
 import { parseRhythmChartPdf } from "./import/rhythmChartPdf";
-import { arrangeWorshipOrchestraFromRhythmChart } from "./arrange/orchestra/worshipOrchestraArranger";
+import { arrangeWorshipOrchestraFromRhythmChart, buildRhythmChartSkeleton } from "./arrange/orchestra/worshipOrchestraArranger";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "./exporters/satbMusicxmlExporter";
 import { extractChordEventsFromMusicXml } from "./extract/chordEventsFromMusicXml";
@@ -772,7 +772,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-05-v25-preview-guard" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-06-v26-rhythm-all-ensembles" });
       return;
     }
 
@@ -1390,9 +1390,11 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // ── Rhythm chart (PDF) → worship orchestra ────────────────────────────
-    // The chart supplies harmony (chords@beats) + rhythm (kicks/comping); the
-    // orchestra plays the accompaniment. PDF is the source most users have.
+    // ── Rhythm chart (PDF) → any ensemble ─────────────────────────────────
+    // The chart supplies harmony (chords@beats) + rhythm (kicks/comping). PDF is
+    // the source most users have. Orchestra ensembles get the rhythm-aware
+    // arranger (kicks = ensemble hits); every other ensemble arranges the
+    // harmony through the general pipeline (SATB/piano/strings/winds/brass).
     if (url === "/generate_from_rhythm_pdf") {
       const pdfBase64 = typeof body.pdfBase64 === "string" ? body.pdfBase64 : null;
       if (!pdfBase64) {
@@ -1400,6 +1402,8 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
+      const ensembleRaw = String((settings as any).ensemble ?? "orchestra").toLowerCase();
+      const isOrchestra = ensembleRaw === "orchestra" || ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra";
       try {
         const chart = await parseRhythmChartPdf(Buffer.from(pdfBase64, "base64"));
         if (!chart.measures.length || !chart.measures.some((m) => m.chords.length)) {
@@ -1407,23 +1411,49 @@ const server = http.createServer(async (req, res) => {
           return;
         }
         const warnings: string[] = [...chart.warnings];
-        const result = arrangeWorshipOrchestraFromRhythmChart(chart, {
-          warnings,
-          intensity: (settings.orchestraIntensity as any) ?? "build",
-          parts: settings.orchestraParts,
-          balance: (settings.orchestraBalance as any) ?? "default",
-          partRanges: settings.orchestraPartRanges as any,
-        });
-        const musicxml = exportScoreModelToMusicXML(result.scoreModel);
         const chordCount = chart.measures.reduce((a, m) => a + m.chords.length, 0);
-        const partList = ((result.scoreModel as any).parts ?? []).map((p: any) => ({ name: p.name ?? p.part_id, instrument: p.instrument ?? "" }));
+
+        let musicxml: string;
+        let scoreModel: unknown;
+        if (isOrchestra) {
+          const result = arrangeWorshipOrchestraFromRhythmChart(chart, {
+            warnings,
+            intensity: (settings.orchestraIntensity as any) ?? "build",
+            parts: settings.orchestraParts,
+            balance: (settings.orchestraBalance as any) ?? "default",
+            partRanges: settings.orchestraPartRanges as any,
+          });
+          musicxml = exportScoreModelToMusicXML(result.scoreModel);
+          scoreModel = result.scoreModel;
+        } else {
+          // Non-orchestra: build the harmony skeleton (guide-tone melody + exact
+          // chords incl. slash basses) and arrange it for the chosen ensemble.
+          const { score, chords } = buildRhythmChartSkeleton(chart);
+          const skeletonXml = exportScoreModelToMusicXML(score as any);
+          const pipe = pipelineMusicxmlToArrangedMusicxml({
+            musicxml: skeletonXml,
+            settings,
+            chords,
+            options: { keepMelodyInSoprano: true },
+          });
+          if (!pipe.ok) {
+            const err = pipe as import("./pipeline/pipelineMusicxmlToArrangedMusicxml").PipelineError;
+            sendJson(res, 500, { ok: false, error: err.error, warnings: [...warnings, ...err.warnings] });
+            return;
+          }
+          musicxml = pipe.musicxml;
+          scoreModel = pipe.scoreModel;
+          warnings.push(...pipe.warnings, `[rhythm-chart] ${chart.measures.length} measures, ${chordCount} chords → ${ensembleRaw}.`);
+        }
+
+        const partList = ((scoreModel as any)?.parts ?? []).map((p: any) => ({ name: p.name ?? p.part_id, instrument: p.instrument ?? "" }));
         sendJson(res, 200, {
           ok: true,
           musicxml,
-          scoreModel: result.scoreModel,
+          scoreModel,
           // Shape-compatible with the /generate meta the UI renders, plus chart extras.
           meta: {
-            ensemble: "orchestra",
+            ensemble: ensembleRaw,
             chordSource: "rhythm_chart_pdf",
             cadenceMeasures: [],
             chordEventCount: chordCount,
