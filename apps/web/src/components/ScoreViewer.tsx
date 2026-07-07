@@ -36,9 +36,19 @@ export default function ScoreViewer({ musicxml }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [truncated, setTruncated] = useState<{ shown: number; total: number; parts: number } | null>(null);
+  // Large scores are NOT auto-rendered — OSMD on a full orchestra score can hang
+  // the tab. The result + downloads appear instantly; the preview is opt-in.
+  const [wantPreview, setWantPreview] = useState(false);
+
+  const dims = musicxml ? measureScore(musicxml) : { parts: 0, measures: 0 };
+  const isLarge = dims.parts * dims.measures > PREVIEW_STAFF_BUDGET;
+  const shouldRender = !!musicxml && (!isLarge || wantPreview);
+
+  // Reset the opt-in whenever a new score arrives.
+  useEffect(() => { setWantPreview(false); setError(null); setTruncated(null); }, [musicxml]);
 
   useEffect(() => {
-    if (!musicxml || !containerRef.current) return;
+    if (!shouldRender || !containerRef.current) return;
 
     let cancelled = false;
     setLoading(true);
@@ -50,8 +60,8 @@ export default function ScoreViewer({ musicxml }: Props) {
 
       const { parts, measures } = measureScore(musicxml!);
       const budgetMeasures = Math.max(6, Math.floor(PREVIEW_STAFF_BUDGET / parts));
-      const isLarge = parts * measures > PREVIEW_STAFF_BUDGET;
-      const drawUpTo = isLarge ? Math.min(measures, budgetMeasures) : measures;
+      const big = parts * measures > PREVIEW_STAFF_BUDGET;
+      const drawUpTo = big ? Math.min(measures, budgetMeasures) : measures;
 
       if (!osmdRef.current) {
         osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
@@ -71,7 +81,7 @@ export default function ScoreViewer({ musicxml }: Props) {
         // Always set explicitly — the instance is reused across renders.
         osmdRef.current.setOptions({ drawUpToMeasureNumber: drawUpTo });
         osmdRef.current.render();
-        if (!cancelled && isLarge) setTruncated({ shown: drawUpTo, total: measures, parts });
+        if (!cancelled && big) setTruncated({ shown: drawUpTo, total: measures, parts });
       } catch (err: any) {
         if (!cancelled) setError(err?.message ?? "Failed to render score.");
       } finally {
@@ -81,7 +91,7 @@ export default function ScoreViewer({ musicxml }: Props) {
 
     render();
     return () => { cancelled = true; };
-  }, [musicxml]);
+  }, [shouldRender, musicxml]);
 
   function exportSvg() {
     if (!containerRef.current) return;
@@ -135,9 +145,32 @@ export default function ScoreViewer({ musicxml }: Props) {
 
   if (!musicxml) return null;
 
+  // Large score, preview not yet requested → show an opt-in card (no OSMD work,
+  // so Generate can never hang/black-out). Downloads live above this panel.
+  if (isLarge && !wantPreview) {
+    return (
+      <div className="score-viewer">
+        <div className="score-truncated" style={{
+          margin: "8px 0", padding: "14px 16px", borderRadius: 8,
+          background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.35)",
+          fontSize: "0.92rem", lineHeight: 1.5,
+        }}>
+          <div style={{ marginBottom: 8 }}>
+            <b>Arrangement ready</b> — {dims.parts} parts × {dims.measures} measures.
+            Inline preview is off for large scores (rendering a full orchestra can freeze the browser).
+            Use <b>↓ MusicXML</b> / <b>↓ MIDI</b> above to open the complete score in MuseScore, Finale, or Sibelius.
+          </div>
+          <button className="ghost" onClick={() => setWantPreview(true)}>
+            Show a quick preview (first {Math.max(6, Math.floor(PREVIEW_STAFF_BUDGET / Math.max(1, dims.parts)))} measures)
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="score-viewer">
-      {loading && <div className="score-loading">Rendering score...</div>}
+      {loading && <div className="score-loading">Rendering score…</div>}
       {error && <div className="score-error">{error}</div>}
       {truncated && (
         <div className="score-truncated" style={{

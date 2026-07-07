@@ -772,7 +772,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-03-v24-rhythm-chart" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-05-v25-preview-guard" });
       return;
     }
 
@@ -1415,16 +1415,24 @@ const server = http.createServer(async (req, res) => {
           partRanges: settings.orchestraPartRanges as any,
         });
         const musicxml = exportScoreModelToMusicXML(result.scoreModel);
+        const chordCount = chart.measures.reduce((a, m) => a + m.chords.length, 0);
+        const partList = ((result.scoreModel as any).parts ?? []).map((p: any) => ({ name: p.name ?? p.part_id, instrument: p.instrument ?? "" }));
         sendJson(res, 200, {
           ok: true,
           musicxml,
+          scoreModel: result.scoreModel,
+          // Shape-compatible with the /generate meta the UI renders, plus chart extras.
           meta: {
+            ensemble: "orchestra",
+            chordSource: "rhythm_chart_pdf",
+            cadenceMeasures: [],
+            chordEventCount: chordCount,
+            parts: partList,
             title: chart.title ?? "",
             tempoBpm: chart.tempoBpm ?? null,
             keyFifths: chart.keyFifths,
             measures: chart.measures.length,
             figureBars: chart.measures.filter((m) => m.kicks && m.kicks.length).length,
-            chords: chart.measures.reduce((a, m) => a + m.chords.length, 0),
             sections: chart.measures.filter((m) => m.section).map((m) => `${m.section}@m${m.number}`),
           },
           warnings,

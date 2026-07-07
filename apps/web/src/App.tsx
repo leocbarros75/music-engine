@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import SettingsForm from "./components/SettingsForm";
 import AISettingsHelper from "./components/AISettingsHelper";
 import ScoreViewer from "./components/ScoreViewer";
+import ErrorBoundary from "./components/ErrorBoundary";
 import AudioPlayer from "./components/AudioPlayer";
 import PartsSelector from "./components/PartsSelector";
 import ReinstrumentTable from "./components/ReinstrumentTable";
@@ -545,11 +546,11 @@ export default function App() {
                 {jobResult.meta.title && (
                   <div className="result-row"><span className="label">Title</span><span>{jobResult.meta.title}</span></div>
                 )}
-                <div className="result-row"><span className="label">Ensemble</span>    <span>{jobResult.meta.ensemble}</span></div>
+                <div className="result-row"><span className="label">Ensemble</span>    <span>{jobResult.meta.ensemble ?? "—"}</span></div>
                 <div className="result-row"><span className="label">Style used</span>  <span>{jobResult.meta.styleUsed ?? "—"}</span></div>
-                <div className="result-row"><span className="label">Chord source</span><span>{jobResult.meta.chordSource}</span></div>
-                <div className="result-row"><span className="label">Chords</span>      <span>{jobResult.meta.chordEventCount}</span></div>
-                {jobResult.meta.cadenceMeasures.length > 0 && (
+                <div className="result-row"><span className="label">Chord source</span><span>{jobResult.meta.chordSource ?? "—"}</span></div>
+                <div className="result-row"><span className="label">Chords</span>      <span>{jobResult.meta.chordEventCount ?? "—"}</span></div>
+                {(jobResult.meta.cadenceMeasures?.length ?? 0) > 0 && (
                   <div className="result-row">
                     <span className="label">Cadence measures</span>
                     <span>{jobResult.meta.cadenceMeasures.join(", ")}</span>
@@ -593,9 +594,13 @@ export default function App() {
             <section className="panel score-panel">
               <div className="score-panel-header">
                 <h2>Score Preview</h2>
-                <AudioPlayer scoreModel={(jobResult?.scoreModel as any) ?? null} />
+                <ErrorBoundary label="audio">
+                  <AudioPlayer scoreModel={(jobResult?.scoreModel as any) ?? null} />
+                </ErrorBoundary>
               </div>
-              <ScoreViewer musicxml={outputMusicxml} />
+              <ErrorBoundary label="score">
+                <ScoreViewer musicxml={outputMusicxml} />
+              </ErrorBoundary>
             </section>
           )}
         </main>
