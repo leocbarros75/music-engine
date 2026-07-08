@@ -66,6 +66,14 @@ function downloadXml(xml: string, filename: string) {
 // "Lead Sheet" / "Chord Chart" / "Rhythm" are NOT here — those carry chord symbols.
 const NOTATED_PART_RE = /\b(piano only|piano|vocal|choir|satb|full score|conductor|score|violin|viola|cello|bass|flute|oboe|clarinet|bassoon|trumpet|horn|trombone|tuba|sax|percussion|timpani|guitar|organ)\b/i;
 
+// Third-party OMR tools for users to convert a notated-score PDF to MusicXML
+// themselves, then upload the .musicxml. Verified free/freemium options (2026).
+const PDF_TO_MUSICXML_TOOLS: Array<{ name: string; url: string }> = [
+  { name: "pdftomusicxml.com", url: "https://pdftomusicxml.com/" },
+  { name: "SheetMusicConvert", url: "https://sheetmusicconvert.com/" },
+  { name: "MuseScore", url: "https://musescore.org/" },
+];
+
 /**
  * If a rejected PDF's filename looks like a notated part (e.g. "… - Piano only.pdf"),
  * suggest the song's chord/rhythm chart by name so the user knows what to grab.
@@ -518,6 +526,16 @@ export default function App() {
                           not enabled yet — needs an OMR API key
                         </span>
                       )}
+                    </div>
+                    <div className="muted" style={{ marginTop: 8, fontSize: "0.82rem" }}>
+                      {!omrEnabled && <>Or c</>}{omrEnabled && <>C</>}onvert a notated-score PDF to MusicXML with a free tool, then upload the <code>.musicxml</code>:{" "}
+                      {PDF_TO_MUSICXML_TOOLS.map((t, i) => (
+                        <span key={t.url}>
+                          {i > 0 ? " · " : ""}
+                          <a href={t.url} target="_blank" rel="noopener noreferrer">{t.name}</a>
+                        </span>
+                      ))}
+                      . Quality varies — a clean digital PDF converts best.
                     </div>
                   </div>
                 )}
