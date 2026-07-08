@@ -62,6 +62,24 @@ function downloadXml(xml: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+// Part names that indicate a NOTATED score (noteheads), not a chord/rhythm chart.
+// "Lead Sheet" / "Chord Chart" / "Rhythm" are NOT here — those carry chord symbols.
+const NOTATED_PART_RE = /\b(piano only|piano|vocal|choir|satb|full score|conductor|score|violin|viola|cello|bass|flute|oboe|clarinet|bassoon|trumpet|horn|trombone|tuba|sax|percussion|timpani|guitar|organ)\b/i;
+
+/**
+ * If a rejected PDF's filename looks like a notated part (e.g. "… - Piano only.pdf"),
+ * suggest the song's chord/rhythm chart by name so the user knows what to grab.
+ */
+function suggestChartFromFilename(name: string | null): string | null {
+  if (!name) return null;
+  const stem = name.replace(/\.pdf$/i, "");
+  const m = stem.match(NOTATED_PART_RE);
+  if (!m) return null;
+  // Base title = everything before the part suffix (drop a trailing " - <part>…").
+  const base = stem.replace(/\s*[-–—]\s*[^-–—]*$/, "").trim() || stem;
+  return `"${name}" looks like the ${m[1]} part — a notated score, which can't be read yet. Look for this song's chord/rhythm chart instead, usually named like "${base} - Rhythm.pdf" or "${base} - Chord Chart.pdf".`;
+}
+
 /** Quick client-side MusicXML sanity check before uploading */
 function validateXmlClient(text: string): string | null {
   if (!text.trimStart().startsWith("<?xml") && !text.trimStart().startsWith("<score")) {
@@ -291,7 +309,13 @@ export default function App() {
       });
       const json: JobResult = await safeJson(res);
       setJobResult(json);
-      if (!json.ok) { setWarnings([json.error ?? "Unknown error"]); return; }
+      if (!json.ok) {
+        const msgs = [json.error ?? "Unknown error"];
+        const hint = suggestChartFromFilename(fileName);
+        if (hint) msgs.push(hint);
+        setWarnings(msgs);
+        return;
+      }
       if (json.warnings?.length) setWarnings(json.warnings);
       if (json.musicxml) setOutputMusicxml(json.musicxml);
     } catch (err: any) {
