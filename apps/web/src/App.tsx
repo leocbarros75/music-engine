@@ -113,8 +113,15 @@ export default function App() {
     settings.ensemble === "satb_orchestra";
 
   const isOrchestraMode = settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra";
-  // A rhythm-chart PDF drives any generative ensemble; only re-instrument needs a real scored file.
-  const pdfCapable = settings.ensemble !== "reinstrument";
+  // A chord/rhythm-chart PDF drives the GENERATIVE ensembles. The "copy" modes
+  // (quartet transcriptions + re-instrument) need a real scored file, not a chart.
+  const CHART_INCAPABLE = new Set<Settings["ensemble"]>([
+    "reinstrument",
+    "piano_string_quartet", "satb_string_quartet",
+    "piano_woodwind_quartet", "satb_woodwind_quartet",
+    "piano_brass_quartet", "satb_brass_quartet",
+  ]);
+  const pdfCapable = !CHART_INCAPABLE.has(settings.ensemble);
   const canRunFile   = (!!musicxmlInput || (!!pdfInput && pdfCapable)) && ensembleReady && !isRunning && !isExtracting;
   const canRunChords = !!chordText.trim() && ensembleReady && !isRunning;
   const canRun = inputMode === "file" ? canRunFile : canRunChords;
@@ -271,7 +278,7 @@ export default function App() {
   // ── Generate an arrangement from a Rhythm-chart PDF (any ensemble) ────────
   async function runRhythmPdf() {
     if (!pdfInput) return;
-    if (!pdfCapable) { setWarnings(["Rhythm chart PDFs can't drive the re-instrument mode (it needs an existing scored file). Pick choir, piano, strings, winds, brass, or orchestra."]); return; }
+    if (!pdfCapable) { setWarnings(["This ensemble transcribes an existing scored file, so a chord/rhythm-chart PDF can't drive it. Pick choir, piano, strings, winds, brass, or orchestra."]); return; }
     setIsRunning(true);
     setWarnings([]);
     setJobResult(null);
@@ -416,7 +423,7 @@ export default function App() {
                 <p>
                   Upload a <code>.musicxml</code> or <code>.xml</code> file exported from MuseScore, Finale, or Sibelius.
                   {pdfCapable && (
-                    <> Or upload a <b>Rhythm chart PDF</b> (PraiseCharts-style) — its harmony{isOrchestraMode ? " and rhythm are" : " is"} arranged for your ensemble.</>
+                    <> Or upload a <b>chord / rhythm chart PDF</b> (printed chord symbols like A, F#m7, D/E) — its harmony{isOrchestraMode ? " and rhythm are" : " is"} arranged for your ensemble. <i>A notated score PDF (piano/vocal notes) won't work — export that as MusicXML.</i></>
                   )}
                 </p>
                 <input

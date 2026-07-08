@@ -725,6 +725,16 @@ function normalizeAppSettings(raw: unknown): AppSettings {
 const RATE_WINDOW_MS   = 60_000;
 const RATE_MAX_HEAVY   = 12;
 const HEAVY_ENDPOINTS  = new Set(["/generate", "/generate_from_chords", "/arrange_musicxml"]);
+
+// Ensembles that TRANSCRIBE an existing scored file (copy a piano/SATB source to
+// a quartet, or re-instrument existing parts). A chord/rhythm-chart PDF has no
+// source parts to copy, so it can't drive these — the rest are generative.
+const CHART_INCAPABLE_ENSEMBLES = new Set([
+  "reinstrument",
+  "piano_string_quartet", "satb_string_quartet",
+  "piano_woodwind_quartet", "satb_woodwind_quartet",
+  "piano_brass_quartet", "satb_brass_quartet",
+]);
 const rateBuckets      = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(ip: string, url: string): boolean {
@@ -772,7 +782,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-06-v26-rhythm-all-ensembles" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-07-v27-chart-guards" });
       return;
     }
 
@@ -1404,14 +1414,30 @@ const server = http.createServer(async (req, res) => {
       const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
       const ensembleRaw = String((settings as any).ensemble ?? "orchestra").toLowerCase();
       const isOrchestra = ensembleRaw === "orchestra" || ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra";
+      // "Copy" ensembles transcribe an existing scored file — a chord chart has no
+      // source parts to copy, so they can't be driven by a PDF chart.
+      if (CHART_INCAPABLE_ENSEMBLES.has(ensembleRaw)) {
+        sendJson(res, 400, { ok: false, error: `The "${ensembleRaw.replace(/_/g, " ")}" mode transcribes an existing score, so a chord/rhythm chart can't drive it. For a PDF chart, choose choir, piano, strings, woodwinds, brass, or full orchestra.` });
+        return;
+      }
       try {
         const chart = await parseRhythmChartPdf(Buffer.from(pdfBase64, "base64"));
-        if (!chart.measures.length || !chart.measures.some((m) => m.chords.length)) {
-          sendJson(res, 400, { ok: false, error: "Could not read chords from this PDF — it doesn't look like a rhythm chart with a text layer.", warnings: chart.warnings });
+        // Distinguish a real chord/rhythm chart from a notated SCORE PDF (piano/
+        // vocal noteheads) or a scan with no text layer: require chord symbols in a
+        // meaningful share of bars, not a few stray glyphs misread as chords.
+        const barsWithChords = chart.measures.filter((m) => m.chords.length).length;
+        const chordCount = chart.measures.reduce((a, m) => a + m.chords.length, 0);
+        const looksLikeChart = chart.measures.length > 0 && chordCount >= 8 &&
+          barsWithChords >= Math.max(3, Math.floor(chart.measures.length * 0.25));
+        if (!looksLikeChart) {
+          sendJson(res, 400, {
+            ok: false,
+            error: `This PDF doesn't look like a chord/rhythm chart — I found only ${chordCount} chord symbol(s) across ${chart.measures.length} bar(s). The PDF import reads printed CHORD SYMBOLS (e.g. A, F#m7, D/E), like a Rhythm or chord chart. A notated SCORE PDF (piano/vocal noteheads) can't be read yet — export it as MusicXML from your notation app, or upload the song's chord/rhythm chart instead.`,
+            warnings: chart.warnings,
+          });
           return;
         }
         const warnings: string[] = [...chart.warnings];
-        const chordCount = chart.measures.reduce((a, m) => a + m.chords.length, 0);
 
         let musicxml: string;
         let scoreModel: unknown;
