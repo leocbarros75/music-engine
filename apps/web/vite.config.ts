@@ -12,6 +12,8 @@ export default defineConfig({
       "/extract_part":          "http://localhost:3001",
       "/arrange_musicxml":      "http://localhost:3001",
       "/analyze_harmony":       "http://localhost:3001",
+      "/omr_to_musicxml":       "http://localhost:3001",
+      "/parse_pdf":             "http://localhost:3001",
       "/health":                "http://localhost:3001"
     }
   }

@@ -31,6 +31,7 @@ import { parsePromptWithAI } from "./app/parsePromptWithAI";
 
 import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
 import { parseRhythmChartPdf } from "./import/rhythmChartPdf";
+import { getOmrProvider, omrStatus } from "./omr/omrProvider";
 import { arrangeWorshipOrchestraFromRhythmChart, buildRhythmChartSkeleton } from "./arrange/orchestra/worshipOrchestraArranger";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "./exporters/satbMusicxmlExporter";
@@ -782,7 +783,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-08-v28-chart-suggest" });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-08-v29-omr-scaffold", omr: omrStatus() });
       return;
     }
 
@@ -1495,6 +1496,31 @@ const server = http.createServer(async (req, res) => {
         });
       } catch (e: any) {
         sendJson(res, 500, { ok: false, error: `Rhythm chart import failed: ${e?.message ?? String(e)}` });
+      }
+      return;
+    }
+
+    // ── OMR: notated-score PDF → MusicXML ─────────────────────────────────
+    // Reads actual noteheads (not chord symbols) via an external OMR engine, then
+    // hands the MusicXML back so the client arranges it like any uploaded file.
+    // Disabled unless a provider is configured (OMR_PROVIDER + keys).
+    if (url === "/omr_to_musicxml") {
+      const pdfBase64 = typeof body.pdfBase64 === "string" ? body.pdfBase64 : null;
+      if (!pdfBase64) {
+        sendJson(res, 400, { ok: false, error: "Provide 'pdfBase64' as a base64-encoded PDF string." });
+        return;
+      }
+      const provider = getOmrProvider();
+      if (!provider) {
+        sendJson(res, 503, { ok: false, error: "OMR is not enabled on this server yet. It needs a cloud OMR API key — set OMR_PROVIDER=cloud with OMR_API_URL and OMR_API_KEY (or OMR_PROVIDER=mock to test the flow)." });
+        return;
+      }
+      try {
+        const filename = typeof body.filename === "string" ? body.filename : undefined;
+        const result = await provider.recognize(Buffer.from(pdfBase64, "base64"), { filename });
+        sendJson(res, 200, { ok: true, musicxml: result.musicxml, provider: result.provider, warnings: result.warnings });
+      } catch (e: any) {
+        sendJson(res, 502, { ok: false, error: `OMR failed: ${e?.message ?? String(e)}` });
       }
       return;
     }

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SettingsForm from "./components/SettingsForm";
 import AISettingsHelper from "./components/AISettingsHelper";
 import ScoreViewer from "./components/ScoreViewer";
@@ -106,8 +106,14 @@ export default function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
+  const [omrEnabled, setOmrEnabled] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
+
+  // Is OMR (notated-score PDF → MusicXML) configured on the server?
+  useEffect(() => {
+    fetch("/health").then((r) => r.json()).then((j) => setOmrEnabled(!!j?.omr?.enabled)).catch(() => {});
+  }, []);
 
   const ensembleReady =
     settings.ensemble === "choral" ||
@@ -325,6 +331,38 @@ export default function App() {
     }
   }
 
+  // ── OMR: read notes from a notated-score PDF → MusicXML input ──────────────
+  async function runOmr() {
+    if (!pdfInput) return;
+    setIsRunning(true);
+    setWarnings([]);
+    try {
+      const res = await fetch("/omr_to_musicxml", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pdfBase64: pdfInput, filename: fileName }),
+      });
+      const json = await safeJson(res);
+      if (!json.ok) { setWarnings([json.error ?? "OMR failed."]); return; }
+      // Recognized MusicXML becomes the normal input — user reviews, picks an
+      // ensemble, and Generates like any uploaded file.
+      setMusicxmlInput(json.musicxml);
+      setPdfInput(null);
+      setFileName(`${(fileName || "score").replace(/\.pdf$/i, "")} (OMR).musicxml`);
+      setOutputMusicxml(null);
+      setJobResult(null);
+      setSelectedPartIds([]);
+      setWarnings([
+        "OMR complete — the notes were read into an editable score below. Pick your ensemble and Generate. Heads-up: OMR isn't perfect, so check the result.",
+        ...(json.warnings ?? []),
+      ]);
+    } catch (err: any) {
+      setWarnings([err?.message ?? "Network error"]);
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
   // ── Generate from MusicXML file ───────────────────────────────────────────
   async function runPipeline() {
     if ((!musicxmlInput && !pdfInput) || !ensembleReady) return;
@@ -462,7 +500,25 @@ export default function App() {
                 </button>
                 {pdfInput && fileName && (
                   <div className="pill info" style={{ marginTop: 6 }}>
-                    Rhythm chart PDF loaded: <b>{fileName}</b> — Generate arranges its harmony{isOrchestraMode ? " + kicks" : ""} for <b>{settings.ensemble.replace(/_/g, " ")}</b>.
+                    PDF loaded: <b>{fileName}</b>. If it's a <b>chord/rhythm chart</b>, Generate arranges its harmony{isOrchestraMode ? " + kicks" : ""} for <b>{settings.ensemble.replace(/_/g, " ")}</b>.
+                    {" "}If it's a <b>notated score</b> (piano/vocal notes), read the notes with OMR:
+                    <div style={{ marginTop: 6 }}>
+                      <button
+                        className="secondary"
+                        onClick={runOmr}
+                        disabled={isRunning}
+                        title={omrEnabled
+                          ? "Read the printed notes and turn them into an editable score"
+                          : "OMR isn't enabled on this server yet — needs a cloud OMR API key"}
+                      >
+                        🎼 Read notes with OMR (experimental)
+                      </button>
+                      {!omrEnabled && (
+                        <span className="muted" style={{ marginLeft: 8, fontSize: "0.82rem" }}>
+                          not enabled yet — needs an OMR API key
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
                 {/* Load built-in example — shown when a string example is selected */}
