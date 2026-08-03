@@ -63,24 +63,43 @@ type PartDef = {
  * enterAt encodes the dynamic architecture — strings play essentially always,
  * winds join as the music fills out, brass and timpani are held for climaxes.
  */
+// CALIBRATED 2026-08-03 against real scores supplied by the user, measured as
+// "share of measures in which the part sounds":
+//
+//                        strings   winds   brass   timpani
+//   Brahms 3, mvt I        93%      66%     33%      12%     (lyrical sonata)
+//   Dvořák 9, finale       86%      67%     51%      44%     (climactic finale)
+//
+// Within the brass the split is emphatic and consistent: HORNS play far more
+// than trumpets/trombones (Brahms 50-54% vs 15-29%; Dvořák 64% vs 44-49%) —
+// horns really are the harmonic glue, the rest is reserved weight.
+//
+// (Two supplied files were deliberately NOT used for these targets: the
+// Beethoven 9 "Ode" file is a fully-tutti excerpt where every part plays every
+// bar, and the Tchaikovsky is a CONCERTO — its orchestra drops to 51/39/14%
+// because it must stay under the soloist. That concerto profile is a good
+// future mode, but it is not symphonic default behaviour.)
+//
+// enterAt is the phrase-intensity at which a part joins; with the curve below it
+// yields roughly: strings 100%, winds ~70%, brass ~37%, timpani ~24%.
 const SYMPHONIC_PARTS: PartDef[] = [
-  // ── Woodwinds — colour and solo lines ──
-  { partId: "SY_FL",   name: "Flute",           instrument: "flute",        family: "ww",    src: "vln1", enterAt: 0.45 },
-  { partId: "SY_OB",   name: "Oboe",            instrument: "oboe",         family: "ww",    src: "vln1", enterAt: 0.35 },
-  { partId: "SY_CL",   name: "Clarinet in Bb",  instrument: "clarinet_bb",  family: "ww",    src: "vln2", enterAt: 0.45 },
+  // ── Woodwinds — colour and solo lines (target ~70% of measures) ──
+  { partId: "SY_FL",   name: "Flute",           instrument: "flute",        family: "ww",    src: "vln1", enterAt: 0.52 },
+  { partId: "SY_OB",   name: "Oboe",            instrument: "oboe",         family: "ww",    src: "vln1", enterAt: 0.50 },
+  { partId: "SY_CL",   name: "Clarinet in Bb",  instrument: "clarinet_bb",  family: "ww",    src: "vln2", enterAt: 0.49 },
   // Bassoon doubles the CELLO line (its Romantic role), not the double bass —
   // that independence is exactly what the worship roster collapses into one part.
-  { partId: "SY_BSN",  name: "Bassoon",         instrument: "bassoon",      family: "ww",    src: "vc",   enterAt: 0.40 },
+  { partId: "SY_BSN",  name: "Bassoon",         instrument: "bassoon",      family: "ww",    src: "vc",   enterAt: 0.47 },
 
-  // ── Brass — reserved; horns are the harmonic glue, trumpets/trombones the climax ──
-  { partId: "SY_HN12", name: "Horn 1-2",        instrument: "horn_f",       family: "brass", src: "vla",  enterAt: 0.50 },
-  { partId: "SY_HN34", name: "Horn 3-4",        instrument: "horn_f",       family: "brass", src: "vc",   enterAt: 0.72, romanticOnly: true },
-  { partId: "SY_TPT",  name: "Trumpet 1-2",     instrument: "trumpet_bb_1", family: "brass", src: "vln1", enterAt: 0.80 },
-  { partId: "SY_TBN12",name: "Trombone 1-2",    instrument: "trombone",     family: "brass", src: "vla",  enterAt: 0.85, romanticOnly: true },
-  { partId: "SY_TBN3", name: "Trombone 3/Tuba", instrument: "tuba_c",       family: "brass", src: "cb",   enterAt: 0.85, romanticOnly: true },
+  // ── Brass — horns are the glue (~55%), trumpets/trombones reserved (~20-33%) ──
+  { partId: "SY_HN12", name: "Horn 1-2",        instrument: "horn_f",       family: "brass", src: "vla",  enterAt: 0.56 },
+  { partId: "SY_HN34", name: "Horn 3-4",        instrument: "horn_f",       family: "brass", src: "vc",   enterAt: 0.60, romanticOnly: true },
+  { partId: "SY_TPT",  name: "Trumpet 1-2",     instrument: "trumpet_bb_1", family: "brass", src: "vln1", enterAt: 0.69 },
+  { partId: "SY_TBN12",name: "Trombone 1-2",    instrument: "trombone",     family: "brass", src: "vla",  enterAt: 0.75, romanticOnly: true },
+  { partId: "SY_TBN3", name: "Trombone 3/Tuba", instrument: "tuba_c",       family: "brass", src: "cb",   enterAt: 0.76, romanticOnly: true },
 
   // ── Percussion ──
-  { partId: "SY_TIMP", name: "Timpani",         instrument: "timpani",      family: "perc",  src: "cb",   enterAt: 0.70, timpani: true },
+  { partId: "SY_TIMP", name: "Timpani",         instrument: "timpani",      family: "perc",  src: "cb",   enterAt: 0.72, timpani: true },
 
   // ── Strings — the protagonist: present throughout ──
   { partId: "SY_VLN1", name: "Violin I",        instrument: "violin_1",     family: "str",   src: "vln1", enterAt: 0.00 },
@@ -88,7 +107,7 @@ const SYMPHONIC_PARTS: PartDef[] = [
   { partId: "SY_VLA",  name: "Viola",           instrument: "viola",        family: "str",   src: "vla",  enterAt: 0.00 },
   { partId: "SY_VC",   name: "Cello",           instrument: "cello",        family: "str",   src: "vc",   enterAt: 0.00 },
   // Contrabass sounds 8vb below the cello line (the exporter writes it 8va).
-  { partId: "SY_CB",   name: "Contrabass",      instrument: "contrabass",   family: "str",   src: "cb",   octave: -12, enterAt: 0.15 },
+  { partId: "SY_CB",   name: "Contrabass",      instrument: "contrabass",   family: "str",   src: "cb",   octave: -12, enterAt: 0.39 },
 ];
 
 /** Below C3 no interval tighter than a 5th (Forsyth/Adler) — acoustics, not style. */
