@@ -27,6 +27,7 @@ import { arrangeBrassQuintetFromPianoInstrumentation } from "../arrange/arrangeB
 import { arrangeSatbToBrassQuartetDirect } from "../arrange/brass/arrangeSatbToBrassQuartet";
 import { applyReinstrumentation } from "../arrange/reinstrument";
 import { arrangeWorshipOrchestra, arrangeWorshipOrchestraFromPiano, arrangeWorshipOrchestraFromSatb } from "../arrange/orchestra/worshipOrchestraArranger";
+import { arrangeSymphonicOrchestra } from "../arrange/symphonic/symphonicOrchestraArranger";
 import { applyStringPolyphonicRhythm } from "../arrange/strings/stringRhythm";
 import { getComposerFromExample } from "../arrange/strings/composerProfiles";
 import { arrangeStringPolyphonic } from "../arrange/stringsPolyphony/stringsPolyphonicArranger";
@@ -84,6 +85,8 @@ export type AppSettings = {
    * "auto" or undefined = auto-select based on style + time signature.
    */
   lhPattern?: string;
+  /** Symphonic orchestra period: switches roster AND scoring style. */
+  symphonicPeriod?: "classical" | "romantic";
   /**
    * Explicit RH pattern for piano accompaniment mode.
    * When set, overrides auto-selection.
@@ -1678,6 +1681,8 @@ export function applyAppSettings(
   const wantsReinstrument     = ensemble === "reinstrument";
   // Worship / church orchestra: auto (lead sheet+chords), piano→orchestra, satb→orchestra.
   const wantsOrchestra        = ensemble === "orchestra" || ensemble === "full_orchestra";
+  // Symphonic (Classical/Romantic) — its own engine, never routed through worship.
+  const wantsSymphonic        = ensemble === "symphonic_orchestra";
   const wantsPianoOrchestra   = ensemble === "piano_orchestra";
   const wantsSatbOrchestra    = ensemble === "satb_orchestra";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
@@ -2266,6 +2271,36 @@ export function applyAppSettings(
     attachTextureAnalysis(orchResult.scoreModel, warnings);
     return {
       scoreModel: orchResult.scoreModel as ScoreModel,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsSymphonic) {
+    // ── Symphonic orchestra (Classical / Romantic) ───────────────────────────
+    // A separate engine from the worship orchestra (own DP fork, own roster):
+    // strings lead, winds colour, brass is reserved for climaxes. Nothing here
+    // touches the worship path.
+    const symChords = chords.length ? chords : inferChordsFromAllVoices(scoreModel);
+    if (!symChords.length) {
+      warnings.push("[symphonic] Could not infer chords from the source — the scoring may be sparse.");
+    }
+    const symTex = settings.orchestraTexture ?? "melody_harmony";
+    const symProfile = symTex === "chorale" ? "bach_chorale"
+      : symTex === "contrapuntal" ? "countermelody"
+      : "melody_harmony";
+    const symResult = arrangeSymphonicOrchestra(scoreModel, symChords as any, {
+      period:   settings.symphonicPeriod ?? "romantic",
+      profile:  symProfile,
+      parts:    settings.orchestraParts,
+      warnings,
+    });
+    attachTextureAnalysis(symResult.scoreModel, warnings);
+    return {
+      scoreModel: symResult.scoreModel as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,

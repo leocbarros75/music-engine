@@ -692,6 +692,10 @@ function normalizeAppSettings(raw: unknown): AppSettings {
       : undefined,
     orchestraIntensity: anyRaw.orchestraIntensity === "build" || anyRaw.orchestraIntensity === "tutti"
       ? anyRaw.orchestraIntensity : undefined,
+    // Symphonic orchestra period (explicit === checks: strict tsc rejects
+    // .includes() on an unknown value — that broke a Render deploy once).
+    symphonicPeriod: anyRaw.symphonicPeriod === "classical" || anyRaw.symphonicPeriod === "romantic"
+      ? anyRaw.symphonicPeriod : undefined,
     orchestraTexture: anyRaw.orchestraTexture === "melody_harmony" || anyRaw.orchestraTexture === "chorale" || anyRaw.orchestraTexture === "contrapuntal"
       ? anyRaw.orchestraTexture : undefined,
     orchestraParts: Array.isArray(anyRaw.orchestraParts)
@@ -783,7 +787,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-09-v31-melody-on-top", omr: omrStatus() });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-10-v32-symphonic", omr: omrStatus() });
       return;
     }
 

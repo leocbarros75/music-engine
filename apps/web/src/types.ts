@@ -19,11 +19,14 @@ export type Settings = {
     | "reinstrument"
     | "orchestra"
     | "piano_orchestra"
-    | "satb_orchestra";
+    | "satb_orchestra"
+    | "symphonic_orchestra";
   /** Re-instrumentation remap table: reassign parts to new instruments (sounding preserved). */
   reinstrument?: Array<{ part: string; to: string }>;
   /** Worship-orchestra intensity: "build" (light intro → climaxes) or "tutti" (full throughout). */
   orchestraIntensity?: "build" | "tutti";
+  /** Symphonic orchestra period — switches the roster AND the scoring style. */
+  symphonicPeriod?: "classical" | "romantic";
   /** Worship-orchestra texture (auto): melody+harmony, chorale block, or contrapuntal. */
   orchestraTexture?: "melody_harmony" | "chorale" | "contrapuntal";
   /** Custom ensemble: worship-orchestra part ids to include (empty/undefined = all). */

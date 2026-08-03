@@ -18,9 +18,12 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "choral → brass (SATB)", value: "satb_brass_quartet" },
   { label: "piano + brass (complement)", value: "piano_with_brass" },
   { label: "re-instrument (swap instruments)", value: "reinstrument" },
-  { label: "orchestra (worship, auto)", value: "orchestra" },
-  { label: "piano → orchestra", value: "piano_orchestra" },
-  { label: "SATB → orchestra", value: "satb_orchestra" }
+  // Label says "worship" for clarity; the VALUE stays "orchestra" — eight code
+  // paths and every saved setting key off that string.
+  { label: "worship orchestra (auto)", value: "orchestra" },
+  { label: "piano → worship orchestra", value: "piano_orchestra" },
+  { label: "SATB → worship orchestra", value: "satb_orchestra" },
+  { label: "symphonic orchestra (classical / romantic)", value: "symphonic_orchestra" }
 ];
 
 // Period styles — used for strings, choral, woodwind, brass, orchestra.
@@ -1436,10 +1439,30 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {/* Worship orchestra — texture (auto mode only; piano/SATB are faithful transcriptions) */}
-          {settings.ensemble === "orchestra" && (
+          {/* Symphonic orchestra — period switches BOTH the roster and the scoring */}
+          {settings.ensemble === "symphonic_orchestra" && (
             <div className="field">
-              <label>Orchestra texture</label>
+              <label>Period</label>
+              <select
+                value={settings.symphonicPeriod ?? "romantic"}
+                onChange={(e) => update("symphonicPeriod", e.target.value as "classical" | "romantic")}
+              >
+                <option value="romantic">Romantic (Brahms / Dvořák / Tchaikovsky)</option>
+                <option value="classical">Classical (Haydn / Mozart / early Beethoven)</option>
+              </select>
+              <span className="slider-help">
+                {settings.symphonicPeriod === "classical"
+                  ? "12 parts — Fl, Ob, Cl, Bsn · Horn 1-2 · Trumpet 1-2 · Timpani · strings. Transparent and lean; no trombones or tuba."
+                  : "15 parts — adds Horn 3-4, Trombone 1-2 and Trombone 3/Tuba for the full Romantic weight."}
+                {" "}Strings lead throughout, winds add colour, brass is held back for the climaxes.
+              </span>
+            </div>
+          )}
+
+          {/* Worship orchestra — texture (auto mode only; piano/SATB are faithful transcriptions) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "symphonic_orchestra") && (
+            <div className="field">
+              <label>{settings.ensemble === "symphonic_orchestra" ? "Texture" : "Orchestra texture"}</label>
               <select
                 value={settings.orchestraTexture ?? "melody_harmony"}
                 onChange={(e) => {

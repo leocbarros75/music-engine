@@ -616,8 +616,11 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
   // Without this the generic sort ranks Piano (35) above an unrecognised
   // "Melody" part (90) and flips the melody underneath the piano.
   const ensembleTag = String((scoreModel as any)?.meta?.ensemble ?? "").toLowerCase();
+  // symphonic_orchestra also emits deliberate score order (Fl Ob Cl Bsn | Hn Tpt
+  // Tbn Tuba | Timp | strings). The generic sort ranks Trumpet above Horn, which
+  // is wrong for an orchestral score.
   const preserveOrder = ensembleTag === "orchestra" || ensembleTag === "full_orchestra" ||
-    ensembleTag === "piano_with_melody";
+    ensembleTag === "piano_with_melody" || ensembleTag === "symphonic_orchestra";
   const parts = preserveOrder ? partsRaw : sortPartsOrchestrally(partsRaw);
 
   const cadenceTextByMeasure = buildCadenceTextByMeasure(scoreModel);

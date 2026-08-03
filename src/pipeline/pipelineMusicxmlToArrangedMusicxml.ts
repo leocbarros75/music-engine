@@ -219,12 +219,15 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const isOrchestra = ensembleRaw === "orchestra" || ensembleRaw === "full_orchestra" ||
       ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra";
     const isReinstrument = ensembleRaw === "reinstrument";
+    // Symphonic (Classical/Romantic) — like the orchestra: skip choral rule
+    // checking and use the general exporter (it applies written transposition).
+    const isSymphonic = ensembleRaw === "symphonic_orchestra";
 
     // 6a. Orchestra is now produced inside applyAppSettings by the worship
     // orchestra arranger (PraiseCharts layout). The old mapPianoToFullOrchestraOpen
     // expansion is retired — scoreModelOut already holds the orchestra here.
 
-    if (!isPiano && !isStrings && !isWoodwinds && !isBrass && !isOrchestra && !isReinstrument) {
+    if (!isPiano && !isStrings && !isWoodwinds && !isBrass && !isOrchestra && !isSymphonic && !isReinstrument) {
       try {
         const ruleCheck = checkChoralRules(scoreModelOut, finalChords as any, {
           strictness: settings.ruleStrictness,
@@ -284,7 +287,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
     });
 
     const useGeneralExporter =
-      isPiano || isWoodwinds || isBrass || isOrchestra || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart || hasDoubleBass ||
+      isPiano || isWoodwinds || isBrass || isOrchestra || isSymphonic || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart || hasDoubleBass ||
       // Re-instrumentation relies on per-instrument written transposition, which
       // only the general exporter applies (the SATB exporter ignores it).
       isReinstrument;

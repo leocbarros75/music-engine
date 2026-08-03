@@ -142,7 +142,8 @@ export default function App() {
     settings.ensemble === "reinstrument" ||
     settings.ensemble === "orchestra" ||
     settings.ensemble === "piano_orchestra" ||
-    settings.ensemble === "satb_orchestra";
+    settings.ensemble === "satb_orchestra" ||
+    settings.ensemble === "symphonic_orchestra";
 
   const isOrchestraMode = settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra";
   // A chord/rhythm-chart PDF drives the GENERATIVE ensembles. The "copy" modes
