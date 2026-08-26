@@ -114,6 +114,49 @@ const SYMPHONIC_PARTS: PartDef[] = [
 const LOW_LIMIT_MIDI = 48;
 const PHRASE_LEN = 4;
 
+export type SymphonicIntensity = "build" | "tutti";
+export type SymphonicBalance = "default" | "more_strings" | "more_winds" | "more_brass";
+/** Manual per-instrument participation: measure ranges in which a part may play. */
+export type PartRange = { part: string; ranges: Array<[number, number]> };
+
+/**
+ * Family balance bias. A part joins when phrase intensity ≥ its enterAt, so
+ * RAISING a family's threshold makes it recede and lowering it brings it
+ * forward. Strings sit at 0.00 (saturated), so "more strings" has to work by
+ * pushing winds and brass back rather than by pulling strings further in.
+ */
+const BALANCE_ADJ: Record<SymphonicBalance, { ww: number; brass: number; str: number }> = {
+  default:      { ww:  0.00, brass:  0.00, str:  0.00 },
+  more_strings: { ww: +0.20, brass: +0.15, str: -0.10 },
+  more_winds:   { ww: -0.22, brass: +0.10, str: +0.06 },
+  more_brass:   { ww: +0.10, brass: -0.18, str: +0.05 },
+};
+
+function adjustedEnterAt(def: PartDef, balance: SymphonicBalance): number {
+  const adj = BALANCE_ADJ[balance];
+  const d = def.family === "ww" ? adj.ww : def.family === "brass" ? adj.brass : def.family === "str" ? adj.str : 0;
+  return Math.max(0, Math.min(1, def.enterAt + d));
+}
+
+function inAnyRange(measureNumber: number, ranges: Array<[number, number]>): boolean {
+  return ranges.some(([a, b]) => measureNumber >= Math.min(a, b) && measureNumber <= Math.max(a, b));
+}
+
+/** Silence a part outside its user-specified measure ranges (advanced control). */
+function applyManualRanges(score: ScoreModel, partRanges?: PartRange[]): void {
+  if (!Array.isArray(partRanges) || !partRanges.length) return;
+  const parts: any[] = (score as any).parts ?? [];
+  for (const { part: pid, ranges } of partRanges) {
+    if (!Array.isArray(ranges) || !ranges.length) continue;
+    const part = parts.find((p) => p.part_id === pid);
+    if (!part) continue;
+    for (const m of part.measures ?? []) {
+      if (inAnyRange(Number(m?.number), ranges)) continue;
+      m.events = [];
+    }
+  }
+}
+
 function eventMidi(ev: any): number | null {
   if (typeof ev?.midi === "number" && Number.isFinite(ev.midi)) return ev.midi;
   if (ev?.pitch) { try { return pitchToMidi(ev.pitch); } catch { return null; } }
@@ -205,6 +248,12 @@ export type SymphonicOptions = {
   profile?: string;
   /** Restrict to these part ids (empty/undefined = the whole period roster). */
   parts?: string[];
+  /** "build" follows the symphonic arc; "tutti" keeps everyone playing throughout. */
+  intensity?: SymphonicIntensity;
+  /** Bias the family balance (strings/winds/brass). */
+  balance?: SymphonicBalance;
+  /** Advanced: restrict individual parts to explicit measure ranges. */
+  partRanges?: PartRange[];
 };
 
 /**
@@ -248,7 +297,11 @@ export function arrangeSymphonicOrchestra(
   }
 
   const nM = Math.max(0, ...[...coreByVoice.values()].map((p: any) => (p.measures ?? []).length));
-  const intens = phraseIntensities(nM);
+  const balance: SymphonicBalance = options.balance ?? "default";
+  // "tutti": every phrase is full, so the whole roster plays throughout.
+  const intens = options.intensity === "tutti"
+    ? new Array(Math.max(1, Math.ceil(nM / PHRASE_LEN))).fill(1)
+    : phraseIntensities(nM);
 
   // Tonic pitch class for the timpani (tonic/dominant only).
   const firstAttrs: any = (core.parts?.[0]?.measures?.[0] as any)?.attributes;
@@ -265,7 +318,7 @@ export function arrangeSymphonicOrchestra(
     for (let mi = 0; mi < nM; mi++) {
       const srcM = srcPart.measures?.[mi];
       const intensity = intens[Math.floor(mi / PHRASE_LEN)] ?? 0.5;
-      const plays = intensity >= def.enterAt;
+      const plays = intensity >= adjustedEnterAt(def, balance);
       const events: any[] = [];
       if (plays) {
         for (const ev of (srcM?.events ?? [])) {
@@ -306,6 +359,9 @@ export function arrangeSymphonicOrchestra(
     parts: outParts,
     meta: { ...(core as any).meta, ensemble: "symphonic_orchestra", symphonicPeriod: period },
   };
+
+  // Advanced: honour explicit per-instrument measure ranges before spacing.
+  applyManualRanges(out as ScoreModel, options.partRanges);
 
   refineLowSpacing(out as ScoreModel);
 

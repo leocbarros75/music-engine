@@ -26,6 +26,31 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "symphonic orchestra (classical / romantic)", value: "symphonic_orchestra" }
 ];
 
+// Symphonic roster — mirrors SYMPHONIC_PARTS in the engine (ids must match).
+// romanticOnly parts don't exist in the classical period, so they're hidden there.
+const SYMPHONIC_ROSTER: Array<{ id: string; name: string; section: string; romanticOnly?: boolean }> = [
+  { id: "SY_FL",    name: "Flute",           section: "Woodwinds" },
+  { id: "SY_OB",    name: "Oboe",            section: "Woodwinds" },
+  { id: "SY_CL",    name: "Clarinet in Bb",  section: "Woodwinds" },
+  { id: "SY_BSN",   name: "Bassoon",         section: "Woodwinds" },
+  { id: "SY_HN12",  name: "Horn 1-2",        section: "Brass" },
+  { id: "SY_HN34",  name: "Horn 3-4",        section: "Brass", romanticOnly: true },
+  { id: "SY_TPT",   name: "Trumpet 1-2",     section: "Brass" },
+  { id: "SY_TBN12", name: "Trombone 1-2",    section: "Brass", romanticOnly: true },
+  { id: "SY_TBN3",  name: "Trombone 3/Tuba", section: "Brass", romanticOnly: true },
+  { id: "SY_TIMP",  name: "Timpani",         section: "Percussion" },
+  { id: "SY_VLN1",  name: "Violin I",        section: "Strings" },
+  { id: "SY_VLN2",  name: "Violin II",       section: "Strings" },
+  { id: "SY_VLA",   name: "Viola",           section: "Strings" },
+  { id: "SY_VC",    name: "Cello",           section: "Strings" },
+  { id: "SY_CB",    name: "Contrabass",      section: "Strings" },
+];
+
+/** The symphonic roster for the selected period (classical drops the romantic-only desks). */
+function symphonicRosterFor(period: string | undefined) {
+  return SYMPHONIC_ROSTER.filter((r) => period !== "classical" || !r.romanticOnly);
+}
+
 // Period styles — used for strings, choral, woodwind, brass, orchestra.
 // Each maps directly to a voice-leading profile in the engine.
 const PERIOD_STYLE_OPTIONS: Array<{ label: string; value: Settings["style"]; help: string }> = [
@@ -682,7 +707,8 @@ export default function SettingsForm({ settings, onChange }: Props) {
           settings.ensemble !== "reinstrument" &&
           settings.ensemble !== "orchestra" &&
           settings.ensemble !== "piano_orchestra" &&
-          settings.ensemble !== "satb_orchestra" && (
+          settings.ensemble !== "satb_orchestra" &&
+          settings.ensemble !== "symphonic_orchestra" && (
             <div className="pill warn">Coming soon (SATB + piano + strings + woodwinds + brass supported)</div>
           )}
       </div>
@@ -1486,8 +1512,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {/* Worship orchestra — intensity control (auto / piano→ / SATB→) */}
-          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") && (
+          {/* Orchestra — intensity control (worship + symphonic) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra" ||
+            settings.ensemble === "symphonic_orchestra") && (
             <div className="field">
               <label>Orchestra intensity</label>
               <select
@@ -1506,8 +1533,9 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {/* Worship orchestra — family balance bias */}
-          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") && (
+          {/* Orchestra — family balance bias (worship + symphonic) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra" ||
+            settings.ensemble === "symphonic_orchestra") && (
             <div className="field">
               <label>Family balance</label>
               <select
@@ -1528,16 +1556,21 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </div>
           )}
 
-          {/* Worship orchestra — ADVANCED: per-instrument measure ranges */}
-          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") &&
+          {/* Orchestra — ADVANCED: per-instrument measure ranges (worship + symphonic) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra" ||
+            settings.ensemble === "symphonic_orchestra") &&
             (() => {
-              const ROSTER: Array<{ id: string; name: string }> = [
+              const WORSHIP_ROSTER: Array<{ id: string; name: string }> = [
                 { id: "P_FLOB", name: "Flute/Oboe" }, { id: "P_CL", name: "Clarinet" }, { id: "P_BSN", name: "Bassoon" },
                 { id: "P_HN12", name: "Horn 1-2" }, { id: "P_TPT1", name: "Trumpet 1" }, { id: "P_TPT23", name: "Trumpet 2-3" },
                 { id: "P_TBN12", name: "Trombone 1-2" }, { id: "P_LOWBR", name: "Trombone 3/Tuba" },
                 { id: "P_TIMP", name: "Timpani" }, { id: "P_PERC", name: "Percussion" },
                 { id: "P_VLN1", name: "Violin 1" }, { id: "P_VLN2", name: "Violin 2" }, { id: "P_VLA", name: "Viola" }, { id: "P_CELBS", name: "Cello-Bass" },
               ];
+              const ROSTER: Array<{ id: string; name: string }> =
+                settings.ensemble === "symphonic_orchestra"
+                  ? symphonicRosterFor(settings.symphonicPeriod)
+                  : WORSHIP_ROSTER;
               const rangesFor = (id: string): string => {
                 const e = (settings.orchestraPartRanges ?? []).find((r) => r.part === id);
                 return e ? e.ranges.map(([a, b]) => `${a}-${b}`).join(", ") : "";
@@ -1574,10 +1607,12 @@ export default function SettingsForm({ settings, onChange }: Props) {
               );
             })()}
 
-          {/* Worship orchestra — custom ensemble part picker (auto / piano→ / SATB→) */}
-          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra") &&
+          {/* Orchestra — custom ensemble part picker (worship + symphonic) */}
+          {(settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra" ||
+            settings.ensemble === "symphonic_orchestra") &&
             (() => {
-              const ROSTER: Array<{ id: string; name: string; section: string }> = [
+              const isSym = settings.ensemble === "symphonic_orchestra";
+              const WORSHIP_ROSTER: Array<{ id: string; name: string; section: string }> = [
                 { id: "P_FLOB", name: "Flute/Oboe", section: "Woodwinds" },
                 { id: "P_CL", name: "Clarinet", section: "Woodwinds" },
                 { id: "P_BSN", name: "Bassoon", section: "Woodwinds" },
@@ -1593,18 +1628,30 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 { id: "P_VLA", name: "Viola", section: "Strings" },
                 { id: "P_CELBS", name: "Cello-Bass", section: "Strings" },
               ];
+              const ROSTER: Array<{ id: string; name: string; section: string }> =
+                isSym ? symphonicRosterFor(settings.symphonicPeriod) : WORSHIP_ROSTER;
               const allIds = ROSTER.map((r) => r.id);
-              const sel = settings.orchestraParts && settings.orchestraParts.length ? settings.orchestraParts : allIds;
+              // Only honour a saved selection that belongs to THIS roster — switching
+              // ensembles leaves the other engine's part ids behind.
+              const savedSel = (settings.orchestraParts ?? []).filter((id) => allIds.includes(id));
+              const sel = savedSel.length ? savedSel : allIds;
               const setSel = (ids: string[]) =>
                 update("orchestraParts", (ids.length >= allIds.length ? undefined : ids) as any);
               const toggle = (id: string) =>
                 setSel(sel.includes(id) ? sel.filter((x) => x !== id) : [...sel, id]);
-              const PRESETS: Array<{ label: string; ids: string[] }> = [
-                { label: "Full", ids: allIds },
-                { label: "Strings only", ids: ["P_VLN1", "P_VLN2", "P_VLA", "P_CELBS"] },
-                { label: "Brass + rhythm", ids: ["P_HN12", "P_TPT1", "P_TPT23", "P_TBN12", "P_LOWBR", "P_TIMP", "P_PERC"] },
-                { label: "Winds + strings", ids: ["P_FLOB", "P_CL", "P_BSN", "P_VLN1", "P_VLN2", "P_VLA", "P_CELBS"] },
-              ];
+              const PRESETS: Array<{ label: string; ids: string[] }> = isSym
+                ? [
+                    { label: "Full", ids: allIds },
+                    { label: "Strings only", ids: ["SY_VLN1", "SY_VLN2", "SY_VLA", "SY_VC", "SY_CB"] },
+                    { label: "Chamber (winds + strings)", ids: ["SY_FL", "SY_OB", "SY_CL", "SY_BSN", "SY_VLN1", "SY_VLN2", "SY_VLA", "SY_VC", "SY_CB"] },
+                    { label: "Classical core", ids: ["SY_FL", "SY_OB", "SY_CL", "SY_BSN", "SY_HN12", "SY_TPT", "SY_TIMP", "SY_VLN1", "SY_VLN2", "SY_VLA", "SY_VC", "SY_CB"] },
+                  ].map((p) => ({ ...p, ids: p.ids.filter((id) => allIds.includes(id)) }))
+                : [
+                    { label: "Full", ids: allIds },
+                    { label: "Strings only", ids: ["P_VLN1", "P_VLN2", "P_VLA", "P_CELBS"] },
+                    { label: "Brass + rhythm", ids: ["P_HN12", "P_TPT1", "P_TPT23", "P_TBN12", "P_LOWBR", "P_TIMP", "P_PERC"] },
+                    { label: "Winds + strings", ids: ["P_FLOB", "P_CL", "P_BSN", "P_VLN1", "P_VLN2", "P_VLA", "P_CELBS"] },
+                  ];
               const sections = ["Woodwinds", "Brass", "Percussion", "Strings"];
               return (
                 <div className="field">
@@ -1612,7 +1659,10 @@ export default function SettingsForm({ settings, onChange }: Props) {
                   <div className="key-preview" style={{ marginBottom: 6 }}>
                     <span className="slider-help">
                       Pick the instruments you have players for. The engine still builds the full harmony,
-                      so even a small ensemble gets correct parts. Swap any part to its sax substitute with the re-instrument tool.
+                      so even a small ensemble gets correct parts.
+                      {isSym
+                        ? " Strings carry the music here, so keep at least Violin I and a bass line."
+                        : " Swap any part to its sax substitute with the re-instrument tool."}
                     </span>
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>

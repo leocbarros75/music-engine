@@ -2293,9 +2293,12 @@ export function applyAppSettings(
       : symTex === "contrapuntal" ? "countermelody"
       : "melody_harmony";
     const symResult = arrangeSymphonicOrchestra(scoreModel, symChords as any, {
-      period:   settings.symphonicPeriod ?? "romantic",
-      profile:  symProfile,
-      parts:    settings.orchestraParts,
+      period:     settings.symphonicPeriod ?? "romantic",
+      profile:    symProfile,
+      parts:      settings.orchestraParts,
+      intensity:  settings.orchestraIntensity ?? "build",
+      balance:    settings.orchestraBalance ?? "default",
+      partRanges: settings.orchestraPartRanges as any,
       warnings,
     });
     attachTextureAnalysis(symResult.scoreModel, warnings);

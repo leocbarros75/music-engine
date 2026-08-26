@@ -787,7 +787,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-11-v33-symphonic-calibrated", omr: omrStatus() });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-12-v34-symphonic-controls", omr: omrStatus() });
       return;
     }
 
