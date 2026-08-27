@@ -1,0 +1,347 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   LANDING PAGE — "score page" design
+   Concert-hall palette: deep navy ground, brass gold accent, and the
+   orchestral family colours used functionally (strings / winds / brass).
+   Scoped under .lp so nothing here can reach the studio UI.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.lp {
+  --lp-ink:       #070B14;
+  --lp-ink-2:     #0C1220;
+  --lp-ink-3:     #131C2E;
+  --lp-rule:      #1D283C;
+  --lp-paper:     #F2EFE7;
+  --lp-dim:       #A6B0C2;
+  --lp-mute:      #6C7891;
+  --lp-gold:      #E9A94D;
+  --lp-gold-hot:  #FFC978;
+  --lp-str:       #E2585F;
+  --lp-ww:        #5FBF9B;
+  --lp-perc:      #8C93A8;
+
+  --lp-shell: min(1180px, 92vw);
+  --lp-rail: 132px;
+
+  --lp--1: clamp(.76rem, .72rem + .18vw, .84rem);
+  --lp-0:  clamp(1rem, .96rem + .22vw, 1.12rem);
+  --lp-1:  clamp(1.2rem, 1.1rem + .5vw, 1.5rem);
+  --lp-2:  clamp(1.6rem, 1.3rem + 1.4vw, 2.4rem);
+  --lp-3:  clamp(2.3rem, 1.6rem + 3.2vw, 4.6rem);
+
+  min-height: 100vh;
+  background: var(--lp-ink);
+  color: var(--lp-paper);
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--lp-0);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lp h1, .lp h2, .lp h3 {
+  font-family: "Fraunces", Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.lp-sheet { width: var(--lp-shell); margin-inline: auto; }
+
+.lp-eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: var(--lp--1);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lp-gold);
+}
+
+/* ── Score-page frame: instrument rail left, system area right ────────────── */
+.lp-system {
+  display: grid;
+  grid-template-columns: var(--lp-rail) 1fr;
+  gap: 0 28px;
+  border-top: 1px solid var(--lp-rule);
+  padding-block: clamp(48px, 7vw, 92px);
+}
+
+.lp-rail {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: var(--lp--1);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--lp-mute);
+  padding-top: .5em;
+}
+.lp-rail b { display: block; color: var(--lp-gold); font-weight: 500; }
+
+@media (max-width: 780px) {
+  .lp-system { grid-template-columns: 1fr; gap: 14px; }
+  .lp-rail { padding-top: 0; }
+}
+
+.lp-h2 { font-size: var(--lp-2); }
+.lp-intro { color: var(--lp-dim); max-width: 60ch; margin: 14px 0 0; }
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.lp-hero { padding-block: clamp(56px, 9vw, 116px) clamp(20px, 4vw, 44px); }
+
+.lp-hero h1 { font-size: var(--lp-3); max-width: 15ch; margin-block: 20px 0; }
+.lp-hero h1 em { font-style: normal; color: var(--lp-gold); }
+
+.lp-lede {
+  max-width: 58ch;
+  color: var(--lp-dim);
+  font-size: var(--lp-1);
+  margin-block: 22px 0;
+}
+
+.lp-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 22px;
+  margin-top: 34px;
+}
+
+/* Own button styling — the studio's .primary is a different visual language. */
+.lp-btn {
+  display: inline-block;
+  background: var(--lp-gold);
+  color: #2A1B05;
+  font-family: "Manrope", sans-serif;
+  font-weight: 700;
+  font-size: var(--lp-0);
+  line-height: 1.2;
+  border: 0;
+  cursor: pointer;
+  padding: 15px 32px;
+  border-radius: 2px;
+  transition: background .18s ease, transform .18s ease;
+}
+.lp-btn:hover, .lp-btn:focus-visible {
+  background: var(--lp-gold-hot);
+  transform: translateY(-1px);
+  color: #2A1B05;
+}
+.lp-btn:focus-visible { outline: 2px solid var(--lp-gold-hot); outline-offset: 3px; }
+
+.lp-cta-note { color: var(--lp-mute); font-size: var(--lp--1); }
+
+/* ── The score stack: one melody becoming an orchestra ────────────────────── */
+.lp-stack {
+  border-top: 1px solid var(--lp-rule);
+  border-bottom: 1px solid var(--lp-rule);
+  padding-block: 22px;
+  overflow-x: auto;
+}
+.lp-stave {
+  display: grid;
+  grid-template-columns: var(--lp-rail) 1fr;
+  gap: 0 28px;
+  align-items: center;
+  min-height: 26px;
+  opacity: 0;
+  animation: lpLightUp .5s ease forwards;
+}
+.lp-stave.is-lead { min-height: 34px; }
+
+.lp-stave-name {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--lp-mute);
+  text-align: right;
+  white-space: nowrap;
+}
+.lp-stave.is-lead .lp-stave-name { color: var(--lp-paper); }
+
+.lp-stave-svg { width: 100%; height: 100%; display: block; min-width: 420px; }
+
+@keyframes lpLightUp { to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-stave { animation: none; opacity: 1; }
+  .lp-btn { transition: none; }
+}
+
+/* ── Credibility ──────────────────────────────────────────────────────────── */
+.lp-credit-line {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: var(--lp-2);
+  line-height: 1.16;
+  max-width: 22ch;
+  margin: 0;
+}
+.lp-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 26px;
+  margin: 34px 0 0;
+  padding-top: 26px;
+  border-top: 1px solid var(--lp-rule);
+}
+.lp-fact dt {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: var(--lp--1);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--lp-gold);
+  margin-bottom: 6px;
+}
+.lp-fact dd { margin: 0; color: var(--lp-dim); font-size: var(--lp--1); line-height: 1.55; }
+
+/* ── Ensembles, colour-coded by orchestral family ─────────────────────────── */
+.lp-ens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(224px, 1fr));
+  gap: 1px;
+  background: var(--lp-rule);
+  border: 1px solid var(--lp-rule);
+  margin-top: 30px;
+}
+.lp-ens {
+  background: var(--lp-ink-2);
+  padding: 22px 20px 24px;
+  border-top: 2px solid var(--lp-fam, var(--lp-gold));
+  transition: background .18s ease;
+}
+.lp-ens:hover { background: var(--lp-ink-3); }
+.lp-ens h3 { font-size: var(--lp-1); margin-bottom: 7px; }
+.lp-ens p { margin: 0; color: var(--lp-dim); font-size: var(--lp--1); line-height: 1.55; }
+.lp-ens-parts {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--lp-fam, var(--lp-gold));
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* ── Calibration receipts ─────────────────────────────────────────────────── */
+.lp-receipts { margin-top: 30px; overflow-x: auto; }
+.lp-receipts table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: var(--lp--1);
+  font-variant-numeric: tabular-nums;
+  min-width: 520px;
+}
+.lp-receipts caption {
+  text-align: left;
+  color: var(--lp-mute);
+  font-family: "Manrope", sans-serif;
+  font-size: var(--lp--1);
+  padding-bottom: 14px;
+}
+.lp-receipts th, .lp-receipts td {
+  text-align: right;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--lp-rule);
+}
+.lp-receipts th:first-child, .lp-receipts td:first-child { text-align: left; color: var(--lp-paper); }
+.lp-receipts thead th {
+  color: var(--lp-mute);
+  font-weight: 400;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.lp-receipts td.is-str { color: var(--lp-str); }
+.lp-receipts td.is-ww  { color: var(--lp-ww); }
+.lp-receipts td.is-br  { color: var(--lp-gold); }
+.lp-receipts tbody tr:last-child td { border-bottom: 0; }
+.lp-row-engine td:first-child { color: var(--lp-gold); }
+
+.lp-note {
+  background: var(--lp-ink-2);
+  border-left: 2px solid var(--lp-gold);
+  padding: 16px 20px;
+  color: var(--lp-dim);
+  font-size: var(--lp--1);
+  margin-top: 34px;
+}
+.lp-note b { color: var(--lp-paper); font-weight: 500; }
+
+/* ── Steps (a real sequence, so the numbering carries meaning) ────────────── */
+.lp-steps {
+  display: grid;
+  gap: 1px;
+  background: var(--lp-rule);
+  border: 1px solid var(--lp-rule);
+  margin-top: 30px;
+}
+.lp-step {
+  background: var(--lp-ink-2);
+  padding: 24px 22px;
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.lp-step-n {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  color: var(--lp-gold);
+  font-size: var(--lp--1);
+  letter-spacing: .1em;
+  padding-top: .35em;
+}
+.lp-step h3 { font-size: var(--lp-1); margin-bottom: 6px; }
+.lp-step p { margin: 0; color: var(--lp-dim); font-size: var(--lp--1); }
+.lp-step code {
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--lp-paper);
+  background: var(--lp-ink-3);
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: .92em;
+}
+
+/* ── Bio ──────────────────────────────────────────────────────────────────── */
+.lp-bio p { color: var(--lp-dim); max-width: 66ch; margin: 0; }
+.lp-bio p + p { margin-top: 1.1em; }
+.lp-bio strong { color: var(--lp-paper); font-weight: 500; }
+.lp-bio h2 { margin-bottom: 20px; }
+
+.lp-cv {
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--lp-rule);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 24px;
+}
+.lp-cv h4 {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--lp-gold);
+  margin: 0 0 8px;
+  font-weight: 500;
+}
+.lp-cv ul { margin: 0; padding: 0; list-style: none; color: var(--lp-dim); font-size: var(--lp--1); }
+.lp-cv li + li { margin-top: 5px; }
+
+/* ── Closing ──────────────────────────────────────────────────────────────── */
+.lp-closer {
+  text-align: center;
+  padding-block: clamp(64px, 10vw, 130px);
+  border-top: 1px solid var(--lp-rule);
+}
+.lp-closer h2 { font-size: var(--lp-2); }
+.lp-closer p { color: var(--lp-dim); margin: 16px auto 30px; max-width: 46ch; }
+
+.lp-footer {
+  border-top: 1px solid var(--lp-rule);
+  padding-block: 30px 46px;
+  color: var(--lp-mute);
+  font-size: var(--lp--1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  justify-content: space-between;
+}
