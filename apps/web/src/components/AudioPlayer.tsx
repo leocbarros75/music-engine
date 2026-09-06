@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 // @ts-ignore — soundfont-player has no bundled types
 import Soundfont from "soundfont-player";
 
-const DIVISIONS = 4; // ScoreModel normalises to 4 divisions per quarter-note
+// ScoreModel times are in quarter-note beats; a bar defaults to 4 of them.
+const BEATS_PER_MEASURE_DEFAULT = 4;
 
 type NoteEvent = {
   type: string;
@@ -17,6 +18,8 @@ type Part    = { name?: string; instrument?: string; measures: Measure[] };
 
 type Props = {
   scoreModel: { parts: Part[]; meta?: { tempo_bpm?: number } } | null;
+  /** Tempo chosen in the settings — the ScoreModel itself carries none. */
+  bpm?: number;
 };
 
 type PlayState = "idle" | "loading" | "playing" | "paused";
@@ -66,41 +69,41 @@ function fmtTime(sec: number): string {
 }
 
 function buildSchedule(parts: Part[], bpm: number): ScheduledNote[] {
-  // 1 beat = 1 quarter note = DIVISIONS divisions
-  const secPerDivision = (60 / bpm) / DIVISIONS;
+  // `t` / `dur` are in QUARTER-NOTE BEATS and `t` is relative to its own
+  // measure, so a bar's worth of beats has to accumulate as we walk the score.
+  const secPerBeat = 60 / bpm;
   const notes: ScheduledNote[] = [];
 
   parts.forEach((part, partIdx) => {
-    let measureStartDiv = 0;
+    let measureStartBeats = 0;
     for (const measure of part.measures) {
-      // Measure length in divisions: max (t + dur) of all events, min 4*DIVISIONS (1 bar)
-      let measureLenDiv = 4 * DIVISIONS;
+      // A full bar, unless something in it runs longer (never truncate).
+      let spanBeats = BEATS_PER_MEASURE_DEFAULT;
       for (const ev of measure.events) {
-        const end = (ev.t ?? 0) + (ev.dur ?? DIVISIONS);
-        if (end > measureLenDiv) measureLenDiv = end;
+        const end = (ev.t ?? 0) + (ev.dur ?? 1);
+        if (end > spanBeats) spanBeats = end;
       }
 
       for (const ev of measure.events) {
         if (ev.type !== "note") continue;
         const midi = ev.midi ?? midiFromPitch(ev.pitch);
         if (!midi) continue;
-        const divOffset = measureStartDiv + (ev.t ?? 0);
         notes.push({
           midi,
-          startSec: divOffset * secPerDivision,
+          startSec: (measureStartBeats + (ev.t ?? 0)) * secPerBeat,
           // 0.85 factor = slight legato gap between notes
-          durSec:   Math.max(0.05, (ev.dur ?? DIVISIONS) * secPerDivision * 0.85),
+          durSec:   Math.max(0.05, (ev.dur ?? 1) * secPerBeat * 0.85),
           partIdx,
         });
       }
-      measureStartDiv += measureLenDiv;
+      measureStartBeats += spanBeats;
     }
   });
 
   return notes.sort((a, b) => a.startSec - b.startSec);
 }
 
-export default function AudioPlayer({ scoreModel }: Props) {
+export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
   const [playState, setPlayState] = useState<PlayState>("idle");
   const [progress, setProgress]   = useState(0);   // 0-1
   const [elapsed, setElapsed]     = useState(0);   // seconds
@@ -145,7 +148,7 @@ export default function AudioPlayer({ scoreModel }: Props) {
     audioCtxRef.current = ctx;
     if (ctx.state === "suspended") await ctx.resume();
 
-    const bpm = scoreModel.meta?.tempo_bpm ?? 100;
+    const bpm = Number(bpmProp ?? scoreModel.meta?.tempo_bpm ?? 100) || 100;
     const schedule = buildSchedule(scoreModel.parts, bpm);
     if (!schedule.length) { setPlayState("idle"); return; }
 
@@ -206,7 +209,7 @@ export default function AudioPlayer({ scoreModel }: Props) {
       }
     }
     rafRef.current = requestAnimationFrame(tick);
-  }, [scoreModel, stop]);
+  }, [scoreModel, stop, bpmProp]);
 
   if (!scoreModel) return null;
 

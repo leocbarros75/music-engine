@@ -686,6 +686,7 @@ export default function App() {
                     onClick={() => downloadMidi(
                       jobResult?.scoreModel,
                       settings.title || jobResult.meta?.title || "arrangement",
+                      settings.tempo,
                     )}
                     disabled={!jobResult?.scoreModel}
                     style={{ marginLeft: "8px" }}
@@ -703,7 +704,7 @@ export default function App() {
               <div className="score-panel-header">
                 <h2>Score Preview</h2>
                 <ErrorBoundary label="audio">
-                  <AudioPlayer scoreModel={(jobResult?.scoreModel as any) ?? null} />
+                  <AudioPlayer scoreModel={(jobResult?.scoreModel as any) ?? null} bpm={settings.tempo} />
                 </ErrorBoundary>
               </div>
               <ErrorBoundary label="score">
