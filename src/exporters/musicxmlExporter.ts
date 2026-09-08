@@ -21,6 +21,17 @@ type PercMap = {
   notehead?: "x" | "normal" | "diamond";
 };
 
+/**
+ * Choral voice names, used only to veto the part-NAME fallback when resolving
+ * transposition (see the call site). A part that explicitly declares
+ * `instrument: "bass"` is a bass guitar and still transposes; a part that merely
+ * happens to be *named* "Bass" is the choral voice and must not.
+ */
+const CHORAL_VOICE_NAMES = new Set(["soprano", "alto", "tenor", "bass"]);
+
+/** Family rank for a part the orchestral families do not recognise (voices, "Melody", …). */
+const UNKNOWN_GROUP_RANK = 90;
+
 function getTransposeForInstrument(instrument: string | undefined): TransposeSpec | null {
   if (!instrument) return null;
   const id = instrument.toLowerCase().replace(/\s+/g, "_");
@@ -420,7 +431,7 @@ function orchestraGroupRank(p: { instrument?: string; part_id?: string; name?: s
   if (isPerc) return 30;
   if (isPiano) return 35;
   if (isString) return 40;
-  return 90;
+  return UNKNOWN_GROUP_RANK;
 }
 
 function orchestraWithinGroupRank(p: { instrument?: string; part_id?: string; name?: string }): number {
@@ -460,12 +471,16 @@ function orchestraWithinGroupRank(p: { instrument?: string; part_id?: string; na
 }
 
 function sortPartsOrchestrally<T extends { instrument?: string; part_id?: string; name?: string }>(parts: T[]): T[] {
-  const tagged = parts.map((p, idx) => ({
-    p,
-    idx,
-    g: orchestraGroupRank(p),
-    w: orchestraWithinGroupRank(p)
-  }));
+  const tagged = parts.map((p, idx) => {
+    const g = orchestraGroupRank(p);
+    // orchestraWithinGroupRank matches instrument keywords without checking the
+    // family it just ranked, so it is only meaningful inside a KNOWN family.
+    // Applied to the unknown group it mis-ranks parts by accidental substrings:
+    // a choral "Bass" hits the contrabass branch (5) while Soprano/Alto/Tenor
+    // stay at 999, hoisting the bass to the top of the score. Unknown parts keep
+    // the order the arranger emitted them in.
+    return { p, idx, g, w: g === UNKNOWN_GROUP_RANK ? 0 : orchestraWithinGroupRank(p) };
+  });
 
   tagged.sort((a, b) => {
     if (a.g !== b.g) return a.g - b.g;
@@ -715,7 +730,15 @@ function renderMusicXML(scoreModel: ScoreModel): string {
 
   for (const p of parts) {
     const pid = xmlEscape(p.part_id ?? "P1");
-    const transpose = getTransposeForInstrument(p.instrument ?? p.name ?? p.part_id);
+    // Fall back to the part name only when it is not a choral voice: the SATB
+    // parts carry no `instrument`, and "Bass" would otherwise resolve to the
+    // bass-guitar entry (sounds an octave below written), writing the choral
+    // bass an octave high and printing it above the tenor.
+    const nameFallback =
+      CHORAL_VOICE_NAMES.has(String(p.name ?? "").toLowerCase().replace(/\s+/g, "_"))
+        ? undefined
+        : (p.name ?? p.part_id);
+    const transpose = getTransposeForInstrument(p.instrument ?? nameFallback);
 
     out += `  <part id="${pid}">\n`;
 
