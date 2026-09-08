@@ -9,7 +9,7 @@ import { harmonizeSatbFromChords } from "../harmonize/satb/harmonizeSatbFromChor
 import { inferChordsFromMelody } from "../harmonize/satb/inferChordsFromMelody";
 import { applyAppSettings, type AppSettings } from "../app/applyAppSettings";
 import { checkChoralRules } from "../rules/choral/checkChoralRules";
-import { exportScoreModelToMusicXML } from "../exporters/musicxmlExporter";
+import { exportScoreModelToMusicXML, ensureFinalBarlines } from "../exporters/musicxmlExporter";
 import { extractChordEventsFromMusicXml, type ChordEvent } from "../extract/chordEventsFromMusicXml";
 import { scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 
@@ -319,6 +319,11 @@ export function pipelineMusicxmlToArrangedMusicxml(
     }
     if (synchronized.report.reason) warnings.push(`MIDI/playback unavailable: ${synchronized.report.reason}`);
     warnings.push(...(synchronized.report.warnings ?? []));
+
+    // Closing double bar, added last — after source verification, so it can never
+    // be mistaken for a change to the preserved source part. Engine-generated
+    // sources (rhythm-chart PDF, typed chords) have no barline to copy across.
+    outputXml = ensureFinalBarlines(outputXml);
 
     const cadenceMeasures: number[] = Array.isArray(appResult.cadenceMeasures)
       ? appResult.cadenceMeasures

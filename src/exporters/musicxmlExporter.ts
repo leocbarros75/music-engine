@@ -607,6 +607,33 @@ function buildCadenceTextByMeasure(scoreModel: ScoreModel): Record<number, strin
   return out;
 }
 
+/**
+ * Guarantee a closing double bar on the last measure of every part.
+ *
+ * Source preservation copies a barline across when the uploaded file has one, so
+ * scores exported from Dorico/Finale/Sibelius keep theirs. But engine-generated
+ * sources — a rhythm-chart PDF skeleton, or a typed chord progression — have no
+ * barline to copy, and a finished arrangement should still end with a double bar.
+ *
+ * Applied AFTER synchronizePerformance, which rebuilds the document and would
+ * otherwise discard anything added earlier. Idempotent: a part whose final
+ * measure already carries a right-hand barline is left untouched.
+ */
+export function ensureFinalBarlines(xml: string): string {
+  return xml.replace(/([\s\S]*?)(<\/part>)/g, (whole, body: string, close: string) => {
+    const lastMeasureStart = body.lastIndexOf("<measure");
+    const lastMeasureClose = body.lastIndexOf("</measure>");
+    if (lastMeasureStart < 0 || lastMeasureClose < lastMeasureStart) return whole;
+    if (/<barline[^>]*location="right"/.test(body.slice(lastMeasureStart))) return whole;
+    return (
+      body.slice(0, lastMeasureClose) +
+      `<barline location="right"><bar-style>light-heavy</bar-style></barline>` +
+      body.slice(lastMeasureClose) +
+      close
+    );
+  });
+}
+
 export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
   const notationModel = { ...scoreModel, parts: scoreModel.parts.map(p => ({ ...p, measures: p.measures.map(m => ({ ...m, events: m.events.filter(e => !e.grace) })) })) };
   return writePerformanceNotation(renderMusicXML(notationModel), scoreModel);
