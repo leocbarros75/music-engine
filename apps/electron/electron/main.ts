@@ -1,3 +1,4 @@
+import { generationRequest, requireGeneratedMusicxml } from "../shared/generation";
 import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import path from "node:path";
 import fs from "node:fs";
@@ -5,7 +6,7 @@ import { spawn } from "node:child_process";
 import type { ChildProcessByStdio } from "node:child_process";
 import type { Readable } from "node:stream";
 import type { JobRequest, JobResult, LogEntry, LogLevel, MusicXmlFile } from "../shared/ipcTypes";
-import { extractChordEventsFromMusicXml } from "./musicxmlChords";
+
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
 const APP_ROOT = path.resolve(__dirname, "..", "..");
@@ -13,9 +14,7 @@ const RENDERER_DIST = path.join(APP_ROOT, "dist", "renderer");
 const TMP_DIR = path.join(REPO_ROOT, "tmp");
 
 const REQUEST_PATH = path.join(TMP_DIR, "app_request.json");
-const SATB_PATH = path.join(TMP_DIR, "app_satb_response.json");
-const RHYTHM_PATH = path.join(TMP_DIR, "app_satb_response_rhythm.json");
-const PIANO_PATH = path.join(TMP_DIR, "app_piano_response.json");
+const RESPONSE_PATH = path.join(TMP_DIR, "app_response.json");
 const OUT_PATH = path.join(TMP_DIR, "app_out.musicxml");
 
 type SpawnedProcess = ChildProcessByStdio<null, Readable, Readable>;
@@ -201,35 +200,6 @@ async function selectMusicXmlFile(): Promise<MusicXmlFile | null> {
   };
 }
 
-function resolveRhythmStyle(style: string, warnings: string[]) {
-  const normalized = style.toLowerCase();
-  const supported = new Set(["classical", "pop", "rock", "funk", "samba"]);
-  if (!supported.has(normalized)) {
-    const warning = `Style "${style}" not supported by rhythm stage. Defaulting to "classical".`;
-    warnings.push(warning);
-    log("warn", `[warn] ${warning}`);
-    return "classical";
-  }
-  return normalized;
-}
-async function runCommand(cmd: string, args: string[], label: string) {
-  return new Promise<void>((resolve, reject) => {
-    const child = spawn(cmd, args, {
-      cwd: REPO_ROOT,
-      env: { ...process.env },
-      stdio: ["ignore", "pipe", "pipe"]
-    }) as SpawnedProcess;
-
-    streamChild(child, label);
-
-    child.on("error", (err) => reject(err));
-    child.on("close", (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`${cmd} ${args.join(" ")} failed with code ${code}`));
-    });
-  });
-}
-
 async function runGenerateJob(payload: JobRequest): Promise<JobResult> {
   const warnings: string[] = [];
 
@@ -259,16 +229,7 @@ async function runGenerateJob(payload: JobRequest): Promise<JobResult> {
 
     const baseUrl = await ensureServer();
 
-    const keySignatureMode = payload.settings.keySignature === "original" ? "original" : "manual";
-    const targetKey = keySignatureMode === "original" ? "original" : payload.settings.keySignature;
-    const timeSignatureMode = payload.settings.timeSignature === "original" ? "original" : "manual";
-
-    const settingsForServer = {
-      ...payload.settings,
-      keySignatureMode,
-      targetKey,
-      timeSignatureMode
-    };
+    const settingsForServer = payload.settings;
 
     const requestPayload = {
       settings: settingsForServer,
@@ -281,72 +242,41 @@ async function runGenerateJob(payload: JobRequest): Promise<JobResult> {
     fs.writeFileSync(REQUEST_PATH, JSON.stringify(requestPayload, null, 2));
 
     const musicxml = fs.readFileSync(payload.filePath, "utf8");
-    const chordParse = extractChordEventsFromMusicXml(musicxml);
-    const extractedChords = chordParse.chords ?? [];
-    if (Array.isArray(chordParse.warnings) && chordParse.warnings.length) {
-      for (const warnMsg of chordParse.warnings) {
-        const msg = String(warnMsg);
-        if (!msg) continue;
-        warnings.push(msg);
-        log("warn", `[warn] ${msg}`);
-      }
-    }
-
-    log("info", `[job] POST /harmonize_satb_from_chords (chords: ${extractedChords.length}).`);
-
-    const response = await fetch(`${baseUrl}/harmonize_satb_from_chords`, {
+    log("info", "[job] POST /generate");
+    const response = await fetch(`${baseUrl}/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        musicxml,
-        chords: extractedChords,
-        options: { keepMelodyInSoprano: true },
-        settings: settingsForServer
-      })
+      body: JSON.stringify(generationRequest(musicxml, settingsForServer))
     });
 
     const json = await response.json();
 
-    if (!response.ok || json?.ok === false) {
+    if (!response.ok || json?.ok !== true) {
       const error = json?.error || `Harmonize failed with status ${response.status}`;
       log("error", `[error] ${error}`);
       return { ok: false, warnings, error };
     }
 
-    fs.writeFileSync(SATB_PATH, JSON.stringify(json, null, 2));
-    log("info", `[job] wrote ${SATB_PATH}`);
+    // A successful application response must contain its authoritative notation.
+    // Re-exporting a reduced model here would bypass preservation and MIDI parity.
+    requireGeneratedMusicxml(json);
+    fs.writeFileSync(RESPONSE_PATH, JSON.stringify(json, null, 2));
+    fs.writeFileSync(OUT_PATH, json.musicxml);
 
-    fs.writeFileSync(RHYTHM_PATH, JSON.stringify(json, null, 2));
-    log("info", `[job] wrote ${RHYTHM_PATH}`);
-
-    const responseEnsemble = String(json?.scoreModel?.meta?.ensemble ?? "");
-    if (
-      payload.settings.ensemble === "piano" ||
-      payload.settings.ensemble === "piano_with_melody" ||
-      responseEnsemble.toLowerCase() === "piano" ||
-      responseEnsemble.toLowerCase() === "piano_with_melody"
-    ) {
-      fs.writeFileSync(PIANO_PATH, JSON.stringify(json, null, 2));
-      log("info", `[job] wrote ${PIANO_PATH}`);
-    }
-
-    const { cmd, argsPrefix } = resolveTsxCommand();
-    await runCommand(
-      cmd,
-      [...argsPrefix, "scripts/exportSatbResponseToMusicxml.ts", RHYTHM_PATH, OUT_PATH],
-      "export"
-    );
-
+    const expectedMidiPath = OUT_PATH.replace(/\.musicxml$/i, ".mid");
+    const midiPath = typeof json.midiBase64 === "string" ? expectedMidiPath : undefined;
+    if (midiPath) fs.writeFileSync(midiPath, Buffer.from(json.midiBase64, "base64"));
+    else if (fs.existsSync(expectedMidiPath)) fs.unlinkSync(expectedMidiPath); // Never leave a stale MIDI paired with a new score.
     const metaApp = json?.scoreModel?.meta?.app ?? {};
-    const styleUsed = typeof metaApp.styleUsed === "string" ? metaApp.styleUsed : payload.settings.style;
-    const chordSource = typeof metaApp.chordSource === "string" ? metaApp.chordSource : undefined;
+    const styleUsed = json.meta?.styleUsed ?? metaApp.styleUsed ?? payload.settings.style;
+    const chordSource = json.meta?.chordSource ?? metaApp.chordSource;
     const debug = metaApp?.debug ?? undefined;
     if (debug && (metaApp as any).detectedInputKeyMode) {
       (debug as any).detectedInputKeyMode = (metaApp as any).detectedInputKeyMode;
     }
 
-    if (Array.isArray(metaApp.warnings)) {
-      for (const warnMsg of metaApp.warnings) {
+    if (Array.isArray(json.warnings)) {
+      for (const warnMsg of json.warnings) {
         const msg = String(warnMsg);
         if (!msg) continue;
         warnings.push(msg);
@@ -356,7 +286,7 @@ async function runGenerateJob(payload: JobRequest): Promise<JobResult> {
 
     let cadenceMeasures: number[] = [];
     try {
-      const applied = metaApp.cadenceMeasures;
+      const applied = json.meta?.cadenceMeasures ?? metaApp.cadenceMeasures;
       if (Array.isArray(applied)) {
         cadenceMeasures = applied.map((value: any) => Number(value)).filter((value: number) => Number.isFinite(value));
       }
@@ -369,6 +299,8 @@ async function runGenerateJob(payload: JobRequest): Promise<JobResult> {
     return {
       ok: true,
       outputPath: OUT_PATH,
+      midiPath,
+      preservation: json?.meta?.preservation,
       serverBaseUrl: baseUrl,
       styleUsed,
       accompanimentUsed: payload.settings.accompaniment,

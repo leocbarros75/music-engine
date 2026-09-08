@@ -1,14 +1,14 @@
+import { instrumentPlayback } from "../../../../src/score/instrumentPlayback";
+import { buildPlaybackSchedule, resumeSchedule, scheduleInstrumentNotes } from "../utils/playbackSchedule";
 import { useCallback, useEffect, useRef, useState } from "react";
 // @ts-ignore — soundfont-player has no bundled types
 import Soundfont from "soundfont-player";
 
-// ScoreModel times are in quarter-note beats; a bar defaults to 4 of them.
-const BEATS_PER_MEASURE_DEFAULT = 4;
 
 type NoteEvent = {
   type: string;
-  t: number;   // onset  in divisions (4 = 1 quarter note)
-  dur: number; // length in divisions
+  t: number;   // measure-relative onset in quarter-note beats
+  dur: number; // length in quarter-note beats
   midi?: number;
   pitch?: { step: string; alter?: number; octave: number };
 };
@@ -18,49 +18,13 @@ type Part    = { name?: string; instrument?: string; measures: Measure[] };
 
 type Props = {
   scoreModel: { parts: Part[]; meta?: { tempo_bpm?: number } } | null;
-  /** Tempo chosen in the settings — the ScoreModel itself carries none. */
+  /** Optional audition tempo; otherwise use the final score tempo map. */
   bpm?: number;
 };
 
 type PlayState = "idle" | "loading" | "playing" | "paused";
 
-// Soundfont name map (MusyngKite names)
-const INSTRUMENTS: Record<string, string> = {
-  violin:   "violin",
-  viola:    "viola",
-  cello:    "cello",
-  contrabass: "contrabass",
-  bass:     "contrabass",
-  flute:    "flute",
-  oboe:     "oboe",
-  clarinet: "clarinet",
-  bassoon:  "bassoon",
-  trumpet:  "trumpet",
-  horn:     "french_horn",
-  trombone: "trombone",
-  tuba:     "tuba",
-  piano:    "acoustic_grand_piano",
-  timpani:  "timpani",
-  default:  "acoustic_grand_piano",
-};
-
-function resolveInstrument(part: Part): string {
-  const key = `${part.instrument ?? ""} ${part.name ?? ""}`.toLowerCase();
-  for (const [k, v] of Object.entries(INSTRUMENTS)) {
-    if (key.includes(k)) return v;
-  }
-  return INSTRUMENTS.default;
-}
-
-type ScheduledNote = { midi: number; startSec: number; durSec: number; partIdx: number };
-
-function midiFromPitch(pitch?: { step: string; alter?: number; octave: number }): number | null {
-  if (!pitch) return null;
-  const STEPS: Record<string, number> = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
-  const base = STEPS[pitch.step.toUpperCase()];
-  if (base === undefined) return null;
-  return (pitch.octave + 1) * 12 + base + (pitch.alter ?? 0);
-}
+function resolveInstrument(part: Part): string { return instrumentPlayback(part).soundfont; }
 
 function fmtTime(sec: number): string {
   const m = Math.floor(sec / 60);
@@ -68,48 +32,17 @@ function fmtTime(sec: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-function buildSchedule(parts: Part[], bpm: number): ScheduledNote[] {
-  // `t` / `dur` are in QUARTER-NOTE BEATS and `t` is relative to its own
-  // measure, so a bar's worth of beats has to accumulate as we walk the score.
-  const secPerBeat = 60 / bpm;
-  const notes: ScheduledNote[] = [];
-
-  parts.forEach((part, partIdx) => {
-    let measureStartBeats = 0;
-    for (const measure of part.measures) {
-      // A full bar, unless something in it runs longer (never truncate).
-      let spanBeats = BEATS_PER_MEASURE_DEFAULT;
-      for (const ev of measure.events) {
-        const end = (ev.t ?? 0) + (ev.dur ?? 1);
-        if (end > spanBeats) spanBeats = end;
-      }
-
-      for (const ev of measure.events) {
-        if (ev.type !== "note") continue;
-        const midi = ev.midi ?? midiFromPitch(ev.pitch);
-        if (!midi) continue;
-        notes.push({
-          midi,
-          startSec: (measureStartBeats + (ev.t ?? 0)) * secPerBeat,
-          // 0.85 factor = slight legato gap between notes
-          durSec:   Math.max(0.05, (ev.dur ?? 1) * secPerBeat * 0.85),
-          partIdx,
-        });
-      }
-      measureStartBeats += spanBeats;
-    }
-  });
-
-  return notes.sort((a, b) => a.startSec - b.startSec);
-}
-
 export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
+  const [playbackError, setPlaybackError] = useState("");
   const [playState, setPlayState] = useState<PlayState>("idle");
   const [progress, setProgress]   = useState(0);   // 0-1
   const [elapsed, setElapsed]     = useState(0);   // seconds
   const [totalDur, setTotalDur]   = useState(0);   // seconds
   const [volume, setVolume]       = useState(0.65);
 
+  const generationRef = useRef(0);
+  const masterGainRef = useRef<GainNode | null>(null);
+  const cacheRef = useRef(new Map<string, Promise<any>>());
   const audioCtxRef    = useRef<AudioContext | null>(null);
   const instrumentsRef = useRef<any[]>([]);
   const startTimeRef   = useRef<number>(0);
@@ -118,10 +51,11 @@ export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
   const stopFnRef      = useRef<(() => void) | null>(null);
   const volumeRef      = useRef(volume);
 
-  useEffect(() => { volumeRef.current = volume; }, [volume]);
-  useEffect(() => () => { cancelAnimationFrame(rafRef.current); stopFnRef.current?.(); }, []);
+  useEffect(() => { volumeRef.current = volume; if (masterGainRef.current) masterGainRef.current.gain.value = volume; }, [volume]);
+  useEffect(() => () => { generationRef.current++; cancelAnimationFrame(rafRef.current); stopFnRef.current?.(); cacheRef.current.clear(); void audioCtxRef.current?.close().catch(() => {}); }, []);
 
   const stop = useCallback(() => {
+    generationRef.current++;
     cancelAnimationFrame(rafRef.current);
     stopFnRef.current?.();
     stopFnRef.current = null;
@@ -130,6 +64,8 @@ export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
     setProgress(0);
     setElapsed(0);
   }, []);
+
+  useEffect(() => { stop(); setTotalDur(0); }, [scoreModel, bpmProp, stop]);
 
   const pause = useCallback(() => {
     if (!audioCtxRef.current) return;
@@ -142,17 +78,27 @@ export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
 
   const play = useCallback(async () => {
     if (!scoreModel) return;
+    const generation = ++generationRef.current;
     setPlayState("loading");
+    setPlaybackError("");
 
     const ctx = audioCtxRef.current ?? new AudioContext();
     audioCtxRef.current = ctx;
-    if (ctx.state === "suspended") await ctx.resume();
+    try { if (ctx.state === "suspended") await ctx.resume(); }
+    catch (error) { setPlaybackError(String(error)); setPlayState("idle"); return; }
+    if (generation !== generationRef.current) return;
+    if (!masterGainRef.current) { const gain=ctx.createGain(); gain.gain.value=volumeRef.current; gain.connect(ctx.destination); masterGainRef.current=gain; }
 
-    const bpm = Number(bpmProp ?? scoreModel.meta?.tempo_bpm ?? 100) || 100;
-    const schedule = buildSchedule(scoreModel.parts, bpm);
-    if (!schedule.length) { setPlayState("idle"); return; }
+    let schedule: ReturnType<typeof buildPlaybackSchedule>;
+    try { schedule = buildPlaybackSchedule(scoreModel, bpmProp); }
+    catch (error) {
+      setPlaybackError(error instanceof Error ? error.message : "Invalid score timing.");
+      setPlayState("idle");
+      return;
+    }
+    if (!schedule.durationSec) { setPlayState("idle"); return; }
 
-    const dur = schedule[schedule.length - 1]!.startSec + schedule[schedule.length - 1]!.durSec;
+    const dur = schedule.durationSec;
     setTotalDur(dur);
 
     // Load instruments (deduplicated); fall back from MusyngKite → FluidR3
@@ -160,46 +106,39 @@ export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
     const uniqueInstr = [...new Set(partInstruments)];
     const loaded: Record<string, any> = {};
 
-    await Promise.all(
-      uniqueInstr.map(async (name) => {
-        try {
-          loaded[name] = await Soundfont.instrument(ctx, name as any, { soundfont: "MusyngKite" });
-        } catch {
-          try {
-            loaded[name] = await Soundfont.instrument(ctx, name as any, { soundfont: "FluidR3_GM" });
-          } catch {
-            loaded[name] = await Soundfont.instrument(ctx, "acoustic_grand_piano" as any);
-          }
+    try {
+      await Promise.all(uniqueInstr.map(async name => {
+        let cached = cacheRef.current.get(name);
+        if (!cached) {
+          const destination = masterGainRef.current!;
+          cached = Soundfont.instrument(ctx, name as any, { soundfont: "MusyngKite", destination })
+            .catch(() => Soundfont.instrument(ctx, name as any, { soundfont: "FluidR3_GM", destination }));
+          cacheRef.current.set(name, cached!);
         }
-      })
-    );
+        try { loaded[name] = await cached; }
+        catch { cacheRef.current.delete(name); throw Error(`Could not load the ${name.replace(/_/g, " ")} sound. Please retry.`); }
+      }));
+    } catch (error) {
+      if (generation === generationRef.current) { setPlaybackError((error as Error).message); setPlayState("idle"); }
+      return;
+    }
+    if (generation !== generationRef.current) return;
 
     instrumentsRef.current = scoreModel.parts.map((p) => loaded[resolveInstrument(p)]);
 
     const offset = pauseOffsetRef.current;
-    const origin = ctx.currentTime - offset;
+    const origin = ctx.currentTime + 0.05 - offset;
     startTimeRef.current = origin;
     pauseOffsetRef.current = 0;
 
     // Schedule all notes from current offset onwards
-    const pending = schedule.filter((n) => n.startSec >= offset - 0.01);
-    const nodes: any[] = [];
-    for (const n of pending) {
-      const instr = instrumentsRef.current[n.partIdx];
-      if (!instr) continue;
-      const node = instr.schedule(ctx, n.midi, origin + n.startSec, {
-        duration: n.durSec,
-        gain: volumeRef.current,
-      });
-      if (node) nodes.push(node);
-    }
-
-    stopFnRef.current = () => nodes.forEach((n) => { try { n.stop(0); } catch {} });
+    const pending = resumeSchedule(schedule, offset);
+    stopFnRef.current = scheduleInstrumentNotes(instrumentsRef.current, pending, origin);
     setPlayState("playing");
 
     function tick() {
       if (!audioCtxRef.current) return;
-      const e = audioCtxRef.current.currentTime - origin;
+      const e = Math.max(0, audioCtxRef.current.currentTime - origin);
       setElapsed(Math.min(e, dur));
       setProgress(Math.min(e / dur, 1));
       if (e < dur) {
@@ -217,6 +156,7 @@ export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
 
   return (
     <div className="audio-player">
+      {playbackError && <div role="alert">{playbackError}</div>}
       <div className="audio-controls">
         {playState === "playing" ? (
           <>
@@ -238,6 +178,8 @@ export default function AudioPlayer({ scoreModel, bpm: bpmProp }: Props) {
             {playState === "loading" ? "Loading…" : "▶ Play"}
           </button>
         )}
+
+        {playState === "loading" && <button className="audio-btn" onClick={stop}>Cancel</button>}
 
         <span className="audio-time">
           {playState === "idle"

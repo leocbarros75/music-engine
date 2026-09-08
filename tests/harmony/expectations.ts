@@ -9,6 +9,8 @@ export type HarmonyOutput = {
     roman?: { roman?: string };
     chord?: { pcs?: number[] };
   }>;
+  measures?: Array<{ measureNumber: number; roman?: { roman?: string }; chord?: { pcs?: number[] } }>;
+  warnings?: Array<{ atMeasure: number; atBeat?: number; type?: string }>;
   cadences?: Array<{
     atMeasure: number;
     type: string;
@@ -20,6 +22,8 @@ export type Expectation = {
   id: string;
   key?: { tonic: string; mode: string };
   beatRomans?: Array<{ measure: number; beat: number; roman: string }>;
+  measureRomans?: Array<{ measure: number; roman: string }>;
+  warnings?: Array<{ atMeasure: number; atBeat?: number; type: string }>;
   cadenceTypes?: Array<{ atMeasure: number; type: string }>;
   cadenceEvidence?: Array<{ atMeasure: number; prevRoman: string; lastRoman: string }>;
   // Basic sanity checks
@@ -27,7 +31,7 @@ export type Expectation = {
 };
 
 export const EXPECTATIONS_BY_BASENAME: Record<string, Expectation> = {
-  "test_am_i64_v7_i.xml": {
+  "test_am_i64_V7_i.xml": {
     id: "am_i64_v7_i",
     key: { tonic: "A", mode: "minor" },
     beatRomans: [
@@ -129,3 +133,8 @@ export const EXPECTATIONS_BY_BASENAME: Record<string, Expectation> = {
     requireNonEmptyChordOnBeat1OfMeasures: [1, 2, 3]
   }
 };
+// These fixtures each sustain one harmony for a full measure; both modes must agree.
+for (const expectation of Object.values(EXPECTATIONS_BY_BASENAME)) {
+  expectation.measureRomans = expectation.beatRomans!.filter(b => b.beat === 1)
+    .map(({ measure, roman }) => ({ measure, roman }));
+}

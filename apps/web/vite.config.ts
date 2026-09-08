@@ -13,6 +13,10 @@ export default defineConfig({
       "/arrange_musicxml":      "http://localhost:3001",
       "/analyze_harmony":       "http://localhost:3001",
       "/omr_to_musicxml":       "http://localhost:3001",
+      "/phrase_context":        "http://localhost:3001",
+      "/propose_phrase_plan":   "http://localhost:3001",
+      "/parse_prompt":          "http://localhost:3001",
+      "/generate_from_rhythm_pdf": "http://localhost:3001",
       "/parse_pdf":             "http://localhost:3001",
       "/health":                "http://localhost:3001"
     }

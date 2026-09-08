@@ -35,8 +35,8 @@ function buildAmbiguousScore(): ScoreModel {
             },
             events: [
               // Ambiguous cluster: C4 + C#4 on beat 1
-              { id: "N1", t: 0, dur: 480, type: "note", pitch: { step: "C", octave: 4 }, voice: 1, staff: 1 },
-              { id: "N2", t: 0, dur: 480, type: "note", pitch: { step: "C", alter: 1, octave: 4 }, voice: 1, staff: 1 }
+              { id: "N1", t: 0, dur: 1, type: "note", pitch: { step: "C", octave: 4 }, voice: 1, staff: 1 },
+              { id: "N2", t: 0, dur: 1, type: "note", pitch: { step: "C", alter: 1, octave: 4 }, voice: 1, staff: 1 }
             ]
           }
         ]
@@ -77,3 +77,8 @@ assert(
 
 // eslint-disable-next-line no-console
 console.log("OK: Roman confidence suppression test passed.");
+
+assert(beats.length === 4, "A 4/4 measure must contain four beat records.");
+for (const beat of beats.filter((b: any) => b.beatNumber > 1)) {
+  assert((beat.chord?.pcs ?? []).length === 0, "Quarter-note cluster must not sustain into later beats.");
+}

@@ -100,3 +100,28 @@ if (!parallelResult.violations.some((v) => v.ruleId === "parallel.perfect")) {
 }
 
 console.log("Choral rules unit tests passed (doubling + resolution).");
+
+// Negative controls: the checker must not flag the corresponding valid behaviors.
+const goodDoubling = makeScore([
+  makePart('P_S', 'Soprano', [note(0, 72)]),
+  makePart('P_A', 'Alto', [note(0, 67)]),
+  makePart('P_T', 'Tenor', [note(0, 64)]),
+  makePart('P_B', 'Bass', [note(0, 48)])
+]);
+if (checkChoralRules(goodDoubling, [{ measure: 1, t: 0, symbol: 'C' }]).violations
+    .some(v => v.ruleId === 'doubling.third.root_position')) {
+  throw new Error('A root-doubled C major triad must not trigger third doubling.');
+}
+const goodResolution = makeScore([
+  makePart('P_S', 'Soprano', [note(0, 71), note(1, 72)]),
+  makePart('P_A', 'Alto', [note(0, 65), note(1, 64)]),
+  makePart('P_T', 'Tenor', [note(0, 62), note(1, 60)]),
+  makePart('P_B', 'Bass', [note(0, 55), note(1, 60)])
+]);
+const goodResult = checkChoralRules(goodResolution, [
+  { measure: 1, t: 0, symbol: 'G7' }, { measure: 1, t: 1, symbol: 'C' }
+]);
+if (goodResult.violations.some(v => ['resolution.seventh', 'resolution.leading_tone', 'parallel.perfect'].includes(v.ruleId))) {
+  throw new Error('Correct G7–C resolution must not trigger seventh, leading-tone or parallel violations.');
+}
+console.log('Choral rule negative controls passed.');

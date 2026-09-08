@@ -39,6 +39,9 @@ import { inferChordsFromAllVoices } from "../harmonize/satb/inferChordsFromMelod
 import { preserveFinalMeasuresRhythm } from "../rhythm/preserveFinalMeasuresRhythm";
 
 export type AppSettings = {
+  preserveSource?: boolean;
+  melodyOctaveShift?: number;
+  sourceMelodyPartId?: string;
   title?: string;
   ensemble?: string;
   keySignature?: string;
@@ -2741,7 +2744,7 @@ export function applyAppSettings(
             const stringScore = stringResult.scoreModel;
             if (usePolyphonic) {
               const levelRaw = String(settings.level ?? "").toLowerCase();
-              const melodyShift = levelRaw === "intermediate" || levelRaw === "advanced" ? 12 : 0;
+              const melodyShift = 0; // Explicit register changes happen at the source boundary.
               const melodyEvents = extractMelodyEventsForStrings(scoreModel, melodyShift);
               // ── Schoenberg density scaling for string inner voices ──────────
               // Measure Vln I melodic density from the ORIGINAL score (before

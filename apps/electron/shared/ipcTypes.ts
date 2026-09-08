@@ -28,6 +28,9 @@ export type InstrumentationOption =
   | "satb_to_woodwind_quartet";
 
 export type Settings = {
+  preserveSource?: boolean;
+  melodyOctaveShift?: number;
+  sourceMelodyPartId?: string;
   title: string;
   ensemble: EnsembleOption;
   keySignature: string;
@@ -137,8 +140,10 @@ export type JobRequest = {
 };
 
 export type JobResult = {
+  preservation?: { status: "verified" | "not_applicable" | "disabled"; reason?: string; measures?: number; notes?: number; chords?: number; octaveShift?: number; };
   ok: boolean;
   outputPath?: string;
+  midiPath?: string;
   serverBaseUrl?: string;
   styleUsed?: string;
   accompanimentUsed?: string;

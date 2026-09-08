@@ -1,3 +1,4 @@
+import { buildMeasureTimeline } from "../../score/standard";
 // src/harmonize/satb/harmonizeSatbFromChords.ts
 import type { ScoreModel } from "../../score/types";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
@@ -519,7 +520,9 @@ function makeEmptyPart(part_id: string, name: string, measuresTemplate: any[]): 
   return {
     part_id,
     name,
+    pitchSpace: "sounding",
     measures: measuresTemplate.map((m) => ({
+      ...m,
       number: m.number,
       attributes: m.attributes ? { ...m.attributes } : undefined,
       events: []
@@ -527,13 +530,6 @@ function makeEmptyPart(part_id: string, name: string, measuresTemplate: any[]): 
   };
 }
 
-function ensureMeasureAttributesOnlyOnFirst(part: any): void {
-  const ms = part.measures ?? [];
-  for (let i = 0; i < ms.length; i++) {
-    if (i === 0) continue;
-    if (ms[i]?.attributes) delete ms[i].attributes;
-  }
-}
 
 function addNoteEvent(measure: any, t: number, dur: number, midi: number, pitchOverride?: PitchSpelling | null): void {
   const base = pitchWithSpelling(midi, pitchOverride);
@@ -1014,6 +1010,7 @@ export function harmonizeSatbFromChords(
     if (bassRange.min > bassRange.max) bassRange.min = bassRange.max;
   }
   const measuresTemplate = (soprPart.measures ?? []).map((m: any) => ({
+    ...m,
     number: m.number,
     attributes: m.attributes ? { ...m.attributes } : undefined
   }));
@@ -1069,7 +1066,10 @@ export function harmonizeSatbFromChords(
   let pending: PendingResolution | null = null;
   const pendingLeaps: PendingLeap[] = [];
 
+  const measureTimeline = buildMeasureTimeline(inScore);
   for (let mi = 0; mi < measuresTemplate.length; mi++) {
+    const beatsPerMeasure = measureTimeline[mi].durationBeats;
+    const lastBeat = Math.max(0, Math.ceil(beatsPerMeasure) - 1);
     const measureNumber = Number(measuresTemplate[mi]?.number ?? mi + 1);
 
     const mS = outS.measures?.[mi];
@@ -1081,6 +1081,7 @@ export function harmonizeSatbFromChords(
     const nextMeasureNumber = Number(measuresTemplate[mi + 1]?.number ?? (measureNumber + 1));
 
     for (let t = 0; t < beatsPerMeasure; t++) {
+      const eventDuration = Math.min(1, beatsPerMeasure - t);
       const chordEv = pickChordForBeat(chordMap, measureNumber, t);
       const parsed = chordEv ? chordPcsFromSymbol(chordEv.symbol) : null;
 
@@ -1088,9 +1089,9 @@ export function harmonizeSatbFromChords(
       const parsedNext = nextChordEv ? chordPcsFromSymbol(nextChordEv.symbol) : null;
 
       if (!parsed) {
-        addRestEvent(mA, t, 1);
-        addRestEvent(mT, t, 1);
-        addRestEvent(mB, t, 1);
+        addRestEvent(mA, t, eventDuration);
+        addRestEvent(mT, t, eventDuration);
+        addRestEvent(mB, t, eventDuration);
         continue;
       }
 
@@ -1135,9 +1136,9 @@ export function harmonizeSatbFromChords(
       }
 
       if (soprMidi === null) {
-        addRestEvent(mA, t, 1);
-        addRestEvent(mT, t, 1);
-        addRestEvent(mB, t, 1);
+        addRestEvent(mA, t, eventDuration);
+        addRestEvent(mT, t, eventDuration);
+        addRestEvent(mB, t, eventDuration);
         continue;
       }
 
@@ -1870,11 +1871,11 @@ export function harmonizeSatbFromChords(
         });
       }
 
-      addNoteEvent(mT, t, 1, tenorMidi);
+      addNoteEvent(mT, t, eventDuration, tenorMidi);
 
-      addNoteEvent(mA, t, 1, altoMidi);
+      addNoteEvent(mA, t, eventDuration, altoMidi);
 
-      addNoteEvent(mB, t, 1, bassMidi, bassPitchSpelling);
+      addNoteEvent(mB, t, eventDuration, bassMidi, bassPitchSpelling);
 
       prevS = soprMidi;
       prevA = altoMidi ?? prevA;
@@ -1884,10 +1885,6 @@ export function harmonizeSatbFromChords(
     }
   }
 
-  ensureMeasureAttributesOnlyOnFirst(outS);
-  ensureMeasureAttributesOnlyOnFirst(outA);
-  ensureMeasureAttributesOnlyOnFirst(outT);
-  ensureMeasureAttributesOnlyOnFirst(outB);
 
   const chordEventSample = safeChords.slice(0, 32).map((c) => ({
     measure: Number((c as any).measure),

@@ -1,3 +1,5 @@
+// Legacy reference only. The desktop application now sends original XML to /generate;
+// chord extraction belongs to src/extract/chordEventsFromMusicXml.ts on the server.
 import { DOMParser } from "@xmldom/xmldom";
 
 export type ChordEvent = {

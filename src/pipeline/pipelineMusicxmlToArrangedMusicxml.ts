@@ -1,3 +1,7 @@
+import { inspectPhrases, validatePhrasePlan, applyPhrasePlan } from "../ai/phrasePlan";
+import { synchronizePerformance } from "../exporters/synchronizePerformance";
+import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
+import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
 // Full server-side pipeline: MusicXML in → arranged MusicXML out.
 import { parseMusicXMLToScoreModel } from "../parsers/musicxmlParser";
@@ -5,12 +9,12 @@ import { harmonizeSatbFromChords } from "../harmonize/satb/harmonizeSatbFromChor
 import { inferChordsFromMelody } from "../harmonize/satb/inferChordsFromMelody";
 import { applyAppSettings, type AppSettings } from "../app/applyAppSettings";
 import { checkChoralRules } from "../rules/choral/checkChoralRules";
-import { exportScoreModelToMusicXML } from "../exporters/musicxmlExporter";
-import { exportSatbScoreModelToMusicXML } from "../exporters/satbMusicxmlExporter";
+import { exportScoreModelToMusicXML, ensureFinalBarlines } from "../exporters/musicxmlExporter";
 import { extractChordEventsFromMusicXml, type ChordEvent } from "../extract/chordEventsFromMusicXml";
 import { scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 
 export type PipelineRequest = {
+  phrasePlan?: unknown;
   musicxml: string;
   settings: AppSettings;
   chords?: ChordEvent[];
@@ -20,6 +24,7 @@ export type PipelineRequest = {
 export type PipelineResult = {
   ok: true;
   musicxml: string;
+  midiBase64?: string;
   scoreModel: unknown;
   warnings: string[];
   meta: {
@@ -30,6 +35,9 @@ export type PipelineResult = {
     chordEventCount: number;
     parts?: Array<{ name: string; instrument: string }>;
     title?: string;
+    phraseCollaboration?: { status: string; phraseCount: number; sourceFingerprint: string; plan: unknown };
+    preservation?: PreservationReport;
+    performance?: { status: string; reason?: string; durationSeconds?: number; warnings?: string[] };
   };
 };
 
@@ -51,8 +59,21 @@ export function pipelineMusicxmlToArrangedMusicxml(
   const { musicxml, settings, options = {} } = req;
 
   try {
+    const phrasePlan = req.phrasePlan === undefined ? undefined : validatePhrasePlan(req.phrasePlan, inspectPhrases(musicxml, settings));
+    if (phrasePlan && req.chords?.length) throw Error("Phrase collaboration uses source chords; remove request chord overrides.");
     // 1. Parse input MusicXML
-    const inputScore = parseMusicXMLToScoreModel(musicxml);
+    const writtenInput = parseMusicXMLToScoreModel(musicxml);
+    const inputScore = toSoundingScore(writtenInput);
+    const protection = prepareSourceLock(musicxml, inputScore, settings);
+    let preservation = protection.report;
+    // Shift only when explicitly requested; the immutable snapshot remains unchanged.
+    if (protection.lock && protection.lock.shift) {
+      const selected = inputScore.parts.find(p => p.part_id === protection.lock!.partId)!;
+      selected.measures = JSON.parse(JSON.stringify(protection.lock.expected.measures));
+    }
+    const sourceTranspose = (protection.lock ? writtenInput.parts.find(p=>p.part_id===protection.lock!.partId) : writtenInput.parts[0])?.transpose;
+    const chordSignature = (events: ChordEvent[]) => JSON.stringify(events.map(c => [c.measure, c.t, c.symbol]).sort((a,b) => Number(a[0])-Number(b[0]) || Number(a[1])-Number(b[1])));
+    const concertChords = (events: ChordEvent[]) => events.map(c => ({ ...c, symbol: transposeChordSymbol(c.symbol, sourceTranspose) }));
 
     // 2. Resolve chords: use provided, fall back to <harmony> tags, then infer
     const extractResult = extractChordEventsFromMusicXml(musicxml);
@@ -61,8 +82,8 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const parsedChords = Array.isArray((inputScore as any)?.meta?.inputChords)
       ? (inputScore as any).meta.inputChords
       : [];
-    const providedChords = Array.isArray(req.chords) ? req.chords : [];
-    const chordsFromFile = extractResult.chords;
+    const providedChords = Array.isArray(req.chords) ? concertChords(req.chords) : [];
+    const chordsFromFile = concertChords(extractResult.chords);
 
     const chordsToUse = providedChords.length
       ? providedChords
@@ -73,6 +94,10 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const inferredIfEmpty = !chordsToUse.length ? inferChordsFromMelody(inputScore as any) : [];
 
     const finalChords = chordsToUse.length ? chordsToUse : inferredIfEmpty;
+    if (protection.lock && providedChords.length && chordsFromFile.length && chordSignature(providedChords) !== chordSignature(chordsFromFile)) {
+      throw new Error("Provided chords differ from the source. Explicitly disable source preservation to reharmonize.");
+    }
+    if (protection.lock) protection.lock.score.meta.inputChords = chordsFromFile;
     const chordSource = providedChords.length
       ? "request"
       : chordsFromFile.length
@@ -178,12 +203,13 @@ export function pipelineMusicxmlToArrangedMusicxml(
     if (isCopyInstrumentation) {
       harmonizedScore = inputScore;
     } else {
+      const melodyInput = protection.lock ? { ...inputScore, meta: { ...inputScore.meta, inputKeyFifths: protection.lock.expected.measures[0]?.attributes?.key_fifths }, parts: inputScore.parts.filter(p => p.part_id === protection.lock!.partId) } : inputScore;
       let outScore: any;
       try {
-        outScore = (harmonizeSatbFromChords as any)(inputScore, finalChords, harmOpts);
+        outScore = (harmonizeSatbFromChords as any)(melodyInput, finalChords, harmOpts);
       } catch {
         outScore = (harmonizeSatbFromChords as any)({
-          scoreModel: inputScore,
+          scoreModel: melodyInput,
           chords: finalChords,
           options: harmOpts
         });
@@ -199,6 +225,8 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const appResult = applyAppSettings(harmonizedScore, settings, finalChords as any);
     let scoreModelOut = appResult.scoreModel as any;
     if (Array.isArray(appResult.warnings)) warnings.push(...appResult.warnings);
+
+    const protectedTargetId = protection.lock ? lockSourceInModel(protection.lock, scoreModelOut, settings) : undefined;
 
     // 6. Choral rule check (skip for non-SATB ensembles)
     const ensembleRaw = String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "").toLowerCase();
@@ -264,37 +292,38 @@ export function pipelineMusicxmlToArrangedMusicxml(
       }
     };
 
+    // An explicit opt-out lets the settings tempo replace the source tempo map.
+    if (settings.preserveSource === false && typeof settings.tempo === "number") {
+      for (const part of scoreModelOut.parts) for (const bar of part.measures) {
+        if (bar.performance) bar.performance = { ...bar.performance, tempos: undefined };
+      }
+    }
+
+    if (phrasePlan) applyPhrasePlan(scoreModelOut, phrasePlan, protectedTargetId!);
+
     // 8. Export to MusicXML
-    const hasPianoPart = scoreModelOut.parts?.some(
-      (p: any) => String(p?.instrument ?? "").toLowerCase().includes("piano")
-    );
-    const hasGrandStaff = scoreModelOut.parts?.some((p: any) => Number(p?.staves ?? 1) === 2);
-    const hasWoodwindPart = scoreModelOut.parts?.some((p: any) => {
-      const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
-      return s.includes("flute") || s.includes("oboe") || s.includes("clarinet") || s.includes("bassoon");
-    });
-    const hasBrassPart = scoreModelOut.parts?.some((p: any) => {
-      const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
-      return s.includes("trumpet") || s.includes("horn") || s.includes("trombone") || s.includes("tuba");
-    });
-    // Double bass is a transposing instrument (written one octave higher than sounding).
-    // The general exporter handles this correctly via getTransposeForInstrument;
-    // the SATB exporter does not — so route any score with a double bass through
-    // the general exporter.
-    const hasDoubleBass = scoreModelOut.parts?.some((p: any) => {
-      const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
-      return s.includes("double_bass") || s.includes("double bass") || s.includes("contrabass");
-    });
+    // One canonical MusicXML exporter for every ensemble.
+    let outputXml = exportScoreModelToMusicXML(scoreModelOut);
+    if (protection.lock && protectedTargetId) {
+      const checked = preserveAndVerifyXml(protection.lock, scoreModelOut, outputXml, protectedTargetId);
+      outputXml = checked.xml;
+      preservation = checked.report;
+    }
+    scoreModelOut.meta.sourcePreservation = preservation;
+    const synchronized = synchronizePerformance(outputXml, scoreModelOut, protectedTargetId);
+    outputXml = synchronized.musicxml;
+    scoreModelOut = synchronized.scoreModel;
+    if (protection.lock && protectedTargetId) {
+      preservation = verifySourceOutput(protection.lock, scoreModelOut, outputXml, protectedTargetId);
+      scoreModelOut.meta.sourcePreservation = preservation;
+    }
+    if (synchronized.report.reason) warnings.push(`MIDI/playback unavailable: ${synchronized.report.reason}`);
+    warnings.push(...(synchronized.report.warnings ?? []));
 
-    const useGeneralExporter =
-      isPiano || isWoodwinds || isBrass || isOrchestra || isSymphonic || hasPianoPart || hasGrandStaff || hasWoodwindPart || hasBrassPart || hasDoubleBass ||
-      // Re-instrumentation relies on per-instrument written transposition, which
-      // only the general exporter applies (the SATB exporter ignores it).
-      isReinstrument;
-
-    const outputXml = useGeneralExporter
-      ? exportScoreModelToMusicXML(scoreModelOut)
-      : exportSatbScoreModelToMusicXML(scoreModelOut);
+    // Closing double bar, added last — after source verification, so it can never
+    // be mistaken for a change to the preserved source part. Engine-generated
+    // sources (rhythm-chart PDF, typed chords) have no barline to copy across.
+    outputXml = ensureFinalBarlines(outputXml);
 
     const cadenceMeasures: number[] = Array.isArray(appResult.cadenceMeasures)
       ? appResult.cadenceMeasures
@@ -308,9 +337,13 @@ export function pipelineMusicxmlToArrangedMusicxml(
     return {
       ok: true,
       musicxml: outputXml,
+      midiBase64: synchronized.midiBase64,
       scoreModel: scoreModelOut,
       warnings,
       meta: {
+        phraseCollaboration: phrasePlan ? { status: "applied", phraseCount: phrasePlan.phrases.length, sourceFingerprint: phrasePlan.sourceFingerprint, plan: phrasePlan } : undefined,
+        preservation,
+        performance: synchronized.report,
         ensemble: ensembleRaw,
         styleUsed: appResult.styleUsed,
         chordSource,

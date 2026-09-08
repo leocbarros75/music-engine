@@ -1,3 +1,4 @@
+import PhraseCollaboration, { type PhrasePlan } from "./components/PhraseCollaboration";
 import { useEffect, useRef, useState } from "react";
 import SettingsForm from "./components/SettingsForm";
 import AISettingsHelper from "./components/AISettingsHelper";
@@ -26,6 +27,8 @@ async function safeJson(res: Response): Promise<any> {
 }
 
 const DEFAULT_SETTINGS: Settings = {
+  preserveSource: true,
+  melodyOctaveShift: 0,
   title: "",
   ensemble: "choral",
   keySignature: "original",
@@ -100,6 +103,7 @@ function validateXmlClient(text: string): string | null {
 }
 
 export default function App() {
+  const [phrasePlan, setPhrasePlan] = useState<PhrasePlan | null>(null);
   const [view, setView] = useState<"landing" | "studio">("landing");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [inputMode, setInputMode] = useState<"file" | "chords">("file");
@@ -382,16 +386,15 @@ export default function App() {
     setOutputMusicxml(null);
 
     try {
-      const keySignatureMode = settings.keySignature === "original" ? "original" : "manual";
-      const timeSignatureMode = settings.timeSignature === "original" ? "original" : "manual";
 
       const res = await fetch("/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           musicxml: musicxmlInput,
+          phrasePlan: settings.ensemble === "string_ensemble" ? phrasePlan ?? undefined : undefined,
           partIds: selectedPartIds,
-          settings: { ...settings, keySignatureMode, timeSignatureMode },
+          settings,
           options: { keepMelodyInSoprano: true },
         }),
       });
@@ -417,15 +420,13 @@ export default function App() {
     setOutputMusicxml(null);
 
     try {
-      const keySignatureMode = settings.keySignature === "original" ? "original" : "manual";
-      const timeSignatureMode = settings.timeSignature === "original" ? "original" : "manual";
 
       const res = await fetch("/generate_from_chords", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chords: chordText,
-          settings: { ...settings, keySignatureMode, timeSignatureMode },
+          settings,
           options: { keepMelodyInSoprano: true },
         }),
       });
@@ -630,6 +631,10 @@ export default function App() {
             />
           </section>
 
+          {inputMode === "file" && musicxmlInput && settings.ensemble === "string_ensemble" && (
+            <PhraseCollaboration musicxml={musicxmlInput} settings={settings} partIds={selectedPartIds} disabled={isRunning} onPlanChange={setPhrasePlan}/>
+          )}
+
           {/* ── Generate action ───────────────────────────────────── */}
           <section className="panel action-panel">
             <div className="action-row">
@@ -651,6 +656,15 @@ export default function App() {
 
             {jobResult?.ok && jobResult.meta && (
               <div className="result-summary">
+                {jobResult.meta.phraseCollaboration && <div className="result-row"><span className="label">Phrase plan</span><span>{jobResult.meta.phraseCollaboration.phraseCount} reviewed phrases applied</span></div>}
+                {jobResult.meta.performance && <div className="result-row"><span className="label">MIDI & playback</span><span>{jobResult.meta.performance.status === "ready" ? "Follow the exported score" : jobResult.meta.performance.reason}</span></div>}
+                {jobResult.meta.preservation && (
+                  <div className="result-row"><span className="label">Source preservation</span><span>
+                    {jobResult.meta.preservation.status === "verified"
+                      ? `Verified: ${jobResult.meta.preservation.notes} notes, ${jobResult.meta.preservation.chords} source chords, ${jobResult.meta.preservation.measures} measures. ${jobResult.meta.preservation.octaveShift ? `Octave shift: ${jobResult.meta.preservation.octaveShift > 0 ? "+" : ""}${jobResult.meta.preservation.octaveShift}.` : "Original octave."}`
+                      : jobResult.meta.preservation.reason}
+                  </span></div>
+                )}
                 {jobResult.meta.title && (
                   <div className="result-row"><span className="label">Title</span><span>{jobResult.meta.title}</span></div>
                 )}
@@ -683,12 +697,11 @@ export default function App() {
                     ↓ MusicXML
                   </button>
                   <button
-                    onClick={() => downloadMidi(
+                    onClick={() => { try { downloadMidi(
                       jobResult?.scoreModel,
                       settings.title || jobResult.meta?.title || "arrangement",
-                      settings.tempo,
-                    )}
-                    disabled={!jobResult?.scoreModel}
+                    ); } catch (error) { setWarnings([error instanceof Error ? error.message : "MIDI export failed."]); } }}
+                    disabled={!jobResult?.scoreModel || jobResult.meta?.performance?.status === "unsupported"}
                     style={{ marginLeft: "8px" }}
                   >
                     ↓ MIDI
@@ -704,7 +717,7 @@ export default function App() {
               <div className="score-panel-header">
                 <h2>Score Preview</h2>
                 <ErrorBoundary label="audio">
-                  <AudioPlayer scoreModel={(jobResult?.scoreModel as any) ?? null} bpm={settings.tempo} />
+                  <AudioPlayer scoreModel={(jobResult?.scoreModel as any) ?? null} />
                 </ErrorBoundary>
               </div>
               <ErrorBoundary label="score">

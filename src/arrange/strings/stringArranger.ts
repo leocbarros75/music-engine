@@ -1,3 +1,4 @@
+import { buildMeasureTimeline } from "../../score/standard";
 import type { NoteEvent, ScoreModel } from "../../score/types";
 import type { Slice, StringArrangerOptions, StringArrangerResult, StringEnsembleArrangement, VoiceId, Voicing } from "./types";
 import { buildCandidatesForSlice, buildVoicingStates } from "./candidates";
@@ -91,10 +92,11 @@ function snapToStandardDuration(dur: number): number {
 function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
   const slices: Slice[] = [];
   const measures = melodyPart?.measures ?? [];
+  const timeline = buildMeasureTimeline({ parts: [melodyPart] });
   for (let i = 0; i < measures.length; i++) {
     const m = measures[i];
-    const mNum = Number(m?.number) || i + 1;
-    const measureLen = measureLengthBeats(m);
+    const mNum = Number(m?.number ?? i + 1);
+    const measureLen = timeline[i].durationBeats;
     const melEvents = (m?.events ?? []).filter(isNoteOrRest).sort((a: any, b: any) => Number(a.t) - Number(b.t));
     const times = new Set<number>();
     // Only add time points within the measure — values beyond measureLen would
@@ -182,11 +184,12 @@ function makeEventsFromVoicing(
 function groupEventsByMeasure(events: NoteEvent[], template: any[]): any[] {
   const byMeasure: Record<number, NoteEvent[]> = {};
   for (const ev of events) {
-    const m = Number(ev.id.split("-")[1]) || 1;
+    const m = Number(ev.id.split("-")[1]);
     if (!byMeasure[m]) byMeasure[m] = [];
     byMeasure[m].push(ev);
   }
   return template.map((m) => ({
+    ...m,
     number: m.number,
     attributes: m.attributes ? clone(m.attributes) : undefined,
     events: (byMeasure[m.number] ?? []).sort((a, b) => a.t - b.t)
@@ -203,6 +206,7 @@ function buildPart(
   return {
     part_id,
     name,
+    pitchSpace: "sounding",
     instrument,
     staves: 1,
     measures: groupEventsByMeasure(voiceEvents, template)
@@ -245,6 +249,7 @@ export function arrangeStringEnsemble(
   const cb = makeEventsFromVoicing(slices, bestVoicings, "cb");
 
   const measuresTemplate = (melodyPart.measures ?? []).map((m: any) => ({
+    ...m,
     number: m.number,
     attributes: m.attributes ? clone(m.attributes) : undefined
   }));

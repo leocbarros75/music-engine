@@ -65,7 +65,7 @@ function chordSuffixFromKind(kind: string, warnings: string[]): string {
   if (k === "major-seventh") return "maj7";
   if (k === "minor-seventh") return "m7";
   if (k === "minor-major-seventh") return "mMaj7";
-  if (k === "dominant-ninth" || k === "major-ninth") return "9";
+  if (k === "dominant-ninth") return "9";
   if (k === "major-ninth") return "maj9";         // MusicXML "major-ninth" = maj9
   if (k === "dominant-11th") return "11";
   if (k === "major-11th") return "maj11";
@@ -166,7 +166,7 @@ export function extractChordEventsFromMusicXml(xml: string): ExtractChordResult 
             if (parsed) {
               const offsetEl = firstChild(el, "offset");
               const offsetDivs = offsetEl ? intOf(offsetEl, 0) : null;
-              const rawBeat = offsetDivs !== null ? offsetDivs / curDivisions : t;
+              const rawBeat = offsetDivs !== null ? t + offsetDivs / curDivisions : t;
               const beat = Number.isFinite(rawBeat) ? rawBeat : 0;
               chordEvents.push({ measure: measureNumber, t: Math.max(0, beat), symbol: parsed.symbol });
             } else {
@@ -178,7 +178,7 @@ export function extractChordEventsFromMusicXml(xml: string): ExtractChordResult 
           if (tag === "note") {
             const isChordTone = !!firstChild(el, "chord");
             const durEl = firstChild(el, "duration");
-            const durDivs = intOf(durEl, curDivisions);
+            const durDivs = firstChild(el, "grace") ? 0 : intOf(durEl, curDivisions);
             const dur = curDivisions > 0 ? durDivs / curDivisions : durDivs;
             if (!isChordTone) t += dur;
             continue;

@@ -1,3 +1,11 @@
+import { inspectPhrases, defaultPhrasePlan, validatePhrasePlan } from "./ai/phrasePlan";
+import { proposePhrasePlan } from "./ai/proposePhrasePlan";
+import { selectSourceParts } from "./preservation/sourcePreservation";
+import { generateArrangement } from "./app/generateArrangement";
+import { normalizeAppSettings } from "./app/normalizeAppSettings";
+import { validateMusicXml } from "./app/validateMusicXml";
+import { toSoundingScore, transposeChordSymbol } from "./score/pitch";
+import { partPitchSpace } from "./score/standard";
 // src/server.ts
 import http from "node:http";
 import process from "node:process";
@@ -25,14 +33,13 @@ import { parseChordSymbol } from "./harmonize/satb/chordSymbol";
 import { harmonizeMelody, extractMelodyFromScore } from "./harmonize/melodic/melodyHarmonizer";
 import { pitchToMidi } from "./instruments/instrumentCatalog";
 import type { HarmonizeSatbFromChordsRequest } from "./harmonize/satb/harmonizeTypes";
-import { applyAppSettings, type AppSettings } from "./app/applyAppSettings";
+import { applyAppSettings } from "./app/applyAppSettings";
 import { checkChoralRules } from "./rules/choral/checkChoralRules";
 import { parsePromptWithAI } from "./app/parsePromptWithAI";
 
-import { pipelineMusicxmlToArrangedMusicxml } from "./pipeline/pipelineMusicxmlToArrangedMusicxml";
 import { parseRhythmChartPdf } from "./import/rhythmChartPdf";
 import { getOmrProvider, omrStatus } from "./omr/omrProvider";
-import { arrangeWorshipOrchestraFromRhythmChart, buildRhythmChartSkeleton } from "./arrange/orchestra/worshipOrchestraArranger";
+import { arrangeRhythmChart } from "./app/arrangeRhythmChart";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
 import { exportSatbScoreModelToMusicXML } from "./exporters/satbMusicxmlExporter";
 import { extractChordEventsFromMusicXml } from "./extract/chordEventsFromMusicXml";
@@ -43,26 +50,6 @@ type Json = Record<string, unknown>;
 type ChordEvent = { measure: number; t: number; symbol: string };
 
 // ── MusicXML validation ────────────────────────────────────────────────────
-function validateMusicXml(xml: string): { ok: true } | { ok: false; error: string } {
-  if (!xml || typeof xml !== "string") return { ok: false, error: "No MusicXML content provided." };
-  const trimmed = xml.trimStart();
-  if (!trimmed.startsWith("<?xml") && !trimmed.startsWith("<score")) {
-    return { ok: false, error: "File does not appear to be an XML document." };
-  }
-  if (!/<score-partwise|<score-timewise/i.test(xml)) {
-    return {
-      ok: false,
-      error: "File is not a valid MusicXML document — missing <score-partwise> or <score-timewise> root element."
-    };
-  }
-  if (!/<part[\s>]/i.test(xml)) {
-    return { ok: false, error: "MusicXML file contains no parts. Please upload a score with at least one instrument." };
-  }
-  if (!/<measure[\s>]/i.test(xml)) {
-    return { ok: false, error: "MusicXML file contains no measures. The score appears to be empty." };
-  }
-  return { ok: true };
-}
 
 function chordPcsFromSymbolLoose(symbol: string): number[] | null {
   const raw = String(symbol || "").trim();
@@ -527,209 +514,12 @@ function extractChordsFromPdfText(text: string): string | null {
   return chordLines.join(" | ");
 }
 
-function isActivity(v: unknown): v is "grounded" | "less_active" | "active" | "high_active" {
-  return v === "grounded" || v === "less_active" || v === "active" || v === "high_active";
-}
-
-function normalizeAppSettings(raw: unknown): AppSettings {
-  if (!isObject(raw)) return {};
-  const anyRaw = raw as Record<string, unknown>;
-  const keyFifths = typeof anyRaw.keyFifths === "number" ? anyRaw.keyFifths : undefined;
-  const accompanimentType =
-    typeof anyRaw.accompanimentType === "string"
-      ? anyRaw.accompanimentType
-      : typeof anyRaw.accompaniment === "string"
-        ? anyRaw.accompaniment
-        : undefined;
-  const keySignatureMode =
-    anyRaw.keySignatureMode === "original" || anyRaw.keySignatureMode === "manual"
-      ? (anyRaw.keySignatureMode as AppSettings["keySignatureMode"])
-      : undefined;
-  const timeSignatureMode =
-    anyRaw.timeSignatureMode === "original" || anyRaw.timeSignatureMode === "manual"
-      ? (anyRaw.timeSignatureMode as AppSettings["timeSignatureMode"])
-      : undefined;
-
-  return {
-    title: typeof anyRaw.title === "string" ? anyRaw.title : undefined,
-    ensemble: typeof anyRaw.ensemble === "string" ? anyRaw.ensemble : undefined,
-    keySignature: typeof anyRaw.keySignature === "string" ? anyRaw.keySignature : undefined,
-    keyFifths,
-    keySignatureMode,
-    targetKey: typeof anyRaw.targetKey === "string" ? anyRaw.targetKey : undefined,
-    timeSignature: typeof anyRaw.timeSignature === "string" ? anyRaw.timeSignature : undefined,
-    timeSignatureMode,
-    tempo: typeof anyRaw.tempo === "number" ? anyRaw.tempo : undefined,
-    style: typeof anyRaw.style === "string" ? anyRaw.style : undefined,
-    level: typeof anyRaw.level === "string" ? (anyRaw.level as AppSettings["level"]) : undefined,
-    accompanimentType,
-    accompaniment: typeof anyRaw.accompaniment === "string" ? anyRaw.accompaniment : undefined,
-    ruleStrictness:
-      anyRaw.ruleStrictness === "relaxed" || anyRaw.ruleStrictness === "standard" || anyRaw.ruleStrictness === "strict"
-        ? (anyRaw.ruleStrictness as AppSettings["ruleStrictness"])
-        : undefined,
-    textureMode: typeof anyRaw.textureMode === "string" ? anyRaw.textureMode : undefined,
-    styleProfile: typeof anyRaw.styleProfile === "string" ? anyRaw.styleProfile : undefined,
-    modernMode: typeof anyRaw.modernMode === "string" ? anyRaw.modernMode : undefined,
-    bassActivity:
-      anyRaw.bassActivity === "grounded" ||
-      anyRaw.bassActivity === "less_active" ||
-      anyRaw.bassActivity === "active" ||
-      anyRaw.bassActivity === "high_active"
-        ? (anyRaw.bassActivity as AppSettings["bassActivity"])
-        : undefined,
-    tenorActivity:
-      anyRaw.tenorActivity === "grounded" ||
-      anyRaw.tenorActivity === "less_active" ||
-      anyRaw.tenorActivity === "active" ||
-      anyRaw.tenorActivity === "high_active"
-        ? (anyRaw.tenorActivity as AppSettings["tenorActivity"])
-        : undefined,
-    altoActivity:
-      anyRaw.altoActivity === "grounded" ||
-      anyRaw.altoActivity === "less_active" ||
-      anyRaw.altoActivity === "active" ||
-      anyRaw.altoActivity === "high_active"
-        ? (anyRaw.altoActivity as AppSettings["altoActivity"])
-        : undefined,
-    sopranoActivity:
-      anyRaw.sopranoActivity === "grounded" ||
-      anyRaw.sopranoActivity === "less_active" ||
-      anyRaw.sopranoActivity === "active" ||
-      anyRaw.sopranoActivity === "high_active"
-        ? (anyRaw.sopranoActivity as AppSettings["sopranoActivity"])
-        : undefined,
-    vln1Activity:
-      anyRaw.vln1Activity === "grounded" ||
-      anyRaw.vln1Activity === "less_active" ||
-      anyRaw.vln1Activity === "active" ||
-      anyRaw.vln1Activity === "high_active"
-        ? (anyRaw.vln1Activity as AppSettings["vln1Activity"])
-        : undefined,
-    vln2Activity:
-      anyRaw.vln2Activity === "grounded" ||
-      anyRaw.vln2Activity === "less_active" ||
-      anyRaw.vln2Activity === "active" ||
-      anyRaw.vln2Activity === "high_active"
-        ? (anyRaw.vln2Activity as AppSettings["vln2Activity"])
-        : undefined,
-    vlaActivity:
-      anyRaw.vlaActivity === "grounded" ||
-      anyRaw.vlaActivity === "less_active" ||
-      anyRaw.vlaActivity === "active" ||
-      anyRaw.vlaActivity === "high_active"
-        ? (anyRaw.vlaActivity as AppSettings["vlaActivity"])
-        : undefined,
-    vcActivity:
-      anyRaw.vcActivity === "grounded" ||
-      anyRaw.vcActivity === "less_active" ||
-      anyRaw.vcActivity === "active" ||
-      anyRaw.vcActivity === "high_active"
-        ? (anyRaw.vcActivity as AppSettings["vcActivity"])
-        : undefined,
-    cbActivity:
-      anyRaw.cbActivity === "grounded" ||
-      anyRaw.cbActivity === "less_active" ||
-      anyRaw.cbActivity === "active" ||
-      anyRaw.cbActivity === "high_active"
-        ? (anyRaw.cbActivity as AppSettings["cbActivity"])
-        : undefined,
-    instrumentation:
-      anyRaw.instrumentation === "auto" ||
-      anyRaw.instrumentation === "piano_copy_to_string_quartet" ||
-      anyRaw.instrumentation === "satb_to_string_quartet" ||
-      anyRaw.instrumentation === "piano_copy_to_woodwind_quartet" ||
-      anyRaw.instrumentation === "satb_to_woodwind_quartet"
-        ? (anyRaw.instrumentation as AppSettings["instrumentation"])
-        : undefined,
-    woodwindQuintet: typeof anyRaw.woodwindQuintet === "boolean" ? anyRaw.woodwindQuintet : undefined,
-    woodwindSize:
-      anyRaw.woodwindSize === "quartet" || anyRaw.woodwindSize === "quintet"
-        ? (anyRaw.woodwindSize as AppSettings["woodwindSize"])
-        : undefined,
-    woodwindTexture:
-      anyRaw.woodwindTexture === "melody_harmony" || anyRaw.woodwindTexture === "chorale" ||
-      anyRaw.woodwindTexture === "contrapuntal" || anyRaw.woodwindTexture === "chamber"
-        ? (anyRaw.woodwindTexture as AppSettings["woodwindTexture"])
-        : undefined,
-    bassoonEntryMeasure:
-      typeof anyRaw.bassoonEntryMeasure === "number" && Number.isFinite(anyRaw.bassoonEntryMeasure)
-        ? anyRaw.bassoonEntryMeasure
-        : undefined,
-    brassTexture:
-      anyRaw.brassTexture === "melody_harmony" || anyRaw.brassTexture === "chamber" ||
-      anyRaw.brassTexture === "chorale" || anyRaw.brassTexture === "fanfare" ||
-      anyRaw.brassTexture === "contrapuntal"
-        ? (anyRaw.brassTexture as AppSettings["brassTexture"])
-        : undefined,
-    brassExample: typeof anyRaw.brassExample === "string" ? anyRaw.brassExample : undefined,
-    brassQuintet: typeof anyRaw.brassQuintet === "boolean" ? anyRaw.brassQuintet : undefined,
-    woodwindExample:  typeof anyRaw.woodwindExample === "string" ? anyRaw.woodwindExample : undefined,
-    woodwindComposer: typeof anyRaw.woodwindComposer === "string" ? anyRaw.woodwindComposer : undefined,
-    fluteActivity:    isActivity(anyRaw.fluteActivity)    ? anyRaw.fluteActivity    : undefined,
-    oboeActivity:     isActivity(anyRaw.oboeActivity)     ? anyRaw.oboeActivity     : undefined,
-    clarinetActivity: isActivity(anyRaw.clarinetActivity) ? anyRaw.clarinetActivity : undefined,
-    hornActivity:     isActivity(anyRaw.hornActivity)     ? anyRaw.hornActivity     : undefined,
-    bassoonActivity:  isActivity(anyRaw.bassoonActivity)  ? anyRaw.bassoonActivity  : undefined,
-    sopranoMelodyShare:
-      typeof anyRaw.sopranoMelodyShare === "number" && Number.isFinite(anyRaw.sopranoMelodyShare)
-        ? anyRaw.sopranoMelodyShare
-        : undefined,
-    randomizeOffsets: typeof anyRaw.randomizeOffsets === "boolean" ? anyRaw.randomizeOffsets : undefined,
-    pianoStylePreset: typeof anyRaw.pianoStylePreset === "string" ? anyRaw.pianoStylePreset : undefined,
-    pianoStylePresetPath: typeof anyRaw.pianoStylePresetPath === "string" ? anyRaw.pianoStylePresetPath : undefined,
-    useStringEnsembleArranger: typeof anyRaw.useStringEnsembleArranger === "boolean" ? anyRaw.useStringEnsembleArranger : undefined,
-    lhPattern: typeof anyRaw.lhPattern === "string" ? anyRaw.lhPattern : undefined,
-    rhPattern: typeof anyRaw.rhPattern === "string" ? anyRaw.rhPattern : undefined,
-    bassRhythm: anyRaw.bassRhythm === "whole" || anyRaw.bassRhythm === "half" || anyRaw.bassRhythm === "quarter"
-      ? anyRaw.bassRhythm : undefined,
-    bassFinalNote: anyRaw.bassFinalNote === "follow_melody" || anyRaw.bassFinalNote === "default"
-      ? anyRaw.bassFinalNote : undefined,
-    reinstrument: Array.isArray(anyRaw.reinstrument)
-      ? anyRaw.reinstrument
-          .filter((r: any) => r && typeof r.part === "string" && typeof r.to === "string")
-          .map((r: any) => ({ part: r.part, to: r.to }))
-      : undefined,
-    orchestraIntensity: anyRaw.orchestraIntensity === "build" || anyRaw.orchestraIntensity === "tutti"
-      ? anyRaw.orchestraIntensity : undefined,
-    // Symphonic orchestra period (explicit === checks: strict tsc rejects
-    // .includes() on an unknown value — that broke a Render deploy once).
-    symphonicPeriod: anyRaw.symphonicPeriod === "classical" || anyRaw.symphonicPeriod === "romantic"
-      ? anyRaw.symphonicPeriod : undefined,
-    orchestraTexture: anyRaw.orchestraTexture === "melody_harmony" || anyRaw.orchestraTexture === "chorale" || anyRaw.orchestraTexture === "contrapuntal"
-      ? anyRaw.orchestraTexture : undefined,
-    orchestraParts: Array.isArray(anyRaw.orchestraParts)
-      ? anyRaw.orchestraParts.filter((s: any) => typeof s === "string")
-      : undefined,
-    orchestraBalance: (anyRaw.orchestraBalance === "default" || anyRaw.orchestraBalance === "more_strings" ||
-      anyRaw.orchestraBalance === "more_winds" || anyRaw.orchestraBalance === "more_brass")
-      ? anyRaw.orchestraBalance : undefined,
-    orchestraPartRanges: Array.isArray(anyRaw.orchestraPartRanges)
-      ? anyRaw.orchestraPartRanges
-          .filter((r: any) => r && typeof r.part === "string" && Array.isArray(r.ranges))
-          .map((r: any) => ({
-            part: r.part,
-            ranges: r.ranges
-              .filter((x: any) => Array.isArray(x) && x.length === 2 && Number.isFinite(Number(x[0])) && Number.isFinite(Number(x[1])))
-              .map((x: any) => [Number(x[0]), Number(x[1])] as [number, number]),
-          }))
-          .filter((r: any) => r.ranges.length)
-      : undefined,
-    suzukiVolume:
-      typeof anyRaw.suzukiVolume === "number" && Number.isInteger(anyRaw.suzukiVolume) && anyRaw.suzukiVolume >= 1
-        ? (anyRaw.suzukiVolume as number)
-        : typeof anyRaw.suzukiVolume === "string" && /^\d+$/.test(anyRaw.suzukiVolume)
-          ? parseInt(anyRaw.suzukiVolume, 10)
-          : undefined,
-  };
-}
-
 // ── Simple in-memory rate limiter ────────────────────────────────────────────
 // Heavy arrangement endpoints: max 12 requests per IP per 60 seconds.
 // Lightweight (health, static assets) are not counted.
 const RATE_WINDOW_MS   = 60_000;
 const RATE_MAX_HEAVY   = 12;
-const HEAVY_ENDPOINTS  = new Set(["/generate", "/generate_from_chords", "/arrange_musicxml"]);
+const HEAVY_ENDPOINTS  = new Set(["/generate", "/generate_from_chords", "/arrange_musicxml", "/harmonize_satb_from_chords", "/generate_from_rhythm_pdf", "/phrase_context", "/propose_phrase_plan"]);
 
 // Ensembles that TRANSCRIBE an existing scored file (copy a piano/SATB source to
 // a quartet, or re-instrument existing parts). A chord/rhythm-chart PDF has no
@@ -760,9 +550,9 @@ setInterval(() => {
   for (const [ip, b] of rateBuckets) {
     if (now > b.resetAt) rateBuckets.delete(ip);
   }
-}, RATE_WINDOW_MS);
+}, RATE_WINDOW_MS).unref();
 
-const server = http.createServer(async (req, res) => {
+export const server = http.createServer(async (req, res) => {
   try {
     if (req.method === "OPTIONS") {
       res.writeHead(204, {
@@ -787,7 +577,7 @@ const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-07-13-v35-midi-timing", omr: omrStatus() });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-09-08-v36-phrase-performance", omr: omrStatus() });
       return;
     }
 
@@ -935,7 +725,17 @@ const server = http.createServer(async (req, res) => {
     // ----------------------------
     // SATB harmonize from chords (new)
     // ----------------------------
+    // Current clients and MusicXML compatibility aliases share validation, source
+    // selection, settings and the exact same output contract.
+    if (url === "/generate" || url === "/arrange_musicxml" ||
+        (url === "/harmonize_satb_from_chords" && "musicxml" in body)) {
+      const result = generateArrangement(body);
+      sendJson(res, result.ok ? 200 : 400, result);
+      return;
+    }
+
     if (url === "/harmonize_satb_from_chords") {
+
       const reqBody = body as unknown as HarmonizeSatbFromChordsRequest;
 
       let musicxml = typeof (reqBody as any).musicxml === "string" ? (reqBody as any).musicxml : null;
@@ -1023,8 +823,10 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
+      const sourceTranspose = score.parts?.[0] && partPitchSpace(score.parts[0]) === "written" ? score.parts[0].transpose : undefined;
+      score = toSoundingScore(score);
       const parsedChords = Array.isArray((score as any)?.meta?.inputChords) ? (score as any).meta.inputChords : [];
-      const chordsToUse = chords.length ? chords : parsedChords;
+      const chordsToUse = chords.length ? chords.map((c: any) => ({ ...c, symbol: transposeChordSymbol(c.symbol, sourceTranspose) })) : parsedChords;
 
       // Melody-only mode: use Krumhansl-Schmuckler key detection + scale-degree harmonizer
       // when no chords are supplied and settings.melodyOnly is enabled.
@@ -1270,88 +1072,6 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // --- full arrange pipeline ---
-    if (url === "/arrange_musicxml" || url === "/generate") {
-      const musicxml = typeof body.musicxml === "string" ? body.musicxml : null;
-      if (!musicxml) {
-        sendJson(res, 400, { ok: false, error: "Provide 'musicxml' as a string in the request body." });
-        return;
-      }
-      const xmlValidation = validateMusicXml(musicxml);
-      if (!xmlValidation.ok) {
-        sendJson(res, 400, { ok: false, error: (xmlValidation as { ok: false; error: string }).error });
-        return;
-      }
-      const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
-      const chords   = Array.isArray(body.chords) ? body.chords : undefined;
-      const options  = isObject(body.options) ? (body.options as Record<string, unknown>) : {};
-      // Optional: filter to specific parts before arranging
-      const partIds  = asArray(body.partIds)?.map(String) ?? [];
-
-      // If partIds provided, extract those parts first.
-      // IMPORTANT: Re-exporting to MusicXML strips <harmony> tags, so we must extract
-      // chord events from the ORIGINAL XML before re-exporting and pass them explicitly.
-      let workingXml = musicxml;
-      let chordsFromPartFilter: ChordEvent[] | undefined;
-      if (partIds.length) {
-        // Extract chord events from original before re-export strips <harmony> tags
-        try {
-          const { chords: origChords } = extractChordEventsFromMusicXml(musicxml);
-          if (origChords.length) chordsFromPartFilter = origChords;
-        } catch {
-          // ignore — pipeline will fall back to inference
-        }
-
-        try {
-          const score: any = parseMusicXMLToScoreModel(musicxml);
-          const filtered = (score.parts ?? []).filter((p: any) => partIds.includes(String(p.part_id ?? "")));
-          // A grand staff / piano part has its RH and LH on separate staves. Both
-          // MusicXML exporters FLATTEN that on a round-trip (staff 2 → staff 1),
-          // which destroys the LH and makes the piano-copy arrangers produce a
-          // sparse, broken result. So when a kept part is a grand staff, DO NOT
-          // re-export — use the original XML (it already has the right structure;
-          // the copy arrangers locate the piano part by name themselves).
-          const keepsGrandStaff = filtered.some((p: any) => {
-            const s = `${p?.instrument ?? ""} ${p?.name ?? ""}`.toLowerCase();
-            if (Number(p?.staves ?? 1) >= 2) return true;
-            if (s.includes("piano") || s.includes("keyboard") || s.includes("organ")) return true;
-            return (p?.measures ?? []).some((m: any) =>
-              (m?.events ?? []).some((ev: any) => Number(ev?.staff) === 2)
-            );
-          });
-          const selectsAllParts = filtered.length === (score.parts ?? []).length;
-          if (filtered.length && !keepsGrandStaff && !selectsAllParts) {
-            // Safe to filter+re-export (single-staff parts only, dropping some).
-            const filteredScore = { ...score, parts: filtered };
-            workingXml = exportSatbScoreModelToMusicXML(filteredScore);
-          }
-          // else: keep the original musicxml (grand staff preserved / nothing dropped).
-        } catch {
-          // fall through — use original xml
-        }
-      }
-
-      // Merge: explicit body chords take priority, then chords rescued from original XML
-      const resolvedChords = chords ?? chordsFromPartFilter;
-
-      const result = pipelineMusicxmlToArrangedMusicxml({ musicxml: workingXml, settings, chords: resolvedChords, options });
-
-      if (!result.ok) {
-        const errResult = result as import("./pipeline/pipelineMusicxmlToArrangedMusicxml").PipelineError;
-        sendJson(res, 500, { ok: false, error: errResult.error, warnings: errResult.warnings });
-        return;
-      }
-
-      sendJson(res, 200, {
-        ok: true,
-        musicxml:   result.musicxml,
-        scoreModel: result.scoreModel,
-        warnings:   result.warnings,
-        meta:       result.meta
-      });
-      return;
-    }
-
     // ----------------------------
     // Generate arrangement from chord progression text
     // ----------------------------
@@ -1381,7 +1101,7 @@ const server = http.createServer(async (req, res) => {
         symbol: c.symbol,
       }));
 
-      const result = pipelineMusicxmlToArrangedMusicxml({
+      const result = generateArrangement({
         musicxml: generatedXml,
         settings,
         chords: chordEvents,
@@ -1398,6 +1118,7 @@ const server = http.createServer(async (req, res) => {
       sendJson(res, 200, {
         ok: true,
         musicxml:   result.musicxml,
+        midiBase64: result.midiBase64,
         scoreModel: result.scoreModel,
         warnings:   [...genWarnings, ...result.warnings],
         meta:       result.meta
@@ -1418,7 +1139,6 @@ const server = http.createServer(async (req, res) => {
       }
       const settings = normalizeAppSettings(isObject(body.settings) ? body.settings : {});
       const ensembleRaw = String((settings as any).ensemble ?? "orchestra").toLowerCase();
-      const isOrchestra = ensembleRaw === "orchestra" || ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra";
       // "Copy" ensembles transcribe an existing scored file — a chord chart has no
       // source parts to copy, so they can't be driven by a PDF chart.
       if (CHART_INCAPABLE_ENSEMBLES.has(ensembleRaw)) {
@@ -1442,62 +1162,8 @@ const server = http.createServer(async (req, res) => {
           });
           return;
         }
-        const warnings: string[] = [...chart.warnings];
-
-        let musicxml: string;
-        let scoreModel: unknown;
-        if (isOrchestra) {
-          const result = arrangeWorshipOrchestraFromRhythmChart(chart, {
-            warnings,
-            intensity: (settings.orchestraIntensity as any) ?? "build",
-            parts: settings.orchestraParts,
-            balance: (settings.orchestraBalance as any) ?? "default",
-            partRanges: settings.orchestraPartRanges as any,
-          });
-          musicxml = exportScoreModelToMusicXML(result.scoreModel);
-          scoreModel = result.scoreModel;
-        } else {
-          // Non-orchestra: build the harmony skeleton (guide-tone melody + exact
-          // chords incl. slash basses) and arrange it for the chosen ensemble.
-          const { score, chords } = buildRhythmChartSkeleton(chart);
-          const skeletonXml = exportScoreModelToMusicXML(score as any);
-          const pipe = pipelineMusicxmlToArrangedMusicxml({
-            musicxml: skeletonXml,
-            settings,
-            chords,
-            options: { keepMelodyInSoprano: true },
-          });
-          if (!pipe.ok) {
-            const err = pipe as import("./pipeline/pipelineMusicxmlToArrangedMusicxml").PipelineError;
-            sendJson(res, 500, { ok: false, error: err.error, warnings: [...warnings, ...err.warnings] });
-            return;
-          }
-          musicxml = pipe.musicxml;
-          scoreModel = pipe.scoreModel;
-          warnings.push(...pipe.warnings, `[rhythm-chart] ${chart.measures.length} measures, ${chordCount} chords → ${ensembleRaw}.`);
-        }
-
-        const partList = ((scoreModel as any)?.parts ?? []).map((p: any) => ({ name: p.name ?? p.part_id, instrument: p.instrument ?? "" }));
-        sendJson(res, 200, {
-          ok: true,
-          musicxml,
-          scoreModel,
-          // Shape-compatible with the /generate meta the UI renders, plus chart extras.
-          meta: {
-            ensemble: ensembleRaw,
-            chordSource: "rhythm_chart_pdf",
-            cadenceMeasures: [],
-            chordEventCount: chordCount,
-            parts: partList,
-            title: chart.title ?? "",
-            tempoBpm: chart.tempoBpm ?? null,
-            keyFifths: chart.keyFifths,
-            measures: chart.measures.length,
-            figureBars: chart.measures.filter((m) => m.kicks && m.kicks.length).length,
-            sections: chart.measures.filter((m) => m.section).map((m) => `${m.section}@m${m.number}`),
-          },
-          warnings,
-        });
+        const result = arrangeRhythmChart(chart, settings);
+        sendJson(res, result.ok ? 200 : 400, result);
       } catch (e: any) {
         sendJson(res, 500, { ok: false, error: `Rhythm chart import failed: ${e?.message ?? String(e)}` });
       }
@@ -1561,6 +1227,24 @@ const server = http.createServer(async (req, res) => {
       }
 
       sendJson(res, 200, { ok: true, chords });
+      return;
+    }
+
+    if (url === "/phrase_context" || url === "/propose_phrase_plan") {
+      try {
+        if (typeof body.musicxml !== "string") throw Error("Provide MusicXML to inspect before planning.");
+        const valid = validateMusicXml(body.musicxml);
+        if (!valid.ok) throw Error((valid as { error: string }).error);
+        const settings = normalizeAppSettings(body.settings);
+        const xml = selectSourceParts(body.musicxml, Array.isArray(body.partIds) ? body.partIds.map(String) : [], true);
+        const context = inspectPhrases(xml, settings);
+        const plan = url === "/propose_phrase_plan"
+          ? await proposePhrasePlan(context, typeof body.brief === "string" ? body.brief : "")
+          : body.phrasePlan === undefined ? defaultPhrasePlan(context) : validatePhrasePlan(body.phrasePlan, context);
+        sendJson(res, 200, { ok: true, context, plan, aiUsed: url === "/propose_phrase_plan" });
+      } catch (error) {
+        sendJson(res, 400, { ok: false, error: (error as Error).message });
+      }
       return;
     }
 
@@ -1642,7 +1326,7 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 const PORT = Number(process.env.PORT ?? 3001);
-server.listen(PORT, () => {
+if (require.main === module) server.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`music-engine server listening on http://localhost:${PORT}`);
 });

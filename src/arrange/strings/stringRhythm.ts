@@ -512,7 +512,7 @@ function enforceBassToChordRoot(
     const mNum = Number(m?.number) || 1;
     const divisions = Number(m?.attributes?.divisions ?? 1);
     const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
-    const beatUnit = divisions * (4 / beatType);
+    const beatUnit = 4 / beatType;
     const next: NoteEvent[] = [];
     for (const ev of m?.events ?? []) {
       if (ev?.type !== "note" || typeof ev.t !== "number") {

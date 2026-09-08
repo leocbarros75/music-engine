@@ -13,7 +13,7 @@ function clampPc(pc: number): number {
 function scalePcs(fifths: number, mode: "major" | "minor"): number[] {
   const major = [0, 2, 4, 5, 7, 9, 11];
   const minor = [0, 2, 3, 5, 7, 8, 10];
-  const root = clampPc(fifths * 7);
+  const root = clampPc(fifths * 7 + (mode === "minor" ? 9 : 0));
   const base = mode === "minor" ? minor : major;
   return base.map((pc) => clampPc(root + pc));
 }
@@ -81,7 +81,7 @@ export function buildCandidateMap(params: {
     rhythmState.totalAttacks > 0 ? (rhythmState.perVoice.cb ?? 0) / rhythmState.totalAttacks : 1;
   const bassAnchored =
     chordBass !== null &&
-    prevVoicing?.cb !== null &&
+    typeof prevVoicing?.cb === "number" &&
     ((prevVoicing.cb % 12) + 12) % 12 === chordBass &&
     bassRatio >= (rules.polyphony.celloSinger?.bassAnchoringThreshold ?? 0);
   const celloAgile = (rhythmState.perVoice.vc ?? 0) >= (rules.polyphony.celloSinger?.agilityNoteDensity ?? 3);
@@ -94,11 +94,7 @@ export function buildCandidateMap(params: {
   for (const voice of VOICES) {
     if (voice === "vln1" && out.vln1.length) continue;
     const prev = prevVoicing ? prevVoicing[voice] : null;
-    let range = rangeMap[voice];
-    if (voice === "vc" && rules.polyphony.celloSinger?.celloFreeRange && bassAnchored) {
-      const [low, high] = rules.polyphony.celloSinger.celloFreeRange;
-      range = { ...range, prefMin: low, prefMax: high };
-    }
+    const range = rangeMap[voice];
 
     const pcs = isStrongBeat ? useChord : [...new Set([...useChord, ...scale])];
     if (voice === "cb") {
@@ -106,6 +102,7 @@ export function buildCandidateMap(params: {
       if (chordBass !== null) {
         if (celloAgile && !isStrongBeat) {
           out[voice] = [];
+          continue; // Preserve the intentional bass rest on an agile weak beat.
         } else {
           out[voice] = pickCandidates([chordBass], range, prev);
         }
@@ -115,6 +112,15 @@ export function buildCandidateMap(params: {
       }
     } else {
       out[voice] = pickCandidates(pcs, range, prev);
+    }
+    if (voice === "vc" && bassAnchored && rules.polyphony.celloSinger?.celloFreeRange) {
+      const [low, high] = rules.polyphony.celloSinger.celloFreeRange;
+      // Retain smooth nearby choices, but also offer the configured singing register.
+      const singing = pickCandidates(pcs, {
+        absMin: Math.max(range.absMin, low),
+        absMax: Math.min(range.absMax, high)
+      }, Math.max(low, Math.min(high, prev ?? low))).slice(0, 2);
+      out[voice] = [...new Set([...out[voice], ...singing])];
     }
     if (!out[voice].length && voice !== "vln1") {
       out[voice] = pickCandidates(scale, range, prev);
@@ -127,7 +133,7 @@ export function buildCandidateMap(params: {
       if (!entry.voice) continue;
       const target = motifMidiAtSlice(motif, entry, slice.index);
       if (target === null) continue;
-      const range = STRING_RANGES[entry.voice];
+      const range = rangeMap[entry.voice];
       const candidates = [target, target + 12, target - 12].filter((m) => {
         if (m < range.absMin || m > range.absMax) return false;
         const pc = ((m % 12) + 12) % 12;
