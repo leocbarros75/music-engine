@@ -153,7 +153,7 @@ export default function SettingsForm({ settings, onChange }: Props) {
   }
 
   function updateEnsemble(nextEnsemble: Settings["ensemble"]) {
-    const next = { ...settings, ensemble: nextEnsemble };
+    const next = { ...settings, ensemble: nextEnsemble, melodyOctaveShift: 0 };
     if (nextEnsemble !== "piano" && nextEnsemble !== "piano_with_melody" && next.accompaniment === "chordal") {
       next.accompaniment = "homophonic";
     }
@@ -249,6 +249,26 @@ export default function SettingsForm({ settings, onChange }: Props) {
 
   return (
     <div className="settings-form">
+      <div className="field">
+        <label>
+          <input type="checkbox" checked={settings.preserveSource !== false}
+            onChange={(e) => onChange({ ...settings, preserveSource: e.target.checked, melodyOctaveShift: 0,
+              ...(e.target.checked ? { keySignature: "original", timeSignature: "original" } : {}) })} />
+          Keep source melody, chords and form
+        </label>
+        <div className="muted">For a single melody line. Keep key and meter at Original; playback follows the score, including source tempo changes. The result shows whether preservation was verified.</div>
+      </div>
+      {settings.preserveSource !== false && ["choral", "string_ensemble", "woodwind_ensemble", "brass_ensemble", "orchestra", "symphonic_orchestra"].includes(settings.ensemble) && (
+        <div className="field">
+          <label>Melody register</label>
+          <select value={settings.melodyOctaveShift ?? 0} onChange={(e) => update("melodyOctaveShift", Number(e.target.value))}>
+            <option value={0}>Original octave</option>
+            <option value={1}>One octave higher</option>
+            <option value={-1}>One octave lower</option>
+          </select>
+        </div>
+      )}
+
       <div className="field">
         <label>Title</label>
         <input

@@ -1,49 +1,8 @@
+import { readMeasurePerformance } from "./musicxmlPerformance";
+import { divisionsToBeats, resolveTimeSignature, SCORE_STANDARD_VERSION } from "../score/standard";
 import { DOMParser } from "@xmldom/xmldom";
 
-type Pitch = {
-  step: string;
-  alter?: number;
-  octave: number;
-};
-
-type NoteEvent =
-  | {
-      type: "note";
-      t: number;
-      dur: number;
-      pitch: Pitch;
-      midi: number;
-      voice?: number;
-      staff?: number;
-      tieStart?: boolean;
-      tieStop?: boolean;
-      chord?: boolean;
-    }
-  | {
-      type: "rest";
-      t: number;
-      dur: number;
-      voice?: number;
-      staff?: number;
-    };
-
-type Measure = {
-  number: number;
-  attributes?: any;
-  events: NoteEvent[];
-};
-
-type Part = {
-  part_id: string;
-  name?: string;
-  transpose?: { diatonic: number; chromatic: number; octaveChange: number };
-  measures: Measure[];
-};
-
-type ScoreModel = {
-  meta?: any;
-  parts: Part[];
-};
+import type { ScoreModel, Part, Measure, NoteEvent, Pitch } from "../score/types";
 
 function textOf(el: Element | null | undefined): string {
   if (!el) return "";
@@ -228,7 +187,7 @@ function parseHarmonySymbol(harmonyEl: Element, warnings: string[]): { symbol: s
 export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
   const doc = new DOMParser().parseFromString(xml, "application/xml");
   const scorePartwise = elementsByTagName(doc, "score-partwise")[0] ?? null;
-  if (!scorePartwise) return { parts: [] };
+  if (!scorePartwise) return { standardVersion: SCORE_STANDARD_VERSION, score_id: "imported-score", meta: { ensemble: "imported" }, global: { divisions: 4 }, parts: [] };
 
   // Extract title: prefer <work-title>, fall back to <movement-title>, then <credit-words>
   let scoreTitle = "";
@@ -275,6 +234,9 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
 
     const measureEls = elementsByTagName(partEl, "measure");
     let curDivisions = 480;
+    let currentTime = resolveTimeSignature(null);
+    let currentKey: number | undefined;
+    let currentMode: string | undefined;
 
     for (let mi = 0; mi < measureEls.length; mi++) {
       const mEl = measureEls[mi] as Element;
@@ -301,7 +263,8 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
         }
       }
 
-      const measureLen = computeMeasureLengthInBeats(beatsForLen, beatTypeForLen);
+      currentTime = resolveTimeSignature(beatsForLen && beatTypeForLen ? { beats: beatsForLen, beat_type: beatTypeForLen } : null, currentTime);
+      const measureLen = computeMeasureLengthInBeats(currentTime.beats, currentTime.beat_type);
 
       const events: NoteEvent[] = [];
       let t = 0;
@@ -337,8 +300,9 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
 
           const restEl = firstChild(el, "rest");
           const durEl = firstChild(el, "duration");
-          const durDivs = intOf(durEl, curDivisions);
-          const dur = curDivisions > 0 ? durDivs / curDivisions : durDivs;
+          const grace = !!firstChild(el, "grace");
+          const durDivs = grace ? 0 : intOf(durEl, curDivisions);
+          const dur = divisionsToBeats(durDivs, curDivisions);
 
           const voiceEl = firstChild(el, "voice");
           const staffEl = firstChild(el, "staff");
@@ -371,7 +335,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
 
               // allow negative alter
               const alterRaw = textOf(alterEl);
-              const alterParsed = alterRaw === "" ? 0 : Number.parseInt(alterRaw, 10);
+              const alterParsed = alterRaw === "" ? 0 : Number(alterRaw);
               const alter = Number.isFinite(alterParsed) ? alterParsed : 0;
 
               const pitch: Pitch = { step, alter, octave };
@@ -386,6 +350,8 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
                 voice,
                 staff,
                 source_t: rawT,
+                grace: grace || undefined,
+                articulations: elementsByTagName(el, "articulations").flatMap(a => Array.from(a.childNodes).filter((n: any) => n.nodeType === 1).map((n: any) => localNameOf(n))),
                 chord: isChordTone ? true : undefined,
                 tieStart: tieFlags.tieStart ? true : undefined,
                 tieStop: tieFlags.tieStop ? true : undefined
@@ -413,7 +379,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
         if (tag === "backup") {
           const durEl = firstChild(el, "duration");
           const durDivs = intOf(durEl, 0);
-          const dur = curDivisions > 0 ? durDivs / curDivisions : durDivs;
+          const dur = divisionsToBeats(durDivs, curDivisions);
           t -= dur;
           if (t < 0) t = 0;
           lastNonChordStartT = t;
@@ -423,7 +389,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
         if (tag === "forward") {
           const durEl = firstChild(el, "duration");
           const durDivs = intOf(durEl, 0);
-          const dur = curDivisions > 0 ? durDivs / curDivisions : durDivs;
+          const dur = divisionsToBeats(durDivs, curDivisions);
           t += dur;
           lastNonChordStartT = t;
           continue;
@@ -488,16 +454,33 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
         }
       }
 
+      // Materialize inherited attributes so downstream arrangers cannot reset to 4/4.
+      attributes.time = { ...currentTime };
+      if (attributes.key_fifths !== undefined) currentKey = attributes.key_fifths;
+      if (attributes.key_mode !== undefined) currentMode = attributes.key_mode;
+      if (currentKey !== undefined) attributes.key_fifths = currentKey;
+      if (currentMode !== undefined) attributes.key_mode = currentMode;
+      attributes.divisions = 4;
+      attributes.source_divisions = curDivisions;
+      const implicit = mEl.getAttribute("implicit") === "yes";
+      const actualLength = Math.max(0, ...events.map(e => e.t + e.dur));
       measures.push({
         number: mNumber,
+        performance: readMeasurePerformance(mEl, curDivisions),
+        ...(implicit ? { implicit: true, ...(actualLength > 0 ? { durationBeats: actualLength } : {}) } : {}),
         attributes: Object.keys(attributes).length ? attributes : undefined,
-        events
+        events: events.map((e, index): NoteEvent => {
+          const common = { id: `${partId}-${mi}-${index}`, voice: e.voice ?? 1, staff: e.staff ?? 1 };
+          return e.type === "rest" ? { ...e, ...common, isRest: true } : { ...e, ...common, isRest: false };
+        })
       });
     }
 
     parts.push({
       part_id: partId,
-      name: partNames.get(partId) ?? undefined,
+      pitchSpace: "written",
+      name: partNames.get(partId) ?? partId,
+      instrument: partNames.get(partId) ?? partId,
       measures,
       ...(partTranspose ? { transpose: partTranspose } : {}),
     });
@@ -520,6 +503,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
 
   const m0 = parts[0]?.measures?.[0];
   const meta: any = {
+    ensemble: "imported",
     title: scoreTitle || undefined,
     inputKeyFifths: m0?.attributes?.key_fifths,
     inputKeyMode: m0?.attributes?.key_mode,
@@ -530,6 +514,9 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
   };
 
   return {
+    standardVersion: SCORE_STANDARD_VERSION,
+    score_id: "imported-score",
+    global: { divisions: 4 },
     meta,
     parts
   };

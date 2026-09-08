@@ -8,6 +8,8 @@ RUN npm --prefix apps/web ci
 
 # Copy web source and build
 COPY apps/web/ apps/web/
+# Browser and backend share the same score timing/pitch contract.
+COPY src/score/ src/score/
 RUN npm --prefix apps/web run build
 # Output: apps/web/dist/
 

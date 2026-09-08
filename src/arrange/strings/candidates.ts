@@ -91,9 +91,9 @@ export function buildCandidatesForSlice(params: {
   };
 
   if (typeof slice.melodyMidi === "number" && !isCelloMelody) {
-    // Standard: Vln I locked to melody (one octave up when range permits)
+    // Keep the source register. Octave changes are explicit pipeline settings.
     const vln1Range = STRING_RANGES.vln1;
-    const shifted = slice.melodyMidi + 12;
+    const shifted = slice.melodyMidi;
     out.vln1 = [shifted >= vln1Range.absMin && shifted <= vln1Range.absMax ? shifted : slice.melodyMidi];
   }
 

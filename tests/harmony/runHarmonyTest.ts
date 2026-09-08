@@ -60,6 +60,7 @@ function hasWarning(out: HarmonyOutput, atMeasure: number, type: string, atBeat?
 const filePathArg = process.argv[2];
 const granularityArg = process.argv[3];
 
+if (granularityArg !== undefined && !["beat", "measure"].includes(granularityArg)) usage();
 const granularity = granularityArg === "measure" || granularityArg === "beat" ? granularityArg : "beat";
 
 if (!filePathArg) usage();
@@ -154,4 +155,4 @@ for (const w of exp.warnings ?? []) {
 
 // Print JSON (keeps your current logs)
 // eslint-disable-next-line no-console
-console.log(JSON.stringify(out, null, 2));
+console.log(`OK: ${base} (${granularity}) harmony expectations passed.`);

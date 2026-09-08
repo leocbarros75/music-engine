@@ -1,3 +1,4 @@
+import { buildMeasureTimeline } from "../../../score/standard";
 import type { NoteEvent, ScoreModel } from "../../../score/types";
 import { midiToPitch, pitchToMidi } from "../../../instruments/instrumentCatalog";
 import { loadCounterpointRules, scoreTransition } from "./counterpointScoring";
@@ -87,12 +88,6 @@ function getKeyInfo(score: ScoreModel, preferPart?: any): { fifths: number; mode
   return { fifths: 0, mode: "major" };
 }
 
-function measureLengthTicks(measure: any): number {
-  const beats = Number(measure?.attributes?.time?.beats ?? 4);
-  const beatType = Number(measure?.attributes?.time?.beat_type ?? 4);
-  const divisions = Number(measure?.attributes?.divisions ?? 1);
-  return beats * divisions * (4 / beatType);
-}
 
 function findMelodyPart(score: ScoreModel): any | null {
   const parts = score.parts ?? [];
@@ -169,13 +164,14 @@ function pickChordForTime(chords: ChordEvent[], measure: number, t: number): str
 function buildSlices(melodyPart: any, chords: ChordEvent[], melodyShift = 0): Slice[] {
   const slices: Slice[] = [];
   const measures = melodyPart?.measures ?? [];
+  const timeline = buildMeasureTimeline({ parts: [melodyPart] });
   for (let i = 0; i < measures.length; i++) {
     const m = measures[i];
-    const mNum = Number(m?.number) || i + 1;
+    const mNum = Number(m?.number ?? i + 1);
     const divisions = Number(m?.attributes?.divisions ?? 1);
     const beatType = Number(m?.attributes?.time?.beat_type ?? 4);
-    const beatUnit = divisions * (4 / beatType);
-    const measureLen = measureLengthTicks(m);
+    const beatUnit = 4 / timeline[i].time.beat_type;
+    const measureLen = timeline[i].durationBeats;
     const melEvents = (m?.events ?? []).filter(isNoteOrRest).sort((a: any, b: any) => Number(a.t) - Number(b.t));
     const times = new Set<number>();
     for (const ev of melEvents) times.add(Number(ev.t ?? 0));
@@ -184,11 +180,11 @@ function buildSlices(melodyPart: any, chords: ChordEvent[], melodyShift = 0): Sl
     }
     times.add(0);
     times.add(measureLen);
-    const ordered = Array.from(times).sort((a, b) => a - b);
+    const ordered = Array.from(times).filter(t => t >= 0 && t <= measureLen).sort((a, b) => a - b);
     for (let tIdx = 0; tIdx < ordered.length - 1; tIdx++) {
       const t = ordered[tIdx]!;
       const next = ordered[tIdx + 1]!;
-      const dur = Math.max(1, next - t);
+      const dur = next - t;
       const active = melEvents.find((e: any) => e.type === "note" && Number(e.t) <= t && t < Number(e.t) + Number(e.dur));
       const melodyMidi = active ? eventMidi(active) : null;
       slices.push({
@@ -462,6 +458,7 @@ export function arrangeBrassPolyphonic(
   const cb = makeEventsFromVoicing(slices, finalVoicings, "cb");
 
   const measuresTemplate = (melodyPart.measures ?? []).map((m: any) => ({
+    ...m,
     number: m.number,
     attributes: m.attributes ? JSON.parse(JSON.stringify(m.attributes)) : undefined
   }));

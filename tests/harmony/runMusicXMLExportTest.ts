@@ -1,5 +1,7 @@
 // tests/harmony/runMusicXMLExportTest.ts
 import process from "node:process";
+import { parseMusicXMLToScoreModel } from "../../src/parsers/musicxmlParser";
+import { buildNoteTimeline } from "../../src/score/standard";
 
 import type { ScoreModel } from "../../src/score/types";
 import { exportScoreModelToMusicXML } from "../../src/exporters/musicxmlExporter";
@@ -56,7 +58,7 @@ function buildTinyScoreModel(): ScoreModel {
               {
                 id: "N1",
                 t: 0,
-                dur: 480,
+                dur: 1,
                 type: "note",
                 pitch: { step: "C", octave: 4 },
                 voice: 1,
@@ -64,8 +66,8 @@ function buildTinyScoreModel(): ScoreModel {
               },
               {
                 id: "R1",
-                t: 480,
-                dur: 480,
+                t: 1,
+                dur: 1,
                 type: "rest",
                 voice: 1,
                 staff: 1
@@ -116,3 +118,7 @@ assert(
 
 // eslint-disable-next-line no-console
 console.log("OK: MusicXML exporter sanity test passed.");
+const timeline = buildNoteTimeline(parseMusicXMLToScoreModel(xml));
+assert(timeline.length === 1, "Exactly one sounding note should survive export.");
+assert(timeline[0].midi === 60 && timeline[0].startBeat === 0 && timeline[0].durationBeats === 1,
+  "Exported C4 must start at beat zero and last one quarter beat regardless of divisions.");

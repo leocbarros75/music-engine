@@ -1,3 +1,6 @@
+import { writePerformanceNotation } from "./performanceNotation";
+import { buildMeasureTimeline } from "../score/standard";
+import { toSoundingScore } from "../score/pitch";
 // src/exporters/musicxmlExporter.ts
 
 import type { ScoreModel } from "../score/types";
@@ -605,6 +608,13 @@ function buildCadenceTextByMeasure(scoreModel: ScoreModel): Record<number, strin
 }
 
 export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
+  const notationModel = { ...scoreModel, parts: scoreModel.parts.map(p => ({ ...p, measures: p.measures.map(m => ({ ...m, events: m.events.filter(e => !e.grace) })) })) };
+  return writePerformanceNotation(renderMusicXML(notationModel), scoreModel);
+}
+
+function renderMusicXML(scoreModel: ScoreModel): string {
+  scoreModel = toSoundingScore(scoreModel);
+  const timeline = buildMeasureTimeline(scoreModel);
   const workTitle = xmlEscape((scoreModel as any)?.meta?.ensemble ?? "ensemble");
   const partsRaw = scoreModel?.parts ?? [];
   // The worship orchestra already emits its parts in deliberate score order
@@ -695,7 +705,7 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
     let currentTimeBeatType = 4;
     let lastAttrKey: string | null = null;
 
-    for (const m of partMeasures) {
+    for (const [measureIndex, m] of partMeasures.entries()) {
       const mNum = m.number ?? 1;
       const attrs = m?.attributes ?? {};
       const hasDivisionsAttr = Number.isFinite((attrs as any)?.divisions);
@@ -732,7 +742,7 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
       const piano = isPiano(p.instrument);
       const isGrandStaff = piano || staves === 2;
 
-      out += `    <measure number="${mNum}">`;
+      out += `    <measure number="${mNum}"${m.implicit || m.durationBeats !== undefined ? ' implicit="yes"' : ""}>`;
 
       // Optional cadence annotation (placed near top of the measure)
       const cadText = cadenceTextByMeasure[mNum];
@@ -806,7 +816,7 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
       currentTimeBeatType = timeBeatType;
       lastAttrKey = attrKey;
 
-      const measureBeats = (Number(timeBeats) || 4) * (4 / (Number(timeBeatType) || 4));
+      const measureBeats = timeline[measureIndex].durationBeats;
       const measureDur = beatsToDivisionsDuration(measureBeats, currentDivisions);
       // Discard any events that start at or past the measure boundary; they
       // would cause the exporter's gap-fill code to emit rests extending well
@@ -973,19 +983,21 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
                 out += `<note>`;
                 if ((gi > 0 || evAny.chord === true) && firstPiece) out += `<chord/>`;
                 out += pitchXml;
+                out += `<duration>${cd}</duration>`;
                 if (tieStart) out += `<tie type="start"/>`;
                 if (tieStop) out += `<tie type="stop"/>`;
-                out += `<duration>${cd}</duration><voice>${voice}</voice>`;
+                out += `<voice>${voice}</voice>`;
                 if (ct) out += `<type>${ct}</type>`;
                 if (cdot) out += `<dot/>`;
                 if (accidental && firstPiece) out += `<accidental>${accidental}</accidental>`;
+                out += `<staff>${staff}</staff>`;
                 if (tieStart || tieStop) {
                   out += `<notations>`;
                   if (tieStart) out += `<tied type="start"/>`;
                   if (tieStop) out += `<tied type="stop"/>`;
                   out += `</notations>`;
                 }
-                out += `<staff>${staff}</staff></note>`;
+                out += `</note>`;
               }
               continue;
             }

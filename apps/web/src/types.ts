@@ -1,4 +1,7 @@
 export type Settings = {
+  preserveSource?: boolean;
+  melodyOctaveShift?: number;
+  sourceMelodyPartId?: string;
   title: string;
   ensemble:
     | "choral"
@@ -172,6 +175,9 @@ export type JobResult = {
   warnings?: string[];
   error?: string;
   meta?: {
+    phraseCollaboration?: { status: string; phraseCount: number; sourceFingerprint: string };
+    performance?: { status: string; reason?: string; durationSeconds?: number };
+    preservation?: { status: "verified" | "not_applicable" | "disabled"; reason?: string; measures?: number; notes?: number; chords?: number; octaveShift?: number; };
     ensemble: string;
     styleUsed?: string;
     chordSource: string;

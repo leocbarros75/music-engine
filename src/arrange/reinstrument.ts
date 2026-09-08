@@ -1,3 +1,4 @@
+import { writtenToSoundingOffset } from "../score/standard";
 // src/arrange/reinstrument.ts
 //
 // Part re-instrumentation: hand an existing part to a different instrument while
@@ -144,7 +145,7 @@ export function applyReinstrumentation(
 
     const lo = Number((spec as any).midi_low);
     const hi = Number((spec as any).midi_high);
-    const sourceOffset = writtenToSoundingSemis(part?.transpose);
+    const sourceOffset = writtenToSoundingOffset(part);
     let shiftedCount = 0;
 
     const measures = (part.measures ?? []).map((m: any) => {
@@ -177,7 +178,7 @@ export function applyReinstrumentation(
     // The part now holds CONCERT pitch; drop the source transpose so the exporter
     // applies only the TARGET instrument's written transposition.
     const { transpose: _drop, ...rest } = part;
-    return { ...rest, name: label, instrument: mapping.to, measures };
+    return { ...rest, pitchSpace: "sounding", name: label, instrument: mapping.to, measures };
   });
 
   return { ...(score as any), parts: newParts } as ScoreModel;

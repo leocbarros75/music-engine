@@ -7,6 +7,8 @@ import ViolationsPanel from "./components/ViolationsPanel";
 import type { JobResult, LogEntry, MusicXmlFile, Settings } from "./types";
 
 const DEFAULT_SETTINGS: Settings = {
+  preserveSource: true,
+  melodyOctaveShift: 0,
   title: "",
   ensemble: "choral",
   keySignature: "original",
@@ -336,8 +338,13 @@ export default function App() {
             {jobResult ? (
               <div className="result-grid">
                 <div>
+                  <div className="summary-label">Source preservation</div>
+                  <div>{jobResult.preservation?.status === "verified"
+                    ? `Verified: ${jobResult.preservation.notes} notes, ${jobResult.preservation.chords} source chords, ${jobResult.preservation.measures} measures; octave shift ${jobResult.preservation.octaveShift ?? 0}.`
+                    : jobResult.preservation?.reason ?? "Not verified"}</div>
                   <div className="summary-label">Output</div>
                   <div className="path">{jobResult.outputPath || "(none)"}</div>
+                  {jobResult.midiPath && <div><button onClick={() => window.api.openFile(jobResult.midiPath!)}>Open MIDI</button></div>}
                 </div>
                 <div>
                   <div className="summary-label">Server</div>

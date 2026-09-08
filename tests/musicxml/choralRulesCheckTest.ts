@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import assert from "node:assert/strict";
+import { buildNoteTimeline } from "../../src/score/standard";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseMusicXMLToScoreModel } from "../../src/parsers/musicxmlParser";
@@ -27,3 +29,14 @@ if (result.rulesVersion !== "choral-v1") {
 console.log(
   `Choral rules check completed. violations=${result.violations.length} warnings=${result.warnings.length}`
 );
+
+assert.equal(outScore.parts.length, 4, "SATB must contain four voices");
+const soprano = outScore.parts.find((p: any) => p.part_id === "P_S");
+assert(soprano, "SATB must contain the soprano melody");
+const notes = (s: any) => buildNoteTimeline(s).map(n => [n.midi, n.startBeat, n.durationBeats]);
+assert.deepEqual(notes({ ...outScore, parts: [soprano] }), notes(score), "Soprano must retain source melody and timing");
+assert(Array.isArray(result.violations) && Array.isArray(result.warnings));
+for (const violation of result.violations) {
+  assert(violation.ruleId && violation.message, "Violations must identify and explain the rule");
+  assert(["warn", "error"].includes(violation.severity));
+}

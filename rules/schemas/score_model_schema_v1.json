@@ -1,8 +1,8 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.2",
   "note_event": {
-    "t": "int",
-    "dur": "int",
+    "t": "number (quarter-note beats, relative to measure start)",
+    "dur": "number (quarter-note beats; >0, or 0 for grace notes)",
     "type": "note|rest",
     "pitch": {
       "step": "A-G",
@@ -10,19 +10,36 @@
       "octave": "int"
     },
     "voice": "int",
-    "staff": "int?"
+    "staff": "int?",
+    "grace": "boolean?",
+    "midi": "number? (cache in the same pitchSpace as pitch)",
+    "tieStart": "boolean?",
+    "tieStop": "boolean?",
+    "articulations": "string[]?"
   },
   "measure": {
     "number": "int",
     "attributes": {
-      "divisions": "int",
+      "divisions": "int (MusicXML serialization resolution only)",
       "key_fifths": "int",
       "time": {
         "beats": "int",
         "beat_type": "int"
-      }
+      },
+      "source_divisions": "int?",
+      "key_mode": "major|minor?"
     },
-    "events": "note_event[]"
+    "events": "note_event[]",
+    "durationBeats": "number? (explicit pickup/irregular-bar length)",
+    "implicit": "boolean?",
+    "performance": {
+      "tempos": "{t: quarter-beat offset, bpm: quarter-note BPM}[]?",
+      "dynamics": "{t: quarter-beat offset, velocity: 1..127}[]?",
+      "repeatStart": "boolean?",
+      "repeatEnd": "int? (total passes)",
+      "endings": "{numbers: int[], type: start|stop|discontinue}[]?",
+      "issues": "string[]? (unsupported instructions)"
+    }
   },
   "part": {
     "part_id": "string",
@@ -30,7 +47,13 @@
     "instrument": "string",
     "clef": "string",
     "staff": "int",
-    "measures": "measure[]"
+    "measures": "measure[]",
+    "pitchSpace": "written|sounding",
+    "transpose": {
+      "diatonic": "int",
+      "chromatic": "int",
+      "octaveChange": "int"
+    }
   },
   "score_model": {
     "score_id": "string",
@@ -38,6 +61,8 @@
     "global": "object",
     "parts": "part[]",
     "harmony_timeline": "array",
-    "analysis_cache": "object"
-  }
+    "analysis_cache": "object",
+    "standardVersion": 1
+  },
+  "contract": "src/score/types.ts, src/score/standard.ts and src/score/performance.ts"
 }

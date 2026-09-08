@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import os from "node:os";
+import { fileURLToPath } from "node:url";
 import { parseMusicXMLToScoreModel } from "../../src/parsers/musicxmlParser";
 import { harmonizeSatbFromChords } from "../../src/harmonize/satb/harmonizeSatbFromChords";
 import { parseChordSymbol } from "../../src/harmonize/satb/chordSymbol";
@@ -8,12 +8,7 @@ import { pitchToMidi } from "../../src/instruments/instrumentCatalog";
 
 type ChordEvent = { measure: number; t: number; symbol: string };
 
-const defaultPath = path.join(
-  os.homedir(),
-  "Downloads",
-  "Flows from Holy Holy Holy Test",
-  "Holy Holy Holy Test - 01_Voice - 01 Flow 1.musicxml"
-);
+const defaultPath = fileURLToPath(new URL("../preservation/fixtures/holy-holy-holy.musicxml", import.meta.url));
 
 const filePath = process.env.HOLY_TEST_PATH ?? defaultPath;
 
