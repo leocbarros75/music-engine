@@ -38,6 +38,7 @@ async function main() {
       'tests/ai/phraseCollaboration.test.ts',
       'tests/application/applicationPaths.test.ts',
       'tests/import/midiFile.test.ts',
+      'tests/import/midiTranscribe.test.ts',
       'tests/score/scoreStandard.test.ts',
       'tests/preservation/sourcePreservation.test.ts',
       'tests/preservation/serverPreservation.test.ts',
