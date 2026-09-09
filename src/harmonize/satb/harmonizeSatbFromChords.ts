@@ -721,51 +721,92 @@ function refineInnerVoices(params: {
     allowUnisonD4
   } = params;
 
-  const tenorCands = collectChordMidis(chordPcs, tenorRange);
   const altoCands = collectChordMidis(chordPcs, altoRange);
-  if (!tenorCands.length || !altoCands.length) return null;
+  if (!altoCands.length) return null;
 
   const soprPc = pc(soprMidi);
   const bassPc = pc(bassMidi);
 
-  let best: { tenor: number; alto: number; score: number } | null = null;
-  for (const t of tenorCands) {
-    for (const a of altoCands) {
-      if (a >= soprMidi) continue;
-      let score = 0;
-      score += Math.abs(t - tenorTarget) * 0.6;
-      score += Math.abs(a - altoTarget) * 0.6;
-      if (pc(t) === soprPc) score += 5;
-      if (pc(a) === soprPc) score += 5;
-      if (pc(t) === bassPc) score += 3;
-      if (pc(a) === bassPc) score += 3;
+  // A narrowed tenor box (the homophonic override clamps the tenor to A3..D4) can
+  // put every decent non-crossing voicing out of reach — e.g. D major under a D4
+  // soprano over a D3 bass, where the inner pitches that fit are F#3 and A3 and the
+  // tenor is barred from F#3. Forbidding the crossing alone then collapses the chord
+  // onto an A3 unison and loses the third. So offer the pitches below the floor too,
+  // at a cost, and let the scorer decide. Dropping below the floor only moves the
+  // tenor closer to the bass, so a piano left hand spans no further than before.
+  // With no override (floor === the natural floor) this is inert.
+  const tenorFloor = tenorRange.min;
+  const naturalFloor = Math.min(RANGES.Tenor.min, tenorFloor);
+  const belowBoxPenalty = (t: number): number => (t >= tenorFloor ? 0 : 2 + (tenorFloor - t) * 0.8);
 
-      const tb = t - bassMidi;
-      const at = a - t;
-      // BWV 578 analysis: Bach uses 17–36 semitones between tenor and bass —
-      // any upper limit is wrong. Only enforce the minimum to avoid muddiness.
-      const minTbSpacing = bassMidi < 48 ? 10 : 5;
-      if (tb < minTbSpacing) score += 4 * Math.max(0, minTbSpacing - tb);
-      if (at >= 0) score += intervalPenalty(at, ALTO_TENOR_ALLOWED_INTERVALS, 3.5);
+  const search = (
+    tenorCands: number[],
+    forbidCrossing: boolean
+  ): { tenor: number; alto: number; score: number } | null => {
+    let best: { tenor: number; alto: number; score: number } | null = null;
+    for (const t of tenorCands) {
+      for (const a of altoCands) {
+        if (a >= soprMidi) continue;
+        // The alto sitting BELOW the tenor is a hard error in SATB writing, not a
+        // preference to be outweighed. Unison (t === a) is still allowed.
+        if (forbidCrossing && t > a) continue;
+        let score = belowBoxPenalty(t);
+        score += Math.abs(t - tenorTarget) * 0.6;
+        score += Math.abs(a - altoTarget) * 0.6;
+        if (pc(t) === soprPc) score += 5;
+        if (pc(a) === soprPc) score += 5;
+        if (pc(t) === bassPc) score += 3;
+        if (pc(a) === bassPc) score += 3;
 
-      if (t >= a) {
-        if (allowUnisonD4 && t === a && t === 62) {
-          score += 0.5;
-        } else {
+        const tb = t - bassMidi;
+        const at = a - t;
+        // BWV 578 analysis: Bach uses 17–36 semitones between tenor and bass —
+        // any upper limit is wrong. Only enforce the minimum to avoid muddiness.
+        const minTbSpacing = bassMidi < 48 ? 10 : 5;
+        if (tb < minTbSpacing) score += 4 * Math.max(0, minTbSpacing - tb);
+        if (at >= 0) score += intervalPenalty(at, ALTO_TENOR_ALLOWED_INTERVALS, 3.5);
+
+        if (t >= a) {
+          if (allowUnisonD4 && t === a && t === 62) {
+            score += 0.5;
+          } else {
+            score += 4;
+          }
+        }
+
+        if (pc(t) === pc(a) && !(allowUnisonD4 && t === a && t === 62)) {
           score += 4;
         }
-      }
 
-      if (pc(t) === pc(a) && !(allowUnisonD4 && t === a && t === 62)) {
-        score += 4;
-      }
+        // Chord completeness. Four voices should spell the chord; dropping a pitch
+        // class entirely (e.g. both inner voices on A, leaving D-A-A-D with no
+        // third) guts the harmony, and no other term here notices. Ask for three
+        // distinct pitch classes — so a triad must be complete, while a seventh
+        // chord may still omit its fifth, as it conventionally does.
+        const covered = new Set<number>([soprPc, bassPc, pc(t), pc(a)]);
+        const need = Math.min(3, new Set(chordPcs).size);
+        let present = 0;
+        for (const p of new Set(chordPcs)) if (covered.has(p)) present++;
+        if (present < need) score += 6 * (need - present);
 
-      if (!best || score < best.score) best = { tenor: t, alto: a, score };
+        if (!best || score < best.score) best = { tenor: t, alto: a, score };
+      }
     }
-  }
+    return best;
+  };
 
-  if (!best) return null;
-  return { tenor: best.tenor, alto: best.alto };
+  const tenorCands = collectChordMidis(chordPcs, { min: naturalFloor, max: tenorRange.max });
+  if (!tenorCands.length) return null;
+
+  // Ordering is a hard rule; only if literally nothing legal exists (a chord with a
+  // single usable pitch class, say) fall back to the original soft-penalty search,
+  // so the caller is never left with its unrefined guess.
+  const strict = search(tenorCands, true);
+  if (strict) return { tenor: strict.tenor, alto: strict.alto };
+
+  const loose = search(tenorCands, false);
+  if (!loose) return null;
+  return { tenor: loose.tenor, alto: loose.alto };
 }
 
 function buildCandidateMap(
