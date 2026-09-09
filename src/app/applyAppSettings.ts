@@ -2508,6 +2508,9 @@ export function applyAppSettings(
       forcePattern: !!(explicitPattern || userRhPattern),
       bassRhythm: settings.bassRhythm,
       bassFinalNote: settings.bassFinalNote,
+      // Voice-led chord voicings are piano_with_melody only; plain piano,
+      // grand_piano and acoustic_piano keep the root-position voicer unchanged.
+      voiceLedVoicing: wantsPianoWithMelody,
     });
     attachTextureAnalysis(finalScore, warnings);
     return {

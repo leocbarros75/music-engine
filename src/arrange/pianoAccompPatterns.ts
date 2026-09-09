@@ -26,6 +26,7 @@
  */
 
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
+import { voiceLedChordVoices, type VoiceLedState } from "./pianoWithMelody/voiceLedVoicing";
 import { midiToPitch } from "../instruments/instrumentCatalog";
 import type { NoteEvent } from "../score/types";
 
@@ -130,6 +131,9 @@ export type LhPatternOptions = {
   bassMax?: number;
   /** spec_bass only: note value of the bass line. Default "half". */
   bassRhythm?: "whole" | "half" | "quarter";
+  /** piano_with_melody only: voice-lead each chord off the previous one. When
+   *  absent (every other ensemble) the root-position voicer is used unchanged. */
+  voiceLead?: VoiceLedState;
   warnings?: string[];
 };
 
@@ -797,6 +801,7 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
     // get octave-shifted up when the root naturally sits in the low register.
     bassMin = 36, // C2  (was G2=43; Hallelujah LH min observed: D1=26, roots ~C2-D2)
     bassMax = 57, // A3
+    voiceLead,
     warnings = [],
   } = options;
 
@@ -804,7 +809,9 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
   function getVoices(t: number): ChordVoices | null {
     const symbol = pickChordAt(chords, measureNumber, t);
     if (!symbol) return null;
-    const v = chordVoicesInRange(symbol, bassMin, bassMax);
+    const v = voiceLead
+      ? voiceLedChordVoices(symbol, bassMin, bassMax, voiceLead)
+      : chordVoicesInRange(symbol, bassMin, bassMax);
     if (!v) {
       warnings.push(`[accomp] m${measureNumber} t=${t}: cannot parse chord "${symbol}" — skipping note`);
     }
@@ -946,6 +953,9 @@ export type RhPatternOptions = {
   trebleMin?: number;
   /** Max MIDI for the treble root. Default: 72 = C5 */
   trebleMax?: number;
+  /** piano_with_melody only: voice-lead each chord off the previous one. When
+   *  absent (every other ensemble) the root-position voicer is used unchanged. */
+  voiceLead?: VoiceLedState;
   warnings?: string[];
 };
 
@@ -1175,13 +1185,16 @@ export function generateRhPattern(options: RhPatternOptions): NoteEvent[] {
     rhPattern,
     trebleMin = 60, // C4
     trebleMax = 72, // C5
+    voiceLead,
     warnings = [],
   } = options;
 
   function getRhVoices(t: number): ChordVoices | null {
     const symbol = pickChordAt(chords, measureNumber, t);
     if (!symbol) return null;
-    const v = chordVoicesInRange(symbol, trebleMin, trebleMax);
+    const v = voiceLead
+      ? voiceLedChordVoices(symbol, trebleMin, trebleMax, voiceLead)
+      : chordVoicesInRange(symbol, trebleMin, trebleMax);
     if (!v) {
       warnings.push(`[rh-accomp] m${measureNumber} t=${t}: cannot parse chord "${symbol}" — skipping`);
     }

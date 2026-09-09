@@ -4,6 +4,7 @@ import path from "path";
 import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 import { generateLhPattern, type LhPatternId, generateRhPattern, type RhPatternId, pickChordAt, chordVoicesInRange, chordProposedBassMidi } from "./pianoAccompPatterns";
+import { createVoiceLedState } from "./pianoWithMelody/voiceLedVoicing";
 
 type PianoLevel = "beginner" | "intermediate" | "advanced" | "professional";
 
@@ -19,6 +20,10 @@ type ArrangePianoOptions = {
   separateMelodyPart?: boolean;
   melodyHand?: "left" | "right";
   ensembleTag?: "piano" | "piano_with_melody";
+  /** piano_with_melody only: voice-lead each chord off the previous one instead of
+   *  rebuilding it in root position, so common tones are held and fingers move less.
+   *  Every other piano ensemble leaves this off and is byte-identical. */
+  voiceLedVoicing?: boolean;
   worshipChordPad?: boolean;
   tempoBpm?: number;
   pianoStylePreset?: string;
@@ -2679,6 +2684,12 @@ function buildPianoMelodyAccomp(
   const lhPattern = options.lhPattern ?? "broken_ascending";
   const forcePattern = options.forcePattern === true;
 
+  // One voice-leading state per hand, living across the whole arrangement so each
+  // chord is voiced relative to the previous one even over a bar line. Left undefined
+  // for every ensemble but piano_with_melody, which keeps the root-position voicer.
+  const rhVoiceLead = options.voiceLedVoicing ? createVoiceLedState("rh") : undefined;
+  const lhVoiceLead = options.voiceLedVoicing ? createVoiceLedState("lh") : undefined;
+
   // Auto-select RH pattern based on mode.
   // When the user has explicitly picked a pattern (forcePattern), use it directly.
   // Default: melody_inner_voice (chiming inner-voice polyphonic feel).
@@ -2841,6 +2852,7 @@ function buildPianoMelodyAccomp(
           rhPattern: activeRhPattern,
           trebleMin: 60, // C4
           trebleMax: 72, // C5
+          voiceLead: rhVoiceLead,
           warnings,
         });
         evs.push(...rhEvents);
@@ -2859,6 +2871,7 @@ function buildPianoMelodyAccomp(
         measureBeats,
         lhPattern: activeLhPattern,
         bassRhythm: options.bassRhythm,
+        voiceLead: lhVoiceLead,
         warnings,
       });
       evs.push(...lhEvents);
