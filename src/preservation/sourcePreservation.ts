@@ -17,6 +17,8 @@ export type PreservationSettings = {
     timeSignatureMode?: string;
     stringTexture?: string;
     instrumentation?: string;
+    textureMode?: string;
+    rhPattern?: string;
 };
 export type PreservationReport = {
     status: 'verified' | 'not_applicable' | 'disabled';
@@ -66,6 +68,26 @@ function isMonophonic(part: Part): boolean {
     });
 }
 const ENSEMBLES = new Set(['choral', 'satb', 'string_ensemble', 'strings', 'woodwind_ensemble', 'woodwinds', 'brass_ensemble', 'brass', 'orchestra', 'full_orchestra', 'symphonic_orchestra']);
+const PIANO_ENSEMBLES = new Set(['piano', 'piano_with_melody', 'grand_piano', 'acoustic_piano']);
+/**
+ * Whether the arrangement will contain a part dedicated to the melody.
+ *
+ * Eligibility is really a property of the OUTPUT's shape, not of the ensemble's
+ * name. The piano ensembles emit a part literally named "Melody", carrying the
+ * source melody note for note, whenever the texture is melody + accompaniment —
+ * unless the right hand is set to double the melody itself (melody_only), which
+ * folds it back into the grand staff and leaves nothing separate to protect.
+ * Every other piano texture merges the melody into the two staves.
+ */
+function hasProtectedMelodyPart(settings: PreservationSettings): boolean {
+    const ensemble = String(settings.ensemble ?? '').toLowerCase();
+    if (ENSEMBLES.has(ensemble))
+        return true;
+    if (!PIANO_ENSEMBLES.has(ensemble))
+        return false;
+    return String(settings.textureMode ?? '').toLowerCase() === 'homophony_melody_accompaniment'
+        && String(settings.rhPattern ?? '').toLowerCase() !== 'melody_only';
+}
 export function prepareSourceLock(xml: string, input: ScoreModel, settings: PreservationSettings): {
     lock?: SourceLock;
     report?: PreservationReport;
@@ -83,10 +105,21 @@ export function prepareSourceLock(xml: string, input: ScoreModel, settings: Pres
         return { report: { status: 'disabled', reason: 'Source preservation was explicitly disabled.' } };
     if (settings.instrumentation && settings.instrumentation !== 'auto')
         return unavailable('Copy instrumentation does not have a separately protected melody; preservation is not verified.');
-    if (!ENSEMBLES.has(String(settings.ensemble ?? '').toLowerCase()))
-        return unavailable('This mode does not have a separately protected melody part; no preservation guarantee is made.');
-    if ((settings.keyFifths !== undefined && settings.keySignatureMode !== 'original' && settings.keySignature !== 'original') || (settings.keySignatureMode === 'manual') || (settings.targetKey && settings.targetKey !== 'original') || (settings.keySignature && settings.keySignature !== 'original') || settings.timeSignatureMode === 'manual' || (settings.timeSignature && settings.timeSignature !== 'original'))
+    if (!hasProtectedMelodyPart(settings))
+        return unavailable(PIANO_ENSEMBLES.has(String(settings.ensemble ?? '').toLowerCase())
+            ? 'The melody is merged into the piano staves here, so there is no separate part to protect. Choose the "melody + accompaniment" texture (with a right-hand pattern other than melody_only) to get a verified melody part.'
+            : 'This mode does not have a separately protected melody part; no preservation guarantee is made.');
+    if ((settings.keyFifths !== undefined && settings.keySignatureMode !== 'original' && settings.keySignature !== 'original') || (settings.keySignatureMode === 'manual') || (settings.targetKey && settings.targetKey !== 'original') || (settings.keySignature && settings.keySignature !== 'original') || settings.timeSignatureMode === 'manual' || (settings.timeSignature && settings.timeSignature !== 'original')) {
+        // The piano modes only became eligible for preservation here, and transposing
+        // a piano arrangement is an everyday thing to do. Failing the whole render
+        // with an error about a setting the user never turned on would be a plain
+        // regression, so they decline instead and say why. The ensembles that have
+        // always been eligible keep their long-standing hard guardrail — and an
+        // explicit melody octave shift still errors either way, via unavailable().
+        if (PIANO_ENSEMBLES.has(String(settings.ensemble ?? '').toLowerCase()))
+            return unavailable('The key or meter was changed, so the melody is deliberately not the source melody and cannot be verified against it. Keep both at Original to get a verified melody.');
         throw new Error('Source preservation locks the original key and meter. Keep those settings at Original, or explicitly turn off source preservation.');
+    }
     let part: Part | undefined;
     if (settings.sourceMelodyPartId) {
         part = input.parts.find(p => p.part_id === settings.sourceMelodyPartId);
