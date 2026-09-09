@@ -29,39 +29,33 @@ export type ChordVoices = { bass: number; mid: number; high: number };
 export type VoiceLedState = {
   lastSymbol: string | null;
   last: ChordVoices | null;
-  /** Cost of a non-root bottom note; see the constants below. */
-  rootBottomPenalty: number;
-  /** Left hand only: a slash chord's named bass note must sit at the bottom. */
-  enforceNotatedBass: boolean;
+  /**
+   * Left hand: the bottom note is the harmony's bass and is pinned to the chord's
+   * root — or to the named bass of a slash chord — with only its octave voice-led.
+   * Right hand: the stack floats freely above that bass.
+   */
+  pinBass: boolean;
 };
 
-export function createVoiceLedState(hand: "rh" | "lh", rootBottomPenaltyOverride?: number): VoiceLedState {
-  return {
-    lastSymbol: null,
-    last: null,
-    rootBottomPenalty:
-      rootBottomPenaltyOverride ?? (hand === "lh" ? LH_NON_ROOT_BOTTOM_PENALTY : RH_NON_ROOT_BOTTOM_PENALTY),
-    enforceNotatedBass: hand === "lh"
-  };
+export function createVoiceLedState(hand: "rh" | "lh"): VoiceLedState {
+  return { lastSymbol: null, last: null, pinBass: hand === "lh" };
 }
 
 /** Widest comfortable reach for one hand, lowest to highest note. */
 const MAX_HAND_SPAN = 12;
 
-/**
- * Cost of putting something other than the root (or the slash bass) at the bottom.
+/*
+ * Why the left hand pins its bass rather than voice-leading it.
  *
- * This applies to the LEFT hand only, where the bottom note is the harmonic
- * foundation: voice leading may still invert a chord when that saves enough motion,
- * but roots stay in the bass by default. Raise to keep more roots, lower to let the
- * bass move more freely.
+ * Letting the whole LH stack float put the bass on inversions and, under a sustained
+ * pattern like pedal_bass, on notes outside the chord altogether — a B under a D
+ * chord. The left hand's bottom note IS the harmony's bass in this texture; nothing
+ * else is playing one. So it is fixed by the chord symbol and only its octave is
+ * chosen to sit near the previous bass. The notes above it still voice-lead.
  *
- * The right hand passes 0. Its stack sits above the bass and has no bass function,
- * so insisting on a root there would recreate the very leaping this module exists to
- * remove — it is what forces D4 F#4 A4 up to G4 B4 D5 instead of settling on D4 G4 B4.
+ * The right hand has no such duty: its stack sits above the bass, and insisting on a
+ * root there is exactly what forced D4 F#4 A4 up to G4 B4 D5 instead of D4 G4 B4.
  */
-const LH_NON_ROOT_BOTTOM_PENALTY = 3;
-const RH_NON_ROOT_BOTTOM_PENALTY = 0;
 
 /**
  * Keeps the voicing from drifting up the window over a long song.
@@ -86,8 +80,7 @@ function bestVoicing(
   lo: number,
   hi: number,
   prev: ChordVoices | null,
-  rootBottomPenalty: number,
-  enforceNotatedBass: boolean
+  pinBass: boolean
 ): ChordVoices | null {
   const parsed = parseChordSymbol(symbol);
   if (!parsed) return null;
@@ -108,41 +101,60 @@ function bestVoicing(
   const homeBottom = lo + 2;
   const prevArr = prev ? [prev.bass, prev.mid, prev.high] : null;
 
-  const scan = (requiredBottomPc: number | null): { v: number[]; cost: number } | null => {
-  let best: { v: number[]; cost: number } | null = null;
-  for (let i = 0; i < pool.length; i++) {
-    for (let j = i + 1; j < pool.length; j++) {
-      for (let k = j + 1; k < pool.length; k++) {
-        const v = [pool[i]!, pool[j]!, pool[k]!];
-        if (v[2]! - v[0]! > MAX_HAND_SPAN) continue;
-        if (distinct(v.map((x) => x % 12)).length < needCoverage) continue;
-        if (requiredBottomPc !== null && v[0]! % 12 !== requiredBottomPc) continue;
+  const scan = (fixedBottom: number | null): { v: number[]; cost: number } | null => {
+    let best: { v: number[]; cost: number } | null = null;
+    const bottoms = fixedBottom !== null ? [fixedBottom] : pool;
+    for (const b of bottoms) {
+      for (const mid of pool) {
+        if (mid <= b) continue;
+        for (const high of pool) {
+          if (high <= mid) continue;
+          const v = [b, mid, high];
+          if (high - b > MAX_HAND_SPAN) continue;
+          if (distinct(v.map((x) => x % 12)).length < needCoverage) continue;
 
-        let cost = prevArr
-          ? Math.abs(v[0]! - prevArr[0]!) +
-            Math.abs(v[1]! - prevArr[1]!) +
-            Math.abs(v[2]! - prevArr[2]!)
-          : // First chord of the piece: seed low in the window, like the old voicer,
-            // so the arrangement starts where a player expects it to.
-            Math.abs(v[0]! - homeBottom);
+          let cost = prevArr
+            ? // A pinned bass is not a free choice, so its distance must not sway the
+              // decision — only the notes actually being chosen are scored.
+              (fixedBottom !== null ? 0 : Math.abs(b - prevArr[0]!)) +
+              Math.abs(mid - prevArr[1]!) +
+              Math.abs(high - prevArr[2]!)
+            : // First chord of the piece: seed low in the window, like the old voicer,
+              // so the arrangement starts where a player expects it to.
+              Math.abs(b - homeBottom);
 
-        if (rootBottomPenalty > 0 && v[0]! % 12 !== bottomPc) cost += rootBottomPenalty;
-        cost += REGISTER_ANCHOR_WEIGHT * Math.abs(v[0]! - homeBottom);
+          if (fixedBottom === null) cost += REGISTER_ANCHOR_WEIGHT * Math.abs(b - homeBottom);
 
-        if (!best || cost < best.cost) best = { v, cost };
+          if (!best || cost < best.cost) best = { v, cost };
+        }
       }
     }
-  }
-  return best;
+    return best;
   };
 
-  // A slash chord names its bass note: the lead sheet asked for the B of G/B, so in
-  // the left hand that is a requirement, not a preference the movement cost may
-  // outvote. Fall back to a free search only if the window admits no such voicing.
-  const notatedBass = parsed.bassPc;
-  const best =
-    (enforceNotatedBass && notatedBass !== null ? scan(notatedBass) : null) ?? scan(null);
+  // Left hand: the bass belongs to the harmony, not to the voice leading. Fix its
+  // pitch class from the chord symbol — the named bass of a slash chord, else the
+  // root — and choose only its octave, nearest the previous bass so the line itself
+  // does not leap. Everything above it is still voice-led.
+  if (pinBass) {
+    // Built from the window directly, not from `pool`: a slash chord can name a bass
+    // that is not one of the chord's own pitch classes, as C/D does.
+    const candidates: number[] = [];
+    for (let m = lo; m <= hi; m++) if (m % 12 === bottomPc) candidates.push(m);
+    if (candidates.length) {
+      const target = prev ? prev.bass : homeBottom;
+      const bass = candidates.reduce((a, b) =>
+        Math.abs(b - target) < Math.abs(a - target) ? b : a
+      );
+      const pinned = scan(bass);
+      if (pinned) return { bass: pinned.v[0]!, mid: pinned.v[1]!, high: pinned.v[2]! };
+      // Nothing stacks above that bass inside the window — still honour the bass.
+      return { bass, mid: bass, high: bass };
+    }
+    // The chord's bass note does not exist anywhere in this window; fall through.
+  }
 
+  const best = scan(null);
   if (!best) return null;
   return { bass: best.v[0]!, mid: best.v[1]!, high: best.v[2]! };
 }
@@ -163,7 +175,7 @@ export function voiceLedChordVoices(
 ): ChordVoices | null {
   if (state.lastSymbol === symbol && state.last) return state.last;
 
-  const v = bestVoicing(symbol, lo, hi, state.last, state.rootBottomPenalty, state.enforceNotatedBass);
+  const v = bestVoicing(symbol, lo, hi, state.last, state.pinBass);
   if (!v) return null;
 
   state.lastSymbol = symbol;
