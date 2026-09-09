@@ -93,16 +93,75 @@ test('the octave follows the letter, not the pitch class', () => {
   assert.deepEqual([e.pitch.step, e.pitch.alter, e.pitch.octave], ['B', 1, 3]);
 });
 
-test('a held note is cut back so one voice never overlaps itself', () => {
+test('a note held under moving notes keeps its length, in its own voice', () => {
   const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack([
-    { at: 0, dur: 4 * PPQ, midi: 72 },   // held across the bar
-    { at: PPQ, dur: PPQ, midi: 74 }      // a later note in the same hand
+    { at: 0, dur: 4 * PPQ, midi: 72 },   // held for the whole bar
+    { at: PPQ, dur: PPQ, midi: 74 },     // moving notes underneath it
+    { at: 2 * PPQ, dur: PPQ, midi: 76 }
   ])]));
-  const { score, report } = transcribeMidiToScore(f);
+  const { score, report } = transcribeMidiToScore(f, { maxVoices: 2 });
   const events = (score.parts[0]!.measures[0] as any).events;
   const held = events.find((e: any) => e.midi === 72);
-  assert.equal(held.dur, 1, 'the held note stops where the next one starts');
+  assert.equal(held.dur, 4, 'the held note is no longer cut back');
+  assert.equal(report.clamped, 0);
+  assert.equal(report.voices.rightHand, 2);
+  const moving = events.filter((e: any) => e.midi !== 72);
+  assert.ok(moving.every((e: any) => e.voice !== held.voice), 'the moving notes are a separate voice');
+});
+
+test('with only one voice allowed, the held note is cut back as before', () => {
+  const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack([
+    { at: 0, dur: 4 * PPQ, midi: 72 },
+    { at: PPQ, dur: PPQ, midi: 74 }
+  ])]));
+  const { score, report } = transcribeMidiToScore(f, { maxVoices: 1 });
+  const held = (score.parts[0]!.measures[0] as any).events.find((e: any) => e.midi === 72);
+  assert.equal(held.dur, 1);
   assert.equal(report.clamped, 1);
+});
+
+test('voices are numbered from the top down, and kept apart per staff', () => {
+  const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack([
+    { at: 0, dur: 4 * PPQ, midi: 76 }, { at: PPQ, dur: PPQ, midi: 67 },   // right hand
+    { at: 0, dur: 4 * PPQ, midi: 48 }, { at: PPQ, dur: PPQ, midi: 40 }    // left hand
+  ])]));
+  const { score } = transcribeMidiToScore(f, { maxVoices: 2 });
+  const events = (score.parts[0]!.measures[0] as any).events;
+  const voiceOf = (midi: number) => events.find((e: any) => e.midi === midi).voice;
+  assert.ok(voiceOf(76) < voiceOf(67), 'the higher line takes the lower voice number');
+  assert.ok(voiceOf(48) < voiceOf(40));
+  assert.ok([1, 2].includes(voiceOf(76)), 'right hand uses voices 1-2');
+  assert.ok([5, 6].includes(voiceOf(48)), 'left hand uses voices 5-6');
+});
+
+test('notes sharing an onset but not a length are never lost when voices run out', () => {
+  // Three lengths at one onset with only two voices: the odd one must be merged,
+  // not shortened to nothing. Cutting it back to the others' start would leave it
+  // zero-length and it would vanish from the page entirely.
+  const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack([
+    { at: 0, dur: 4 * PPQ, midi: 72 },
+    { at: 0, dur: 2 * PPQ, midi: 76 },
+    { at: 0, dur: PPQ, midi: 79 }
+  ])]));
+  const { score } = transcribeMidiToScore(f, { maxVoices: 2 });
+  const all = (score.parts[0]!.measures as any[]).flatMap(m => m.events);
+  for (const midi of [72, 76, 79])
+    assert.ok(all.some((e: any) => e.midi === midi), `midi ${midi} must still be written`);
+  assert.ok(all.every((e: any) => e.dur > 0), 'no note may have zero length');
+});
+
+test('every source note reaches the page exactly once', () => {
+  // The check that catches a note silently disappearing: source notes plus tie
+  // continuations must equal the note elements written.
+  const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack([
+    { at: 0, dur: 5 * PPQ, midi: 72 }, { at: PPQ, dur: PPQ, midi: 67 },
+    { at: 2 * PPQ, dur: 3 * PPQ, midi: 64 }, { at: 3 * PPQ, dur: PPQ, midi: 55 },
+    { at: 0, dur: 2 * PPQ, midi: 48 }, { at: 5 * PPQ, dur: PPQ, midi: 43 }
+  ])]));
+  const source = f.tracks.reduce((a, b) => (b.notes.length > a.notes.length ? b : a)).notes.length;
+  const { score, report } = transcribeMidiToScore(f);
+  const written = (score.parts[0]!.measures as any[]).reduce((n, m) => n + m.events.length, 0);
+  assert.equal(written, source + report.tied, 'nothing lost, nothing invented');
 });
 
 test('a note too short to notate is lengthened rather than dropped', () => {

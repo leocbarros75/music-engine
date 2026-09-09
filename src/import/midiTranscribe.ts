@@ -22,6 +22,8 @@ export type TranscribeOptions = {
     handSplit?: number;
     /** Track to transcribe. Default: the track with the most notes. */
     trackIndex?: number;
+    /** Independent voices allowed per hand. Default 2. */
+    maxVoices?: number;
 };
 
 export type TranscriptionReport = {
@@ -41,6 +43,8 @@ export type TranscriptionReport = {
     widened: number;
     /** Notes written as tied notes because they cross a bar line. */
     tied: number;
+    /** Voices actually used in each hand. */
+    voices: { rightHand: number; leftHand: number };
     /** True when the key signature came from the notes rather than the file. */
     keyInferred: boolean;
     handSplit: number;
@@ -189,7 +193,7 @@ function buildBars(file: MidiFile, endTick: number): Bar[] {
 }
 
 // ── Transcription ────────────────────────────────────────────────────────────
-type Placed = { midi: number; startTick: number; endTick: number; staff: 1 | 2 };
+type Placed = { midi: number; startTick: number; endTick: number; staff: 1 | 2; voice: number };
 
 /** Split one simultaneity between the hands, at its widest interior gap. */
 function splitChord(pitches: number[], handSplit: number): { rh: number[]; lh: number[] } {
@@ -210,6 +214,96 @@ function splitChord(pitches: number[], handSplit: number): { rh: number[]; lh: n
     return { rh: sorted.slice(cut), lh: sorted.slice(0, cut) };
 }
 
+// ── Voice separation ─────────────────────────────────────────────────────────
+/**
+ * Split one hand into independent voices.
+ *
+ * Two notes in a single voice may not overlap, so with one voice per hand a note
+ * held under moving notes has to be cut back to the next chord — which is exactly
+ * how a pianist's sustained inner line disappears. Giving the hand a second voice
+ * lets the held note keep its length while the others move underneath it.
+ *
+ * Notes that begin AND end together are one chord in one voice; a note of a chord
+ * held longer than its neighbours becomes its own voice. Each chord goes to the
+ * free voice whose previous note was nearest in pitch, which keeps a line in a
+ * consistent register instead of letting voices swap places. Only when every voice
+ * is busy and none may be opened does a note get shortened, so clamping becomes
+ * the last resort rather than the rule.
+ */
+type Chord = { start: number; end: number; top: number; notes: Placed[] };
+
+function assignVoices(notes: Placed[], maxVoices: number): number {
+    const chords = new Map<string, Placed[]>();
+    for (const n of notes) {
+        const key = `${n.startTick}:${n.endTick}`;
+        const list = chords.get(key) ?? [];
+        list.push(n);
+        chords.set(key, list);
+    }
+    const events: Chord[] = [...chords.values()]
+        .map((g) => ({ start: g[0]!.startTick, end: g[0]!.endTick, top: Math.max(...g.map((x) => x.midi)), notes: g }))
+        .sort((a, b) => a.start - b.start || b.top - a.top);
+
+    const voices: Array<{ lastEnd: number; lastPitch: number; last: Chord | null; sum: number; count: number }> = [];
+    let clamped = 0;
+
+    for (const ev of events) {
+        let pick = -1;
+        let nearest = Infinity;
+        for (let i = 0; i < voices.length; i++) {
+            if (voices[i]!.lastEnd > ev.start) continue; // still sounding
+            const distance = Math.abs(voices[i]!.lastPitch - ev.top);
+            if (distance < nearest) { nearest = distance; pick = i; }
+        }
+        if (pick < 0 && voices.length < maxVoices) {
+            voices.push({ lastEnd: -Infinity, lastPitch: ev.top, last: null, sum: 0, count: 0 });
+            pick = voices.length - 1;
+        }
+        if (pick < 0) {
+            // Every voice is busy and no more may be opened. Fall back to the voice
+            // whose line this chord continues most naturally.
+            let closest = Infinity;
+            pick = 0;
+            for (let i = 0; i < voices.length; i++) {
+                const distance = Math.abs(voices[i]!.lastPitch - ev.top);
+                if (distance < closest) { closest = distance; pick = i; }
+            }
+            const blocking = voices[pick]!.last;
+            if (blocking && blocking.start === ev.start) {
+                // Same onset, different lengths, nowhere left to put it: merge into
+                // that chord and adopt its length. Shortening to the other note's
+                // start would give this one zero length and lose it altogether.
+                for (const n of ev.notes) { n.endTick = blocking.end; n.voice = pick; }
+                blocking.notes.push(...ev.notes);
+                clamped += ev.notes.length;
+                continue;
+            }
+            // The blocker began earlier, so cutting it back here still leaves it a
+            // positive length.
+            if (blocking) for (const n of blocking.notes) {
+                if (n.endTick > ev.start) { n.endTick = ev.start; clamped++; }
+            }
+        }
+        const voice = voices[pick]!;
+        for (const n of ev.notes) n.voice = pick;
+        voice.lastEnd = ev.end;
+        voice.lastPitch = ev.top;
+        voice.last = ev;
+        voice.sum += ev.top;
+        voice.count++;
+    }
+
+    // Number the voices from the top down, as piano notation expects: voice 1 above
+    // voice 2, so stems and rests fall the conventional way.
+    const order = voices
+        .map((v, i) => ({ i, average: v.count ? v.sum / v.count : 0 }))
+        .sort((a, b) => b.average - a.average)
+        .map((x, rank) => [x.i, rank] as const);
+    const rankOf = new Map(order);
+    for (const n of notes) n.voice = rankOf.get(n.voice) ?? 0;
+    return clamped;
+}
+
 export function transcribeMidiToScore(
     file: MidiFile,
     options: TranscribeOptions = {}
@@ -217,6 +311,7 @@ export function transcribeMidiToScore(
     const warnings: string[] = [...file.warnings];
     const grid = options.grid ?? 16;
     const handSplit = options.handSplit ?? 60;
+    const maxVoices = Math.max(1, options.maxVoices ?? 2);
     const step = (file.ppq * 4) / grid; // ticks per grid step
 
     const candidates = file.tracks.filter((t) => t.notes.length && !t.isDrums);
@@ -262,24 +357,18 @@ export function transcribeMidiToScore(
         for (const p of rh) staffOf.set(`${tick}:${p}`, 1);
         for (const p of lh) staffOf.set(`${tick}:${p}`, 2);
     }
-    const placed: Placed[] = snapped.map((n) => ({ ...n, staff: staffOf.get(`${n.startTick}:${n.midi}`) ?? 1 }));
+    const placed: Placed[] = snapped.map((n) => ({ ...n, staff: staffOf.get(`${n.startTick}:${n.midi}`) ?? 1, voice: 0 }));
 
     // 4. One voice per hand: a chord lasts until the next chord in that hand. Without
     //    real voice separation two notes in one voice must not overlap, so a sustained
     //    note under moving ones is cut back rather than written as a second voice.
     let clamped = 0;
+    const voicesPerHand: Record<1 | 2, number> = { 1: 0, 2: 0 };
     for (const staff of [1, 2] as const) {
-        const onsets = [...new Set(placed.filter((p) => p.staff === staff).map((p) => p.startTick))].sort((a, b) => a - b);
-        const nextOf = new Map<number, number>();
-        onsets.forEach((t, i) => { if (i + 1 < onsets.length) nextOf.set(t, onsets[i + 1]!); });
-        for (const p of placed) {
-            if (p.staff !== staff) continue;
-            const next = nextOf.get(p.startTick);
-            if (next !== undefined && p.endTick > next) {
-                clamped++;
-                p.endTick = next;
-            }
-        }
+        const hand = placed.filter((p) => p.staff === staff);
+        if (!hand.length) continue;
+        clamped += assignVoices(hand, maxVoices);
+        voicesPerHand[staff] = new Set(hand.map((p) => p.voice)).size;
     }
 
     // 5. Lay the notes into bars.
@@ -308,6 +397,9 @@ export function transcribeMidiToScore(
     for (const p of placed) {
         let bi = bars.findIndex((b) => p.startTick >= b.startTick && p.startTick < b.startTick + b.ticks);
         if (bi < 0) { dropped++; continue; }
+        // Belt and braces: nothing may reach the page with no length, or the loop
+        // below would emit nothing at all and the note would silently disappear.
+        if (p.endTick <= p.startTick) p.endTick = p.startTick + step;
         // A note running past the bar line is written as tied notes, one per bar it
         // crosses — not cut short at the line. Truncating loses real music: the
         // opening chord of a performance that begins on the last sixteenth of a bar
@@ -326,7 +418,7 @@ export function transcribeMidiToScore(
                 dur: Math.max(step / file.ppq, (segmentEnd - cursor) / file.ppq),
                 pitch: { ...pitch },
                 midi: p.midi,
-                voice: p.staff === 1 ? 1 : 5,
+                voice: (p.staff === 1 ? 1 : 5) + p.voice,
                 staff: p.staff,
                 ...(continues ? { tieStart: true } : {}),
                 ...(cursor > p.startTick ? { tieStop: true } : {})
@@ -371,6 +463,7 @@ export function transcribeMidiToScore(
             widened,
             tied,
             keyInferred: key.inferred,
+            voices: { rightHand: voicesPerHand[1], leftHand: voicesPerHand[2] },
             handSplit,
             rightHandNotes: placed.filter((p) => p.staff === 1).length,
             leftHandNotes: placed.filter((p) => p.staff === 2).length,
