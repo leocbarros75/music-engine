@@ -37,6 +37,7 @@ async function main() {
     for (const file of [
       'tests/ai/phraseCollaboration.test.ts',
       'tests/application/applicationPaths.test.ts',
+      'tests/import/midiFile.test.ts',
       'tests/score/scoreStandard.test.ts',
       'tests/preservation/sourcePreservation.test.ts',
       'tests/preservation/serverPreservation.test.ts',
