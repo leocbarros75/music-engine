@@ -102,6 +102,39 @@ test('a real tune is accepted, with its measurements reported', () => {
   assert.equal(ls.confidence.bigLeaps, 0);
 });
 
+test('a short release gap is absorbed into the note, a real rest is kept', () => {
+  // A performance lifts each finger slightly early. Printing every one of those as
+  // a short rest is what makes a transcription unreadable — but a genuine silence
+  // is phrasing and must survive.
+  const specs = [
+    // Released early enough that quantization does not already absorb it: a
+    // sixteenth of silence before the next attack, which prints as a rest.
+    { at: 0, dur: PPQ - 180, midi: 74 },
+    { at: PPQ, dur: PPQ - 180, midi: 76 },
+    { at: 2 * PPQ, dur: PPQ - 180, midi: 78 },
+    { at: 3 * PPQ, dur: PPQ - 180, midi: 76 },
+    { at: 6 * PPQ, dur: PPQ, midi: 74 }          // after a two-beat silence
+  ];
+  for (const bar of [0, 1]) {
+    for (const offset of [0, 4, 7]) specs.push({ at: bar * 4 * PPQ, dur: 4 * PPQ, midi: 50 + offset });
+  }
+  const f = parseMidiFile(smf([notesTrack(specs, [...timeSig, ...keySig(2)])]));
+
+  const tight = extractLeadSheet(f, { closeGaps: 0 });
+  const eased = extractLeadSheet(f, { closeGaps: 0.5 });
+  const rests = (x: string) => (x.match(/<note>\s*<rest\s*\/?>/g) ?? []).length;
+  assert.ok(rests(eased.musicxml) < rests(tight.musicxml),
+    `closing gaps must remove rests (${rests(tight.musicxml)} -> ${rests(eased.musicxml)})`);
+
+  const notesOf = (ls: any) => (ls.score.parts[0].measures as any[]).flatMap(m => m.events);
+  assert.equal(notesOf(eased).length, notesOf(tight).length, 'no note may be swallowed');
+
+  // The two-beat silence is phrasing: it must still be there.
+  assert.ok(rests(eased.musicxml) > 0, 'a real rest survives');
+  const first: any = notesOf(eased)[0];
+  assert.equal(first.dur, 1, 'the early release is rounded up to a full beat');
+});
+
 test('silent bars get no chord', () => {
   // Two bars of music, then two of silence, then one more.
   const specs: Array<{ at: number; dur: number; midi: number }> = [];

@@ -43,6 +43,17 @@ export type MelodyConfidence = {
     bigLeaps: number;
 };
 
+export type LeadSheetOptions = TranscribeOptions & {
+    /**
+     * Silence up to this many quarter-note beats is absorbed into the note before
+     * it, rather than printed as a rest. A performance releases each note a little
+     * early, and writing every one of those as a short rest is what makes a
+     * transcription unreadable. Longer silences are phrasing and are kept.
+     * Default: half a beat.
+     */
+    closeGaps?: number;
+};
+
 export type LeadSheet = {
     /** One part, "Melody", monophonic. */
     score: ScoreModel;
@@ -105,7 +116,7 @@ function assess(midis: number[], coverage: number): MelodyConfidence {
  * are numbered across the whole hand, so "voice 1" is simply absent from bars where
  * the top line rests, and following it there would silently promote an inner part.
  */
-function topLine(score: ScoreModel): { events: NoteEvent[][]; midis: number[]; coverage: number } {
+function topLine(score: ScoreModel, closeGaps: number): { events: NoteEvent[][]; midis: number[]; coverage: number } {
     const bars = (score.parts[0]?.measures ?? []) as any[];
     const events: NoteEvent[][] = [];
     const midis: number[] = [];
@@ -113,6 +124,8 @@ function topLine(score: ScoreModel): { events: NoteEvent[][]; midis: number[]; c
     let withMelody = 0;
 
     for (const bar of bars) {
+        const barBeats = bar.durationBeats
+            ?? ((bar.attributes?.time?.beats ?? 4) * 4 / (bar.attributes?.time?.beat_type ?? 4));
         const upper = (bar.events ?? []).filter((e: any) => e.staff === 1 && e.type === "note");
         if ((bar.events ?? []).length) sounding++;
         if (!upper.length) { events.push([]); continue; }
@@ -125,8 +138,24 @@ function topLine(score: ScoreModel): { events: NoteEvent[][]; midis: number[]; c
         }
         const line = [...highest.values()].sort((a, b) => a.t - b.t);
         // One line, so nothing may overlap: each note stops where the next begins.
-        for (let i = 0; i < line.length - 1; i++)
-            line[i]!.dur = Math.min(line[i]!.dur, line[i + 1]!.t - line[i]!.t);
+        // Where it stops SHORT of the next, a rest appears — and a performance leaves
+        // hundreds of them, because a player lifts a finger a little early every time.
+        // Printing each of those as a sixteenth rest is what makes a transcription
+        // unreadable, so a gap up to `closeGaps` is absorbed into the note before it.
+        // Longer silences are real phrasing and stay.
+        for (let i = 0; i < line.length - 1; i++) {
+            const span = line[i + 1]!.t - line[i]!.t;
+            const gap = span - line[i]!.dur;
+            line[i]!.dur = gap > 0 && gap <= closeGaps ? span : Math.min(line[i]!.dur, span);
+        }
+        // The same at the end of a bar, where a short gap before the bar line is the
+        // same artefact and prints as a trailing rest.
+        const last = line[line.length - 1];
+        if (last) {
+            const toBarEnd = barBeats - last.t;
+            const gap = toBarEnd - last.dur;
+            if (gap > 0 && gap <= closeGaps) last.dur = toBarEnd;
+        }
 
         const kept = line
             .filter((e) => e.dur > 1e-9)
@@ -146,11 +175,11 @@ function topLine(score: ScoreModel): { events: NoteEvent[][]; midis: number[]; c
     return { events, midis, coverage: sounding ? withMelody / sounding : 0 };
 }
 
-export function extractLeadSheet(file: MidiFile, options: TranscribeOptions = {}): LeadSheet {
+export function extractLeadSheet(file: MidiFile, options: LeadSheetOptions = {}): LeadSheet {
     const { score: full, report } = transcribeMidiToScore(file, options);
     const warnings = [...report.warnings];
 
-    const { events, midis, coverage } = topLine(full);
+    const { events, midis, coverage } = topLine(full, options.closeGaps ?? 0.5);
     const confidence = assess(midis, coverage);
     if (!confidence.hasMelody) warnings.push(confidence.reason);
 
