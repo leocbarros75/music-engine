@@ -45,6 +45,10 @@ export type TranscriptionReport = {
     tied: number;
     /** Voices actually used in each hand. */
     voices: { rightHand: number; leftHand: number };
+    /** Tempo marks carried over from the recording. */
+    tempoMarks: number;
+    /** Dynamic marks written, one per change rather than one per bar. */
+    dynamicMarks: number;
     /** True when the key signature came from the notes rather than the file. */
     keyInferred: boolean;
     handSplit: number;
@@ -193,7 +197,7 @@ function buildBars(file: MidiFile, endTick: number): Bar[] {
 }
 
 // ── Transcription ────────────────────────────────────────────────────────────
-type Placed = { midi: number; startTick: number; endTick: number; staff: 1 | 2; voice: number };
+type Placed = { midi: number; startTick: number; endTick: number; staff: 1 | 2; voice: number; velocity: number };
 
 /** Split one simultaneity between the hands, at its widest interior gap. */
 function splitChord(pitches: number[], handSplit: number): { rh: number[]; lh: number[] } {
@@ -352,7 +356,7 @@ export function transcribeMidiToScore(
             end = start + step; // Too short to notate; give it the shortest value on the grid.
             widened++;
         }
-        return { midi: n.midi, startTick: start, endTick: end };
+        return { midi: n.midi, startTick: start, endTick: end, velocity: n.velocity };
     });
 
     // 3. Split the hands, one simultaneity at a time.
@@ -438,11 +442,59 @@ export function transcribeMidiToScore(
     if (dropped) warnings.push(`${dropped} note(s) fell outside the bar grid and were dropped.`);
     for (const m of measures) m.events.sort((a, b) => a.t - b.t || (a.staff ?? 1) - (b.staff ?? 1));
 
+    // 6. Tempo and dynamics.
+    //
+    // These go into `measure.performance`, which writePerformanceNotation already
+    // turns into <direction> marks for every ensemble — the velocity-to-ppp..fff
+    // mapping is already written there. Nothing was filling those fields for an
+    // imported score, so a recording made at 67bpm was being printed as the 120bpm
+    // default with no dynamics at all.
+    for (const t of file.tempos) {
+        const bi = bars.findIndex((b) => t.tick >= b.startTick && t.tick < b.startTick + b.ticks);
+        if (bi < 0) continue;
+        const at = (t.tick - bars[bi]!.startTick) / file.ppq;
+        const perf = (measures[bi]!.performance ??= {});
+        (perf.tempos ??= []).push({ t: at, bpm: Math.round(t.bpm * 10) / 10 });
+    }
+
+    // One dynamic per bar would be unreadable — a performance varies every note.
+    // So each bar is reduced to the mark its average velocity would print, and a
+    // mark is written only where that changes.
+    const LEVELS = [32, 44, 56, 68, 80, 96, 112, 124];
+    const markOf = (velocity: number) =>
+        LEVELS.reduce((best, v, i) => (Math.abs(v - velocity) < Math.abs(LEVELS[best]! - velocity) ? i : best), 0);
+    // Even per bar this flickers: a player's touch varies constantly, so the average
+    // crosses a boundary every couple of bars and the page fills with marks nobody
+    // would write. A new mark therefore has to earn its place — either the level has
+    // held long enough to be a real change of intent, or it has jumped far enough
+    // that it plainly is one.
+    const MIN_BARS_BETWEEN = 4;
+    const JUMP_REGARDLESS = 2;
+    const levelOfBar = bars.map((bar, bi) => {
+        const inBar = placed.filter((p) => p.startTick >= bar.startTick && p.startTick < bar.startTick + bar.ticks);
+        return inBar.length ? markOf(inBar.reduce((s, p) => s + p.velocity, 0) / inBar.length) : null;
+    });
+    let lastMark = -1;
+    let lastBar = -Infinity;
+    for (let bi = 0; bi < bars.length; bi++) {
+        const mark = levelOfBar[bi];
+        if (mark === null || mark === lastMark) continue;
+        const jump = lastMark < 0 ? Infinity : Math.abs(mark - lastMark);
+        if (bi - lastBar < MIN_BARS_BETWEEN && jump < JUMP_REGARDLESS) continue;
+        lastMark = mark;
+        lastBar = bi;
+        const perf = (measures[bi]!.performance ??= {});
+        (perf.dynamics ??= []).push({ t: 0, velocity: LEVELS[mark]! });
+    }
+
     const score: ScoreModel = {
         meta: {
             ensemble: "piano",
             title: track.name ?? "Transcription",
-            inputKeyFifths: key.fifths
+            inputKeyFifths: key.fifths,
+            // The opening tempo, so a score with no tempo map still carries the
+            // recording's speed rather than falling back to the 120bpm default.
+            tempo_bpm: Math.round((file.tempos[0]?.bpm ?? 120) * 10) / 10
         },
         parts: [{
             part_id: "P_PNO",
@@ -471,6 +523,8 @@ export function transcribeMidiToScore(
             tied,
             keyInferred: key.inferred,
             voices: { rightHand: voicesPerHand[1], leftHand: voicesPerHand[2] },
+            tempoMarks: measures.reduce((n, m) => n + (m.performance?.tempos?.length ?? 0), 0),
+            dynamicMarks: measures.reduce((n, m) => n + (m.performance?.dynamics?.length ?? 0), 0),
             handSplit,
             rightHandNotes: placed.filter((p) => p.staff === 1).length,
             leftHandNotes: placed.filter((p) => p.staff === 2).length,

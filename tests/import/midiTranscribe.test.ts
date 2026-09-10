@@ -273,6 +273,61 @@ test('a declared key signature that fits the music is left alone', () => {
   assert.equal(report.keyInferred, false);
 });
 
+test('the recording\'s tempo is carried over, not replaced by the default', () => {
+  // 500000 microseconds per quarter = 120bpm; 895522 = 67bpm, test 4's tempo.
+  const tempo = (us: number) => [0, 0xff, 0x51, 3, (us >> 16) & 255, (us >> 8) & 255, us & 255];
+  const f = parseMidiFile(smf([[...timeSig(4, 2), ...tempo(895522)],
+    notesTrack([{ at: 0, dur: PPQ, midi: 60 }, { at: PPQ, dur: PPQ, midi: 62 }])]));
+  const { score, report } = transcribeMidiToScore(f);
+  assert.equal(report.tempoMarks, 1);
+  assert.equal(Math.round((score.meta as any).tempo_bpm), 67, 'not the 120 default');
+  const marks = (score.parts[0]!.measures[0] as any).performance?.tempos ?? [];
+  assert.equal(Math.round(marks[0].bpm), 67);
+});
+
+test('a tempo map survives, so a ritardando is not flattened', () => {
+  const tempo = (us: number) => [0xff, 0x51, 3, (us >> 16) & 255, (us >> 8) & 255, us & 255];
+  const body = [0, ...timeSig(4, 2).slice(1), 0, ...tempo(500000)];
+  // three slowing tempo changes, one per bar
+  for (const [bar, us] of [[1, 545454], [2, 600000], [3, 666666]] as const) {
+    body.push(...vlq(bar === 1 ? 4 * PPQ : 4 * PPQ), ...tempo(us));
+  }
+  const f = parseMidiFile(smf([body, notesTrack(
+    [0, 1, 2, 3].map(i => ({ at: i * 4 * PPQ, dur: PPQ, midi: 60 + i }))
+  )]));
+  const { score, report } = transcribeMidiToScore(f);
+  assert.equal(report.tempoMarks, 4, 'every tempo change is written');
+  const all = (score.parts[0]!.measures as any[]).flatMap(m => m.performance?.tempos ?? []).map((t: any) => Math.round(t.bpm));
+  assert.deepEqual(all, [120, 110, 100, 90], 'the ritardando is preserved in order');
+});
+
+test('a steady touch gets one dynamic, not one per bar', () => {
+  const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack(
+    Array.from({ length: 32 }, (_, i) => ({ at: i * PPQ, dur: PPQ, midi: 60 + (i % 5) }))
+  )]));
+  const { report } = transcribeMidiToScore(f);
+  assert.equal(report.dynamicMarks, 1, 'one mark for an unchanging velocity');
+});
+
+test('dynamics are damped so the page is not filled with marks', () => {
+  // Velocity wandering across a boundary every bar: an engraver would not write a
+  // mark each time, and neither should this.
+  const specs: Array<{ at: number; dur: number; midi: number }> = [];
+  const evs: Array<{ tick: number; d: number[] }> = [];
+  for (let bar = 0; bar < 24; bar++) {
+    const v = bar % 2 === 0 ? 74 : 86;   // straddles the mp/mf boundary
+    evs.push({ tick: bar * 4 * PPQ, d: [0x90, 60 + (bar % 4), v] });
+    evs.push({ tick: bar * 4 * PPQ + PPQ, d: [0x80, 60 + (bar % 4), 0] });
+  }
+  const body = [...timeSig(4, 2)];
+  let t = 0;
+  for (const e of evs.sort((a, b) => a.tick - b.tick)) { body.push(...vlq(e.tick - t), ...e.d); t = e.tick; }
+  const { report } = transcribeMidiToScore(parseMidiFile(smf([body])));
+  assert.ok(report.dynamicMarks <= 24 / 4 + 1,
+    `alternating velocity must not yield a mark per bar (got ${report.dynamicMarks} over 24 bars)`);
+  assert.ok(report.dynamicMarks >= 1, 'but the level is still reported');
+});
+
 test('a file with only drums is refused with a reason', () => {
   const body = [0, 0x99, 38, 100, ...vlq(PPQ), 0x89, 38, 0];
   assert.throws(() => transcribeMidiToScore(parseMidiFile(smf([body]))), /no pitched notes/);
