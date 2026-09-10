@@ -201,13 +201,20 @@ function splitChord(pitches: number[], handSplit: number): { rh: number[]; lh: n
     if (sorted[0]! >= handSplit) return { rh: sorted, lh: [] };
     if (sorted[sorted.length - 1]! < handSplit) return { rh: [], lh: sorted };
     // Straddles the split point: prefer a real gap in the chord over the nominal
-    // boundary, so a voicing is not sliced through the middle of a cluster.
+    // boundary, so a voicing is not sliced through the middle of a cluster. Where
+    // several gaps are equally wide, take the one nearest where the hands actually
+    // divide — F#1 F#2 F#3 A#3 B3 C#4 has a twelve-semitone gap in two places, and
+    // cutting at the lower one strands F#2 in the right hand instead of keeping the
+    // octave bass together.
     let cut = sorted.findIndex((p) => p >= handSplit);
-    let widest = 0;
+    let bestScore = -Infinity;
     for (let i = 1; i < sorted.length; i++) {
         const gap = sorted[i]! - sorted[i - 1]!;
-        if (gap > widest && gap >= 5) {
-            widest = gap;
+        if (gap < 5) continue;
+        const middle = (sorted[i - 1]! + sorted[i]!) / 2;
+        const score = gap - 0.5 * Math.abs(middle - handSplit);
+        if (score > bestScore) {
+            bestScore = score;
             cut = i;
         }
     }

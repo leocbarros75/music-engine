@@ -76,6 +76,19 @@ test('a chord is split between the hands at its widest interior gap', () => {
   assert.equal(report.leftHandNotes, 2);
 });
 
+test('an octave bass is kept together when two gaps are equally wide', () => {
+  // F#1 F#2 F#3 A#3 B3 C#4 has a twelve-semitone gap in two places. Cutting at the
+  // lower one strands F#2 in the right hand and breaks the octave bass; the split
+  // must fall at the gap nearer where the hands actually divide.
+  const f = parseMidiFile(smf([[...timeSig(4, 2)], notesTrack(
+    [30, 42, 54, 58, 59, 61].map(m => ({ at: 0, dur: PPQ, midi: m }))
+  )]));
+  const { score } = transcribeMidiToScore(f, { handSplit: 60 });
+  const events = (score.parts[0]!.measures[0] as any).events;
+  const lh = events.filter((e: any) => e.staff === 2).map((e: any) => e.midi).sort((a: number, b: number) => a - b);
+  assert.deepEqual(lh, [30, 42], 'both octave bass notes stay in the left hand');
+});
+
 test('spelling follows the key signature', () => {
   const sharp = parseMidiFile(smf([[...timeSig(4, 2), ...keySig(5)], notesTrack([{ at: 0, dur: PPQ, midi: 63 }])]));
   const a: any = (transcribeMidiToScore(sharp).score.parts[0]!.measures[0] as any).events[0];
