@@ -88,6 +88,24 @@ function hasProtectedMelodyPart(settings: PreservationSettings): boolean {
     return String(settings.textureMode ?? '').toLowerCase() === 'homophony_melody_accompaniment'
         && String(settings.rhPattern ?? '').toLowerCase() !== 'melody_only';
 }
+/**
+ * Whether two key signatures are the same key, allowing for enharmonic spelling.
+ *
+ * A transposing part's key may legitimately be respelled: the exporter writes a B
+ * flat clarinet in D flat (-5) rather than C sharp (+7) against a concert B major,
+ * because five flats read better than seven sharps. Undoing that transposition
+ * arithmetically — fifths plus a fixed shift, as toSoundingScore does — then lands
+ * on -7 instead of +5. Same key, different number.
+ *
+ * So keys are compared by the pitch class of their tonic, which the respelling does
+ * not change, rather than by the signed count of accidentals, which it does.
+ */
+function sameKey(a: unknown, b: unknown): boolean {
+    if (typeof a !== 'number' || typeof b !== 'number') return a === b;
+    const tonicPc = (fifths: number) => ((fifths * 7) % 12 + 12) % 12;
+    return tonicPc(a) === tonicPc(b);
+}
+
 export function prepareSourceLock(xml: string, input: ScoreModel, settings: PreservationSettings): {
     lock?: SourceLock;
     report?: PreservationReport;
@@ -385,7 +403,7 @@ export function verifySourceOutput(lock: SourceLock, score: ScoreModel, xml: str
     for (const p of actualScore.parts)
         p.measures.forEach((m, i) => {
             const src = lock.expected.measures[i];
-            if (src && (m.number !== src.number || m.attributes?.key_fifths !== src.attributes?.key_fifths || m.attributes?.key_mode !== src.attributes?.key_mode))
+            if (src && (m.number !== src.number || !sameKey(m.attributes?.key_fifths, src.attributes?.key_fifths) || m.attributes?.key_mode !== src.attributes?.key_mode))
                 issues.push(`measure ${src.number}: source key or measure label changed in ${p.name}`);
         });
     const actualDoc = document(xml), expectedBars = children(expectedPart, 'measure');

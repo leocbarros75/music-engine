@@ -141,4 +141,18 @@ test('part selection cannot silently discard a separate chord chart', () => {
     assert.throws(() => selectSourceParts(two, ['P2']), /discard source chord symbols/);
     assert.equal(parse(selectSourceParts(two, ['P2'], false)).parts.length, 1);
 });
+test('an enharmonic key on a transposing part is the same key, a different one is not', () => {
+    // A B flat clarinet against a concert key of 4+ sharps is written in flats — six
+    // flats read better than six sharps — and undoing that transposition
+    // arithmetically lands on a fifths number outside the valid range. Same key,
+    // different number. Comparing tonic pitch class rather than the signed count of
+    // accidentals is what tells them apart, and it must NOT make every key equal.
+    const tonicPc = (fifths: number) => ((fifths * 7) % 12 + 12) % 12;
+    assert.equal(tonicPc(-8), tonicPc(4), 'G flat respelled is still E concert');
+    assert.equal(tonicPc(-7), tonicPc(5), 'D flat respelled is still B concert');
+    assert.equal(tonicPc(7), tonicPc(-5), 'C sharp and D flat are one key');
+    assert.notEqual(tonicPc(0), tonicPc(2), 'C and D remain different keys');
+    assert.notEqual(tonicPc(2), tonicPc(3), 'neighbouring keys stay distinct');
+});
+
 console.log(`${passed} source-preservation tests passed.`);
