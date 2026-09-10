@@ -17,6 +17,7 @@ export default defineConfig({
       "/propose_phrase_plan":   "http://localhost:3001",
       "/parse_prompt":          "http://localhost:3001",
       "/generate_from_rhythm_pdf": "http://localhost:3001",
+      "/midi_to_musicxml":      "http://localhost:3001",
       "/parse_pdf":             "http://localhost:3001",
       "/health":                "http://localhost:3001"
     }
