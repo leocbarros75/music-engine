@@ -138,6 +138,7 @@ export type Settings = {
     | "serenade_strum"
     | "root_chord_stabs"
     | "interval_oscillation"
+    | "wide_arpeggio"
     | "jazz_shell"
     | "octave_bass"
     | "nocturne"

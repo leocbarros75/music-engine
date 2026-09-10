@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { parseMidiFile } from '../../src/import/midiFile.ts';
-import { extractLeadSheet } from '../../src/import/extractLeadSheet.ts';
+import { extractLeadSheet, embedChords } from '../../src/import/extractLeadSheet.ts';
 import { parseMusicXMLToScoreModel } from '../../src/parsers/musicxmlParser.ts';
 import { pipelineMusicxmlToArrangedMusicxml } from '../../src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts';
 
@@ -181,6 +181,71 @@ test('the arrangers carry the slurs through', () => {
   const stops = (r.musicxml.match(/<slur type="stop"/g) ?? []).length;
   assert.ok(starts > 0, 'slurs survive into the arrangement');
   assert.equal(starts, stops);
+});
+
+test('chord symbols are written into the file and read back unchanged', () => {
+  const ls = extractLeadSheet(parseMidiFile(smf([tuneOverChords(
+    [74, 76, 78, 76, 74, 71, 69, 71], [38, 45]
+  )])));
+  assert.ok(ls.chords.length > 0);
+  assert.equal((ls.musicxml.match(/<harmony>/g) ?? []).length, ls.chords.length);
+  // The parser must recover exactly what the harmony analysis produced.
+  const back: any = parseMusicXMLToScoreModel(ls.musicxml);
+  assert.deepEqual(
+    (back.meta?.inputChords ?? []).map((c: any) => c.symbol),
+    ls.chords.map(c => c.symbol),
+    'chord symbols must survive the round trip'
+  );
+});
+
+test('a slash chord stays one chord, not two', () => {
+  // The old chord-text writer turned D/F# into a D and an F#; splitting the symbol
+  // and writing <bass> separately is what keeps it whole.
+  const xml = embedChords(
+    '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>4</divisions></attributes>' +
+    '<note><pitch><step>D</step><octave>4</octave></pitch><duration>16</duration><voice>1</voice></note>' +
+    '</measure></part></score-partwise>',
+    [{ measure: 1, t: 0, symbol: 'D/F#' }]
+  );
+  assert.equal((xml.match(/<harmony>/g) ?? []).length, 1, 'one harmony element, not two');
+  assert.match(xml, /<root-step>D<\/root-step>/);
+  assert.match(xml, /<bass-step>F<\/bass-step>\s*<bass-alter>1<\/bass-alter>/);
+  const back: any = parseMusicXMLToScoreModel(xml);
+  assert.equal(back.meta?.inputChords?.[0]?.symbol, 'D/F#');
+});
+
+test('chord qualities survive, and an unknown one falls back to a triad', () => {
+  const cases: Array<[string, RegExp]> = [
+    ['Am', /<kind text="m">minor<\/kind>/],
+    ['G7', /<kind text="7">dominant<\/kind>/],
+    ['Cmaj7', /major-seventh/],
+    ['Dm7', /minor-seventh/],
+    ['Esus4', /suspended-fourth/],
+    ['Bdim', /diminished/],
+    ['F#zzz', /major<\/kind>/]   // unrecognised: a correct root beats a wrong chord
+  ];
+  for (const [symbol, expected] of cases) {
+    const xml = embedChords(
+      '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>4</divisions></attributes>' +
+      '<note><pitch><step>C</step><octave>4</octave></pitch><duration>16</duration><voice>1</voice></note>' +
+      '</measure></part></score-partwise>',
+      [{ measure: 1, t: 0, symbol }]
+    );
+    assert.match(xml, expected, `${symbol} did not write the expected kind`);
+  }
+});
+
+test('the arrangers take a lead sheet with no chords argument at all', () => {
+  const ls = extractLeadSheet(parseMidiFile(smf([tuneOverChords(
+    [74, 76, 78, 76, 74, 71, 69, 71], [38, 45]
+  )])));
+  // No `chords` passed — the harmony must come from the file itself.
+  const r: any = pipelineMusicxmlToArrangedMusicxml({
+    musicxml: ls.musicxml,
+    settings: { ensemble: 'piano_with_melody', textureMode: 'homophony_melody_accompaniment' }
+  });
+  assert.ok(r?.musicxml, `the file must carry its own harmony: ${String(r?.error).slice(0, 120)}`);
+  assert.equal(r.meta?.chordSource, 'musicxml_harmony');
 });
 
 test('silent bars get no chord', () => {

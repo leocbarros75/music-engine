@@ -228,6 +228,91 @@ function markSlurs(events: NoteEvent[][], bars: any[], enabled: boolean): number
     return count;
 }
 
+/**
+ * Chord qualities this writes. Anything else falls back to a plain triad, which is
+ * honest — better a correct root with a missing colour than a wrong chord.
+ */
+const KINDS: Array<[RegExp, string]> = [
+    // Case is NOT ignored here: in a chord symbol "M7" is major and "m7" is minor,
+    // so a case-insensitive pattern silently turns every minor seventh into a major
+    // one. Only the qualities where case carries no meaning use the i flag.
+    [/^(maj7|Maj7|MAJ7|ma7|M7|Δ7?)$/, "major-seventh"],
+    [/^(m7|min7|Min7|-7)$/, "minor-seventh"],
+    [/^(m6|min6|Min6|-6)$/, "minor-sixth"],
+    [/^6$/, "major-sixth"],
+    [/^9$/, "dominant-ninth"],
+    [/^7$/, "dominant"],
+    [/^(m|min|Min|-)$/, "minor"],
+    [/^(dim|o|°)$/i, "diminished"],
+    [/^(aug|\+)$/i, "augmented"],
+    [/^(sus4|sus)$/i, "suspended-fourth"],
+    [/^sus2$/i, "suspended-second"],
+    [/^(|maj|Maj|M)$/, "major"]
+];
+
+/**
+ * One chord symbol as a MusicXML <harmony> element.
+ *
+ * Written from the symbol's own TEXT rather than from a parsed pitch class, so the
+ * letter the harmony analysis chose survives — F sharp minor stays F sharp minor
+ * and is not respelled G flat. The slash bass is read from the symbol directly too:
+ * splitting on "/" and parsing each side separately is what keeps D/F# from
+ * becoming two unrelated chords.
+ */
+function harmonyXml(symbol: string, offsetDivisions: number): string | null {
+    const [main, slash] = symbol.split("/");
+    const m = /^([A-G])([#b]?)(.*)$/.exec((main ?? "").trim());
+    if (!m) return null;
+    const quality = (m[3] ?? "").trim();
+    const kind = KINDS.find(([re]) => re.test(quality))?.[1] ?? "major";
+    const alter = m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0;
+
+    let out = "<harmony>";
+    out += `<root><root-step>${m[1]}</root-step>${alter ? `<root-alter>${alter}</root-alter>` : ""}</root>`;
+    out += `<kind text="${quality.replace(/[<>&"]/g, "")}">${kind}</kind>`;
+    if (slash) {
+        const b = /^([A-G])([#b]?)$/.exec(slash.trim());
+        if (b) {
+            const bAlter = b[2] === "#" ? 1 : b[2] === "b" ? -1 : 0;
+            out += `<bass><bass-step>${b[1]}</bass-step>${bAlter ? `<bass-alter>${bAlter}</bass-alter>` : ""}</bass>`;
+        }
+    }
+    if (offsetDivisions) out += `<offset>${offsetDivisions}</offset>`;
+    return out + "</harmony>";
+}
+
+/**
+ * Put the chord symbols into the melody's MusicXML, so what leaves here is a real
+ * lead sheet: one file carrying both the tune and its harmony. The parser reads
+ * <harmony> back into the chord list, so the arrangers need nothing else, and a
+ * person opening the file in Dorico sees chord symbols above the staff.
+ */
+export function embedChords(musicxml: string, chords: ChordEvent[], divisions = 4): string {
+    const byMeasure = new Map<string, ChordEvent[]>();
+    for (const c of chords) {
+        const key = String(c.measure);
+        byMeasure.set(key, [...(byMeasure.get(key) ?? []), c]);
+    }
+    return musicxml.replace(/(<measure number="([^"]+)">)([\s\S]*?)(<\/measure>)/g,
+        (whole, open: string, number: string, body: string, close: string) => {
+            const here = byMeasure.get(number);
+            if (!here?.length) return whole;
+            const marks = here
+                .slice()
+                .sort((a, b) => a.t - b.t)
+                .map((c) => harmonyXml(c.symbol, Math.round(c.t * divisions)))
+                .filter(Boolean)
+                .join("");
+            if (!marks) return whole;
+            // A <harmony> belongs before the note it sits over, and after the
+            // measure's <attributes> if it has any.
+            const afterAttrs = body.indexOf("</attributes>");
+            return afterAttrs >= 0
+                ? open + body.slice(0, afterAttrs + 13) + marks + body.slice(afterAttrs + 13) + close
+                : open + marks + body + close;
+        });
+}
+
 export function extractLeadSheet(file: MidiFile, options: LeadSheetOptions = {}): LeadSheet {
     const { score: full, report } = transcribeMidiToScore(file, options);
     const warnings = [...report.warnings];
@@ -265,7 +350,7 @@ export function extractLeadSheet(file: MidiFile, options: LeadSheetOptions = {})
 
     return {
         score: melodyScore,
-        musicxml: exportScoreModelToMusicXML(melodyScore),
+        musicxml: embedChords(exportScoreModelToMusicXML(melodyScore), chords),
         chords,
         confidence,
         transcription: report,

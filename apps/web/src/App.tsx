@@ -111,6 +111,7 @@ export default function App() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [musicxmlInput, setMusicxmlInput] = useState<string | null>(null);
   const [pdfInput, setPdfInput] = useState<string | null>(null);
+  const [midiReport, setMidiReport] = useState<any | null>(null);
   const [selectedPartIds, setSelectedPartIds] = useState<string[]>([]);
   const [outputMusicxml, setOutputMusicxml] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -183,9 +184,65 @@ export default function App() {
     }
   }
 
+  function keyName(fifths: number, mode?: string): string {
+    const majors = ["Cb","Gb","Db","Ab","Eb","Bb","F","C","G","D","A","E","B","F#","C#"];
+    const minors = ["Ab","Eb","Bb","F","C","G","D","A","E","B","F#","C#","G#","D#","A#"];
+    const i = Math.max(0, Math.min(14, (fifths ?? 0) + 7));
+    return `${(mode === "minor" ? minors : majors)[i]} ${mode === "minor" ? "minor" : "major"}`;
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // MIDI → lead sheet. The server notates the top line, works out the harmony and
+    // returns MusicXML with chord symbols embedded, so from here on it is treated
+    // exactly like an uploaded MusicXML file.
+    if (/\.midi?$/i.test(file.name)) {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const buf = ev.target?.result;
+        if (!(buf instanceof ArrayBuffer)) return;
+        let bin = "";
+        const bytes = new Uint8Array(buf);
+        for (let i = 0; i < bytes.length; i += 0x8000) {
+          bin += String.fromCharCode(...Array.from(bytes.subarray(i, i + 0x8000)));
+        }
+        setIsExtracting(true);
+        setWarnings([]);
+        try {
+          const res = await fetch("/midi_to_musicxml", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ midiBase64: btoa(bin) })
+          });
+          const data = await res.json();
+          if (!data?.ok || !data.musicxml) {
+            setWarnings([data?.error ?? "Could not read that MIDI file."]);
+            return;
+          }
+          const r = data.report ?? {};
+          setMusicxmlInput(data.musicxml);
+          setPdfInput(null);
+      setMidiReport(null);
+          setFileName(`${file.name.replace(/\.midi?$/i, "")} (from MIDI).musicxml`);
+          setOutputMusicxml(null);
+          setJobResult(null);
+          setSelectedPartIds([]);
+          setMidiReport(r);
+          setWarnings([
+            ...(r.hasMelody === false ? [r.melodyReason] : []),
+            ...(data.warnings ?? [])
+          ].filter(Boolean));
+        } catch (err: any) {
+          setWarnings([`MIDI import failed: ${err?.message ?? String(err)}`]);
+        } finally {
+          setIsExtracting(false);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      e.target.value = "";
+      return;
+    }
     // Rhythm chart PDF → base64 (orchestra accompaniment source)
     if (/\.pdf$/i.test(file.name)) {
       const reader = new FileReader();
@@ -199,6 +256,7 @@ export default function App() {
         }
         setPdfInput(btoa(bin));
         setMusicxmlInput(null);
+        setMidiReport(null);
         setFileName(file.name);
         setOutputMusicxml(null);
         setJobResult(null);
@@ -493,7 +551,9 @@ export default function App() {
             {inputMode === "file" && (
               <div className="upload-card">
                 <p>
-                  Upload a <code>.musicxml</code> or <code>.xml</code> file exported from MuseScore, Finale, or Sibelius.
+                  Upload a <code>.musicxml</code> or <code>.xml</code> file exported from MuseScore, Finale, or Sibelius,
+                  or a <b>MIDI file</b> (<code>.mid</code>) you played or exported — the engine notates it, finds the tune
+                  and the chords, and arranges it for your ensemble.
                   {pdfCapable && (
                     <> Or upload a <b>chord / rhythm chart PDF</b> (printed chord symbols like A, F#m7, D/E) — its harmony{isOrchestraMode ? " and rhythm are" : " is"} arranged for your ensemble. <i>A notated score PDF (piano/vocal notes) won't work — export that as MusicXML.</i></>
                   )}
@@ -501,13 +561,32 @@ export default function App() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".musicxml,.xml,.pdf"
+                  accept=".musicxml,.xml,.pdf,.mid,.midi"
                   style={{ display: "none" }}
                   onChange={handleFileChange}
                 />
                 <button className="primary" onClick={() => fileInputRef.current?.click()}>
-                  {pdfCapable ? "Select MusicXML or Rhythm PDF" : "Select MusicXML"}
+                  {pdfCapable ? "Select MusicXML, MIDI or Rhythm PDF" : "Select MusicXML or MIDI"}
                 </button>
+                {midiReport && (
+                  <div className={`pill ${midiReport.hasMelody === false ? "warn" : "info"}`} style={{ marginTop: 6 }}>
+                    Read <b>{midiReport.notes}</b> notes over <b>{midiReport.measures}</b> bars
+                    {midiReport.track ? <> from “{midiReport.track}”</> : null}.
+                    {" "}Key <b>{keyName(midiReport.keyFifths, midiReport.keyMode)}</b>
+                    {midiReport.keyInferred ? " (worked out from the notes — the file said otherwise)" : ""},
+                    {" "}<b>{midiReport.tempoBpm}</b> bpm
+                    {midiReport.tempoChanges > 1 ? <> with <b>{midiReport.tempoChanges}</b> tempo changes</> : null}.
+                    {" "}Melody <b>{midiReport.melodyNotes}</b> notes, <b>{midiReport.chords}</b> chords,
+                    {" "}{midiReport.slurs} slurs, {midiReport.dynamics} dynamic mark{midiReport.dynamics === 1 ? "" : "s"}
+                    {midiReport.pickup ? ", pickup bar" : ""}.
+                    {midiReport.hasMelody === false && (
+                      <div style={{ marginTop: 4 }}>
+                        The top line doesn’t read as a tune, so the chords are the useful part here —
+                        pick an ensemble and Generate, or supply the melody yourself.
+                      </div>
+                    )}
+                  </div>
+                )}
                 {pdfInput && fileName && (
                   <div className="pill info" style={{ marginTop: 6 }}>
                     PDF loaded: <b>{fileName}</b>. If it's a <b>chord/rhythm chart</b>, Generate arranges its harmony{isOrchestraMode ? " + kicks" : ""} for <b>{settings.ensemble.replace(/_/g, " ")}</b>.

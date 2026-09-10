@@ -38,6 +38,8 @@ import { checkChoralRules } from "./rules/choral/checkChoralRules";
 import { parsePromptWithAI } from "./app/parsePromptWithAI";
 
 import { parseRhythmChartPdf } from "./import/rhythmChartPdf";
+import { parseMidiFile } from "./import/midiFile";
+import { extractLeadSheet } from "./import/extractLeadSheet";
 import { getOmrProvider, omrStatus } from "./omr/omrProvider";
 import { arrangeRhythmChart } from "./app/arrangeRhythmChart";
 import { exportScoreModelToMusicXML } from "./exporters/musicxmlExporter";
@@ -577,7 +579,7 @@ export const server = http.createServer(async (req, res) => {
 
     // Health can be GET or POST
     if (url === "/health" && (req.method === "GET" || req.method === "POST")) {
-      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-09-09-v41-piano-preservation", omr: omrStatus() });
+      sendJson(res, 200, { ok: true, name: "music-engine", status: "up", deploy: "2026-09-10-v42-midi-upload", omr: omrStatus() });
       return;
     }
 
@@ -1191,6 +1193,49 @@ export const server = http.createServer(async (req, res) => {
         sendJson(res, 200, { ok: true, musicxml: result.musicxml, provider: result.provider, warnings: result.warnings });
       } catch (e: any) {
         sendJson(res, 502, { ok: false, error: `OMR failed: ${e?.message ?? String(e)}` });
+      }
+      return;
+    }
+
+    // ── MIDI → lead-sheet MusicXML ────────────────────────────────────────
+    // Reads a recorded or exported MIDI file, notates the top line as a melody and
+    // works out the harmony underneath it, then hands back MusicXML with chord
+    // symbols embedded. The client then arranges it like any uploaded file — no
+    // separate generate path, and the user can save the lead sheet on its own.
+    if (url === "/midi_to_musicxml") {
+      const midiBase64 = typeof body.midiBase64 === "string" ? body.midiBase64 : null;
+      if (!midiBase64) {
+        sendJson(res, 400, { ok: false, error: "Provide 'midiBase64' as a base64-encoded MIDI file." });
+        return;
+      }
+      try {
+        const file = parseMidiFile(new Uint8Array(Buffer.from(midiBase64, "base64")));
+        const lead = extractLeadSheet(file);
+        const t = lead.transcription;
+        sendJson(res, 200, {
+          ok: true,
+          musicxml: lead.musicxml,
+          warnings: lead.warnings,
+          report: {
+            track: t.trackName,
+            notes: t.notes,
+            measures: t.measures,
+            tempoBpm: Math.round((file.tempos[0]?.bpm ?? 120) * 10) / 10,
+            tempoChanges: t.tempoMarks,
+            keyFifths: t.keyFifths,
+            keyMode: t.keyMode,
+            keyInferred: t.keyInferred,
+            pickup: t.pickup,
+            chords: lead.chords.length,
+            melodyNotes: lead.confidence.notes,
+            slurs: lead.slurs,
+            dynamics: t.dynamicMarks,
+            hasMelody: lead.confidence.hasMelody,
+            melodyReason: lead.confidence.reason
+          }
+        });
+      } catch (e: any) {
+        sendJson(res, 400, { ok: false, error: `MIDI import failed: ${e?.message ?? String(e)}` });
       }
       return;
     }
