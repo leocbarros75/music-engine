@@ -72,6 +72,15 @@ export default function ScoreViewer({ musicxml }: Props) {
           drawCredits: false,
           backend: "svg",
           followCursor: false,
+          // OSMD leaves eighths and shorter unbeamed unless told otherwise, so a
+          // score whose MusicXML carries no <beam> elements previews as a row of
+          // flagged notes. Ours carry none — and neither does Dorico's own export,
+          // because beaming is normally the reading program's job. Measured: with
+          // this off, eight eighths render with 8 flag glyphs and no beam; with it
+          // on they beam. It does not override beams a file already has — a score
+          // with explicit beaming renders identically either way — so a preserved
+          // source keeps exactly the beaming it arrived with.
+          autoBeam: true,
         });
       }
 
