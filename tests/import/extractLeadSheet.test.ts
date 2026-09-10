@@ -135,6 +135,54 @@ test('a short release gap is absorbed into the note, a real rest is kept', () =>
   assert.equal(first.dur, 1, 'the early release is rounded up to a full beat');
 });
 
+test('legato groups are slurred, and the slurs are balanced and sane', () => {
+  const ls = extractLeadSheet(parseMidiFile(smf([tuneOverChords(
+    [74, 76, 78, 76, 74, 71, 69, 71], [38, 45]
+  )])));
+  assert.ok(ls.slurs > 0, 'a flowing melody gets slurs');
+  const starts = (ls.musicxml.match(/<slur type="start"/g) ?? []).length;
+  const stops = (ls.musicxml.match(/<slur type="stop"/g) ?? []).length;
+  assert.equal(starts, stops, 'every slur that opens must close');
+  assert.equal(starts, ls.slurs);
+
+  // No slur may span a single note, and none may run away across the piece.
+  const line: any[] = [];
+  (ls.score.parts[0]!.measures as any[]).forEach((m, i) => m.events.forEach((e: any) => line.push({ ...e, bar: i })));
+  let open: any = null;
+  for (const e of line) {
+    if (e.slurStart) { assert.equal(open, null, 'slurs must not nest'); open = e; }
+    if (e.slurStop) {
+      assert.ok(open, 'a slur closed without opening');
+      assert.ok(e.bar - open.bar <= 2, `a slur ran ${e.bar - open.bar + 1} bars`);
+      open = null;
+    }
+  }
+  assert.equal(open, null, 'a slur was left open at the end');
+});
+
+test('slurs can be turned off', () => {
+  const ls = extractLeadSheet(parseMidiFile(smf([tuneOverChords(
+    [74, 76, 78, 76, 74, 71, 69, 71], [38, 45]
+  )])), { slurs: false });
+  assert.equal(ls.slurs, 0);
+  assert.equal((ls.musicxml.match(/<slur /g) ?? []).length, 0);
+});
+
+test('the arrangers carry the slurs through', () => {
+  const ls = extractLeadSheet(parseMidiFile(smf([tuneOverChords(
+    [74, 76, 78, 76, 74, 71, 69, 71], [38, 45]
+  )])));
+  const r: any = pipelineMusicxmlToArrangedMusicxml({
+    musicxml: ls.musicxml, chords: ls.chords as any,
+    settings: { ensemble: 'piano_with_melody', textureMode: 'homophony_melody_accompaniment' }
+  });
+  assert.ok(r?.musicxml);
+  const starts = (r.musicxml.match(/<slur type="start"/g) ?? []).length;
+  const stops = (r.musicxml.match(/<slur type="stop"/g) ?? []).length;
+  assert.ok(starts > 0, 'slurs survive into the arrangement');
+  assert.equal(starts, stops);
+});
+
 test('silent bars get no chord', () => {
   // Two bars of music, then two of silence, then one more.
   const specs: Array<{ at: number; dur: number; midi: number }> = [];

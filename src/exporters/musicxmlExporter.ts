@@ -1006,6 +1006,11 @@ function renderMusicXML(scoreModel: ScoreModel): string {
               const accidental =
                 alterVal === expectedAlter ? null : accidentalFromAlterForDisplay(alterVal);
               const origTieStart = evAny.tieStart === true;
+              // Slurs mark a legato group — a breath or bow. Only scores that set
+              // these carry them (today, a melody extracted from MIDI); every other
+              // ensemble leaves them undefined and its output is unchanged.
+              const slurStart = evAny.slurStart === true;
+              const slurStop = evAny.slurStop === true;
               const origTieStop = evAny.tieStop === true;
               const pitchXml =
                 `<pitch><step>${xmlEscape(wp.step)}</step>` +
@@ -1041,10 +1046,15 @@ function renderMusicXML(scoreModel: ScoreModel): string {
                 if (cdot) out += `<dot/>`;
                 if (accidental && firstPiece) out += `<accidental>${accidental}</accidental>`;
                 out += `<staff>${staff}</staff>`;
-                if (tieStart || tieStop) {
+                // A note written as several tied pieces is one note musically, so a
+                // slur begins on its first piece and ends on its last.
+                const slurHere = (slurStart && firstPiece) || (slurStop && lastPiece);
+                if (tieStart || tieStop || slurHere) {
                   out += `<notations>`;
                   if (tieStart) out += `<tied type="start"/>`;
                   if (tieStop) out += `<tied type="stop"/>`;
+                  if (slurStart && firstPiece) out += `<slur type="start" number="1"/>`;
+                  if (slurStop && lastPiece) out += `<slur type="stop" number="1"/>`;
                   out += `</notations>`;
                 }
                 out += `</note>`;

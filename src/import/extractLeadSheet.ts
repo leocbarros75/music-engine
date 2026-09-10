@@ -52,6 +52,8 @@ export type LeadSheetOptions = TranscribeOptions & {
      * Default: half a beat.
      */
     closeGaps?: number;
+    /** Mark legato groups with slurs. Default on. */
+    slurs?: boolean;
 };
 
 export type LeadSheet = {
@@ -61,6 +63,8 @@ export type LeadSheet = {
     chords: ChordEvent[];
     confidence: MelodyConfidence;
     transcription: TranscriptionReport;
+    /** Legato groups marked on the melody. */
+    slurs: number;
     warnings: string[];
 };
 
@@ -175,6 +179,55 @@ function topLine(score: ScoreModel, closeGaps: number): { events: NoteEvent[][];
     return { events, midis, coverage: sounding ? withMelody / sounding : 0 };
 }
 
+/**
+ * Mark legato groups on the melody with slurs.
+ *
+ * A slur is a breath, or a bow: the run of notes a player takes in one gesture. So
+ * a group runs until the line stops or settles — at a silence, at a note long
+ * enough to be an arrival rather than a passing note, and at the end of the piece.
+ * A group of one note is not a gesture and gets nothing.
+ *
+ * There is also a ceiling. Without one, a melody that never rests would carry a
+ * single slur from the first bar to the last, which tells a player nothing; real
+ * phrasing breathes every few bars.
+ */
+const PHRASE_END_NOTE = 2;   // a note this long, in beats, ends the gesture
+const MAX_SLUR_BARS = 2;     // and nothing runs longer than this without a breath
+
+function markSlurs(events: NoteEvent[][], bars: any[], enabled: boolean): number {
+    if (!enabled) return 0;
+    // Flatten to one line, remembering which bar each note came from.
+    const line: Array<{ e: any; bar: number; endsBar: boolean }> = [];
+    events.forEach((barEvents, i) => {
+        const capacity = bars[i]?.durationBeats
+            ?? ((bars[i]?.attributes?.time?.beats ?? 4) * 4 / (bars[i]?.attributes?.time?.beat_type ?? 4));
+        barEvents.forEach((e: any) => line.push({ e, bar: i, endsBar: e.t + e.dur >= capacity - 1e-9 }));
+    });
+
+    let count = 0;
+    let start = 0;
+    const close = (end: number) => {
+        if (end > start) {
+            (line[start]!.e as any).slurStart = true;
+            (line[end]!.e as any).slurStop = true;
+            count++;
+        }
+        start = end + 1;
+    };
+
+    for (let i = 0; i < line.length; i++) {
+        const here = line[i]!;
+        const next = line[i + 1];
+        const silenceFollows = !next || next.bar !== here.bar
+            ? !here.endsBar                     // the line stops before the bar line
+            : next.e.t > here.e.t + here.e.dur + 1e-9;
+        const arrival = here.e.dur >= PHRASE_END_NOTE;
+        const tooLong = here.bar - line[start]!.bar >= MAX_SLUR_BARS;
+        if (!next || silenceFollows || arrival || tooLong) close(i);
+    }
+    return count;
+}
+
 export function extractLeadSheet(file: MidiFile, options: LeadSheetOptions = {}): LeadSheet {
     const { score: full, report } = transcribeMidiToScore(file, options);
     const warnings = [...report.warnings];
@@ -183,6 +236,7 @@ export function extractLeadSheet(file: MidiFile, options: LeadSheetOptions = {})
     const confidence = assess(midis, coverage);
     if (!confidence.hasMelody) warnings.push(confidence.reason);
 
+    const slurs = markSlurs(events, (full.parts[0]?.measures ?? []) as any[], options.slurs !== false);
     const sourceBars = (full.parts[0]?.measures ?? []) as any[];
     const melodyScore: ScoreModel = {
         meta: { ...(full.meta as any), ensemble: "lead_sheet" },
@@ -215,6 +269,7 @@ export function extractLeadSheet(file: MidiFile, options: LeadSheetOptions = {})
         chords,
         confidence,
         transcription: report,
+        slurs,
         warnings
     };
 }
