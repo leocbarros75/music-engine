@@ -94,6 +94,8 @@ export type LhPatternId =
    *   In 4/4: 8 eighth notes = 2 full cycles. In 3/4: 6 eighths = 1.5 cycles.
    */
   | "pop_arpeggio"
+  /** Wide two-octave arch: root-5th-oct-10th-12th and back, in 8ths */
+  | "wide_arpeggio"
   /**
    * Walking bass with chromatic approach (Ron Drotos Lessons 12, 14):
    *   Quarter-note bass line walking through chord tones: root→3rd→5th→approach.
@@ -625,6 +627,79 @@ function buildNocturne(
  * 4/4: 8 eighth notes = 2 full root→5th→oct→5th cycles.
  * 3/4: 6 eighth notes = 1.5 cycles (ends on oct after the 2nd loop).
  */
+/**
+ * WIDE ARPEGGIO — a two-octave arch, up and back down, in eighths.
+ *
+ *     D major:  D2  A2  D3  F#3  A3  F#3  D3  A2
+ *
+ * The point is that a wide RANGE is not a wide STRETCH. The hand travels nearly
+ * two octaves, but never spans more than a fifth at once, so it moves laterally
+ * along the keyboard instead of reaching. That is why a Romantic left hand can
+ * fill this much space and still be comfortable, where the same notes struck
+ * together would be unplayable.
+ *
+ * The root is dropped into the bottom octave of the hand's range first, so the top
+ * of the arch stays under the right hand rather than colliding with it.
+ */
+function buildWideArpeggio(
+  chords: Array<{ measure: number; t: number; symbol: string }>,
+  measureNumber: number,
+  measureBeats: number,
+  bassMin: number,
+  bassMax: number,
+  voice: number,
+  staff: number,
+  mNum: number,
+  warnings: string[]
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const noteDur = 0.5; // eighth note
+  const count = Math.max(1, Math.round(measureBeats / noteDur));
+
+  // Built from the chord's own root, third and fifth — NOT from whatever stack the
+  // voicer returned. Under piano_with_melody that stack is voice-led, so its middle
+  // and top notes are an inversion rather than a tenth and a twelfth, and an arch
+  // built on those intervals lurches by an octave in the middle of a bar.
+  const rungsFor = (symbol: string): number[] | null => {
+    const v = chordVoicesInRange(symbol, bassMin, bassMax);
+    const low = chordProposedBassMidi(symbol, bassMin, bassMax);
+    if (!v || low === null) return null;
+    // Drop the bass into the bottom octave of the hand so the top of the arch stays
+    // clear of the right hand.
+    let root = low;
+    while (root > 45) root -= 12;  // A2
+    while (root < 36) root += 12;  // C2
+    const third = root + (v.mid - v.bass);
+    const fifth = root + (v.high - v.bass);
+    return [root, fifth, root + 12, third + 12, fifth + 12];
+  };
+
+  let symbol = pickChordAt(chords, measureNumber, 0);
+  if (!symbol) return events;
+  let ladder = rungsFor(symbol);
+  if (!ladder) {
+    warnings.push(`[accomp] m${measureNumber}: cannot parse chord "${symbol}" — skipping bar`);
+    return events;
+  }
+
+  let rung = 0;
+  let climbing = 1;
+  for (let i = 0; i < count; i++) {
+    const t = i * noteDur;
+    // A chord change mid-bar restarts the arch, from the bottom, on the new harmony.
+    const here = pickChordAt(chords, measureNumber, t);
+    if (here && here !== symbol) {
+      const next = rungsFor(here);
+      if (next) { ladder = next; symbol = here; rung = 0; climbing = 1; }
+    }
+    events.push(makeNote(ladder[rung]!, t, noteDur, voice, staff, `lh-wide-${mNum}-${i}`));
+    rung += climbing;
+    if (rung >= ladder.length - 1) { rung = ladder.length - 1; climbing = -1; }
+    if (rung <= 0) { rung = 0; climbing = 1; }
+  }
+  return events;
+}
+
 function buildPopArpeggio(
   getVoices: (t: number) => ChordVoices | null,
   measureBeats: number,
@@ -862,6 +937,9 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
 
     case "pop_arpeggio":
       return buildPopArpeggio(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
+
+    case "wide_arpeggio":
+      return buildWideArpeggio(chords, measureNumber, measureBeats, bassMin, bassMax, LH_VOICE, LH_STAFF, measureNumber, warnings);
 
     case "walking_bass":
       return buildWalkingBass(

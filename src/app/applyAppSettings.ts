@@ -2410,7 +2410,7 @@ export function applyAppSettings(
       "alberti", "block_beats", "boom_chick", "broken_ascending", "waltz_bass",
       "serenade_strum", "root_chord_stabs", "interval_oscillation",
       "jazz_shell", "octave_bass", "nocturne",
-      "pop_arpeggio", "walking_bass", "pedal_bass", "spec_bass",
+      "pop_arpeggio", "wide_arpeggio", "walking_bass", "pedal_bass", "spec_bass",
     ]);
     const explicitPattern = settings.lhPattern && settings.lhPattern !== "auto"
       ? (VALID_LH_PATTERNS.has(settings.lhPattern as LhPatternId) ? settings.lhPattern as LhPatternId : null)
@@ -2462,7 +2462,7 @@ export function applyAppSettings(
     // a long-note family (boom_chick, block_beats, jazz_shell, octave_bass).
     const FAST_TEMPO_THRESHOLD = 144;
     const FIGURATION_PATTERNS = new Set<LhPatternId>([
-      "alberti", "broken_ascending", "interval_oscillation", "nocturne", "pop_arpeggio",
+      "alberti", "broken_ascending", "interval_oscillation", "nocturne", "pop_arpeggio", "wide_arpeggio",
     ]);
     if (
       !explicitPattern &&

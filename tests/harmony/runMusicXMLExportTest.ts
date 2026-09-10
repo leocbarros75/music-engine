@@ -5,6 +5,7 @@ import { buildNoteTimeline } from "../../src/score/standard";
 
 import type { ScoreModel } from "../../src/score/types";
 import { exportScoreModelToMusicXML } from "../../src/exporters/musicxmlExporter";
+import { generateLhPattern } from "../../src/arrange/pianoAccompPatterns";
 
 function die(msg: string): never {
   // eslint-disable-next-line no-console
@@ -161,6 +162,35 @@ assert(
   if (/<rest\s*\/?>[\s\S]*?<staff>1<\/staff>/.test(lh))
     throw new Error("a left-hand rest was written on staff 1");
   console.log("OK: backups rewind by what each voice actually wrote.");
+}
+
+// A wide arpeggio must cover a wide RANGE without a wide STRETCH: the hand travels
+// along the keyboard instead of reaching, which is what makes two octaves playable.
+{
+  const chords = [{ measure: 1, t: 0, symbol: "D" }];
+  const events: any[] = generateLhPattern({
+    chords, measureNumber: 1, measureBeats: 4, lhPattern: "wide_arpeggio", warnings: []
+  } as any);
+  const midis = events.sort((a, b) => a.t - b.t).map((e: any) => e.midi);
+  if (midis.length !== 8) throw new Error(`expected 8 eighths, got ${midis.length}`);
+
+  // The arch: root, fifth, octave, tenth, twelfth, and back down.
+  const root = midis[0]!;
+  const shape = midis.map(m => m - root);
+  if (JSON.stringify(shape) !== JSON.stringify([0, 7, 12, 16, 19, 16, 12, 7]))
+    throw new Error(`arch shape wrong: ${shape}`);
+
+  // Nothing sounds together, and no step is a wild leap.
+  const byOnset = new Map<number, number>();
+  for (const e of events) byOnset.set(e.t, (byOnset.get(e.t) ?? 0) + 1);
+  for (const [t, n] of byOnset) if (n > 1) throw new Error(`arpeggio has ${n} notes together at beat ${t}`);
+  for (let i = 1; i < midis.length; i++) {
+    const step = Math.abs(midis[i]! - midis[i - 1]!);
+    if (step > 7) throw new Error(`step of ${step} semitones inside the arch — the hand should travel, not leap`);
+  }
+  if (Math.max(...midis) - Math.min(...midis) < 18)
+    throw new Error("the arch should cover at least an octave and a half");
+  console.log("OK: wide arpeggio covers two octaves with no step wider than a fifth.");
 }
 
 console.log("OK: MusicXML exporter sanity test passed.");

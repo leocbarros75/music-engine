@@ -372,6 +372,7 @@ const LH_PATTERN_OPTIONS: Array<{ label: string; value: LhPatternValue; help: st
   { value: "octave_bass",        label: "Octave Bass",                      help: "Root played as octave pair on every beat. Source: Lobe den Herren (hymn)." },
   { value: "nocturne",           label: "Nocturne",                         help: "Compound-beat rolling arpeggio: bass + chord + chord per dotted quarter. Source: Chopin Op.9 No.2, Mendelssohn Op.19 No.3." },
   { value: "pop_arpeggio",       label: "Pop Arpeggio (8ths)",              help: "Rolling 8th-note arpeggio: root→5th→oct→5th cycling. Smoother pop ballad LH feel. Source: Drotos Lesson 4." },
+  { value: "wide_arpeggio",      label: "Wide Arpeggio (8ths, 2 octaves)",  help: "Two-octave arch up and back down: root→5th→oct→10th→12th. Wide RANGE without a wide stretch — the hand travels rather than reaches, so it stays comfortable. Romantic concert LH." },
   { value: "walking_bass",       label: "Walking Bass",                     help: "Quarter-note bass walking root→3rd→5th→approach, chromatic step into next chord. Source: Drotos Lessons 12 & 14." },
   { value: "pedal_bass",         label: "Pedal Bass",                       help: "Root sustained as whole note. LH anchors while RH moves through neighbor chords. Source: Drotos Lesson 13 (Elton John style)." },
 ];
