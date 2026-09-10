@@ -117,6 +117,52 @@ assert(
 );
 
 // eslint-disable-next-line no-console
+// A <backup> must rewind by exactly what the previous voice wrote, or the next
+// voice starts before the bar line. A chord whose duration is not a standard note
+// value is printed snapped DOWN — 3.75 beats prints as a dotted half — so a voice
+// containing one does not fill the bar, and rewinding by the bar's nominal length
+// overshoots. This was 36 bars of a real transcription.
+{
+  const score: any = {
+    meta: { ensemble: "piano" },
+    parts: [{
+      part_id: "P_PNO", name: "Piano", instrument: "piano", staves: 2, pitchSpace: "sounding",
+      measures: [{
+        number: 1,
+        attributes: { divisions: 4, key_fifths: 0, key_mode: "major", time: { beats: 4, beat_type: 4 } },
+        events: [
+          // a three-note chord lasting 3.75 beats — not a standard note value
+          { id: "a", type: "note", t: 0, dur: 3.75, midi: 62, pitch: { step: "D", octave: 4 }, voice: 1, staff: 1 },
+          { id: "b", type: "note", t: 0, dur: 3.75, midi: 66, pitch: { step: "F", alter: 1, octave: 4 }, voice: 1, staff: 1 },
+          { id: "c", type: "note", t: 0, dur: 3.75, midi: 69, pitch: { step: "A", octave: 4 }, voice: 1, staff: 1 },
+          { id: "d", type: "note", t: 0, dur: 4, midi: 50, pitch: { step: "D", octave: 3 }, voice: 5, staff: 2 }
+        ]
+      }]
+    }]
+  };
+  const xml = exportScoreModelToMusicXML(score);
+  const body = /<measure number="1">([\s\S]*?)<\/measure>/.exec(xml)?.[1] ?? "";
+  const segments = body.split(/<backup>\s*<duration>(\d+)<\/duration>\s*<\/backup>/);
+  let checked = 0;
+  for (let i = 0; i + 1 < segments.length; i += 2) {
+    let written = 0;
+    for (const n of segments[i]!.matchAll(/<note>([\s\S]*?)<\/note>/g)) {
+      if (/<chord\s*\/?>/.test(n[1]!)) continue;
+      written += Number(/<duration>(\d+)<\/duration>/.exec(n[1]!)?.[1] ?? 0);
+    }
+    const backup = Number(segments[i + 1]);
+    if (written !== backup)
+      throw new Error(`backup rewinds ${backup} but the voice wrote ${written}: the next voice would start ${backup - written} divisions early`);
+    checked++;
+  }
+  if (!checked) throw new Error("expected at least one backup to check");
+  // And a left-hand voice's rest belongs on its own staff, not hardcoded to staff 1.
+  const lh = /<backup>[\s\S]*$/.exec(body)?.[0] ?? "";
+  if (/<rest\s*\/?>[\s\S]*?<staff>1<\/staff>/.test(lh))
+    throw new Error("a left-hand rest was written on staff 1");
+  console.log("OK: backups rewind by what each voice actually wrote.");
+}
+
 console.log("OK: MusicXML exporter sanity test passed.");
 const timeline = buildNoteTimeline(parseMusicXMLToScoreModel(xml));
 assert(timeline.length === 1, "Exactly one sounding note should survive export.");

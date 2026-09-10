@@ -884,16 +884,31 @@ function renderMusicXML(scoreModel: ScoreModel): string {
       }
 
       const voiceNumbers = Array.from(byVoice.keys()).sort((a, b) => a - b);
+      let previousVoiceDivs = measureDur;
       for (let vi = 0; vi < voiceNumbers.length; vi++) {
         const voice = voiceNumbers[vi] ?? 1;
         if (vi > 0) {
-          out += `<backup><duration>${measureDur}</duration></backup>`;
+          // Rewind by what the PREVIOUS voice actually wrote. Rewinding by the bar's
+          // nominal length assumes every voice filled it exactly, and a chord whose
+          // duration is not a standard note value does not — it prints snapped down,
+          // leaving the voice short, and the next voice then starts before the bar
+          // line. Washed had 36 bars like that.
+          out += `<backup><duration>${previousVoiceDivs}</duration></backup>`;
         }
 
         const voiceEvents = (byVoice.get(voice) ?? [])
           .slice()
           .sort((a: any, b: any) => (a.t ?? 0) - (b.t ?? 0));
+        // A rest belongs on the staff its voice lives on; hardcoding staff 1 puts a
+        // left-hand voice's rest on the treble.
+        const staffOfVoice = Number((byVoice.get(voice) ?? [])[0]?.staff ?? 1) || 1;
         let cursor = 0;
+        // Divisions this voice has actually WRITTEN. Not the same as `cursor`, which
+        // tracks musical time: a chord whose duration is not a standard note value is
+        // printed snapped DOWN to one that is, so the two can drift apart. The
+        // <backup> below has to rewind by what was written, or the next voice starts
+        // before the bar line.
+        let writtenDivs = 0;
         let idx = 0;
         const EPS = 1e-6;
         while (idx < voiceEvents.length) {
@@ -907,6 +922,7 @@ function renderMusicXML(scoreModel: ScoreModel): string {
             const restType = durToType(currentDivisions, gapDur);
             const restDot  = durHasDot(currentDivisions, gapDur);
             const gapStaff = isGrandStaff ? (ev0?.staff ?? 1) : 1;
+            writtenDivs += gapDur;
             out += `<note><rest/><duration>${gapDur}</duration><voice>${voice}</voice>`;
             if (restType) out += `<type>${restType}</type>`;
             if (restDot)  out += `<dot/>`;
@@ -964,6 +980,7 @@ function renderMusicXML(scoreModel: ScoreModel): string {
               const totalDivs = beatsToDivisionsDuration(durBeats, currentDivisions);
               for (const cd of decomposeToStandardDivs(currentDivisions, totalDivs)) {
                 const ct = durToType(currentDivisions, cd);
+                writtenDivs += cd;
                 out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
                 if (ct) out += `<type>${ct}</type>`;
                 if (durHasDot(currentDivisions, cd)) out += `<dot/>`;
@@ -975,6 +992,7 @@ function renderMusicXML(scoreModel: ScoreModel): string {
             if (evAny.type === "unpitched") {
               const pm = getPercussionMap(evAny.instrumentId ?? "");
               if (!pm) {
+                writtenDivs += dur;
                 out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
                 if (type) out += `<type>${type}</type>`;
                 if (dot)  out += `<dot/>`;
@@ -1035,8 +1053,13 @@ function renderMusicXML(scoreModel: ScoreModel): string {
                 const tieStart = (!lastPiece)  || (origTieStart && lastPiece);
                 const tieStop  = (!firstPiece) || (origTieStop && firstPiece);
 
+                // A chord member sounds WITH the note before it, so it does not
+                // advance the cursor and its duration is not "written" time.
+                const isChordMember = (gi > 0 || evAny.chord === true);
+                if (!isChordMember) writtenDivs += cd;
+
                 out += `<note>`;
-                if ((gi > 0 || evAny.chord === true) && firstPiece) out += `<chord/>`;
+                if (isChordMember && firstPiece) out += `<chord/>`;
                 out += pitchXml;
                 out += `<duration>${cd}</duration>`;
                 if (tieStart) out += `<tie type="start"/>`;
@@ -1073,12 +1096,14 @@ function renderMusicXML(scoreModel: ScoreModel): string {
           const tailDur   = beatsToDivisionsDuration(tailBeats, currentDivisions);
           for (const cd of decomposeToStandardDivs(currentDivisions, tailDur)) {
             const ct = durToType(currentDivisions, cd);
+            writtenDivs += cd;
             out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
             if (ct) out += `<type>${ct}</type>`;
             if (durHasDot(currentDivisions, cd)) out += `<dot/>`;
-            out += `<staff>1</staff></note>`;
+            out += `<staff>${staffOfVoice}</staff></note>`;
           }
         }
+        previousVoiceDivs = writtenDivs;
       }
 
       // Final barline on the last measure of the part
