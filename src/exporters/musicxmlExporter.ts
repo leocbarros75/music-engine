@@ -32,6 +32,14 @@ const CHORAL_VOICE_NAMES = new Set(["soprano", "alto", "tenor", "bass"]);
 /** Family rank for a part the orchestral families do not recognise (voices, "Melody", …). */
 const UNKNOWN_GROUP_RANK = 90;
 
+/** The dedicated melody/lead staff the piano ensembles emit above the grand staff. */
+function isMelodyPart(p: { part_id?: string; name?: string }): boolean {
+  return (
+    String(p.part_id ?? "") === "P_MEL" ||
+    String(p.name ?? "").trim().toLowerCase() === "melody"
+  );
+}
+
 function getTransposeForInstrument(instrument: string | undefined): TransposeSpec | null {
   if (!instrument) return null;
   const id = instrument.toLowerCase().replace(/\s+/g, "_");
@@ -364,6 +372,15 @@ function isPiano(instrument: string | undefined): boolean {
  */
 function orchestraGroupRank(p: { instrument?: string; part_id?: string; name?: string }): number {
   const s = `${p.instrument ?? ""} ${p.part_id ?? ""} ${p.name ?? ""}`.toLowerCase();
+
+  // A dedicated melody/lead staff belongs ON TOP of whatever accompanies it, as in
+  // any lead + piano score. Without this it falls into the unknown group (90) and
+  // sorts UNDER the piano (35) — the plain "piano" ensemble emits a Melody part too,
+  // not just piano_with_melody, and its melody was landing below the grand staff.
+  //
+  // Matched exactly, never as a substring: "melody" inside some other part's name
+  // must not hoist that part to the top of an orchestral score.
+  if (isMelodyPart(p)) return 0;
 
   const isWoodwind =
     s.includes("flute") ||
