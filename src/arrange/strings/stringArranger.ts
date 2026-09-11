@@ -330,7 +330,10 @@ export function arrangeStringEnsemble(
   const candidatesBySlice: Voicing[][] = [];
   let prevVoicing: Voicing | null = null;
   for (const slice of slices) {
-    const candidateMap = buildCandidatesForSlice({ slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode, profileId: profile });
+    const candidateMap = buildCandidatesForSlice({
+      slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode, profileId: profile,
+      keepInnerVoicesBelowMelody: options.keepInnerVoicesBelowMelody === true,
+    });
     const voicings = buildVoicingStates(candidateMap);
     candidatesBySlice.push(voicings);
     prevVoicing = voicings[0] ?? null;
@@ -339,6 +342,24 @@ export function arrangeStringEnsemble(
   const dpResult = runDp({ slices, candidatesBySlice, profileId: profile });
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);
+
+  // ── Melody register check ────────────────────────────────────────────────
+  // The candidate stage keeps the accompaniment under Violin I, but it can only
+  // do that with the pitches the chord offers inside each voice's own range. A
+  // melody lying in the violin's bottom octave leaves the inner voices nowhere
+  // to go, and they are forced above the tune. That is a register decision the
+  // player's "Melody register" setting already owns, so say so rather than
+  // silently transposing a melody the source-preservation contract protects.
+  const crossed = bestVoicings.filter(
+    (v) => v.vln1 !== null && ((v.vln2 !== null && v.vln2 > v.vln1) || (v.vla !== null && v.vla > v.vln1))
+  ).length;
+  if (options.keepInnerVoicesBelowMelody && bestVoicings.length && crossed / bestVoicings.length > 0.2) {
+    warnings.push(
+      `[strings] The melody sits low for Violin I: the inner voices are forced above it in ` +
+      `${Math.round((100 * crossed) / bestVoicings.length)}% of the score. ` +
+      `Set "Melody register" to one octave higher to give Violin II and Viola room underneath.`
+    );
+  }
 
   // Accompanying voices hold their pitch instead of re-striking it on every
   // melody onset; which voices those are depends on the texture profile.

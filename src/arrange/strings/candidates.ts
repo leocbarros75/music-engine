@@ -4,6 +4,13 @@ import { parseChordSymbol } from "../../harmonize/satb/chordSymbol";
 
 const VOICES: VoiceId[] = ["vln1", "vln2", "vla", "vc", "cb"];
 
+/**
+ * How far above Violin II's preferred floor the melody must sit before the
+ * inner voices are held underneath it. An octave: less than that and there is
+ * no room to hold them there without compressing the ensemble downward.
+ */
+export const MELODY_HEADROOM = 12;
+
 function clampPc(pc: number): number {
   const v = pc % 12;
   return v < 0 ? v + 12 : v;
@@ -50,7 +57,23 @@ function inferChordPcs(melodyPc: number, scalePcs: number[]): number[] {
   return scalePcs;
 }
 
-function pickCandidatesForVoice(pcs: number[], range: { absMin: number; absMax: number }, prev: number | null): number[] {
+function pickCandidatesForVoice(
+  pcs: number[],
+  range: { absMin: number; absMax: number },
+  prev: number | null,
+  /**
+   * Highest pitch this voice may take at this slice — the melody, when Violin I
+   * is locked to it. Crossing above the melody is only a soft DP penalty, and a
+   * melody sitting low in the violin's range loses to the pull of each voice's
+   * own preferred register on nearly every slice: Violin II came out above the
+   * tune at 62 of 64 sampled points. A ceiling cannot be outvoted.
+   *
+   * Advisory, not absolute. If nothing the chord offers fits underneath, the
+   * voice keeps its full choice — a forced crossing beats an empty candidate
+   * list or a pitch outside the harmony.
+   */
+  ceiling: number | null = null
+): number[] {
   if (!pcs.length) return [];
   const target = typeof prev === "number" ? prev : Math.round((range.absMin + range.absMax) / 2);
   const candidates: number[] = [];
@@ -61,8 +84,10 @@ function pickCandidatesForVoice(pcs: number[], range: { absMin: number; absMax: 
     }
   }
   const unique = Array.from(new Set(candidates));
-  unique.sort((a, b) => Math.abs(a - target) - Math.abs(b - target));
-  return unique.slice(0, 4);
+  const under = ceiling === null ? unique : unique.filter((m) => m <= ceiling);
+  const pool = under.length ? under : unique;
+  pool.sort((a, b) => Math.abs(a - target) - Math.abs(b - target));
+  return pool.slice(0, 4);
 }
 
 export function buildCandidatesForSlice(params: {
@@ -71,6 +96,8 @@ export function buildCandidatesForSlice(params: {
   keyFifths: number;
   keyMode: "major" | "minor";
   profileId?: string;
+  /** See StringArrangerOptions.keepInnerVoicesBelowMelody. Off unless asked. */
+  keepInnerVoicesBelowMelody?: boolean;
 }): Record<VoiceId, number[]> {
   const { slice, prevVoicing, keyFifths, keyMode, profileId } = params;
   const { pcs, bassPc, rootPc } = parseChordPcs(slice.chordSymbol);
@@ -125,9 +152,30 @@ export function buildCandidatesForSlice(params: {
             ? [rootPc]
             : chordPcs
         : chordPcs;
-    out[voice] = pickCandidatesForVoice(pcsForVoice, range, prev);
+    // Keep Violin II and Viola under the tune — but only where they fit.
+    //
+    // Crossing is just a soft DP penalty, and a melody low in the violin's range
+    // loses to each voice's pull toward its own register: Violin II came out
+    // above the melody at 62 of 64 sampled points. A candidate ceiling settles
+    // it outright.
+    //
+    // It is conditional because forcing four voices under a low melody does not
+    // make room that is not there, it compresses the whole ensemble. Applied
+    // unconditionally to a melody at C#4–A4, crossings went to zero and the
+    // double bass paid for it: a clean D2 G2 A2 line became D2 G1 A1 … D3 D3,
+    // under the preferred floor the Forsyth note in ranges.ts argues for, with
+    // a 17-semitone leap. So the ceiling waits until the melody sits at least
+    // an octave above Violin II's preferred floor; below that the register
+    // itself is the problem, and arrangeStringEnsemble says so in a warning
+    // rather than quietly writing a cramped score.
+    const melodyTop =
+      params.keepInnerVoicesBelowMelody && out.vln1.length ? (out.vln1[0] as number) : null;
+    const roomBelow =
+      melodyTop !== null && melodyTop - STRING_RANGES.vln2.prefMin >= MELODY_HEADROOM;
+    const ceiling = roomBelow && (voice === "vln2" || voice === "vla") ? melodyTop : null;
+    out[voice] = pickCandidatesForVoice(pcsForVoice, range, prev, ceiling);
     if (!out[voice].length) {
-      out[voice] = pickCandidatesForVoice(chordPcs, range, prev);
+      out[voice] = pickCandidatesForVoice(chordPcs, range, prev, ceiling);
     }
   }
 

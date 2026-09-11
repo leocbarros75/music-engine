@@ -107,6 +107,14 @@ export type StringArrangerOptions = {
    * tonguing decision there, not a bowing one. Only the string route opts in.
    */
   sustainAccompaniment?: boolean;
+  /**
+   * Hold the second violin and viola below the melody, and report when the
+   * melody's register leaves them no room. Off by default for the same reason
+   * as sustainAccompaniment: the brass and woodwind arrangers run this DP too
+   * (Trumpet 2 reads vln2, Horn reads vla), and whether their inner voices sit
+   * under the lead is a decision for those ensembles to take on their own.
+   */
+  keepInnerVoicesBelowMelody?: boolean;
 };
 
 export type StringArrangerResult = {
