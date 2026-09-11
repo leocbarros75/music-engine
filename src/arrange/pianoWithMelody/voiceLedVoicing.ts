@@ -92,8 +92,13 @@ function bestVoicing(
   // one (the B of G/B), otherwise the root.
   const bottomPc = parsed.bassPc ?? parsed.rootPc;
 
-  const pool: number[] = [];
-  for (let m = lo; m <= hi; m++) if (pcs.includes(m % 12)) pool.push(m);
+  const poolUpTo = (ceiling: number): number[] => {
+    const xs: number[] = [];
+    for (let m = lo; m <= ceiling; m++) if (pcs.includes(m % 12)) xs.push(m);
+    return xs;
+  };
+
+  const pool = poolUpTo(hi);
   if (pool.length < 3) return null;
 
   // A triad must be complete; a seventh chord may omit its fifth, as it usually does.
@@ -101,13 +106,19 @@ function bestVoicing(
   const homeBottom = lo + 2;
   const prevArr = prev ? [prev.bass, prev.mid, prev.high] : null;
 
-  const scan = (fixedBottom: number | null): { v: number[]; cost: number } | null => {
+  const scan = (
+    fixedBottom: number | null,
+    // Upper notes may reach above the window only in the last-resort pass below,
+    // where the alternative is three voices on one pitch.
+    ceiling: number = hi
+  ): { v: number[]; cost: number } | null => {
+    const upper = ceiling === hi ? pool : poolUpTo(ceiling);
     let best: { v: number[]; cost: number } | null = null;
     const bottoms = fixedBottom !== null ? [fixedBottom] : pool;
     for (const b of bottoms) {
-      for (const mid of pool) {
+      for (const mid of upper) {
         if (mid <= b) continue;
-        for (const high of pool) {
+        for (const high of upper) {
           if (high <= mid) continue;
           const v = [b, mid, high];
           if (high - b > MAX_HAND_SPAN) continue;
@@ -143,12 +154,31 @@ function bestVoicing(
     for (let m = lo; m <= hi; m++) if (m % 12 === bottomPc) candidates.push(m);
     if (candidates.length) {
       const target = prev ? prev.bass : homeBottom;
-      const bass = candidates.reduce((a, b) =>
-        Math.abs(b - target) < Math.abs(a - target) ? b : a
-      );
+
+      // Nearest the previous bass, but with the same gentle pull toward the bottom
+      // of the window that the free branch gets. Distance alone made the bass
+      // ratchet UPWARD: each chord picks the octave nearest the last one, which
+      // keeps moving in whichever direction it has already moved, and over a song
+      // the whole left hand climbed an octave (D2–E3 became D2–A3).
+      const octaveCost = (m: number) =>
+        Math.abs(m - target) + REGISTER_ANCHOR_WEIGHT * Math.abs(m - homeBottom);
+
+      // Prefer an octave that a full voicing can actually stack above. A bass near
+      // the ceiling leaves no room for mid and high, and the voicing then collapsed
+      // onto three copies of the bass — which a walking bass turns into the same
+      // note three times in a row instead of root–3rd–5th.
+      const stackable = candidates.filter((m) => scan(m) !== null);
+      const octaves = stackable.length ? stackable : candidates;
+      const bass = octaves.reduce((a, b) => (octaveCost(b) < octaveCost(a) ? b : a));
+
       const pinned = scan(bass);
       if (pinned) return { bass: pinned.v[0]!, mid: pinned.v[1]!, high: pinned.v[2]! };
-      // Nothing stacks above that bass inside the window — still honour the bass.
+
+      // No octave of this bass admits a stack inside the window. Reach above the
+      // window rather than return a unison — still inside one hand span, so it
+      // stays playable, and the upper voices remain real, distinct chord tones.
+      const reached = scan(bass, bass + MAX_HAND_SPAN);
+      if (reached) return { bass: reached.v[0]!, mid: reached.v[1]!, high: reached.v[2]! };
       return { bass, mid: bass, high: bass };
     }
     // The chord's bass note does not exist anywhere in this window; fall through.
