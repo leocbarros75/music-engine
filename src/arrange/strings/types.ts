@@ -100,6 +100,13 @@ export type StringArrangerOptions = {
   profile?: ProfileId;
   seed?: number;
   allowDivisi?: boolean;
+  /**
+   * Let the accompanying voices hold a pitch instead of re-striking it at every
+   * melody onset. Off by default: the brass and woodwind arrangers run this same
+   * DP and then impose their own rhythm, and re-articulation is a breathing and
+   * tonguing decision there, not a bowing one. Only the string route opts in.
+   */
+  sustainAccompaniment?: boolean;
 };
 
 export type StringArrangerResult = {

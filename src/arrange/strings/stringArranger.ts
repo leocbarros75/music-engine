@@ -181,6 +181,104 @@ function makeEventsFromVoicing(
   return out;
 }
 
+/*
+ * Sustaining an accompanying voice instead of re-striking it.
+ *
+ * buildSlices cuts the bar at every melody onset, and each voice gets one note
+ * per slice. The harmony rarely changes that often, so an accompanying voice
+ * came out re-articulating the same pitch on every melody note — a viola part
+ * that played F#4 five times in bar 1 was the melody's rhythm with the pitch
+ * removed. Measured on a 15-bar lead sheet, 79-85% of the transitions in
+ * Violin II, Viola, Cello and Bass were a repeat of the pitch just played.
+ *
+ * That is not a notation defect so much as a texture one: a held inner voice
+ * is what a string section actually plays under a moving melody, and a
+ * repeated-attack part cannot be bowed as a line — every note needs its own
+ * stroke. So consecutive slices holding the same pitch become one sustained
+ * note. The voice keeps its pitch; it simply stops being struck again.
+ *
+ * Which voices sustain is a profile decision, never a global one. Pizzicato
+ * chord hits, chorale writing and block chords all re-articulate on purpose.
+ */
+const SUSTAINED_VOICES: Partial<Record<string, readonly VoiceId[]>> = {
+  melody_harmony: ["vln2", "vla", "vc", "cb"],
+  countermelody:  ["vln2", "vla", "vc", "cb"],
+  cello_melody:   ["vln1", "vln2", "vla", "cb"],
+  cinematic_pads: ["vln1", "vln2", "vla", "vc", "cb"],
+  // melody_pizzicato, homophonic_block, bach_chorale and dance_baroque are
+  // deliberately absent: each re-strikes as part of its texture.
+};
+
+/** Split a merged duration into standard note values, largest first, to be tied. */
+function splitIntoStandardDurations(total: number): number[] {
+  const pieces: number[] = [];
+  let left = total;
+  while (left > 1e-9) {
+    const piece = snapToStandardDuration(left);
+    pieces.push(piece);
+    left -= piece;
+    // snapToStandardDuration floors at 0.25, so a remainder below that would
+    // otherwise loop forever adding length the bar does not have.
+    if (piece <= 0.25 + 1e-9 && left < 0.25 - 1e-9) break;
+  }
+  return pieces;
+}
+
+function sustainRepeatedPitches(events: NoteEvent[]): NoteEvent[] {
+  const out: NoteEvent[] = [];
+  let run: NoteEvent[] = [];
+
+  const flush = () => {
+    if (!run.length) return;
+    const first = run[0] as any;
+    if (run.length === 1) {
+      out.push(run[0]!);
+      run = [];
+      return;
+    }
+    const total = run.reduce((sum, e) => sum + Number(e.dur), 0);
+    const measure = String(first.id).split("-")[1];
+    let t = Number(first.t);
+    const pieces = splitIntoStandardDurations(total);
+    pieces.forEach((dur, i) => {
+      out.push({
+        ...(clone(first) as any),
+        id: `${first.id.split("-")[0]}-${measure}-${t}`,
+        t,
+        dur,
+        // One sustained event, notated as tied pieces when no single note value
+        // spans it. The exporter writes <tie> and <tied> from these.
+        ...(i > 0 ? { tieStop: true } : {}),
+        ...(i < pieces.length - 1 ? { tieStart: true } : {}),
+      } as NoteEvent);
+      t += dur;
+    });
+    run = [];
+  };
+
+  for (const ev of events) {
+    const prev = run[run.length - 1] as any;
+    const evAny = ev as any;
+    const continues =
+      prev &&
+      evAny.type === "note" &&
+      prev.type === "note" &&
+      pitchToMidi(evAny.pitch) === pitchToMidi(prev.pitch) &&
+      // Slice ids carry the measure; merging across a bar line would rewrite
+      // the measure grouping that groupEventsByMeasure relies on.
+      String(evAny.id).split("-")[1] === String(prev.id).split("-")[1] &&
+      Math.abs(Number(prev.t) + Number(prev.dur) - Number(evAny.t)) < 1e-9 &&
+      // A tie the arranger already placed is not ours to re-cut.
+      prev.tieStart !== true &&
+      evAny.tieStop !== true;
+
+    if (!continues) flush();
+    run.push(ev);
+  }
+  flush();
+  return out;
+}
+
 function groupEventsByMeasure(events: NoteEvent[], template: any[]): any[] {
   const byMeasure: Record<number, NoteEvent[]> = {};
   for (const ev of events) {
@@ -242,11 +340,21 @@ export function arrangeStringEnsemble(
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);
 
-  const vln1 = makeEventsFromVoicing(slices, bestVoicings, "vln1");
-  const vln2 = makeEventsFromVoicing(slices, bestVoicings, "vln2");
-  const vla = makeEventsFromVoicing(slices, bestVoicings, "vla");
-  const vc = makeEventsFromVoicing(slices, bestVoicings, "vc");
-  const cb = makeEventsFromVoicing(slices, bestVoicings, "cb");
+  // Accompanying voices hold their pitch instead of re-striking it on every
+  // melody onset; which voices those are depends on the texture profile.
+  const sustained = new Set<VoiceId>(
+    options.sustainAccompaniment ? (SUSTAINED_VOICES[profile] ?? []) : []
+  );
+  const voiceEvents = (voice: VoiceId): NoteEvent[] => {
+    const raw = makeEventsFromVoicing(slices, bestVoicings, voice);
+    return sustained.has(voice) ? sustainRepeatedPitches(raw) : raw;
+  };
+
+  const vln1 = voiceEvents("vln1");
+  const vln2 = voiceEvents("vln2");
+  const vla = voiceEvents("vla");
+  const vc = voiceEvents("vc");
+  const cb = voiceEvents("cb");
 
   const measuresTemplate = (melodyPart.measures ?? []).map((m: any) => ({
     ...m,

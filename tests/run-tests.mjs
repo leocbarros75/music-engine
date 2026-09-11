@@ -52,7 +52,8 @@ async function main() {
       'src/arrange/strings/__tests__/stringArranger.test.ts',
       'src/arrange/stringsPolyphony/__tests__/stringsPolyphonicArranger.test.ts',
       'tests/arrange/candidates.test.ts',
-      'tests/arrange/voiceLedVoicing.test.ts'
+      'tests/arrange/voiceLedVoicing.test.ts',
+      'tests/arrange/stringSustain.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {
