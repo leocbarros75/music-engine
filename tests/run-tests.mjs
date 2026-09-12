@@ -63,7 +63,8 @@ async function main() {
     for (const file of ['tests/musicxml/holyHolyHolyChordTest.ts', 'tests/musicxml/choralRulesCheckTest.ts',
       'tests/musicxml/choralRulesUnitTest_doubling_resolution.ts',
       'tests/musicxml/multiMeasureRest.test.ts',
-      'tests/musicxml/tempoRounding.test.ts']) add(file, file);
+      'tests/musicxml/tempoRounding.test.ts',
+      'tests/musicxml/tiedChordDuration.test.ts']) add(file, file);
   }
   if (group === 'all' || group === 'harmony') {
     for (const file of Object.keys(EXPECTATIONS_BY_BASENAME).sort()) {

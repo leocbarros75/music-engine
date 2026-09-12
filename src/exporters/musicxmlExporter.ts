@@ -1050,10 +1050,99 @@ function renderMusicXML(scoreModel: ScoreModel): string {
           const notes = group.filter((g) => g?.type === "note" || g?.type === "unpitched");
           const rests = group.filter((g) => g?.type === "rest");
           const useGroup = notes.length ? notes : rests;
-          // Chord = multiple simultaneous noteheads sharing one duration. Chord
-          // durations stay as a single snapped value (decomposing tied chords is
-          // unsafe); single notes/rests are decomposed into readable tied values.
+          // Chord = multiple simultaneous noteheads sharing one duration.
           const isChordGroup = useGroup.length > 1;
+
+          const clampDur = (evAny: any) => {
+            const raw = Number.isFinite(evAny?.dur) ? Number(evAny.dur) : 1;
+            return Math.min(raw, Math.max(1 / currentDivisions, measureBeats - t));
+          };
+
+          // ── A chord whose length needs more than one note value ─────────────
+          // A single note of 3.5 beats is written as a dotted half tied to an
+          // eighth. A CHORD of 3.5 beats used to be snapped down to the dotted
+          // half and the eighth simply vanished — the MIDI transcription of
+          // test 4.mid produces exactly that, losing half a beat and shifting
+          // everything after it in the voice until the bar's trailing rest.
+          //
+          // It could not be decomposed before because this loop runs note by
+          // note, and <chord/> attaches a note to whatever precedes it in
+          // document order: emitting each note's tied pieces in turn would
+          // interleave the stacks into nonsense. Tied chords have to be written
+          // piece by piece, each piece a complete stack of noteheads.
+          //
+          // Members must agree on a length — MusicXML gives a chord one duration
+          // — so a group that disagrees falls through to the old path rather
+          // than having a length chosen for it.
+          const chordDurBeats = useGroup.length ? clampDur(useGroup[0]) : 0;
+          const pitchedTiedChord =
+            isChordGroup &&
+            useGroup.every((g: any) => g?.type === "note" && g?.pitch?.step) &&
+            useGroup.every((g: any) => Math.abs(clampDur(g) - chordDurBeats) < EPS);
+
+          if (pitchedTiedChord) {
+            const totalDivs = beatsToDivisionsDuration(chordDurBeats, currentDivisions);
+            const comps = decomposeToStandardDivs(currentDivisions, totalDivs);
+            const members = useGroup.map((evAny: any) => {
+              const wpBase = toWrittenPitch(evAny.pitch, transpose, p.instrument);
+              const wp = evAny.preserveSpelling ? wpBase : normalizePitchForKey(wpBase, fifthsToWrite);
+              const alterVal = typeof wp.alter === "number" ? wp.alter : 0;
+              return {
+                pitchXml:
+                  `<pitch><step>${xmlEscape(wp.step)}</step>` +
+                  (typeof wp.alter === "number" && wp.alter !== 0 ? `<alter>${wp.alter}</alter>` : "") +
+                  `<octave>${wp.octave}</octave></pitch>`,
+                accidental:
+                  alterVal === keySignatureAlter(wp.step, fifthsToWrite)
+                    ? null
+                    : accidentalFromAlterForDisplay(alterVal),
+                origTieStart: evAny.tieStart === true,
+                origTieStop: evAny.tieStop === true,
+                slurStart: evAny.slurStart === true,
+                slurStop: evAny.slurStop === true,
+                staff: isGrandStaff ? (evAny.staff ?? 1) : 1
+              };
+            });
+
+            for (let ci = 0; ci < comps.length; ci++) {
+              const cd = comps[ci]!;
+              const ct2 = durToType(currentDivisions, cd);
+              const cdot = durHasDot(currentDivisions, cd);
+              const firstPiece = ci === 0;
+              const lastPiece = ci === comps.length - 1;
+              for (let mi = 0; mi < members.length; mi++) {
+                const mem = members[mi]!;
+                const tieStart = !lastPiece || (mem.origTieStart && lastPiece);
+                const tieStop = !firstPiece || (mem.origTieStop && firstPiece);
+                out += `<note>`;
+                // The stack's first note opens a new time slot; the rest attach to it.
+                if (mi > 0) out += `<chord/>`;
+                out += mem.pitchXml;
+                out += `<duration>${cd}</duration>`;
+                if (tieStart) out += `<tie type="start"/>`;
+                if (tieStop) out += `<tie type="stop"/>`;
+                out += `<voice>${voice}</voice>`;
+                if (ct2) out += `<type>${ct2}</type>`;
+                if (cdot) out += `<dot/>`;
+                if (mem.accidental && firstPiece) out += `<accidental>${mem.accidental}</accidental>`;
+                out += `<staff>${mem.staff}</staff>`;
+                const slurHere = (mem.slurStart && firstPiece) || (mem.slurStop && lastPiece);
+                if (tieStart || tieStop || slurHere) {
+                  out += `<notations>`;
+                  if (tieStart) out += `<tied type="start"/>`;
+                  if (tieStop) out += `<tied type="stop"/>`;
+                  if (mem.slurStart && firstPiece) out += `<slur type="start" number="1"/>`;
+                  if (mem.slurStop && lastPiece) out += `<slur type="stop" number="1"/>`;
+                  out += `</notations>`;
+                }
+                out += `</note>`;
+              }
+              // One stack occupies one slot however many noteheads it has.
+              writtenDivs += cd;
+            }
+            cursor = Math.max(cursor, t + chordDurBeats);
+            continue;
+          }
 
           let groupMaxDur = 0;
           for (let gi = 0; gi < useGroup.length; gi++) {
