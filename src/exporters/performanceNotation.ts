@@ -1,6 +1,7 @@
 import { pitchToMidi } from "../score/standard";
 import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
 import { toSoundingScore, transposeWrittenPitch } from '../score/pitch';
+import { readableTempo } from '../score/performance';
 const children = (n: any, tag?: string): any[] => Array.from(n.childNodes ?? []).filter((x: any) => x.nodeType === 1 && (!tag || x.localName === tag));
 const all = (n: any, tag: string): any[] => Array.from(n.getElementsByTagNameNS('*', tag));
 const value = (n: any, tag: string, fallback = '0') => all(n, tag)[0]?.textContent ?? fallback;
@@ -40,11 +41,14 @@ export function writePerformanceNotation(xml: string, input: any): string {
                 bar.insertBefore(d, anchor);
             };
             for (const t of marks.tempos ?? []) {
+                // The printed mark and the playback tempo agree on one readable
+                // number; the hundredth of a beat lost is 0.00005% of the tempo.
+                const bpm = readableTempo(t.bpm);
                 const met = make('metronome');
                 met.appendChild(make('beat-unit', 'quarter'));
-                met.appendChild(make('per-minute', t.bpm));
+                met.appendChild(make('per-minute', bpm));
                 const sound = make('sound');
-                sound.setAttribute('tempo', String(t.bpm));
+                sound.setAttribute('tempo', String(bpm));
                 direction(t.t, met, sound);
             }
             for (const d of marks.dynamics ?? []) {

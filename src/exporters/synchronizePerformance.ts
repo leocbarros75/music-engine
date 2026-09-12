@@ -2,7 +2,7 @@ import { exportMidi } from "../score/midi";
 import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
 import { parseMusicXMLToScoreModel } from '../parsers/musicxmlParser';
 import { toSoundingScore } from '../score/pitch';
-import { buildPerformance } from '../score/performance';
+import { buildPerformance, readableTempo } from '../score/performance';
 /** Final notation is authoritative: never audition the pre-export approximation. */
 export function synchronizePerformance(xml: string, model: any, protectedPartId?: string) {
     let parsed = toSoundingScore(parseMusicXMLToScoreModel(xml));
@@ -16,7 +16,7 @@ export function synchronizePerformance(xml: string, model: any, protectedPartId?
         // Preserve the protected source staff verbatim; a score-wide tempo can live on another staff.
         const part = parts.find(p => p.getAttribute('id') !== protectedPartId) ?? parts[0];
         const measure = part.getElementsByTagName('measure')[0];
-        const directionDoc = new DOMParser().parseFromString(`<direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${bpm}</per-minute></metronome></direction-type><sound tempo="${bpm}"/></direction>`, 'application/xml');
+        const directionDoc = new DOMParser().parseFromString(`<direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${readableTempo(bpm)}</per-minute></metronome></direction-type><sound tempo="${readableTempo(bpm)}"/></direction>`, 'application/xml');
         const attrs = measure.getElementsByTagName('attributes')[0];
         measure.insertBefore(doc.importNode(directionDoc.documentElement, true), attrs ? attrs.nextSibling : measure.firstChild);
         xml = new XMLSerializer().serializeToString(doc);
@@ -34,7 +34,10 @@ export function synchronizePerformance(xml: string, model: any, protectedPartId?
     let midiBase64: string | undefined;
     try {
         const performance = buildPerformance(scoreModel);
-        scoreModel.meta.tempo_bpm = performance.tempos[0]?.bpm ?? 120;
+        // Rounded here, where the artefact is manufactured: buildPerformance
+        // converts the tempo to ticks and back, so 67 returns as 67.0000290 and
+        // is written into the model every caller reads afterwards.
+        scoreModel.meta.tempo_bpm = readableTempo(performance.tempos[0]?.bpm ?? 120);
         midiBase64 = Buffer.from(exportMidi(scoreModel)).toString('base64');
         report = { status: 'ready', measuresPlayed: performance.measures.length, notesPlayed: performance.notes.length, durationSeconds: performance.durationSec, tempoChanges: performance.tempos.length, warnings: performance.warnings };
     }

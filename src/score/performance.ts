@@ -39,6 +39,24 @@ export type Performance = {
     warnings: string[];
 };
 export const PERFORMANCE_PPQ = 480;
+
+/**
+ * A tempo as a player should read it.
+ *
+ * MIDI stores microseconds per quarter note, so every tempo arrives as a
+ * reciprocal: 895522 µs is 60000000/895522 = 67.0000298 bpm, and the mark
+ * printed above the staff read "= 67.00002903334591". The intended number is
+ * plainly 67.
+ *
+ * Anything within a hundredth of a whole number is that whole number — no
+ * writer means 67.0000298. Past that the decimal is deliberate, so a genuine
+ * 132.5 survives as 132.5 rather than being flattened to 133.
+ */
+export function readableTempo(bpm: number): number {
+  if (!Number.isFinite(bpm)) return 120;
+  const whole = Math.round(bpm);
+  return Math.abs(bpm - whole) < 0.01 ? whole : Math.round(bpm * 10) / 10;
+}
 const quantize = (beat: number) => Math.round(beat * PERFORMANCE_PPQ) / PERFORMANCE_PPQ;
 const EPS = 1e-7;
 const equal = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
