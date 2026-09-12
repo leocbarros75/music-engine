@@ -333,13 +333,17 @@ export function arrangeStringEnsemble(
     const candidateMap = buildCandidatesForSlice({
       slice, prevVoicing, keyFifths: key.fifths, keyMode: key.mode, profileId: profile,
       keepInnerVoicesBelowMelody: options.keepInnerVoicesBelowMelody === true,
+      innerVoiceMotion: options.innerVoiceMotion === true,
     });
     const voicings = buildVoicingStates(candidateMap);
     candidatesBySlice.push(voicings);
     prevVoicing = voicings[0] ?? null;
   }
 
-  const dpResult = runDp({ slices, candidatesBySlice, profileId: profile });
+  const dpResult = runDp({
+    slices, candidatesBySlice, profileId: profile,
+    scoreOffChordTones: options.innerVoiceMotion === true,
+  });
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);
 

@@ -1,5 +1,6 @@
 import type { CandidateState, PendingRecovery, Slice, TransitionScore, VoiceId, Voicing } from "./types";
 import { evaluateTransition, PROFILE_WEIGHTS } from "./constraints";
+import { chordPcsOf } from "./candidates";
 
 type Node = {
   cost: number;
@@ -18,8 +19,10 @@ export function runDp(params: {
   slices: Slice[];
   candidatesBySlice: Voicing[][];
   profileId: keyof typeof PROFILE_WEIGHTS;
+  /** True when candidates.ts has offered off-chord steps that need costing. */
+  scoreOffChordTones?: boolean;
 }): { best: CandidateState[]; penalties: Array<{ measure: number; t: number; penalties: TransitionScore["penalties"] }> } {
-  const { slices, candidatesBySlice, profileId } = params;
+  const { slices, candidatesBySlice, profileId, scoreOffChordTones } = params;
   const profile = PROFILE_WEIGHTS[profileId];
   if (!slices.length || !candidatesBySlice.length) return { best: [], penalties: [] };
 
@@ -36,6 +39,14 @@ export function runDp(params: {
     const slice = slices[i];
     const nextLayer: Node[] = [];
     const candidates = candidatesBySlice[i];
+    // Supplied only when the caller opted into inner-voice motion; otherwise the
+    // candidates are all chord tones and there is nothing to charge for.
+    const sliceChordPcs = scoreOffChordTones ? chordPcsOf(slice.chordSymbol) : undefined;
+    const prevChordPcs = scoreOffChordTones ? chordPcsOf(slices[i - 1]?.chordSymbol) : undefined;
+    // Strong beats in a bar of quarters: 1 and 3. A passing tone belongs between
+    // them, not on them.
+    const strongBeat =
+      Math.abs(slice.t - Math.round(slice.t)) < 1e-9 && Math.round(slice.t) % 2 === 0;
     for (let j = 0; j < candidates.length; j++) {
       let bestCost = Number.POSITIVE_INFINITY;
       let bestPrev = -1;
@@ -46,7 +57,10 @@ export function runDp(params: {
         const prevNode = prevLayer[k];
         const score = evaluateTransition(prevNode.state.voicing, candidates[j], {
           profile,
-          pendingRecovery: prevNode.state.pendingRecovery
+          pendingRecovery: prevNode.state.pendingRecovery,
+          chordPcs: sliceChordPcs,
+          strongBeat,
+          prevChordPcs
         });
         const cost = prevNode.cost + score.cost;
         if (cost < bestCost) {

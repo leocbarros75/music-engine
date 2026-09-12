@@ -16,6 +16,11 @@ function clampPc(pc: number): number {
   return v < 0 ? v + 12 : v;
 }
 
+/** Pitch classes of a chord symbol — the harmony a voice is expected to spell. */
+export function chordPcsOf(symbol?: string | null): number[] {
+  return parseChordPcs(symbol).pcs;
+}
+
 function parseChordPcs(symbol?: string | null): { pcs: number[]; bassPc: number | null; rootPc: number | null } {
   if (!symbol) return { pcs: [], bassPc: null, rootPc: null };
   const raw = String(symbol);
@@ -98,6 +103,8 @@ export function buildCandidatesForSlice(params: {
   profileId?: string;
   /** See StringArrangerOptions.keepInnerVoicesBelowMelody. Off unless asked. */
   keepInnerVoicesBelowMelody?: boolean;
+  /** See StringArrangerOptions.innerVoiceMotion. Off unless asked. */
+  innerVoiceMotion?: boolean;
 }): Record<VoiceId, number[]> {
   const { slice, prevVoicing, keyFifths, keyMode, profileId } = params;
   const { pcs, bassPc, rootPc } = parseChordPcs(slice.chordSymbol);
@@ -176,6 +183,43 @@ export function buildCandidatesForSlice(params: {
     out[voice] = pickCandidatesForVoice(pcsForVoice, range, prev, ceiling);
     if (!out[voice].length) {
       out[voice] = pickCandidatesForVoice(chordPcs, range, prev, ceiling);
+    }
+
+    // ── A step to move to ────────────────────────────────────────────────────
+    // Chord tones sit a third or more apart, so a voice restricted to them can
+    // only hold or jump. Measured over this progression, a stepwise chord tone
+    // existed for only 50% of the inner voices' transitions — which is why they
+    // repeat far more often than Beethoven's do (Op.18 No.3: Violin II 58%
+    // stepwise, Viola 49%; the calibration note above records it).
+    //
+    // So offer one scale tone a step from where the voice already is. It is not
+    // free: evaluateTransition charges for landing off the chord, heavily on a
+    // strong beat or when approached by leap, lightly when it is what it looks
+    // like here — a passing or neighbour tone on a weak beat.
+    //
+    // Offered ONLY where the chord itself supplies no step. The DP explores the
+    // product of all five voices' candidate lists, and applyAppSettings records
+    // an OOM on Render's 512 MB tier from exactly that growth, so a sixth voice
+    // state is not free. Withholding it where a stepwise chord tone already
+    // exists costs nothing musically — the voice can already step — and on this
+    // progression that was half the transitions.
+    //
+    // Dropping a chord tone to make room instead was worse: it narrowed the
+    // viola to three pitches over fifteen bars, because removing an option is
+    // not the same as adding one.
+    if (params.innerVoiceMotion && (voice === "vln2" || voice === "vla") && typeof prev === "number") {
+      const chordStepExists = out[voice].some((m) => Math.abs(m - prev) >= 1 && Math.abs(m - prev) <= 2);
+      if (!chordStepExists) {
+        const stepTone = scale
+          .flatMap((pc) => [prev - 2, prev - 1, prev + 1, prev + 2].filter((m) => clampPc(m) === pc))
+          .filter((m) => m >= range.absMin && m <= range.absMax)
+          .filter((m) => !chordPcs.includes(clampPc(m)))
+          .filter((m) => ceiling === null || m <= ceiling)
+          .sort((a, b) => Math.abs(a - prev) - Math.abs(b - prev))[0];
+        if (stepTone !== undefined && !out[voice].includes(stepTone)) {
+          out[voice] = [...out[voice], stepTone];
+        }
+      }
     }
   }
 

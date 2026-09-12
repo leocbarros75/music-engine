@@ -134,6 +134,16 @@ export const PROFILE_WEIGHTS: Record<ProfileId, ProfileWeights> = {
 export type ConstraintContext = {
   profile: ProfileWeights;
   pendingRecovery: PendingRecovery;
+  /**
+   * The harmony the arriving slice spells, and whether it lands on a strong
+   * beat. Supplied only when inner-voice motion is enabled; without it a voice
+   * off the chord is not charged for, because only chord tones were ever
+   * offered.
+   */
+  chordPcs?: number[];
+  strongBeat?: boolean;
+  /** The harmony the departing slice spelt, so an off-chord tone can be made to resolve. */
+  prevChordPcs?: number[];
 };
 
 export function evaluateTransition(
@@ -211,6 +221,45 @@ export function evaluateTransition(
       penalties.push({ id: "skip", cost: profile.leapPenalty * 0.5, detail: v });
     } else if (prim === "half_step" || prim === "whole_step" || prim === "step") {
       penalties.push({ id: "step_preference", cost: -profile.stepPreference, detail: v });
+    }
+
+    // ── Off-chord tones: earn them or pay for them ───────────────────────────
+    // A scale tone a step away is offered to the inner voices so they have
+    // somewhere to move (see candidates.ts). What makes it music rather than a
+    // wrong note is how it is approached and where it falls: stepwise, on a
+    // weak beat, it reads as a passing or neighbour tone and costs little.
+    // Reached by leap, or landing on a strong beat where the ear takes it as
+    // the harmony, it costs what any dissonance costs.
+    if (context.chordPcs?.length && (v === "vln2" || v === "vla")) {
+      const pc = ((b % 12) + 12) % 12;
+      const steppedIn = prim === "half_step" || prim === "whole_step" || prim === "step";
+      const offChord = !context.chordPcs.includes(pc);
+      const cameFromOffChord =
+        a !== null &&
+        !!context.prevChordPcs?.length &&
+        !context.prevChordPcs.includes(((a % 12) + 12) % 12);
+
+      if (offChord) {
+        const factor = context.strongBeat ? 1 : steppedIn ? 0.15 : 1;
+        penalties.push({
+          id: "non_chord_tone",
+          cost: profile.dissonancePenalty * factor,
+          detail: `${v}${context.strongBeat ? ":strong" : steppedIn ? ":passing" : ":leapt-to"}`
+        });
+      }
+
+      // A passing tone is a way THROUGH, not a place to stay. Charged cheaply to
+      // arrive at and left uncharged, one becomes a destination: the viola
+      // narrowed to an F#4-G4-A4 hover, three pitches over fifteen bars, because
+      // endless cheap stepping beat committing to a chord tone further off. So
+      // leaving one must resolve — by step, onto the chord.
+      if (cameFromOffChord && (offChord || !steppedIn)) {
+        penalties.push({
+          id: "unresolved_non_chord_tone",
+          cost: profile.dissonancePenalty * (offChord ? 1.5 : 1),
+          detail: `${v}${offChord ? ":chained" : ":left-by-leap"}`
+        });
+      }
     }
 
     const range = STRING_RANGES[v];

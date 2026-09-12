@@ -115,6 +115,12 @@ export type StringArrangerOptions = {
    * under the lead is a decision for those ensembles to take on their own.
    */
   keepInnerVoicesBelowMelody?: boolean;
+  /**
+   * Offer the second violin and viola a scale tone a step away, so they have
+   * somewhere to move when the chord's own tones are a third apart. Off by
+   * default, like the rest: brass and woodwinds read vln2/vla from this DP.
+   */
+  innerVoiceMotion?: boolean;
 };
 
 export type StringArrangerResult = {
