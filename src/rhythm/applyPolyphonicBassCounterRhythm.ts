@@ -751,6 +751,32 @@ function eventMidi(ev: any): number | null {
   return null;
 }
 
+/**
+ * The lowest the melody goes while a note starting at `t` is still sounding.
+ *
+ * The alto is held below the melody, but the ceiling used to be read at the
+ * alto note's onset alone. A held alto note outlives that instant: take the
+ * melody's D4 at beat 1.5, write the alto a semitone under at C#4, and when the
+ * melody falls to C#4 on beat 2 the alto is above the tune for half a bar —
+ * which is what happened in bar 7. The ceiling has to hold for as long as the
+ * note does.
+ */
+export function lowestNoteMidiDuring(events: any[], t: number, dur: number): number | null {
+  const end = t + (Number.isFinite(dur) ? dur : 0);
+  let lowest: number | null = null;
+  for (const e of events) {
+    if (e?.type !== "note" || typeof e?.midi !== "number") continue;
+    const et = Number(e.t);
+    const ed = Number(e.dur);
+    if (!Number.isFinite(et) || !Number.isFinite(ed)) continue;
+    // Any melody note overlapping the span, not just the one at its start.
+    if (et < end - 1e-9 && et + ed > t + 1e-9) {
+      lowest = lowest === null ? e.midi : Math.min(lowest, e.midi);
+    }
+  }
+  return lowest ?? findNoteMidiAtTime(events, t);
+}
+
 function findNoteMidiAtTime(events: any[], t: number): number | null {
   let active: any | null = null;
   for (const e of events) {
@@ -1444,7 +1470,7 @@ export function applyPolyphonicAltoCounterRhythm(
         return { ...ev, type: "note", midi: prevMidi, pitch: midiToPitch(prevMidi), lockPitch: true };
       }
 
-      const soprMidi = findNoteMidiAtTime(melEvents, Number(ev.t));
+      const soprMidi = lowestNoteMidiDuring(melEvents, Number(ev.t), Number(ev.dur));
       const localRange = {
         min: baseRange.min,
         max: soprMidi !== null ? Math.min(baseRange.max, soprMidi - 1) : baseRange.max
