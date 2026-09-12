@@ -372,3 +372,26 @@ test('trailing silence in the file does not become empty bars', () => {
   for (const m of measures)
     assert((m as any).events.length > 0, `measure ${m.number} is empty`);
 });
+
+test('a measure with no events still exports as a complete bar of rest', () => {
+  // The per-voice loop is what writes rests, so a measure with no voices used to
+  // emit <measure><barline/></measure> — no notes, no rests, not a valid measure.
+  const score: any = {
+    parts: [{
+      part_id: 'P1', name: 'Piano', instrument: 'piano', staves: 1,
+      measures: [
+        { number: 1, attributes: { divisions: 4, key_fifths: 0, time: { beats: 4, beat_type: 4 } },
+          events: [{ id: 'n1', t: 0, dur: 4, type: 'note', pitch: { step: 'C', octave: 4 }, voice: 1, staff: 1 }] },
+        { number: 2, events: [] },
+      ],
+    }],
+    meta: {},
+  };
+  const xml = exportScoreModelToMusicXML(score);
+  const back = parseMusicXMLToScoreModel(xml);
+  const second: any = back.parts[0]!.measures[1];
+  assert(second, 'the empty measure should survive export');
+  const filled = (second.events ?? []).reduce((n: number, e: any) => n + Number(e.dur ?? 0), 0);
+  assert.equal(filled, 4, `the bar should be full of rest, got ${filled} beats`);
+  assert((second.events ?? []).every((e: any) => e.isRest || e.type === 'rest'), 'rests only');
+});

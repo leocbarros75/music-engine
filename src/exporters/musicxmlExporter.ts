@@ -900,6 +900,14 @@ function renderMusicXML(scoreModel: ScoreModel): string {
         byVoice.set(v, list);
       }
 
+      // A measure with nothing in it still has to be a measure. The per-voice
+      // loop below is what writes rests, so with no voices it wrote nothing at
+      // all and the bar came out as <measure><barline/></measure> — no notes,
+      // no rests, not a valid measure in any reader, and the shape MuseScore
+      // reports as an incomplete measure. Give it one silent voice and the
+      // trailing-rest logic fills the bar.
+      if (!byVoice.size) byVoice.set(1, []);
+
       const voiceNumbers = Array.from(byVoice.keys()).sort((a, b) => a - b);
       let previousVoiceDivs = measureDur;
       for (let vi = 0; vi < voiceNumbers.length; vi++) {
