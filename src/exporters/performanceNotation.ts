@@ -128,6 +128,22 @@ export function writePerformanceNotation(xml: string, input: any): string {
                     if (a.childNodes.length)
                         notations.appendChild(a);
                 }
+                // Bow directions and other <technical> marks. MusicXML keeps these
+                // separate from <articulations>: a down-bow says which way the arm
+                // travels, not how the note is attacked.
+                if (sourceNote?.technical?.length) {
+                    let notations = all(n, 'notations')[0];
+                    if (!notations) {
+                        notations = make('notations');
+                        n.appendChild(notations);
+                    }
+                    const tech = make('technical');
+                    for (const name of sourceNote.technical)
+                        if (['down-bow', 'up-bow', 'open-string', 'harmonic', 'snap-pizzicato'].includes(name))
+                            tech.appendChild(make(name));
+                    if (tech.childNodes.length)
+                        notations.appendChild(tech);
+                }
             }
             if (original.events.some((e: any) => e.grace && !matched.has(e)))
                 throw Error(`Cannot serialize grace notes without a principal note in measure ${original.number}.`);

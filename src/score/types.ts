@@ -15,6 +15,12 @@ export type NoteEvent =
       tieStart?: boolean;
       tieStop?: boolean;
       articulations?: string[];
+      /**
+       * MusicXML <technical> marks — bow direction and the like. Kept apart from
+       * `articulations` because the two answer different questions: an accent is
+       * how the note is attacked, a down-bow is which way the arm travels.
+       */
+      technical?: string[];
       voice: number;
       staff: number;
       isRest?: false;

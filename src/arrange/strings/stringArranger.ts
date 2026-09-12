@@ -4,6 +4,7 @@ import type { Slice, StringArrangerOptions, StringArrangerResult, StringEnsemble
 import { buildCandidatesForSlice, buildVoicingStates } from "./candidates";
 import { runDp } from "./dp";
 import { STRING_RANGES } from "./ranges";
+import { markBowDirections, startsWithPickup } from "./bowing";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 
 type ChordEvent = { measure: number; t: number; symbol: string };
@@ -394,6 +395,21 @@ export function arrangeStringEnsemble(
     buildPart(measuresTemplate, vc, "P_VC", "Cello", "cello"),
     buildPart(measuresTemplate, cb, "P_DB", "Double Bass", "double_bass")
   ];
+
+  // Bow directions at the points a section would otherwise pencil in: the start
+  // of the part and each retake after a rest. Never note-by-note — see bowing.ts
+  // for why a run of alternating symbols proves nothing about bow distribution.
+  // Pizzicato voices are plucked, so a bow direction would be meaningless there.
+  if (options.bowDirections) {
+    const plucked = new Set<string>(
+      profile === "melody_pizzicato" ? ["P_V2", "P_VA", "P_VC", "P_DB"] : []
+    );
+    const pickup = startsWithPickup(parts[0] as any);
+    for (const p of parts) {
+      if (plucked.has(p.part_id)) continue;
+      markBowDirections(p as any, { pickup });
+    }
+  }
 
   // melody_pizzicato: Vln I arco; all others pizzicato
   const baseArticulations: StringEnsembleArrangement["articulations"] = [{ measure: 1, t: 0, type: "legato" }];

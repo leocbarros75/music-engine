@@ -121,6 +121,12 @@ export type StringArrangerOptions = {
    * default, like the rest: brass and woodwinds read vln2/vla from this DP.
    */
   innerVoiceMotion?: boolean;
+  /**
+   * Print bow directions where a section would otherwise agree them by hand —
+   * the first note, and each retake after a rest. Off by default: the brass and
+   * woodwind arrangers run this DP, and a down-bow on a trumpet is nonsense.
+   */
+  bowDirections?: boolean;
 };
 
 export type StringArrangerResult = {
