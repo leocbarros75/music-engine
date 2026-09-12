@@ -61,7 +61,8 @@ async function main() {
   }
   if (group === 'all' || group === 'musicxml') {
     for (const file of ['tests/musicxml/holyHolyHolyChordTest.ts', 'tests/musicxml/choralRulesCheckTest.ts',
-      'tests/musicxml/choralRulesUnitTest_doubling_resolution.ts']) add(file, file);
+      'tests/musicxml/choralRulesUnitTest_doubling_resolution.ts',
+      'tests/musicxml/multiMeasureRest.test.ts']) add(file, file);
   }
   if (group === 'all' || group === 'harmony') {
     for (const file of Object.keys(EXPECTATIONS_BY_BASENAME).sort()) {

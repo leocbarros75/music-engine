@@ -32,6 +32,73 @@ const CHORAL_VOICE_NAMES = new Set(["soprano", "alto", "tenor", "bass"]);
 /** Family rank for a part the orchestral families do not recognise (voices, "Melody", …). */
 const UNKNOWN_GROUP_RANK = 90;
 
+function multiRestXml(count: number): string {
+  return `<measure-style><multiple-rest>${count}</multiple-rest></measure-style>`;
+}
+
+/**
+ * Runs of silent bars a player should be able to count as one.
+ *
+ * The symphonic orchestra stages its entries — timpani rest for fourteen of
+ * fifteen bars, trumpets and trombones for twelve — and a part printing twelve
+ * separate whole rests is a part nobody can keep their place in.
+ *
+ * PARTS ONLY, never a full score. A multi-measure rest compresses one staff's
+ * bars into a single numbered box; do that to the timpani while the violins
+ * play and every system below it loses its vertical alignment. The convention
+ * belongs to extracted parts, which is why this is keyed on the export holding
+ * exactly one part.
+ *
+ * A run breaks wherever the player needs to see the bar go by: a meter, key or
+ * divisions change, a tempo or dynamic mark, a cadence annotation. Runs of one
+ * stay as an ordinary bar's rest.
+ */
+function findMultiMeasureRests(
+  measures: any[],
+  cadenceTextByMeasure: Record<number, string>,
+  enabled: boolean
+): Map<number, number> {
+  const out = new Map<number, number>();
+  if (!enabled) return out;
+
+  const silent = (m: any) => !(m?.events ?? []).some((e: any) => e?.type === "note");
+  const shape = (m: any) =>
+    [
+      m?.attributes?.divisions,
+      m?.attributes?.key_fifths,
+      m?.attributes?.key_mode,
+      m?.attributes?.time?.beats,
+      m?.attributes?.time?.beat_type
+    ].join("|");
+  const marked = (m: any) => {
+    const perf = m?.performance;
+    return (
+      !!cadenceTextByMeasure[Number(m?.number)] ||
+      !!perf?.tempos?.length ||
+      !!perf?.dynamics?.length ||
+      !!perf?.repeatStart ||
+      !!perf?.repeatEnd ||
+      !!perf?.endings?.length
+    );
+  };
+
+  let i = 0;
+  while (i < measures.length) {
+    if (!silent(measures[i]) || marked(measures[i])) { i++; continue; }
+    let j = i + 1;
+    while (
+      j < measures.length &&
+      silent(measures[j]) &&
+      !marked(measures[j]) &&
+      shape(measures[j]) === shape(measures[i])
+    ) j++;
+    const count = j - i;
+    if (count >= 2) out.set(i, count);
+    i = j;
+  }
+  return out;
+}
+
 /** The dedicated melody/lead staff the piano ensembles emit above the grand staff. */
 function isMelodyPart(p: { part_id?: string; name?: string }): boolean {
   return (
@@ -691,6 +758,9 @@ function renderMusicXML(scoreModel: ScoreModel): string {
   const preserveOrder = ensembleTag === "orchestra" || ensembleTag === "full_orchestra" ||
     ensembleTag === "piano_with_melody" || ensembleTag === "symphonic_orchestra";
   const parts = preserveOrder ? partsRaw : sortPartsOrchestrally(partsRaw);
+  // One part means an extracted part, where multi-measure rests belong; a full
+  // score keeps every bar so the staves stay aligned.
+  const isSinglePartExport = parts.length === 1;
 
   const cadenceTextByMeasure = buildCadenceTextByMeasure(scoreModel);
   const fallbackKeyFifths =
@@ -771,6 +841,8 @@ function renderMusicXML(scoreModel: ScoreModel): string {
     let currentTimeBeats = 4;
     let currentTimeBeatType = 4;
     let lastAttrKey: string | null = null;
+
+    const multiRestAt = findMultiMeasureRests(partMeasures, cadenceTextByMeasure, isSinglePartExport);
 
     for (const [measureIndex, m] of partMeasures.entries()) {
       const mNum = m.number ?? 1;
@@ -873,7 +945,12 @@ function renderMusicXML(scoreModel: ScoreModel): string {
           }
         }
 
+        if (multiRestAt.has(measureIndex)) out += multiRestXml(multiRestAt.get(measureIndex)!);
         out += `</attributes>`;
+      } else if (multiRestAt.has(measureIndex)) {
+        // Nothing else about the bar changed, but the multi-rest still has to be
+        // announced, and <measure-style> lives in <attributes>.
+        out += `<attributes>${multiRestXml(multiRestAt.get(measureIndex)!)}</attributes>`;
       }
 
       currentDivisions = nextDivisions;
