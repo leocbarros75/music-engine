@@ -353,3 +353,22 @@ if (REAL && fs.existsSync(REAL)) {
 }
 
 console.log(`\n${passed} assertions passed.`);
+
+test('trailing silence in the file does not become empty bars', () => {
+  // DAWs park the end-of-track marker past the last note — test 4.mid declares
+  // 16 bars for 15 bars of music. Every bar of that silence used to become an
+  // empty measure, in the score and in every arrangement built from it.
+  const bar = 4 * PPQ;
+  const f = parseMidiFile(smf([
+    [...timeSig(4, 2)],
+    // Two bars of music, then a marker four bars later to push the track end out.
+    [...notesTrack([{ at: 0, dur: bar, midi: 60 }, { at: bar, dur: bar, midi: 62 }]),
+     ...vlq(4 * bar), 0xff, 0x06, 1, 0x20],
+  ]));
+  assert(f.totalTicks >= 6 * bar, 'the fixture should declare a long track');
+  const { score } = transcribeMidiToScore(f);
+  const measures = score.parts[0]!.measures;
+  assert.equal(measures.length, 2, `expected 2 bars of music, got ${measures.length}`);
+  for (const m of measures)
+    assert((m as any).events.length > 0, `measure ${m.number} is empty`);
+});

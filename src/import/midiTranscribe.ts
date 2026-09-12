@@ -383,7 +383,17 @@ export function transcribeMidiToScore(
     }
 
     // 5. Lay the notes into bars.
-    const endTick = Math.max(file.totalTicks, ...placed.map((p) => p.endTick), 1);
+    // Bars cover the music, not the file. file.totalTicks runs to the
+    // end-of-track marker, which DAWs park well past the last note — test 4.mid
+    // declares 16 bars for 15 bars of music — and every bar of that trailing
+    // silence became an empty measure in the score, and then in every
+    // arrangement built from it.
+    //
+    // totalTicks is still the floor when there are no notes at all, so an empty
+    // or drums-only track still yields a bar rather than nothing.
+    const endTick = placed.length
+        ? Math.max(...placed.map((p) => p.endTick), 1)
+        : Math.max(file.totalTicks, 1);
     const bars = buildBars(file, endTick);
     const key = inferKey(track.notes, file.keySigs[0]);
     if (key.inferred)
