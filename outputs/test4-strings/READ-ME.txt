@@ -1,0 +1,32 @@
+STRING ENSEMBLE ARRANGEMENT — TEST4
+
+Instrumentation: Violin I, Violin II, Viola, Violoncello, Double Bass.
+Playable as a string quintet or by string sections. No divisi or double stops.
+15 measures, D major, 4/4. Suggested quarter-note tempo: 76.
+
+This is an editorial arrangement based on the supplied transcription and the
+clarified melodic reading used in the approved piano arrangements. The inner
+parts are newly arranged; this is not a literal allocation of every source note.
+
+Violin I: melodic line in an elevated register.
+Violin II: harmonic support and occasional passing motion.
+Viola: moving inner voice in alto clef.
+Cello: bass outline with connecting movement.
+Double bass: written an octave above sounding pitch; MusicXML includes the
+transpose instruction. No extension below standard low E is required.
+
+Slurs and dynamics are editorial. Repeated pitches under a slur may be gently
+rearticulated within the bow. Players may revise bow distribution together.
+Professional here describes an ensemble arrangement for experienced players;
+the writing is lyrical and does not aim for virtuoso technical difficulty.
+
+Validation performed: complete measures, rhythmic type/duration agreement,
+written instrument ranges, slur pairing, bass octave transposition.
+Not performed: audio comparison, visual engraving proof, player read-through.
+Open the full score or individual parts in notation software for these checks.
+
+CODE
+build_strings.py is self-contained and uses only Python's standard library.
+Each part is a list of measures. Each measure contains (pitch, beats) events.
+The generator encodes those events as MusicXML and validates the saved files.
+To regenerate: python3 build_strings.py

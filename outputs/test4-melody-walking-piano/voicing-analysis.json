@@ -1,0 +1,434 @@
+[
+  {
+    "measure": 1,
+    "RH": [
+      {
+        "triad": "D",
+        "notes": [
+          "A3",
+          "D4",
+          "F#4"
+        ],
+        "RH_position": "second inversion"
+      },
+      {
+        "triad": "D",
+        "notes": [
+          "A3",
+          "D4",
+          "F#4"
+        ],
+        "RH_position": "second inversion"
+      }
+    ],
+    "LH": [
+      "D3",
+      "F#3",
+      "A2",
+      "C#3"
+    ]
+  },
+  {
+    "measure": 2,
+    "RH": [
+      {
+        "triad": "G",
+        "notes": [
+          "B3",
+          "D4",
+          "G4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "G",
+        "notes": [
+          "B3",
+          "D4",
+          "G4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "D3",
+      "G2",
+      "B2",
+      "C#3"
+    ]
+  },
+  {
+    "measure": 3,
+    "RH": [
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "D3",
+      "A2",
+      "C#3",
+      "E3"
+    ]
+  },
+  {
+    "measure": 4,
+    "RH": [
+      {
+        "triad": "D",
+        "notes": [
+          "D4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "root position"
+      },
+      {
+        "triad": "D",
+        "notes": [
+          "D4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "root position"
+      }
+    ],
+    "LH": [
+      "D3",
+      "F#3",
+      "A2",
+      "A#2"
+    ]
+  },
+  {
+    "measure": 5,
+    "RH": [
+      {
+        "triad": "Bm",
+        "notes": [
+          "D4",
+          "F#4",
+          "B4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "B2",
+      "D3",
+      "A2",
+      "F#2"
+    ]
+  },
+  {
+    "measure": 6,
+    "RH": [
+      {
+        "triad": "G",
+        "notes": [
+          "B3",
+          "D4",
+          "G4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "G",
+        "notes": [
+          "B3",
+          "D4",
+          "G4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "G2",
+      "B2",
+      "D3",
+      "G#2"
+    ]
+  },
+  {
+    "measure": 7,
+    "RH": [
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "A2",
+      "C#3",
+      "E3",
+      "C#3"
+    ]
+  },
+  {
+    "measure": 8,
+    "RH": [
+      {
+        "triad": "D",
+        "notes": [
+          "D4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "root position"
+      },
+      {
+        "triad": "D",
+        "notes": [
+          "D4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "root position"
+      }
+    ],
+    "LH": [
+      "D3",
+      "A2",
+      "E3",
+      "F#3"
+    ]
+  },
+  {
+    "measure": 9,
+    "RH": [
+      {
+        "triad": "G",
+        "notes": [
+          "D4",
+          "G4",
+          "B4"
+        ],
+        "RH_position": "second inversion"
+      },
+      {
+        "triad": "G",
+        "notes": [
+          "D4",
+          "G4",
+          "B4"
+        ],
+        "RH_position": "second inversion"
+      }
+    ],
+    "LH": [
+      "G3",
+      "D3",
+      "B2",
+      "F#2"
+    ]
+  },
+  {
+    "measure": 10,
+    "RH": [
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "G2",
+      "A2",
+      "C#3",
+      "E#3"
+    ]
+  },
+  {
+    "measure": 11,
+    "RH": [
+      {
+        "triad": "F#m",
+        "notes": [
+          "C#4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "second inversion"
+      },
+      {
+        "triad": "F#m",
+        "notes": [
+          "C#4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "second inversion"
+      }
+    ],
+    "LH": [
+      "F#3",
+      "C#3",
+      "A2",
+      "A#2"
+    ]
+  },
+  {
+    "measure": 12,
+    "RH": [
+      {
+        "triad": "Bm",
+        "notes": [
+          "D4",
+          "F#4",
+          "B4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "Bm",
+        "notes": [
+          "D4",
+          "F#4",
+          "B4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "B2",
+      "D3",
+      "F#3",
+      "F#2"
+    ]
+  },
+  {
+    "measure": 13,
+    "RH": [
+      {
+        "triad": "G",
+        "notes": [
+          "D4",
+          "G4",
+          "B4"
+        ],
+        "RH_position": "second inversion"
+      },
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "G2",
+      "B2",
+      "A2",
+      "F#2"
+    ]
+  },
+  {
+    "measure": 14,
+    "RH": [
+      {
+        "triad": "G",
+        "notes": [
+          "B3",
+          "D4",
+          "G4"
+        ],
+        "RH_position": "first inversion"
+      },
+      {
+        "triad": "A",
+        "notes": [
+          "C#4",
+          "E4",
+          "A4"
+        ],
+        "RH_position": "first inversion"
+      }
+    ],
+    "LH": [
+      "G2",
+      "B2",
+      "A2",
+      "C#3"
+    ]
+  },
+  {
+    "measure": 15,
+    "RH": [
+      {
+        "triad": "D",
+        "notes": [
+          "D4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "root position"
+      },
+      {
+        "triad": "D",
+        "notes": [
+          "D4",
+          "F#4",
+          "A4"
+        ],
+        "RH_position": "root position"
+      }
+    ],
+    "LH": [
+      "D3"
+    ]
+  }
+]

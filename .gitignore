@@ -38,3 +38,12 @@ out_*.musicxml
 _diag_*.ts
 _test_*.ts
 .claude/launch.json
+
+# ---- reference material in outputs/ ----
+# outputs/ holds external comparison scores (Codex Astra arrangements, the
+# string bowing lab) used as benchmarks, NOT engine output. Each folder also
+# ships a zip and a nested copy of its own contents; those are byte-identical
+# duplicates, so only the canonical files are tracked.
+outputs/**/*.zip
+outputs/string-bowing-lab/string-bowing-lab/
+outputs/test4-strings/test4-string-ensemble/

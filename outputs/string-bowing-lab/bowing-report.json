@@ -1,0 +1,2490 @@
+{
+  "input": "test4-strings-score.musicxml",
+  "tempo_assumption": 76,
+  "policy": {
+    "max_group_beats": 2,
+    "review_seconds": 2.5,
+    "start_direction": "down",
+    "split_repeated_attacks": true
+  },
+  "status": "EDUCATIONAL CANDIDATES \u2014 PLAYER REVIEW REQUIRED",
+  "parts": [
+    {
+      "part_id": "V1",
+      "original_slur_audit": [
+        {
+          "from": "m1:note1",
+          "to": "m1:note5",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m1:note2",
+            "m1:note3"
+          ]
+        },
+        {
+          "from": "m2:note1",
+          "to": "m2:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m2:note2"
+          ]
+        },
+        {
+          "from": "m3:note1",
+          "to": "m3:note5",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m3:note2",
+            "m3:note3"
+          ]
+        },
+        {
+          "from": "m4:note1",
+          "to": "m4:note6",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m4:note5"
+          ]
+        },
+        {
+          "from": "m5:note1",
+          "to": "m5:note6",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m5:note2",
+            "m5:note3",
+            "m5:note4"
+          ]
+        },
+        {
+          "from": "m6:note1",
+          "to": "m6:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m6:note3"
+          ]
+        },
+        {
+          "from": "m7:note1",
+          "to": "m7:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m7:note2"
+          ]
+        },
+        {
+          "from": "m8:note1",
+          "to": "m8:note5",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m8:note2",
+            "m8:note4"
+          ]
+        },
+        {
+          "from": "m9:note1",
+          "to": "m9:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m9:note2",
+            "m9:note3"
+          ]
+        },
+        {
+          "from": "m10:note1",
+          "to": "m10:note2",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m11:note1",
+          "to": "m11:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m11:note3"
+          ]
+        },
+        {
+          "from": "m12:note1",
+          "to": "m12:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m13:note1",
+          "to": "m13:note5",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m13:note2",
+            "m13:note4"
+          ]
+        },
+        {
+          "from": "m14:note1",
+          "to": "m14:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m14:note2"
+          ]
+        }
+      ],
+      "candidate_groups": [
+        {
+          "notes": [
+            "F#5"
+          ],
+          "locations": [
+            "m1:note1"
+          ],
+          "beats": 1.5,
+          "seconds": 1.184,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5"
+          ],
+          "locations": [
+            "m1:note2"
+          ],
+          "beats": 0.5,
+          "seconds": 0.395,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5",
+            "G5",
+            "A5"
+          ],
+          "locations": [
+            "m1:note3",
+            "m1:note4",
+            "m1:note5"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m2:note1"
+          ],
+          "beats": 3.0,
+          "seconds": 2.368,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5",
+            "F#5"
+          ],
+          "locations": [
+            "m2:note2",
+            "m2:note3"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m3:note1"
+          ],
+          "beats": 1.5,
+          "seconds": 1.184,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m3:note2"
+          ],
+          "beats": 0.5,
+          "seconds": 0.395,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5",
+            "F#5",
+            "G5"
+          ],
+          "locations": [
+            "m3:note3",
+            "m3:note4",
+            "m3:note5"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5",
+            "D5",
+            "E5"
+          ],
+          "locations": [
+            "m4:note1",
+            "m4:note2",
+            "m4:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5"
+          ],
+          "locations": [
+            "m4:note4"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5",
+            "D5"
+          ],
+          "locations": [
+            "m4:note5",
+            "m4:note6"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m5:note1"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m5:note2"
+          ],
+          "beats": 0.5,
+          "seconds": 0.395,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m5:note3"
+          ],
+          "beats": 0.5,
+          "seconds": 0.395,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5",
+            "E5",
+            "F#5"
+          ],
+          "locations": [
+            "m5:note4",
+            "m5:note5",
+            "m5:note6"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m6:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m6:note2"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m6:note3"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m7:note1"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5",
+            "E5"
+          ],
+          "locations": [
+            "m7:note2",
+            "m7:note3"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#5"
+          ],
+          "locations": [
+            "m7:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m8:note1"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5",
+            "E5"
+          ],
+          "locations": [
+            "m8:note2",
+            "m8:note3"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5",
+            "F#5"
+          ],
+          "locations": [
+            "m8:note4",
+            "m8:note5"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m9:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m9:note2"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m9:note3"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m10:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A5"
+          ],
+          "locations": [
+            "m10:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#5"
+          ],
+          "locations": [
+            "m11:note1"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m11:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m11:note3"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5",
+            "D5",
+            "E5"
+          ],
+          "locations": [
+            "m12:note1",
+            "m12:note2",
+            "m12:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5"
+          ],
+          "locations": [
+            "m12:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m13:note1"
+          ],
+          "beats": 1.5,
+          "seconds": 1.184,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5",
+            "C#5"
+          ],
+          "locations": [
+            "m13:note2",
+            "m13:note3"
+          ],
+          "beats": 1.5,
+          "seconds": 1.184,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#5",
+            "E5"
+          ],
+          "locations": [
+            "m13:note4",
+            "m13:note5"
+          ],
+          "beats": 1.0,
+          "seconds": 0.789,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m14:note1"
+          ],
+          "beats": 1.5,
+          "seconds": 1.184,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G5"
+          ],
+          "locations": [
+            "m14:note2"
+          ],
+          "beats": 0.5,
+          "seconds": 0.395,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m14:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#5"
+          ],
+          "locations": [
+            "m15:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        }
+      ],
+      "limitations": [
+        "No physical bow model or fingering/string assignment.",
+        "Dynamics, tempo changes and fermata duration are not modeled.",
+        "Direction alternation is an illustrative baseline, not a final prescription."
+      ]
+    },
+    {
+      "part_id": "V2",
+      "original_slur_audit": [
+        {
+          "from": "m1:note1",
+          "to": "m1:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m2:note1",
+          "to": "m2:note2",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m3:note1",
+          "to": "m3:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m4:note1",
+          "to": "m4:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m5:note1",
+          "to": "m5:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m5:note2"
+          ]
+        },
+        {
+          "from": "m6:note1",
+          "to": "m6:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m6:note3"
+          ]
+        },
+        {
+          "from": "m7:note1",
+          "to": "m7:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m7:note2"
+          ]
+        },
+        {
+          "from": "m8:note1",
+          "to": "m8:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m9:note1",
+          "to": "m9:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m10:note1",
+          "to": "m10:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m11:note1",
+          "to": "m11:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m12:note1",
+          "to": "m12:note2",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m13:note1",
+          "to": "m13:note2",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m14:note1",
+          "to": "m14:note2",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        }
+      ],
+      "candidate_groups": [
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m1:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4",
+            "D5"
+          ],
+          "locations": [
+            "m1:note2",
+            "m1:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "B4"
+          ],
+          "locations": [
+            "m2:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m2:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#5"
+          ],
+          "locations": [
+            "m3:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4",
+            "C#5"
+          ],
+          "locations": [
+            "m3:note2",
+            "m3:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4"
+          ],
+          "locations": [
+            "m4:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5",
+            "A4"
+          ],
+          "locations": [
+            "m4:note2",
+            "m4:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4"
+          ],
+          "locations": [
+            "m5:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4",
+            "D5"
+          ],
+          "locations": [
+            "m5:note2",
+            "m5:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "B4",
+            "D5"
+          ],
+          "locations": [
+            "m6:note1",
+            "m6:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m6:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4"
+          ],
+          "locations": [
+            "m7:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4",
+            "G4"
+          ],
+          "locations": [
+            "m7:note2",
+            "m7:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4"
+          ],
+          "locations": [
+            "m8:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "B4",
+            "D5"
+          ],
+          "locations": [
+            "m8:note2",
+            "m8:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5",
+            "B4"
+          ],
+          "locations": [
+            "m9:note1",
+            "m9:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m9:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#5",
+            "B4",
+            "C#5"
+          ],
+          "locations": [
+            "m10:note1",
+            "m10:note2",
+            "m10:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E5"
+          ],
+          "locations": [
+            "m10:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4",
+            "C#5"
+          ],
+          "locations": [
+            "m11:note1",
+            "m11:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4",
+            "C#5"
+          ],
+          "locations": [
+            "m11:note3",
+            "m11:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4"
+          ],
+          "locations": [
+            "m12:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m12:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m13:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A4"
+          ],
+          "locations": [
+            "m13:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m14:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#5"
+          ],
+          "locations": [
+            "m14:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D5"
+          ],
+          "locations": [
+            "m15:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        }
+      ],
+      "limitations": [
+        "No physical bow model or fingering/string assignment.",
+        "Dynamics, tempo changes and fermata duration are not modeled.",
+        "Direction alternation is an illustrative baseline, not a final prescription."
+      ]
+    },
+    {
+      "part_id": "VA",
+      "original_slur_audit": [
+        {
+          "from": "m1:note1",
+          "to": "m1:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m2:note1",
+          "to": "m2:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m3:note1",
+          "to": "m3:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m4:note1",
+          "to": "m4:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m5:note1",
+          "to": "m5:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m6:note1",
+          "to": "m6:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m7:note1",
+          "to": "m7:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m8:note1",
+          "to": "m8:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m9:note1",
+          "to": "m9:note5",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m10:note1",
+          "to": "m10:note3",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": [
+            "m10:note2"
+          ]
+        },
+        {
+          "from": "m11:note1",
+          "to": "m11:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m12:note1",
+          "to": "m12:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m13:note1",
+          "to": "m13:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        },
+        {
+          "from": "m14:note1",
+          "to": "m14:note4",
+          "seconds": 3.158,
+          "review_duration": true,
+          "repeated_attacks_under_slur": []
+        }
+      ],
+      "candidate_groups": [
+        {
+          "notes": [
+            "A3",
+            "D4"
+          ],
+          "locations": [
+            "m1:note1",
+            "m1:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "D4"
+          ],
+          "locations": [
+            "m1:note3",
+            "m1:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G3",
+            "D4"
+          ],
+          "locations": [
+            "m2:note1",
+            "m2:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G4",
+            "D4"
+          ],
+          "locations": [
+            "m2:note3",
+            "m2:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A3",
+            "E4"
+          ],
+          "locations": [
+            "m3:note1",
+            "m3:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A3",
+            "E4"
+          ],
+          "locations": [
+            "m3:note3",
+            "m3:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "D4"
+          ],
+          "locations": [
+            "m4:note1",
+            "m4:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A3",
+            "E4"
+          ],
+          "locations": [
+            "m4:note3",
+            "m4:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "D4"
+          ],
+          "locations": [
+            "m5:note1",
+            "m5:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E4",
+            "D4"
+          ],
+          "locations": [
+            "m5:note3",
+            "m5:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G3",
+            "B3"
+          ],
+          "locations": [
+            "m6:note1",
+            "m6:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D4",
+            "G4"
+          ],
+          "locations": [
+            "m6:note3",
+            "m6:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E4",
+            "D4"
+          ],
+          "locations": [
+            "m7:note1",
+            "m7:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E4"
+          ],
+          "locations": [
+            "m7:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "D4"
+          ],
+          "locations": [
+            "m8:note1",
+            "m8:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A3",
+            "D4"
+          ],
+          "locations": [
+            "m8:note3",
+            "m8:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G4",
+            "D4",
+            "B3"
+          ],
+          "locations": [
+            "m9:note1",
+            "m9:note2",
+            "m9:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G3",
+            "D4"
+          ],
+          "locations": [
+            "m9:note4",
+            "m9:note5"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G4"
+          ],
+          "locations": [
+            "m10:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G4",
+            "E4"
+          ],
+          "locations": [
+            "m10:note2",
+            "m10:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "E4"
+          ],
+          "locations": [
+            "m11:note1",
+            "m11:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "E4"
+          ],
+          "locations": [
+            "m11:note3",
+            "m11:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#4",
+            "D4"
+          ],
+          "locations": [
+            "m12:note1",
+            "m12:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A3",
+            "D4"
+          ],
+          "locations": [
+            "m12:note3",
+            "m12:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "B3",
+            "D4"
+          ],
+          "locations": [
+            "m13:note1",
+            "m13:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "E4",
+            "G4"
+          ],
+          "locations": [
+            "m13:note3",
+            "m13:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "B3",
+            "D4"
+          ],
+          "locations": [
+            "m14:note1",
+            "m14:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G4",
+            "E4"
+          ],
+          "locations": [
+            "m14:note3",
+            "m14:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A3"
+          ],
+          "locations": [
+            "m15:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        }
+      ],
+      "limitations": [
+        "No physical bow model or fingering/string assignment.",
+        "Dynamics, tempo changes and fermata duration are not modeled.",
+        "Direction alternation is an illustrative baseline, not a final prescription."
+      ]
+    },
+    {
+      "part_id": "VC",
+      "original_slur_audit": [],
+      "candidate_groups": [
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m1:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2",
+            "D3"
+          ],
+          "locations": [
+            "m1:note2",
+            "m1:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m2:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2",
+            "B2"
+          ],
+          "locations": [
+            "m2:note2",
+            "m2:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m3:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m3:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m4:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2",
+            "C#3"
+          ],
+          "locations": [
+            "m4:note2",
+            "m4:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "B2"
+          ],
+          "locations": [
+            "m5:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m5:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m6:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m6:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m7:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E3",
+            "A2"
+          ],
+          "locations": [
+            "m7:note2",
+            "m7:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m8:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E3",
+            "F#3"
+          ],
+          "locations": [
+            "m8:note2",
+            "m8:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2",
+            "B2"
+          ],
+          "locations": [
+            "m9:note1",
+            "m9:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3",
+            "G3"
+          ],
+          "locations": [
+            "m9:note3",
+            "m9:note4"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m10:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E3",
+            "A2"
+          ],
+          "locations": [
+            "m10:note2",
+            "m10:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#3"
+          ],
+          "locations": [
+            "m11:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "C#3",
+            "F#3"
+          ],
+          "locations": [
+            "m11:note2",
+            "m11:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "B2"
+          ],
+          "locations": [
+            "m12:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "F#3",
+            "D3"
+          ],
+          "locations": [
+            "m12:note2",
+            "m12:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m13:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m13:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m14:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m14:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m15:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        }
+      ],
+      "limitations": [
+        "No physical bow model or fingering/string assignment.",
+        "Dynamics, tempo changes and fermata duration are not modeled.",
+        "Direction alternation is an illustrative baseline, not a final prescription."
+      ]
+    },
+    {
+      "part_id": "CB",
+      "original_slur_audit": [],
+      "candidate_groups": [
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m1:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m2:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m3:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m4:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "B2"
+          ],
+          "locations": [
+            "m5:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m5:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m6:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m6:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m7:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m8:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "E3",
+            "F#3"
+          ],
+          "locations": [
+            "m8:note2",
+            "m8:note3"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": true,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m9:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "G3"
+          ],
+          "locations": [
+            "m10:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "F#3"
+          ],
+          "locations": [
+            "m11:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "B2"
+          ],
+          "locations": [
+            "m12:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m13:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m13:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "G2"
+          ],
+          "locations": [
+            "m14:note1"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "A2"
+          ],
+          "locations": [
+            "m14:note2"
+          ],
+          "beats": 2.0,
+          "seconds": 1.579,
+          "candidate_direction": "down",
+          "candidate_slur": false,
+          "review": []
+        },
+        {
+          "notes": [
+            "D3"
+          ],
+          "locations": [
+            "m15:note1"
+          ],
+          "beats": 4.0,
+          "seconds": 3.158,
+          "candidate_direction": "up",
+          "candidate_slur": false,
+          "review": [
+            "Review bow distribution; threshold is editorial, not a physical limit."
+          ]
+        }
+      ],
+      "limitations": [
+        "No physical bow model or fingering/string assignment.",
+        "Dynamics, tempo changes and fermata duration are not modeled.",
+        "Direction alternation is an illustrative baseline, not a final prescription."
+      ]
+    }
+  ]
+}
