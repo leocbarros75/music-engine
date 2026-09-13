@@ -168,8 +168,26 @@ function mod(n: number, m: number) {
   return ((n % m) + m) % m;
 }
 
-function transposeKeyFifths(concertFifths: number, semitoneShift: number): number {
+/**
+ * The key signature a transposing instrument reads for a given concert key.
+ *
+ * Fewest accidentals wins, which is why a B flat clarinet reads concert B major
+ * in D flat (5 flats) rather than C sharp (7 sharps).
+ *
+ * Six of one is the interesting case: F sharp major and G flat major are the
+ * same key and both carry six accidentals, so the count cannot separate them.
+ * The loop used to settle it by running upward from -7 and keeping the first
+ * match, which meant flats always won — a clarinet in concert E major was
+ * written in G flat, where every player and publisher writes F sharp. A tie
+ * follows the concert key instead: sharps stay sharp, flats stay flat.
+ */
+export function transposeKeyFifths(concertFifths: number, semitoneShift: number): number {
   const targetPc = mod(7 * concertFifths + semitoneShift, 12);
+
+  // Concert C is the only key with no direction of its own, and it can only tie
+  // under a tritone transposition, which no orchestral instrument uses. Sharps
+  // are the conventional default there.
+  const preferSharp = concertFifths >= 0;
 
   let best = 0;
   let bestAbs = 999;
@@ -178,7 +196,7 @@ function transposeKeyFifths(concertFifths: number, semitoneShift: number): numbe
     const pc = mod(7 * f, 12);
     if (pc !== targetPc) continue;
     const abs = Math.abs(f);
-    if (abs < bestAbs) {
+    if (abs < bestAbs || (abs === bestAbs && (preferSharp ? f > best : f < best))) {
       best = f;
       bestAbs = abs;
     }
@@ -353,11 +371,36 @@ function normalizePitchForKey(p: Pitch, keyFifths: number): Pitch {
     0: { step: "B", alter: 1 }
   };
 
+  /*
+   * Two of these respellings cross the octave boundary, because octave numbers
+   * change at C, not at the start of the alphabet.
+   *
+   *   B4 respelt in a flat key is C flat FIVE — C flat sits above its B.
+   *   C4 respelt in a sharp key is B sharp THREE — B sharp sits below its C.
+   *
+   * Keeping the octave turned each of those into the wrong pitch by a full
+   * octave: B4 came out as C flat 4, which sounds a B3. Every other respelling
+   * here stays inside its octave (E4 to F flat 4 is the same pitch), which is
+   * why this only ever bit the extreme keys.
+   */
+  const octaveShiftFor = (step: string, alter: number): number => {
+    if (step === "C" && alter === -1) return 1;
+    if (step === "B" && alter === 1) return -1;
+    return 0;
+  };
+
+  const respell = (mapped: { step: string; alter: number }): Pitch => ({
+    ...p,
+    step: mapped.step,
+    alter: mapped.alter,
+    octave: p.octave + octaveShiftFor(mapped.step, mapped.alter)
+  });
+
   if (keyFifths < 0) {
     const idx = Math.min(Math.abs(keyFifths), 7);
     if (flatTargets[idx]?.includes(pc)) {
       const mapped = flatsByPc[pc];
-      if (mapped) return { ...p, step: mapped.step, alter: mapped.alter };
+      if (mapped) return respell(mapped);
     }
     return p;
   }
@@ -366,7 +409,7 @@ function normalizePitchForKey(p: Pitch, keyFifths: number): Pitch {
     const idx = Math.min(Math.abs(keyFifths), 7);
     if (sharpTargets[idx]?.includes(pc)) {
       const mapped = sharpsByPc[pc];
-      if (mapped) return { ...p, step: mapped.step, alter: mapped.alter };
+      if (mapped) return respell(mapped);
     }
     return p;
   }

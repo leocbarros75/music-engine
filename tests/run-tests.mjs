@@ -65,7 +65,8 @@ async function main() {
       'tests/musicxml/choralRulesUnitTest_doubling_resolution.ts',
       'tests/musicxml/multiMeasureRest.test.ts',
       'tests/musicxml/tempoRounding.test.ts',
-      'tests/musicxml/tiedChordDuration.test.ts']) add(file, file);
+      'tests/musicxml/tiedChordDuration.test.ts',
+      'tests/musicxml/transposedKeySpelling.test.ts']) add(file, file);
   }
   if (group === 'all' || group === 'harmony') {
     for (const file of Object.keys(EXPECTATIONS_BY_BASENAME).sort()) {
