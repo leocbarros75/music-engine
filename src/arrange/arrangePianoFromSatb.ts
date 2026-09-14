@@ -24,6 +24,13 @@ type ArrangePianoOptions = {
    *  rebuilding it in root position, so common tones are held and fingers move less.
    *  Every other piano ensemble leaves this off and is byte-identical. */
   voiceLedVoicing?: boolean;
+  /**
+   * Let the hands take turns carrying motion instead of thinning and thickening
+   * together: the left hand flows while the voice moves, the right hand answers
+   * while it holds. Off by default — plain piano, grand_piano and acoustic_piano
+   * keep the existing both-hands-at-once response.
+   */
+  handRoleTrading?: boolean;
   worshipChordPad?: boolean;
   tempoBpm?: number;
   pianoStylePreset?: string;
@@ -2837,10 +2844,33 @@ function buildPianoMelodyAccomp(
 
       // Schoenberg override: simplify only when pattern was NOT explicitly chosen by the user.
       // When forcePattern is true, the user's selection is always honoured verbatim.
+      //
+      // ── The hands take turns, rather than moving together ────────────────
+      // Thinning BOTH hands under a busy melody and enriching BOTH under a held
+      // one is the right instinct applied twice: measured against a hand-written
+      // reference arrangement of the same source, ours swung between 18 attacks
+      // in a bar and 8, where the reference held a near-steady 9 or 10 and
+      // changed what the hands were doing instead.
+      //
+      //   voice moving   ->  left hand carries the motion, right hand sustains
+      //   voice holding  ->  right hand answers, left hand steps back
+      //
+      // Rapid harmonic change does NOT suppress the trade. Schoenberg's point is
+      // that the accompaniment should not add competing figuration; a left hand
+      // arpeggiating the two chords of the bar is spelling that harmony, not
+      // competing with it. Guarding on it here disabled the trade in precisely
+      // the bars that needed it — on this source, most moving-melody bars carry
+      // two chords, and the left hand stepped back in 20 of 21 measures.
+      const tradeHands = options.handRoleTrading === true && !forcePattern;
+
       const activeLhPattern: LhPatternId =
-        (!forcePattern && simplify && !isWaltzFamily) ? "block_beats" : lhPattern;
+        tradeHands
+          ? (isOrnateMelody || isWaltzFamily ? lhPattern : "block_beats")
+          : ((!forcePattern && simplify && !isWaltzFamily) ? "block_beats" : lhPattern);
       const activeRhPattern: RhPatternId =
-        (!forcePattern && simplify) ? "block_beats" : rhPattern;
+        tradeHands
+          ? (isOrnateMelody ? "block_beats" : rhPattern)
+          : ((!forcePattern && simplify) ? "block_beats" : rhPattern);
 
       // Staff 1 (treble) — RH pattern (chords, arpeggios, inner-voice, etc.)
       // For melody_only the RH is handled below via melody note copy.

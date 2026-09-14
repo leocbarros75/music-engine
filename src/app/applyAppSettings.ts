@@ -2511,6 +2511,8 @@ export function applyAppSettings(
       // Voice-led chord voicings are piano_with_melody only; plain piano,
       // grand_piano and acoustic_piano keep the root-position voicer unchanged.
       voiceLedVoicing: wantsPianoWithMelody,
+      // Same scope as the voice-led voicings: piano_with_melody only.
+      handRoleTrading: wantsPianoWithMelody,
     });
     attachTextureAnalysis(finalScore, warnings);
     return {

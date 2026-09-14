@@ -57,7 +57,8 @@ async function main() {
       'tests/arrange/stringRegister.test.ts',
       'tests/arrange/innerVoiceMotion.test.ts',
       'tests/arrange/bowing.test.ts',
-      'tests/arrange/altoUnderMelody.test.ts'
+      'tests/arrange/altoUnderMelody.test.ts',
+      'tests/arrange/handRoleTrading.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {
