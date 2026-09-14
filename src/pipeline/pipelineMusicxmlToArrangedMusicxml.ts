@@ -1,5 +1,6 @@
 import { inspectPhrases, validatePhrasePlan, applyPhrasePlan } from "../ai/phrasePlan";
 import { synchronizePerformance } from "../exporters/synchronizePerformance";
+import { auditNoteConservation, TRANSCRIPTION_ENSEMBLES, type ConservationReport } from "../preservation/noteConservation";
 import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
 import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
@@ -37,6 +38,8 @@ export type PipelineResult = {
     title?: string;
     phraseCollaboration?: { status: string; phraseCount: number; sourceFingerprint: string; plan: unknown };
     preservation?: PreservationReport;
+    /** Note-level audit; present only for the transcription ensembles. */
+    noteConservation?: ConservationReport;
     performance?: { status: string; reason?: string; durationSeconds?: number; warnings?: string[] };
   };
 };
@@ -329,6 +332,31 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ? appResult.cadenceMeasures
       : [];
 
+    // ── Did every note reach the page? ──────────────────────────────────────
+    // Only for the modes that re-instrument an existing score. The rest arrange
+    // from harmony — a complementary string cushion is not supposed to contain
+    // the piano's every note, and measuring it against that invariant would
+    // report a fault where there is none.
+    let noteConservation: ConservationReport | undefined;
+    if (TRANSCRIPTION_ENSEMBLES.has(ensembleRaw)) {
+      try {
+        noteConservation = auditNoteConservation(musicxml, outputXml);
+        if (noteConservation.lost > 0) {
+          const pct = Math.round((1000 * noteConservation.lost) / noteConservation.sourceSegments) / 10;
+          const where = noteConservation.examples
+            .slice(0, 3)
+            .map((e) => `m${e.measure} beat ${Math.round(e.beat * 100) / 100}`)
+            .join(", ");
+          warnings.push(
+            `[transcription] ${noteConservation.lost} of ${noteConservation.sourceSegments} source notes ` +
+            `(${pct}%) have no destination in the arrangement` + (where ? `; first at ${where}` : "") + "."
+          );
+        }
+      } catch {
+        // An audit that cannot run must never take the arrangement down with it.
+      }
+    }
+
     // Collect output parts list (useful for orchestra / large ensembles)
     const outputParts: Array<{ name: string; instrument: string }> = (scoreModelOut.parts ?? []).map(
       (p: any) => ({ name: String(p?.name ?? ""), instrument: String(p?.instrument ?? p?.name ?? "") })
@@ -343,6 +371,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
       meta: {
         phraseCollaboration: phrasePlan ? { status: "applied", phraseCount: phrasePlan.phrases.length, sourceFingerprint: phrasePlan.sourceFingerprint, plan: phrasePlan } : undefined,
         preservation,
+        noteConservation,
         performance: synchronized.report,
         ensemble: ensembleRaw,
         styleUsed: appResult.styleUsed,

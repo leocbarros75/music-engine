@@ -13,7 +13,7 @@
     "web": "npm --prefix apps/web run dev",
     "web:install": "npm --prefix apps/web install",
     "test:score": "node --import tsx tests/score/scoreStandard.test.ts",
-    "test:preservation": "node --import tsx tests/preservation/sourcePreservation.test.ts && node --import tsx tests/preservation/serverPreservation.test.ts",
+    "test:preservation": "node --import tsx tests/preservation/sourcePreservation.test.ts && node --import tsx tests/preservation/serverPreservation.test.ts && node --import tsx tests/preservation/noteConservation.test.ts",
     "test:performance": "node --import tsx tests/performance/performance.test.ts",
     "test": "node --import tsx tests/run-tests.mjs",
     "test:arrange": "node --import tsx tests/run-tests.mjs arrange",
