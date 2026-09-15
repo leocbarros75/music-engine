@@ -1019,7 +1019,16 @@ export type RhPatternId =
    *   similar pop ballad piano accompaniments.
    *   In 4/4: 2 groups; in 3/4: 1 group (2 beats) + 1 quarter (beat 3).
    */
-  | "dotted_ballad";
+  | "dotted_ballad"
+  /**
+   * One chord per harmony, held for as long as that harmony lasts.
+   *
+   * The counterpart to block_beats: where that re-strikes on every beat, this
+   * lets go. It is what the right hand does while the left carries the motion —
+   * a sustained cushion under a moving voice, not four chords a bar competing
+   * with it. Two attacks in a bar of two chords, one in a bar of one.
+   */
+  | "sustained";
 
 export type RhPatternOptions = {
   chords: Array<{ measure: number; t: number; symbol: string }>;
@@ -1044,6 +1053,47 @@ export type RhPatternOptions = {
  * Root+3rd+5th chord block on every beat as quarter notes.
  * Voice 1, Staff 1. Root placed in treble range (default C4–C5).
  */
+/**
+ * RH SUSTAINED — one chord per harmony, held for the harmony's full span.
+ *
+ * Chord boundaries come from the chord list rather than the beat grid, so a bar
+ * of one harmony is a single held chord and a bar of two is two halves. The
+ * exporter ties a span that no single note value covers, so an odd harmonic
+ * rhythm still notates correctly.
+ */
+function buildRhSustained(
+  getVoices: (t: number) => ChordVoices | null,
+  chords: Array<{ measure: number; t: number; symbol: string }>,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V = 1, S = 1;
+  const onsets = Array.from(
+    new Set(
+      chords
+        .filter((c) => Number(c.measure) === mNum)
+        .map((c) => Number(c.t))
+        .filter((t) => Number.isFinite(t) && t >= 0 && t < measureBeats)
+    )
+  ).sort((a, b) => a - b);
+  // The bar always opens with whatever harmony is sounding, named here or held
+  // over from the bar before.
+  if (!onsets.length || onsets[0]! > 0) onsets.unshift(0);
+
+  for (let i = 0; i < onsets.length; i++) {
+    const t = onsets[i]!;
+    const dur = (i + 1 < onsets.length ? onsets[i + 1]! : measureBeats) - t;
+    if (dur <= 0) continue;
+    const v = getVoices(t);
+    if (!v) continue;
+    events.push(makeNote(v.bass, t, dur, V, S, `rh-sus-${mNum}-${t}-r`));
+    events.push(makeNote(v.mid,  t, dur, V, S, `rh-sus-${mNum}-${t}-m`));
+    events.push(makeNote(v.high, t, dur, V, S, `rh-sus-${mNum}-${t}-h`));
+  }
+  return events;
+}
+
 function buildRhBlockBeats(
   getVoices: (t: number) => ChordVoices | null,
   measureBeats: number,
@@ -1284,6 +1334,8 @@ export function generateRhPattern(options: RhPatternOptions): NoteEvent[] {
   switch (rhPattern) {
     case "block_beats":
       return buildRhBlockBeats(getRhVoices, measureBeats, measureNumber);
+    case "sustained":
+      return buildRhSustained(getRhVoices, chords, measureBeats, measureNumber);
     case "melody_inner_voice":
       return buildRhMelodyInnerVoice(getRhVoices, measureBeats, measureNumber);
     case "melody_fill_eighths":

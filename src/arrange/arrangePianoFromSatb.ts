@@ -2869,7 +2869,11 @@ function buildPianoMelodyAccomp(
           : ((!forcePattern && simplify && !isWaltzFamily) ? "block_beats" : lhPattern);
       const activeRhPattern: RhPatternId =
         tradeHands
-          ? (isOrnateMelody ? "block_beats" : rhPattern)
+          // "Sustains" has to mean it. Falling back to block_beats still struck
+          // a chord on every beat, which is why the traded texture came out at
+          // 424 notes against a reference arrangement's 257 on the same source:
+          // the hands were taking turns, but the resting hand never rested.
+          ? (isOrnateMelody ? "sustained" : rhPattern)
           : ((!forcePattern && simplify) ? "block_beats" : rhPattern);
 
       // Staff 1 (treble) — RH pattern (chords, arpeggios, inner-voice, etc.)
