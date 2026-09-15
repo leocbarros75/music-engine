@@ -2411,6 +2411,7 @@ export function applyAppSettings(
       "serenade_strum", "root_chord_stabs", "interval_oscillation",
       "jazz_shell", "octave_bass", "nocturne",
       "pop_arpeggio", "wide_arpeggio", "walking_bass", "pedal_bass", "spec_bass",
+      "quarter_arpeggio",
     ]);
     const explicitPattern = settings.lhPattern && settings.lhPattern !== "auto"
       ? (VALID_LH_PATTERNS.has(settings.lhPattern as LhPatternId) ? settings.lhPattern as LhPatternId : null)

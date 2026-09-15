@@ -2865,7 +2865,9 @@ function buildPianoMelodyAccomp(
 
       const activeLhPattern: LhPatternId =
         tradeHands
-          ? (isOrnateMelody || isWaltzFamily ? lhPattern : "block_beats")
+          // Stepping back means single notes, not a triad on every beat: four
+          // block chords under an answering right hand is not standing aside.
+          ? (isOrnateMelody || isWaltzFamily ? lhPattern : "quarter_arpeggio")
           : ((!forcePattern && simplify && !isWaltzFamily) ? "block_beats" : lhPattern);
       const activeRhPattern: RhPatternId =
         tradeHands
@@ -2873,7 +2875,10 @@ function buildPianoMelodyAccomp(
           // a chord on every beat, which is why the traded texture came out at
           // 424 notes against a reference arrangement's 257 on the same source:
           // the hands were taking turns, but the resting hand never rested.
-          ? (isOrnateMelody ? "sustained" : rhPattern)
+          // Hold while the voice moves; reply in the space when it stops. The
+          // auto-selected pattern runs eighths straight through the bar, which
+          // answers nothing — it just keeps playing.
+          ? (isOrnateMelody ? "sustained" : "answer")
           : ((!forcePattern && simplify) ? "block_beats" : rhPattern);
 
       // Staff 1 (treble) — RH pattern (chords, arpeggios, inner-voice, etc.)

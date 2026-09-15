@@ -103,6 +103,14 @@ export type LhPatternId =
    *   toward the next measure's chord root. Creates the melodic "walking" feel
    *   characteristic of pop ballad and gospel bass lines.
    */
+  /**
+   * One chord tone per beat, single notes — the left hand stepping back.
+   *
+   * block_beats stacks the whole triad on every beat, which is four chords a
+   * bar however quiet the moment is meant to be. When the right hand is
+   * answering, the left needs to be present without being three voices thick.
+   */
+  | "quarter_arpeggio"
   | "walking_bass"
   /**
    * Pedal tone (sustained root) — Ron Drotos Lesson 13 / Elton John style:
@@ -284,6 +292,30 @@ function buildAlberti(
  * Root+3rd+5th block chord on every beat as quarter notes.
  * All three notes share the same voice; the exporter renders them as a chord.
  */
+/**
+ * LH QUARTER ARPEGGIO — one chord tone a beat, as single notes.
+ *
+ * Bass, middle, top, middle: an arch that spells the harmony and keeps the
+ * beat without occupying the texture. Twelve noteheads in a bar of block
+ * chords become four.
+ */
+function buildQuarterArpeggio(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  voice: number,
+  staff: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  for (let b = 0; b < Math.round(measureBeats); b++) {
+    const v = getVoices(b);
+    if (!v) continue;
+    const arch = [v.bass, v.mid, v.high, v.mid];
+    events.push(makeNote(arch[b % arch.length]!, b, 1, voice, staff, `lh-qarp-${mNum}-${b}`));
+  }
+  return events;
+}
+
 function buildBlockBeats(
   getVoices: (t: number) => ChordVoices | null,
   measureBeats: number,
@@ -908,6 +940,9 @@ export function generateLhPattern(options: LhPatternOptions): NoteEvent[] {
     case "block_beats":
       return buildBlockBeats(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
 
+    case "quarter_arpeggio":
+      return buildQuarterArpeggio(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
+
     case "boom_chick":
       return buildBoomChick(getVoices, measureBeats, LH_VOICE, LH_STAFF, measureNumber);
 
@@ -1028,7 +1063,17 @@ export type RhPatternId =
    * a sustained cushion under a moving voice, not four chords a bar competing
    * with it. Two attacks in a bar of two chords, one in a bar of one.
    */
-  | "sustained";
+  | "sustained"
+  /**
+   * Hold, then reply: the chord for the first half of the bar, a short figure
+   * through its own tones for the second.
+   *
+   * What the right hand does in the space a singer leaves. Continuous eighths
+   * across the whole bar are not an answer, they are another accompaniment
+   * pattern competing for the same air — five attacks where a reference
+   * arrangement of the same music plays five, against the eight we had.
+   */
+  | "answer";
 
 export type RhPatternOptions = {
   chords: Array<{ measure: number; t: number; symbol: string }>;
@@ -1061,6 +1106,47 @@ export type RhPatternOptions = {
  * exporter ties a span that no single note value covers, so an odd harmonic
  * rhythm still notates correctly.
  */
+/**
+ * RH ANSWER — a held chord, then a brief reply in the space after it.
+ *
+ * The bar splits at its midpoint: the chord is held through the first half
+ * while the voice finishes its phrase, then the hand answers with eighths
+ * through the chord's own tones. The figure is a small arch (mid, high, mid,
+ * low) rather than a scale — a reply, not a second melody.
+ */
+function buildRhAnswer(
+  getVoices: (t: number) => ChordVoices | null,
+  measureBeats: number,
+  mNum: number
+): NoteEvent[] {
+  const events: NoteEvent[] = [];
+  const V = 1, S = 1;
+  const half = measureBeats / 2;
+
+  const held = getVoices(0);
+  if (held) {
+    events.push(makeNote(held.bass, 0, half, V, S, `rh-ans-${mNum}-hold-r`));
+    events.push(makeNote(held.mid,  0, half, V, S, `rh-ans-${mNum}-hold-m`));
+    events.push(makeNote(held.high, 0, half, V, S, `rh-ans-${mNum}-hold-h`));
+  }
+
+  // Eighths for the rest of the bar, on whatever harmony is sounding there.
+  const step = 0.5;
+  const shape = (v: ChordVoices) => [v.mid, v.high, v.mid, v.bass];
+  let t = half;
+  let i = 0;
+  while (t < measureBeats - 1e-9) {
+    const v = getVoices(t);
+    if (!v) break;
+    const dur = Math.min(step, measureBeats - t);
+    const pitches = shape(v);
+    events.push(makeNote(pitches[i % pitches.length]!, t, dur, V, S, `rh-ans-${mNum}-${t}`));
+    t += dur;
+    i++;
+  }
+  return events;
+}
+
 function buildRhSustained(
   getVoices: (t: number) => ChordVoices | null,
   chords: Array<{ measure: number; t: number; symbol: string }>,
@@ -1336,6 +1422,8 @@ export function generateRhPattern(options: RhPatternOptions): NoteEvent[] {
       return buildRhBlockBeats(getRhVoices, measureBeats, measureNumber);
     case "sustained":
       return buildRhSustained(getRhVoices, chords, measureBeats, measureNumber);
+    case "answer":
+      return buildRhAnswer(getRhVoices, measureBeats, measureNumber);
     case "melody_inner_voice":
       return buildRhMelodyInnerVoice(getRhVoices, measureBeats, measureNumber);
     case "melody_fill_eighths":
