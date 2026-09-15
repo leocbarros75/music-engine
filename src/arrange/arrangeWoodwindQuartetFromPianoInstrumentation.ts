@@ -188,6 +188,37 @@ function pushMappedNote(
   });
 }
 
+/**
+ * Clip each note in a voice where the next one begins.
+ *
+ * A wind plays one note at a time, and this path hands each of them a line
+ * drawn from a keyboard texture that does not respect that. Bar 112 of the
+ * reference gives the flute a four-beat pedal C AND the fourteen sixteenths
+ * that decorate it, in one voice. MusicXML cannot write two notes at once on a
+ * single staff line, so the exporter keeps the pedal and the whole figure
+ * vanishes — silently, and with the bar still looking full.
+ *
+ * Clipping is the right resolution rather than dropping either: a player
+ * covering both a held tone and a figure releases the held tone to speak the
+ * figure, which is what this writes. Onsets and pitches are untouched; only a
+ * note that was overrunning the next gets shortened.
+ */
+function clipOverlaps(events: EventLike[]): void {
+  const notes = events
+    .filter((e: any) => e?.type === "note" && Number.isFinite(Number(e?.t)))
+    .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+  for (let i = 0; i < notes.length; i++) {
+    const cur: any = notes[i];
+    let next = i + 1;
+    // Chord members share an onset; the clip is against the next onset, not a
+    // sibling that starts at the same moment.
+    while (next < notes.length && Math.abs(Number(notes[next]!.t) - Number(cur.t)) < 1e-9) next++;
+    if (next >= notes.length) continue;
+    const room = Number(notes[next]!.t) - Number(cur.t);
+    if (Number(cur.dur) > room + 1e-9) cur.dur = room;
+  }
+}
+
 function selectNotesForOnset(events: EventLike[]): Array<{ ev: EventLike; midi: number }> {
   return events
     .map((ev) => {
@@ -335,11 +366,15 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
     // on every RH onset (when fewer than 3 RH notes, the nearest note is reused
     // so each upper voice still sounds). Flute lifts to its bright register;
     // Oboe/Clarinet are octave-placed into their sweet spots.
+    //
+    // The note is written at its own onset, not at the 1/64 key it was grouped
+    // under: rounding a triplet's 2/3 of a beat onto that grid moves it, and a
+    // moved note is a note the source no longer has.
     for (const k of Array.from(rhByOnset.keys()).sort()) {
-      const onset = Number(k);
       const sel = selectNotesForOnset(rhByOnset.get(k) ?? []); // ascending by midi
       if (!sel.length) continue;
       const n = sel.length;
+      const onset = Number(sel[n - 1]!.ev?.t);
       const topEv = sel[n - 1]!;                 // highest → Flute
       const midEv = n >= 2 ? sel[n - 2]! : sel[n - 1]!; // 2nd  → Oboe
       const botEv = n >= 3 ? sel[n - 3]! : (n >= 2 ? sel[n - 2]! : sel[n - 1]!); // 3rd → Clarinet
@@ -350,12 +385,15 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
 
     // ── LH bass → Bassoon ──────────────────────────────────────────────────
     for (const k of Array.from(lhByOnset.keys()).sort()) {
-      const onset = Number(k);
       const sel = selectNotesForOnset(lhByOnset.get(k) ?? []);
       if (!sel.length) continue;
       const bottom = sel[0]!;
-      pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn") }, "bassoon", "bn", ++seq, { t: onset });
+      pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn") }, "bassoon", "bn", ++seq, { t: Number(bottom.ev?.t) });
     }
+
+    // One wind, one note at a time: release a held tone where the next attack
+    // falls, rather than letting the export choose between them.
+    for (const d of voiceDefs) clipOverlaps(d.part.measures[mi].events as any[]);
 
     for (const d of voiceDefs) (d.part.measures[mi].events as any[]).sort(measureEventSort);
   }
