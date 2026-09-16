@@ -230,6 +230,222 @@ function durToType(divisions: number, dur: number): string | null {
 }
 
 /**
+ * A duration as something a player can read: a note value, a dot, and — when
+ * the value is a tuplet — the ratio that makes it one.
+ *
+ * Three notes in the time of two has no plain note value: a triplet quarter is
+ * two thirds of a quarter, which is not a whole number of anything. MusicXML
+ * writes it as the QUARTER it looks like, with a <time-modification> saying
+ * three are played where two are written. Without that ratio the exporter had
+ * no way to spell 2/3 of a beat at all, and every triplet in a source came out
+ * snapped to a dotted eighth — which then pushed every note after it in the
+ * bar off its beat.
+ *
+ * The ratio is derived rather than looked up in a table of the usual ones.
+ * Triplets are the common case, but this reference score writes five notes in
+ * the time of seven eighths — a 5:7 the source declares outright — and a
+ * hardcoded list of "the tuplets people use" would have silently mangled it
+ * the way the old code mangled every triplet. For each note value the duration
+ * could be written as, the ratio follows from the arithmetic; of those, the
+ * one with the fewest notes in the group is taken, which is how a tuplet is
+ * chosen on paper too.
+ */
+type NoteValue = { type: string; dot: boolean; tuplet: { actual: number; normal: number } | null };
+
+/** Beyond this, a "tuplet" is arithmetic rather than something a player reads. */
+const MAX_TUPLET_TERM = 16;
+
+/** Whole down to 32nd, dots included — the plain note values, largest first. */
+const NOTE_VALUE_MULTS = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.125];
+
+function dupleDivValues(divisions: number): number[] {
+  return NOTE_VALUE_MULTS.map((m) => Math.round(divisions * m)).filter((v) => v > 0);
+}
+
+/** Whole down to 32nd with no dots — the values a tuplet can be written as. */
+function undottedDivValues(divisions: number): number[] {
+  return [4, 2, 1, 0.5, 0.25, 0.125]
+    .map((m) => divisions * m)
+    .filter((v) => v > 0 && Number.isInteger(v));
+}
+
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
+function resolveNoteValue(divisions: number, dur: number): NoteValue | null {
+  const plain = durToType(divisions, dur);
+  if (plain) return { type: plain, dot: durHasDot(divisions, dur), tuplet: null };
+  if (!Number.isInteger(dur) || dur <= 0) return null;
+
+  let best: NoteValue | null = null;
+  let bestRank: [number, number] = [Infinity, Infinity];
+  // Every plain note value this duration could be WRITTEN as. Writing it as
+  // `written` and playing `dur` is a tuplet of actual:normal = written:dur.
+  // Undotted values only — a triplet quarter is three quarters in the time of
+  // two, never nine dotted eighths in the time of eight, and the arithmetic
+  // alone cannot tell those apart.
+  for (const written of undottedDivValues(divisions)) {
+    const type = durToType(divisions, written);
+    if (!type) continue;
+    const g = gcd(written, dur);
+    const actual = written / g;
+    const normal = dur / g;
+    if (actual === normal) continue;
+    if (actual > MAX_TUPLET_TERM || normal > MAX_TUPLET_TERM) continue;
+    // A group of 2, 4, 8 or 16 is not a tuplet — it is an ordinary note value,
+    // or a duration that wants tying into ordinary ones. Without this, 3.5
+    // beats at four divisions "resolves" as a whole note played
+    // eight-in-the-time-of-seven instead of the dotted half tied to an eighth
+    // that it is. It also makes the guarantee exact: every undotted value at a
+    // power-of-two divisions is itself a power of two, so `actual` could only
+    // ever be one, no tuplet is reachable at those divisions at all, and every
+    // score on one exports exactly as it did before.
+    if ((actual & (actual - 1)) === 0) continue;
+    // A tuplet note plays between half and double its written value; further
+    // than that and the notation says nothing a reader could follow.
+    const ratio = normal / actual;
+    if (ratio <= 0.5 || ratio >= 2) continue;
+    // Fewest notes in the group first — 3:2 over 9:8 for the same duration —
+    // and where two spellings tie, the one that compresses, which is what a
+    // tuplet ordinarily does. That yields 3:2 for a triplet and, for this
+    // reference's five-in-seven, the 5:7 its own source declares.
+    const rank: [number, number] = [actual, normal < actual ? 0 : 1];
+    if (rank[0] < bestRank[0] || (rank[0] === bestRank[0] && rank[1] < bestRank[1])) {
+      bestRank = rank;
+      best = { type, dot: false, tuplet: { actual, normal } };
+    }
+  }
+  return best;
+}
+
+/** `<type>` and `<dot/>`, in that order — the note-value half of a duration. */
+function typeDotXml(divisions: number, dur: number): string {
+  const v = resolveNoteValue(divisions, dur);
+  if (!v) return "";
+  return `<type>${v.type}</type>` + (v.dot ? `<dot/>` : "");
+}
+
+/**
+ * `<time-modification>`, or nothing for an ordinary note value. MusicXML puts
+ * it after <dot/> and <accidental> and before <staff>, so it is emitted
+ * separately from the type rather than alongside it.
+ */
+function timeModXml(divisions: number, dur: number): string {
+  const v = resolveNoteValue(divisions, dur);
+  if (!v?.tuplet) return "";
+  return `<time-modification><actual-notes>${v.tuplet.actual}</actual-notes>` +
+    `<normal-notes>${v.tuplet.normal}</normal-notes></time-modification>`;
+}
+
+const standardDivValuesCache = new Map<number, number[]>();
+
+/**
+ * The durations this `divisions` can actually spell, largest first — the
+ * vocabulary that snapping and decomposition draw on.
+ *
+ * A candidate only survives if `resolveNoteValue` can spell it, so at a
+ * power-of-two divisions (every score before this) the ladder is exactly the
+ * plain note values it always was and their output does not move.
+ */
+
+function standardDivValues(divisions: number): number[] {
+  const cached = standardDivValuesCache.get(divisions);
+  if (cached) return cached;
+  const computed = computeStandardDivValues(divisions);
+  standardDivValuesCache.set(divisions, computed);
+  return computed;
+}
+
+function computeStandardDivValues(divisions: number): number[] {
+  const duple = dupleDivValues(divisions);
+  const tuplet: number[] = [];
+  // A tuplet value is a plain value scaled by normal/actual. Only whole
+  // numbers of divisions qualify, so at the duple-only divisions every
+  // existing score has used, this adds nothing and their output does not move.
+  for (const w of duple) {
+    for (let actual = 2; actual <= MAX_TUPLET_TERM; actual++) {
+      for (let normal = 1; normal <= MAX_TUPLET_TERM; normal++) {
+        const v = (w * normal) / actual;
+        if (Number.isInteger(v) && v > 0 && !duple.includes(v)) tuplet.push(v);
+      }
+    }
+  }
+  return [...new Set([...duple, ...tuplet])]
+    .filter((v) => v > 0 && resolveNoteValue(divisions, v) !== null)
+    .sort((a, b) => b - a);
+}
+
+/**
+ * The smallest divisions that spells every onset and duration in the score
+ * exactly, at or above what the score declares.
+ *
+ * Declared divisions were taken on trust, and the parser normalises everything
+ * to 4 — one sixteenth, the finest thing four divisions of a quarter can
+ * describe. A triplet needs thirds, so it could not survive the trip at all: a
+ * bare parse-and-export round trip of a 123-bar piano score lost 31 notes
+ * before any arranging happened.
+ *
+ * Only raised when the declared value genuinely cannot spell the content, and
+ * only to a multiple of it, so a score whose rhythms are all duple exports
+ * byte-for-byte as it did before.
+ */
+function requiredDivisions(scoreModel: any, declared: number): number {
+  const base = Number.isFinite(declared) && declared > 0 ? Number(declared) : 480;
+  const onsets: number[] = [];
+  const durations: number[] = [];
+  for (const part of scoreModel?.parts ?? []) {
+    for (const measure of part?.measures ?? []) {
+      const byVoice = new Map<number, Array<{ t: number; dur: number }>>();
+      for (const ev of measure?.events ?? []) {
+        const t = Number(ev?.t);
+        const dur = Number(ev?.dur);
+        if (!Number.isFinite(t) || !Number.isFinite(dur) || dur <= 0) continue;
+        if (t > 0) onsets.push(t);
+        durations.push(dur);
+        const v = Number(ev?.voice ?? 1) || 1;
+        byVoice.set(v, [...(byVoice.get(v) ?? []), { t, dur }]);
+      }
+      // The rests BETWEEN events have to be writable too. A voice whose notes
+      // leave a twentieth of a beat between them needs that gap spelled, and
+      // no divisions can spell it — which is how a finer divisions ended up
+      // printing type-less rests in the orchestra's bar 74 while every note in
+      // the model looked perfectly representable.
+      for (const evs of byVoice.values()) {
+        const sorted = evs.slice().sort((a, b) => a.t - b.t);
+        for (let i = 0; i < sorted.length - 1; i++) {
+          const gap = sorted[i + 1]!.t - (sorted[i]!.t + sorted[i]!.dur);
+          if (gap > 1e-9) durations.push(gap);
+        }
+      }
+    }
+  }
+  if (!durations.length) return base;
+  // Spelling means two things, and both matter. The duration has to land on a
+  // whole number of divisions, and that number has to be writable as note
+  // values — a finer divisions that makes a duration exactly representable but
+  // unwritable is worse than a coarse one that rounds it, because the rounding
+  // at least printed. An arranger working on an irregular grid leaves rests of
+  // five hundredths of a beat, and no divisions can write one of those; a
+  // score containing such debris keeps the divisions it had, and behaves
+  // exactly as it did before, rather than trading clean notation for exactness
+  // it cannot use.
+  const lands = (b: number, d: number) => Math.abs(b * d - Math.round(b * d)) < 1e-6;
+  const spellsEverything = (d: number) =>
+    onsets.every((t) => lands(t, d)) &&
+    durations.every((dur) => lands(dur, d) && canSpellExactly(d, dur * d));
+  if (spellsEverything(base)) return base;
+  // The conventional divisions values, so a score that needs thirds and tenths
+  // lands on 60 — what an engraver would have written — rather than the next
+  // power of two that happens to contain both.
+  const ladder = [8, 12, 16, 24, 32, 48, 60, 64, 96, 120, 192, 240, 384, 480, 960];
+  for (const d of ladder) {
+    if (d > base && d % base === 0 && spellsEverything(d)) return d;
+  }
+  return base;
+}
+
+/**
  * Snap a duration (in divisions) DOWN to the nearest standard note value.
  * Non-standard values (e.g. 13 divisions = 3.25 beats, 5 divisions = 1.25 beats)
  * produce null from durToType, which means no <type> element is written.
@@ -242,11 +458,8 @@ function durToType(divisions: number, dur: number): string | null {
  */
 function snapDurToStandard(divisions: number, dur: number): number {
   if (!divisions || divisions <= 0) return dur;
-  // Standard multiples in descending order
-  const mults = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.125];
-  for (const m of mults) {
-    const candidate = Math.round(divisions * m); // avoid float drift
-    if (candidate > 0 && candidate <= dur + 0.5) return candidate;
+  for (const candidate of standardDivValues(divisions)) {
+    if (candidate <= dur + 0.5) return candidate;
   }
   return Math.max(1, dur);
 }
@@ -274,10 +487,10 @@ function durHasDot(divisions: number, dur: number): boolean {
  */
 function decomposeToStandardDivs(divisions: number, totalDivs: number): number[] {
   if (!divisions || divisions <= 0 || totalDivs <= 0) return [];
-  // Standard multiples of a quarter (divisions), descending. Dotted values
-  // included so e.g. 3 beats → one dotted-half, not half+quarter.
-  const mults = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25, 0.125];
-  const standard = mults.map((m) => Math.round(divisions * m)).filter((v) => v > 0);
+  // Standard values descending. Dotted values included so e.g. 3 beats → one
+  // dotted-half, not half+quarter; tuplet values so a triplet stays one note
+  // rather than being split into pieces that do not add up to it.
+  const standard = standardDivValues(divisions);
   const out: number[] = [];
   let remaining = Math.round(totalDivs);
   let guard = 0;
@@ -288,6 +501,55 @@ function decomposeToStandardDivs(divisions: number, totalDivs: number): number[]
     remaining -= next;
   }
   return out.length ? out : [Math.max(1, Math.round(totalDivs))];
+}
+
+/**
+ * True when `totalDivs` can be written as standard note values summing to it
+ * exactly. Asks the ladder directly rather than going through
+ * `decomposeToStandardDivs`, whose last-resort branch hands back the
+ * unspellable duration itself and would answer yes to everything.
+ */
+function canSpellExactly(divisions: number, totalDivs: number): boolean {
+  const target = Math.round(totalDivs);
+  if (target <= 0) return false;
+  let remaining = target;
+  for (const v of standardDivValues(divisions)) {
+    while (v <= remaining) remaining -= v;
+    if (remaining === 0) return true;
+  }
+  return false;
+}
+
+/**
+ * Give a rest too short to write to the event before it.
+ *
+ * An arranger placing notes on an irregular grid leaves slivers between them —
+ * bar 74 of the reference ends up with a rest of five hundredths of a beat.
+ * There is no note value for that. At four divisions it was quietly inflated
+ * to a sixteenth, which was wrong but at least printable; at the finer
+ * divisions a tuplet needs, it came out with no <type> at all, which is what
+ * MuseScore turns into a ghost rest and the "17/16" error.
+ *
+ * Neither is necessary: the time belongs to the note before it, which simply
+ * holds a twentieth of a beat longer. Onsets are untouched and the bar still
+ * adds up. Only rests move — absorbing a note would lose a pitch — and only
+ * ones no note value can spell, so at the duple divisions every existing score
+ * uses (where the shortest rest is already a whole division) nothing is
+ * absorbed and their output does not move.
+ */
+function absorbUnspellableRests(events: any[], divisions: number): any[] {
+  const out: any[] = [];
+  for (const ev of events) {
+    const isRest = ev?.type === "rest";
+    const divs = beatsToDivisionsDuration(Number(ev?.dur), divisions);
+    if (isRest && !canSpellExactly(divisions, divs) && out.length) {
+      const prev = out[out.length - 1];
+      prev.dur = Number(prev.dur) + Number(ev.dur);
+      continue;
+    }
+    out.push({ ...ev });
+  }
+  return out;
 }
 
 function beatsToDivisionsDuration(durBeats: number, divisions: number): number {
@@ -878,7 +1140,8 @@ function renderMusicXML(scoreModel: ScoreModel): string {
     const defaultDivisions =
       (scoreModel as any)?.global?.divisions ??
       (partMeasures[0]?.attributes?.divisions ?? 480);
-    let currentDivisions = Number.isFinite(defaultDivisions) ? Number(defaultDivisions) : 480;
+    const scoreDivisions = requiredDivisions(scoreModel, Number(defaultDivisions));
+    let currentDivisions = Number.isFinite(scoreDivisions) ? scoreDivisions : 480;
     let currentKeyFifths: number | undefined = undefined;
     let currentKeyMode = "";
     let currentTimeBeats = 4;
@@ -890,8 +1153,12 @@ function renderMusicXML(scoreModel: ScoreModel): string {
     for (const [measureIndex, m] of partMeasures.entries()) {
       const mNum = m.number ?? 1;
       const attrs = m?.attributes ?? {};
-      const hasDivisionsAttr = Number.isFinite((attrs as any)?.divisions);
-      const nextDivisions = hasDivisionsAttr ? Number((attrs as any).divisions) : currentDivisions;
+      // A declared divisions that cannot spell the score's own rhythms is not a
+      // fact to honour, and `scoreDivisions` keeps the declared value whenever
+      // it can. Every measure uses that one resolved value, so a part cannot
+      // switch resolution partway and leave the later bars unable to write
+      // what the earlier ones could.
+      const nextDivisions = scoreDivisions;
 
       let concertFifths = typeof (attrs as any)?.key_fifths === "number" ? (attrs as any).key_fifths : currentKeyFifths;
       if (typeof concertFifths !== "number" && typeof fallbackKeyFifths === "number") {
@@ -1041,9 +1308,10 @@ function renderMusicXML(scoreModel: ScoreModel): string {
           out += `<backup><duration>${previousVoiceDivs}</duration></backup>`;
         }
 
-        const voiceEvents = (byVoice.get(voice) ?? [])
-          .slice()
-          .sort((a: any, b: any) => (a.t ?? 0) - (b.t ?? 0));
+        const voiceEvents = absorbUnspellableRests(
+          (byVoice.get(voice) ?? []).slice().sort((a: any, b: any) => (a.t ?? 0) - (b.t ?? 0)),
+          currentDivisions
+        );
         // A rest belongs on the staff its voice lives on; hardcoding staff 1 puts a
         // left-hand voice's rest on the treble.
         const staffOfVoice = Number((byVoice.get(voice) ?? [])[0]?.staff ?? 1) || 1;
@@ -1064,14 +1332,17 @@ function renderMusicXML(scoreModel: ScoreModel): string {
           if (t > cursor + EPS) {
             const gapBeats = t - cursor;
             const gapDur = beatsToDivisionsDuration(gapBeats, currentDivisions);
-            const restType = durToType(currentDivisions, gapDur);
-            const restDot  = durHasDot(currentDivisions, gapDur);
             const gapStaff = isGrandStaff ? (ev0?.staff ?? 1) : 1;
-            writtenDivs += gapDur;
-            out += `<note><rest/><duration>${gapDur}</duration><voice>${voice}</voice>`;
-            if (restType) out += `<type>${restType}</type>`;
-            if (restDot)  out += `<dot/>`;
-            out += `<staff>${gapStaff}</staff></note>`;
+            // Decomposed into standard values, as the trailing rest already
+            // was: a gap that is not itself a note value still has to be
+            // written as ones that are, or it prints as a type-less rest.
+            for (const cd of decomposeToStandardDivs(currentDivisions, gapDur)) {
+              writtenDivs += cd;
+              out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
+              out += typeDotXml(currentDivisions, cd);
+              out += timeModXml(currentDivisions, cd);
+              out += `<staff>${gapStaff}</staff></note>`;
+            }
             cursor = t;
           }
 
@@ -1165,9 +1436,9 @@ function renderMusicXML(scoreModel: ScoreModel): string {
                 if (tieStart) out += `<tie type="start"/>`;
                 if (tieStop) out += `<tie type="stop"/>`;
                 out += `<voice>${voice}</voice>`;
-                if (ct2) out += `<type>${ct2}</type>`;
-                if (cdot) out += `<dot/>`;
+                out += typeDotXml(currentDivisions, cd);
                 if (mem.accidental && firstPiece) out += `<accidental>${mem.accidental}</accidental>`;
+                out += timeModXml(currentDivisions, cd);
                 out += `<staff>${mem.staff}</staff>`;
                 const slurHere = (mem.slurStart && firstPiece) || (mem.slurStop && lastPiece);
                 if (tieStart || tieStop || slurHere) {
@@ -1213,11 +1484,10 @@ function renderMusicXML(scoreModel: ScoreModel): string {
               // stays exactly filled.
               const totalDivs = beatsToDivisionsDuration(durBeats, currentDivisions);
               for (const cd of decomposeToStandardDivs(currentDivisions, totalDivs)) {
-                const ct = durToType(currentDivisions, cd);
                 writtenDivs += cd;
                 out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
-                if (ct) out += `<type>${ct}</type>`;
-                if (durHasDot(currentDivisions, cd)) out += `<dot/>`;
+                out += typeDotXml(currentDivisions, cd);
+                out += timeModXml(currentDivisions, cd);
                 out += `<staff>${staff}</staff></note>`;
               }
               continue;
@@ -1228,8 +1498,8 @@ function renderMusicXML(scoreModel: ScoreModel): string {
               if (!pm) {
                 writtenDivs += dur;
                 out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;
-                if (type) out += `<type>${type}</type>`;
-                if (dot)  out += `<dot/>`;
+                out += typeDotXml(currentDivisions, dur);
+                out += timeModXml(currentDivisions, dur);
                 out += `<staff>${staff}</staff></note>`;
                 continue;
               }
@@ -1242,8 +1512,8 @@ function renderMusicXML(scoreModel: ScoreModel): string {
               out += `<duration>${dur}</duration>`;
               out += `<instrument id="${xmlEscape(instXmlId)}"/>`;
               out += `<voice>${voice}</voice>`;
-              if (type) out += `<type>${type}</type>`;
-              if (dot)  out += `<dot/>`;
+              out += typeDotXml(currentDivisions, dur);
+              out += timeModXml(currentDivisions, dur);
               if (pm.notehead && pm.notehead !== "normal") out += `<notehead>${pm.notehead}</notehead>`;
               out += `<staff>${staff}</staff>`;
               out += `</note>`;
@@ -1299,9 +1569,9 @@ function renderMusicXML(scoreModel: ScoreModel): string {
                 if (tieStart) out += `<tie type="start"/>`;
                 if (tieStop) out += `<tie type="stop"/>`;
                 out += `<voice>${voice}</voice>`;
-                if (ct) out += `<type>${ct}</type>`;
-                if (cdot) out += `<dot/>`;
+                out += typeDotXml(currentDivisions, cd);
                 if (accidental && firstPiece) out += `<accidental>${accidental}</accidental>`;
+                out += timeModXml(currentDivisions, cd);
                 out += `<staff>${staff}</staff>`;
                 // A note written as several tied pieces is one note musically, so a
                 // slur begins on its first piece and ends on its last.
@@ -1329,11 +1599,10 @@ function renderMusicXML(scoreModel: ScoreModel): string {
           const tailBeats = measureBeats - cursor;
           const tailDur   = beatsToDivisionsDuration(tailBeats, currentDivisions);
           for (const cd of decomposeToStandardDivs(currentDivisions, tailDur)) {
-            const ct = durToType(currentDivisions, cd);
             writtenDivs += cd;
             out += `<note><rest/><duration>${cd}</duration><voice>${voice}</voice>`;
-            if (ct) out += `<type>${ct}</type>`;
-            if (durHasDot(currentDivisions, cd)) out += `<dot/>`;
+            out += typeDotXml(currentDivisions, cd);
+            out += timeModXml(currentDivisions, cd);
             out += `<staff>${staffOfVoice}</staff></note>`;
           }
         }
