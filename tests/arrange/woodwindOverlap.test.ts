@@ -77,6 +77,41 @@ test('a triplet keeps its own onsets rather than the 1/64 grid', () => {
     assert(Math.abs(Number(fl[i].t) - i * third) < 1e-9, `onset ${i} moved to ${fl[i].t}`);
 });
 
+// ── Who plays which hand ────────────────────────────────────────────────────
+
+test('the clarinet takes the left hand\'s tenor, not a third copy of the right', () => {
+  // RH C4-E4-G4 over LH C3-G3: the clarinet's note is the left hand's upper
+  // one, not the right hand's lowest.
+  const out = arrangeWoodwindQuartetFromPianoInstrumentation(
+    piano([{ rh: [[0, 4, 60], [0, 4, 64], [0, 4, 67]], lh: [[0, 4, 48], [0, 4, 55]] }]), {});
+  const at = (id: string) => notesIn(out, id, 0).map((n: any) => pitchClassOf(n));
+  assert.deepEqual(at('P_FL'), [7], 'flute: the right hand\'s top, G');
+  assert.deepEqual(at('P_OB'), [4], 'oboe: the right hand\'s second, E');
+  assert.deepEqual(at('P_CL'), [7], 'clarinet: the left hand\'s upper note, G3');
+  assert.deepEqual(at('P_BN'), [0], 'bassoon: the left hand\'s bottom, C3');
+});
+
+test('a single-note left hand sends the clarinet back to the right hand', () => {
+  // Nothing to take as a tenor line, and doubling the bassoon in octaves for
+  // whole stretches is not four-part writing.
+  const out = arrangeWoodwindQuartetFromPianoInstrumentation(
+    piano([{ rh: [[0, 4, 60], [0, 4, 64], [0, 4, 67]], lh: [[0, 4, 48]] }]), {});
+  assert.deepEqual(notesIn(out, 'P_CL', 0).map((n: any) => pitchClassOf(n)), [0],
+    'the right hand\'s third note, C — not another C an octave off the bassoon');
+});
+
+test('a right-hand onset the left hand does not share still gets a clarinet', () => {
+  const out = arrangeWoodwindQuartetFromPianoInstrumentation(
+    piano([{ rh: [[0, 2, 60], [0, 2, 64], [0, 2, 67], [2, 2, 62], [2, 2, 65], [2, 2, 69]],
+             lh: [[0, 4, 48], [0, 4, 55]] }]), {});
+  assert.equal(notesIn(out, 'P_CL', 0).length, 2,
+    'the clarinet plays the second half too, rather than falling silent under it');
+});
+
+const PC_OF: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+const pitchClassOf = (n: any) =>
+  ((PC_OF[n.pitch.step]! + (n.pitch.alter ?? 0)) % 12 + 12) % 12;
+
 test('a plain chord sequence is untouched — clipping only fires on an overlap', () => {
   const src = piano([{
     rh: [[0, 2, 72], [0, 2, 76], [0, 2, 79], [2, 2, 74], [2, 2, 77], [2, 2, 81]],

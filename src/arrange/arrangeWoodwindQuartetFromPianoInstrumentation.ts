@@ -219,6 +219,22 @@ function clipOverlaps(events: EventLike[]): void {
   }
 }
 
+/**
+ * The right hand's third-from-top note at an onset — the clarinet's fallback
+ * when the left hand has no tenor line to give it. Falls back in turn to the
+ * second and then the only note, so the voice is never left silent under a
+ * hand that is still sounding.
+ */
+function rhInnerAt(
+  rhByOnset: Map<string, EventLike[]>,
+  key: string
+): { ev: EventLike; midi: number } | null {
+  const sel = selectNotesForOnset(rhByOnset.get(key) ?? []);
+  const n = sel.length;
+  if (!n) return null;
+  return sel[Math.max(0, n - 3)]!;
+}
+
 function selectNotesForOnset(events: EventLike[]): Array<{ ev: EventLike; midi: number }> {
   return events
     .map((ev) => {
@@ -298,6 +314,14 @@ function enforceWoodwindVoiceOrder(parts: PartLike[]): void {
  *   Flute    ← RH top note          Oboe    ← RH 2nd-from-top (when present)
  *   Clarinet ← LH top note          Bassoon ← LH bottom note
  *
+ * Two hands, two winds each. The clarinet had drifted onto the right hand as a
+ * third copy of that chord, which left the bassoon alone underneath and threw
+ * away every left-hand note but the lowest — 215 of this reference's 376 lost
+ * notes came from that one cap. Where the left hand plays a single note there
+ * is no tenor line to take, and doubling the bassoon in octaves is not
+ * four-part writing either, so the clarinet returns to the right hand's third
+ * note for those onsets.
+ *
  * A voice with no source note at an onset simply RESTS (no per-beat chord
  * completion). Each note is octave-placed into its instrument's sweet-spot
  * register and voices are kept ordered top-to-bottom (no crossings).
@@ -361,11 +385,10 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       const k = onsetKey(t); const b = map.get(k) ?? []; b.push(ev); map.set(k, b);
     }
 
-    // ── RH chord → Flute (top) / Oboe (mid) / Clarinet (bottom) ────────────
-    // The right-hand chord is spread across the three upper winds, all playing
-    // on every RH onset (when fewer than 3 RH notes, the nearest note is reused
-    // so each upper voice still sounds). Flute lifts to its bright register;
-    // Oboe/Clarinet are octave-placed into their sweet spots.
+    // ── RH chord → Flute (top) / Oboe (2nd) ───────────────────────────────
+    // Both upper winds play on every RH onset; where the hand has one note it
+    // is reused so neither voice drops out. Flute lifts to its bright
+    // register, Oboe is octave-placed into its sweet spot.
     //
     // The note is written at its own onset, not at the 1/64 key it was grouped
     // under: rounding a triplet's 2/3 of a beat onto that grid moves it, and a
@@ -375,20 +398,41 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       if (!sel.length) continue;
       const n = sel.length;
       const onset = Number(sel[n - 1]!.ev?.t);
-      const topEv = sel[n - 1]!;                 // highest → Flute
-      const midEv = n >= 2 ? sel[n - 2]! : sel[n - 1]!; // 2nd  → Oboe
-      const botEv = n >= 3 ? sel[n - 3]! : (n >= 2 ? sel[n - 2]! : sel[n - 1]!); // 3rd → Clarinet
-      pushMappedNote(flute.measures[mi],    { ev: topEv.ev, midi: clampToWoodwindSweetSpot(topEv.midi, "fl") }, "flute",       "fl", ++seq, { t: onset });
-      pushMappedNote(oboe.measures[mi],     { ev: midEv.ev, midi: clampToWoodwindSweetSpot(midEv.midi, "ob") }, "oboe",        "ob", ++seq, { t: onset });
-      pushMappedNote(clarinet.measures[mi], { ev: botEv.ev, midi: clampToWoodwindSweetSpot(botEv.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: onset });
+      const topEv = sel[n - 1]!;                        // highest → Flute
+      const midEv = n >= 2 ? sel[n - 2]! : sel[n - 1]!; // 2nd     → Oboe
+      pushMappedNote(flute.measures[mi], { ev: topEv.ev, midi: clampToWoodwindSweetSpot(topEv.midi, "fl") }, "flute", "fl", ++seq, { t: onset });
+      pushMappedNote(oboe.measures[mi],  { ev: midEv.ev, midi: clampToWoodwindSweetSpot(midEv.midi, "ob") }, "oboe",  "ob", ++seq, { t: onset });
     }
 
-    // ── LH bass → Bassoon ──────────────────────────────────────────────────
+    // ── LH → Clarinet (top) / Bassoon (bottom) ────────────────────────────
+    // The clarinet takes the left hand's upper note — the keyboard's tenor
+    // line, and the clarinet's own chalumeau register — rather than a third
+    // copy of the right-hand chord. Three winds crowded onto one hand left the
+    // bassoon alone under them and threw away every left-hand note but the
+    // lowest; this reads as four parts instead.
+    //
+    // Where the left hand plays a single note the clarinet has no tenor to
+    // take, and doubling the bassoon in octaves for whole stretches is not
+    // four-part writing either. It goes back to the right hand's third note
+    // there, which is what it had before.
     for (const k of Array.from(lhByOnset.keys()).sort()) {
       const sel = selectNotesForOnset(lhByOnset.get(k) ?? []);
       if (!sel.length) continue;
       const bottom = sel[0]!;
       pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn") }, "bassoon", "bn", ++seq, { t: Number(bottom.ev?.t) });
+      const tenor = sel.length >= 2 ? sel[sel.length - 1]! : rhInnerAt(rhByOnset, k);
+      if (tenor) {
+        pushMappedNote(clarinet.measures[mi], { ev: tenor.ev, midi: clampToWoodwindSweetSpot(tenor.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: Number(tenor.ev?.t) });
+      }
+    }
+
+    // A right-hand onset the left hand does not share still needs the clarinet,
+    // or it falls silent under the figuration the other two winds are playing.
+    for (const k of Array.from(rhByOnset.keys()).sort()) {
+      if (lhByOnset.has(k)) continue;
+      const inner = rhInnerAt(rhByOnset, k);
+      if (!inner) continue;
+      pushMappedNote(clarinet.measures[mi], { ev: inner.ev, midi: clampToWoodwindSweetSpot(inner.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: Number(inner.ev?.t) });
     }
 
     // One wind, one note at a time: release a held tone where the next attack
@@ -420,7 +464,7 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
   // The bassoon's intentional intro-rest measures are skipped (kept tacet).
   fillSustainedGaps(woodwindParts, sourceMeasures, { bassoonTacet });
 
-  warn(warnings, "[woodwinds] Faithful copy: RH chord→Flute/Oboe/Clarinet, LH bass→Bassoon; voices rest where the piano rests.");
+  warn(warnings, "[woodwinds] Faithful copy: RH chord→Flute/Oboe, LH→Clarinet (tenor)/Bassoon (bass); voices rest where the piano rests.");
 
   return {
     ...(score as any),
