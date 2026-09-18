@@ -4,6 +4,7 @@ import {
   midiToPitch,
   pitchToMidi
 } from "../instruments/instrumentCatalog";
+import { resolveTies } from "./tieResolution";
 
 type PartLike = any;
 type MeasureLike = any;
@@ -476,7 +477,7 @@ function pushMappedNote(
   instrumentId: string,
   idPrefix: string,
   seq: number,
-  options?: { t?: number; dur?: number; chord?: boolean }
+  options?: { t?: number; dur?: number; chord?: boolean; articulations?: string[] }
 ): void {
   const t = Number.isFinite(options?.t as number) ? Number(options?.t) : Number(source.ev?.t);
   const dur = Number.isFinite(options?.dur as number) ? Number(options?.dur) : Number(source.ev?.dur);
@@ -484,6 +485,9 @@ function pushMappedNote(
   const clampedMidi = clampMidiToAbsoluteRange(source.midi, instrumentId);
   const tieStart = source.ev?.tieStart === true;
   const tieStop = source.ev?.tieStop === true;
+  const articulations = options?.articulations?.length
+    ? options.articulations
+    : (Array.isArray(source.ev?.articulations) ? source.ev.articulations : undefined);
   targetMeasure.events.push({
     id: `${idPrefix}-${targetMeasure.number}-${seq}`,
     t,
@@ -492,10 +496,29 @@ function pushMappedNote(
     pitch: midiToPitch(clampedMidi),
     voice: 1,
     staff: 1,
+    ...(articulations?.length ? { articulations: [...articulations] } : {}),
     ...(tieStart ? { tieStart: true } : {}),
     ...(tieStop ? { tieStop: true } : {}),
     ...(options?.chord === true ? { chord: true } : {})
   });
+}
+
+/**
+ * The articulations of a chord, gathered from all of its notes.
+ *
+ * A piano engraver marks a chord once — the dot or the accent goes on one
+ * notehead of the stack and means the whole chord. Splitting that chord across
+ * instruments hands the mark to whichever player gets that note and leaves the
+ * others playing the same attack unmarked. The union is what the piano
+ * notation already meant.
+ */
+function chordArticulations(events: EventLike[]): string[] {
+  const marks = new Set<string>();
+  for (const ev of events) {
+    if (!Array.isArray(ev?.articulations)) continue;
+    for (const a of ev.articulations) if (typeof a === "string") marks.add(a);
+  }
+  return [...marks];
 }
 
 function selectNotesForOnset(events: EventLike[]): Array<{ ev: EventLike; midi: number }> {
@@ -741,8 +764,9 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       if (!selected.length) continue;
       const top    = selected[selected.length - 1]!;
       const bottom = selected[0]!;
+      const marks  = chordArticulations(selected.map((s) => s.ev));
 
-      pushMappedNote(v1m, top, "violin_1", "v1", ++seq);
+      pushMappedNote(v1m, top, "violin_1", "v1", ++seq, { articulations: marks });
       v1AtOnset.set(key, {
         midi: clampMidiToAbsoluteRange(top.midi, "violin_1"),
         t:   Number(top.ev?.t   ?? 0),
@@ -750,13 +774,13 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       });
 
       if (selected.length >= 3) {
-        pushMappedNote(v2m, bottom, "violin_2", "v2-lo", ++seq);
+        pushMappedNote(v2m, bottom, "violin_2", "v2-lo", ++seq, { articulations: marks });
         v2AtOnset.set(key, { midi: clampMidiToAbsoluteRange(bottom.midi, "violin_2") });
         for (let i = 1; i <= selected.length - 2; i++) {
-          pushMappedNote(v2m, selected[i]!, "violin_2", "v2-inner", ++seq, { chord: true });
+          pushMappedNote(v2m, selected[i]!, "violin_2", "v2-inner", ++seq, { chord: true, articulations: marks });
         }
       } else if (selected.length === 2) {
-        pushMappedNote(v2m, bottom, "violin_2", "v2", ++seq);
+        pushMappedNote(v2m, bottom, "violin_2", "v2", ++seq, { articulations: marks });
         v2AtOnset.set(key, { midi: clampMidiToAbsoluteRange(bottom.midi, "violin_2") });
       } else {
         // Single RH note → queue chord-aware V2 fill
@@ -773,8 +797,9 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       const selected = selectNotesForOnset(lhByOnset.get(key) ?? []);
       if (!selected.length) continue;
       const bottom = selected[0]!;
+      const marks  = chordArticulations(selected.map((s) => s.ev));
 
-      pushMappedNote(vcm, bottom, "cello", "vc", ++seq);
+      pushMappedNote(vcm, bottom, "cello", "vc", ++seq, { articulations: marks });
       vcAtOnset.set(key, {
         midi: clampMidiToAbsoluteRange(bottom.midi, "cello"),
         t:   Number(bottom.ev?.t   ?? 0),
@@ -782,9 +807,9 @@ export function arrangeStringQuartetFromPianoInstrumentation(
       });
 
       if (selected.length >= 2) {
-        pushMappedNote(vam, selected[1]!, "viola", "va", ++seq);
+        pushMappedNote(vam, selected[1]!, "viola", "va", ++seq, { articulations: marks });
         for (let i = 2; i < selected.length; i++) {
-          pushMappedNote(vam, selected[i]!, "viola", "va-extra", ++seq, { chord: true });
+          pushMappedNote(vam, selected[i]!, "viola", "va-extra", ++seq, { chord: true, articulations: marks });
         }
       } else {
         // Single LH note → queue chord-aware VA fill
@@ -902,6 +927,17 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     v2m.events.sort(measureEventSort);
     vam.events.sort(measureEventSort);
     vcm.events.sort(measureEventSort);
+  }
+
+  // A held pitch changes rank as the harmony moves under it, so a tie can be
+  // handed to a different instrument halfway through — leaving the first with a
+  // bind that nothing resolves. The note stays where it is; the tie that no
+  // longer describes it does not.
+  const untied = resolveTies([violin1, violin2, viola, cello], pitchToMidi);
+  if (untied) {
+    warn(warnings, untied === 1
+      ? "[strings] 1 tie could not follow its pitch into a single instrument and became a re-attack."
+      : `[strings] ${untied} ties could not follow their pitch into a single instrument and became re-attacks.`);
   }
 
   warn(

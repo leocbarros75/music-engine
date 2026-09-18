@@ -60,7 +60,8 @@ async function main() {
       'tests/arrange/altoUnderMelody.test.ts',
       'tests/arrange/handRoleTrading.test.ts',
       'tests/arrange/rhSustained.test.ts',
-      'tests/arrange/woodwindOverlap.test.ts'
+      'tests/arrange/woodwindOverlap.test.ts',
+      'tests/arrange/tieAndArticulation.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {

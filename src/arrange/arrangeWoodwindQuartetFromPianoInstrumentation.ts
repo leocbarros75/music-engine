@@ -2,6 +2,7 @@ import type { ScoreModel } from "../score/types";
 import { getInstrumentSpec, midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { arrangeStringQuartetFromPianoInstrumentation } from "./arrangeStringQuartetFromPianoInstrumentation";
 import { WOODWIND_RANGES, type WoodwindVoiceId } from "./woodwinds/woodwindRanges";
+import { resolveTies } from "./tieResolution";
 
 /**
  * Place a pitch in a woodwind's sweet-spot register by octave. Keeps the pitch
@@ -9,15 +10,72 @@ import { WOODWIND_RANGES, type WoodwindVoiceId } from "./woodwinds/woodwindRange
  * sounds in its idiomatic register — lifting a low piano melody into the flute's
  * bright octave, and keeping voices ordered top-to-bottom (Fl>Ob>Cl>Bn).
  */
-function clampToWoodwindSweetSpot(midi: number, wvId: WoodwindVoiceId): number {
+function clampToWoodwindSweetSpot(
+  midi: number,
+  wvId: WoodwindVoiceId,
+  options?: { keepOctave?: boolean }
+): number {
   const r = WOODWIND_RANGES[wvId];
   let m = midi;
   while (m < r.absMin) m += 12;
   while (m > r.absMax) m -= 12;
+  // Some material belongs where it was written even though the sweet spot
+  // would pull it elsewhere. Range is still enforced above; only the
+  // preference is waived.
+  if (options?.keepOctave) return m;
   const mid = (r.prefMin + r.prefMax) / 2;
+  // Up is not the same as down. A note under the preferred floor is weak or
+  // unspeakable there — the flute's bottom fourth is breathy, and lifting it
+  // is a real improvement — so that branch is unconditional.
   if (m < r.prefMin) { const up = m + 12; if (up <= r.absMax && Math.abs(up - mid) <= Math.abs(m - mid)) m = up; }
-  if (m > r.prefMax) { const dn = m - 12; if (dn >= r.absMin && Math.abs(dn - mid) <= Math.abs(m - mid)) m = dn; }
+  // Downward, the preferred ceiling is a p90 of real writing, not a limit: a
+  // tenth of the notes in the scores it was measured from already sit above
+  // it. Dropping a line a whole octave to save a semitone or two of that is
+  // not a register choice, it is losing the top of the phrase — and it
+  // inverts the texture, putting a right-hand melody under the left hand and
+  // dragging the lower voices down after it through the de-crossing pass.
+  // Bar 33 of the reference did exactly that: a melody on F#6, two semitones
+  // over the flute's ceiling, came out an octave down at F#5.
+  if (m > r.prefMax && m - r.prefMax > FOLD_SLACK_SEMITONES) {
+    const dn = m - 12;
+    if (dn >= r.absMin && Math.abs(dn - mid) <= Math.abs(m - mid)) m = dn;
+  }
   return m;
+}
+
+/**
+ * How far above its preferred ceiling a note may sit before it is worth moving
+ * an octave: a major third. Measured against the p10-p90 working ranges taken
+ * from three real wind scores, this is the value at which the oboe's own p90
+ * comes back to 79 against a target of 81, with no other voice moving away
+ * from its target.
+ */
+const FOLD_SLACK_SEMITONES = 4;
+
+/**
+ * Does this left-hand group actually contain bass?
+ *
+ * A left-hand staff is not a bass clef by another name. Where the piano's left
+ * hand climbs into treble register it is playing an inner or accompanying
+ * line, and the passage has no bass at all — bars 33-38 of the reference, and
+ * the same material returning at 65-70, 97-102 and 104-109, put the whole left
+ * hand at B3 and above.
+ *
+ * Treating it as bass anyway is what the sweet-spot fold did: 124 onsets
+ * across 24 bars were pulled down a full octave, so an inner figure on B3 and
+ * D4 came out of the bassoon as B2. That is not a register choice, it is a
+ * different musical function.
+ *
+ * The bassoon can play those notes where they stand — the reference's
+ * treble-hand material spans B3 to C5, inside the instrument's range and in
+ * the tenor register it sings in. So nothing moves to another instrument and
+ * nothing is dropped; the fold simply does not apply when there is no bass to
+ * put in the bass register.
+ */
+const TREBLE_HAND_FLOOR = 60; // C4
+
+function handHasNoBass(midis: number[]): boolean {
+  return midis.length > 0 && midis.every((m) => m >= TREBLE_HAND_FLOOR);
 }
 
 type PartLike = any;
@@ -167,7 +225,7 @@ function pushMappedNote(
   instrumentId: string,
   idPrefix: string,
   seq: number,
-  options?: { t?: number; dur?: number }
+  options?: { t?: number; dur?: number; articulations?: string[] }
 ): void {
   const t = Number.isFinite(options?.t as number) ? Number(options?.t) : Number(source.ev?.t);
   const dur = Number.isFinite(options?.dur as number) ? Number(options?.dur) : Number(source.ev?.dur);
@@ -175,6 +233,9 @@ function pushMappedNote(
   const clampedMidi = clampMidiToAbsoluteRange(source.midi, instrumentId);
   const tieStart = source.ev?.tieStart === true;
   const tieStop = source.ev?.tieStop === true;
+  const articulations = options?.articulations?.length
+    ? options.articulations
+    : (Array.isArray(source.ev?.articulations) ? source.ev.articulations : undefined);
   targetMeasure.events.push({
     id: `${idPrefix}-${targetMeasure.number}-${seq}`,
     t,
@@ -183,9 +244,29 @@ function pushMappedNote(
     pitch: midiToPitch(clampedMidi),
     voice: 1,
     staff: 1,
+    ...(articulations?.length ? { articulations: [...articulations] } : {}),
     ...(tieStart ? { tieStart: true } : {}),
     ...(tieStop ? { tieStop: true } : {})
   });
+}
+
+/**
+ * The articulations of a chord, gathered from all of its notes.
+ *
+ * A piano engraver marks a chord once — the staccato dot or the accent goes on
+ * one notehead of the stack, usually the bottom, and means the whole chord.
+ * Splitting that chord across four instruments hands the mark to whichever
+ * player happens to get that note and leaves the others playing the same attack
+ * unmarked. Taking the union of the stack and giving it to every member is what
+ * the piano notation already meant.
+ */
+function chordArticulations(events: EventLike[]): string[] {
+  const marks = new Set<string>();
+  for (const ev of events) {
+    if (!Array.isArray(ev?.articulations)) continue;
+    for (const a of ev.articulations) if (typeof a === "string") marks.add(a);
+  }
+  return [...marks];
 }
 
 /**
@@ -400,8 +481,9 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       const onset = Number(sel[n - 1]!.ev?.t);
       const topEv = sel[n - 1]!;                        // highest → Flute
       const midEv = n >= 2 ? sel[n - 2]! : sel[n - 1]!; // 2nd     → Oboe
-      pushMappedNote(flute.measures[mi], { ev: topEv.ev, midi: clampToWoodwindSweetSpot(topEv.midi, "fl") }, "flute", "fl", ++seq, { t: onset });
-      pushMappedNote(oboe.measures[mi],  { ev: midEv.ev, midi: clampToWoodwindSweetSpot(midEv.midi, "ob") }, "oboe",  "ob", ++seq, { t: onset });
+      const marks = chordArticulations(sel.map((s) => s.ev));
+      pushMappedNote(flute.measures[mi], { ev: topEv.ev, midi: clampToWoodwindSweetSpot(topEv.midi, "fl") }, "flute", "fl", ++seq, { t: onset, articulations: marks });
+      pushMappedNote(oboe.measures[mi],  { ev: midEv.ev, midi: clampToWoodwindSweetSpot(midEv.midi, "ob") }, "oboe",  "ob", ++seq, { t: onset, articulations: marks });
     }
 
     // ── LH → Clarinet (top) / Bassoon (bottom) ────────────────────────────
@@ -419,10 +501,14 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       const sel = selectNotesForOnset(lhByOnset.get(k) ?? []);
       if (!sel.length) continue;
       const bottom = sel[0]!;
-      pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn") }, "bassoon", "bn", ++seq, { t: Number(bottom.ev?.t) });
+      const lhMarks = chordArticulations(sel.map((s) => s.ev));
+      // A left hand up in treble register is an inner line, not a bass line.
+      const noBass = handHasNoBass(sel.map((s) => s.midi));
+      pushMappedNote(bassoon.measures[mi], { ev: bottom.ev, midi: clampToWoodwindSweetSpot(bottom.midi, "bn", { keepOctave: noBass }) }, "bassoon", "bn", ++seq, { t: Number(bottom.ev?.t), articulations: lhMarks });
       const tenor = sel.length >= 2 ? sel[sel.length - 1]! : rhInnerAt(rhByOnset, k);
       if (tenor) {
-        pushMappedNote(clarinet.measures[mi], { ev: tenor.ev, midi: clampToWoodwindSweetSpot(tenor.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: Number(tenor.ev?.t) });
+        const marks = sel.length >= 2 ? lhMarks : chordArticulations(rhByOnset.get(k) ?? []);
+        pushMappedNote(clarinet.measures[mi], { ev: tenor.ev, midi: clampToWoodwindSweetSpot(tenor.midi, "cl", { keepOctave: noBass }) }, "clarinet_bb", "cl", ++seq, { t: Number(tenor.ev?.t), articulations: marks });
       }
     }
 
@@ -432,7 +518,8 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       if (lhByOnset.has(k)) continue;
       const inner = rhInnerAt(rhByOnset, k);
       if (!inner) continue;
-      pushMappedNote(clarinet.measures[mi], { ev: inner.ev, midi: clampToWoodwindSweetSpot(inner.midi, "cl") }, "clarinet_bb", "cl", ++seq, { t: Number(inner.ev?.t) });
+      pushMappedNote(clarinet.measures[mi], { ev: inner.ev, midi: clampToWoodwindSweetSpot(inner.midi, "cl") }, "clarinet_bb", "cl", ++seq,
+        { t: Number(inner.ev?.t), articulations: chordArticulations(rhByOnset.get(k) ?? []) });
     }
 
     // One wind, one note at a time: release a held tone where the next attack
@@ -463,6 +550,16 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
   // single sustained chord tone, drawn from the harmony of the other voices.
   // The bassoon's intentional intro-rest measures are skipped (kept tacet).
   fillSustainedGaps(woodwindParts, sourceMeasures, { bassoonTacet });
+
+  // Last, so it judges what actually reached the page: the de-crossing pass
+  // above moves octaves, and a tie between two different pitches is no more a
+  // tie than one whose continuation was never written.
+  const untied = resolveTies(woodwindParts, pitchToMidi);
+  if (untied) {
+    warn(warnings, untied === 1
+      ? "[woodwinds] 1 tie could not follow its pitch into a single instrument and became a re-attack."
+      : `[woodwinds] ${untied} ties could not follow their pitch into a single instrument and became re-attacks.`);
+  }
 
   warn(warnings, "[woodwinds] Faithful copy: RH chord→Flute/Oboe, LH→Clarinet (tenor)/Bassoon (bass); voices rest where the piano rests.");
 
