@@ -61,7 +61,8 @@ async function main() {
       'tests/arrange/handRoleTrading.test.ts',
       'tests/arrange/rhSustained.test.ts',
       'tests/arrange/woodwindOverlap.test.ts',
-      'tests/arrange/tieAndArticulation.test.ts'
+      'tests/arrange/tieAndArticulation.test.ts',
+      'tests/arrange/brassQuintetCopy.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {

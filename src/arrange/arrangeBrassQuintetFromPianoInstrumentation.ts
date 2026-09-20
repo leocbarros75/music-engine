@@ -1,6 +1,7 @@
 import type { ScoreModel } from "../score/types";
 import { getInstrumentSpec, midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
 import { BRASS_RANGES, BRASS_PART_META, type BrassVoiceId } from "./brass/brassRanges";
+import { resolveTies } from "./tieResolution";
 
 /**
  * Piano → Brass quintet/quartet — FAITHFUL COPY (voices rest where the piano rests).
@@ -42,6 +43,15 @@ type ArrangeOptions = {
   tubaEntry?: number | "auto" | "always";
 };
 
+/**
+ * How far above its preferred ceiling a note may sit before it is worth moving
+ * an octave: a major third. A preferred ceiling is the top of a working range,
+ * not the top of the instrument — dropping a line a whole octave to save a
+ * semitone or two of it loses the top of the phrase and can put a right-hand
+ * melody underneath the left hand.
+ */
+const FOLD_SLACK_SEMITONES = 4;
+
 /** Octave-place a pitch into a brass voice's sweet-spot register (pitch class kept). */
 function clampToBrassSweetSpot(midi: number, bvId: BrassVoiceId): number {
   const r = BRASS_RANGES[bvId];
@@ -49,9 +59,48 @@ function clampToBrassSweetSpot(midi: number, bvId: BrassVoiceId): number {
   while (m < r.absMin) m += 12;
   while (m > r.absMax) m -= 12;
   const mid = (r.prefMin + r.prefMax) / 2;
+  // Up is unconditional: a note under the preferred floor is weak or
+  // unspeakable there, and lifting it is a real improvement.
   if (m < r.prefMin) { const up = m + 12; if (up <= r.absMax && Math.abs(up - mid) <= Math.abs(m - mid)) m = up; }
-  if (m > r.prefMax) { const dn = m - 12; if (dn >= r.absMin && Math.abs(dn - mid) <= Math.abs(m - mid)) m = dn; }
+  if (m > r.prefMax && m - r.prefMax > FOLD_SLACK_SEMITONES) {
+    const dn = m - 12;
+    if (dn >= r.absMin && Math.abs(dn - mid) <= Math.abs(m - mid)) m = dn;
+  }
   return m;
+}
+
+/**
+ * The articulations of a chord, gathered from all of its notes. A piano
+ * engraver marks a stack once; split across brass voices, only the player who
+ * happened to get that notehead saw it.
+ */
+function chordArticulations(events: EventLike[]): string[] {
+  const marks = new Set<string>();
+  for (const ev of events) {
+    if (!Array.isArray(ev?.articulations)) continue;
+    for (const a of ev.articulations) if (typeof a === "string") marks.add(a);
+  }
+  return [...marks];
+}
+
+/**
+ * Clip each note in a voice where the next one begins. A brass player sounds
+ * one note at a time, and a keyboard texture does not respect that: handing a
+ * voice a held tone and the figure decorating it means MusicXML can only write
+ * one of them, and the figure disappears silently.
+ */
+function clipOverlaps(events: EventLike[]): void {
+  const notes = events
+    .filter((e: any) => e?.type === "note" && Number.isFinite(Number(e?.t)))
+    .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+  for (let i = 0; i < notes.length; i++) {
+    const cur: any = notes[i];
+    let next = i + 1;
+    while (next < notes.length && Math.abs(Number(notes[next]!.t) - Number(cur.t)) < 1e-9) next++;
+    if (next >= notes.length) continue;
+    const room = Number(notes[next]!.t) - Number(cur.t);
+    if (Number(cur.dur) > room + 1e-9) cur.dur = room;
+  }
 }
 
 /**
@@ -173,7 +222,8 @@ function pushMappedNote(
   instrumentId: string,
   idPrefix: string,
   seq: number,
-  onset: number
+  onset: number,
+  articulations?: string[]
 ): void {
   const t = Number.isFinite(onset) ? onset : Number(ev?.t);
   const dur = Number(ev?.dur);
@@ -181,11 +231,15 @@ function pushMappedNote(
   const clampedMidi = clampMidiToAbsoluteRange(midi, instrumentId);
   const tieStart = ev?.tieStart === true;
   const tieStop = ev?.tieStop === true;
+  const marks = articulations?.length
+    ? articulations
+    : (Array.isArray(ev?.articulations) ? ev.articulations : undefined);
   targetMeasure.events.push({
     id: `${idPrefix}-${targetMeasure.number}-${seq}`,
     t, dur, type: "note",
     pitch: midiToPitch(clampedMidi),
     voice: 1, staff: 1,
+    ...(marks?.length ? { articulations: [...marks] } : {}),
     ...(tieStart ? { tieStart: true } : {}),
     ...(tieStop ? { tieStop: true } : {})
   });
@@ -279,31 +333,43 @@ export function arrangeBrassQuintetFromPianoInstrumentation(
     // ── RH chord → upper brass (Tpt1 top, Tpt2 mid, Horn bottom) ─────────────
     // Spread the right-hand chord across the upper voices. With fewer RH notes
     // than upper voices, the nearest note is reused so each voice still sounds.
+    // Each note is written at its OWN onset, not at the 1/64 key it was
+    // grouped under: rounding a triplet's two thirds of a beat onto that grid
+    // moves it, and a moved note is one the source no longer has.
     for (const k of Array.from(rhByOnset.keys()).sort()) {
-      const onset = Number(k);
       const sel = selectNotesForOnset(rhByOnset.get(k) ?? []); // ascending by midi
       if (!sel.length) continue;
       const n = sel.length;
+      const marks = chordArticulations(sel.map((s) => s.ev));
       upperIds.forEach((bvId, idx) => {
         // idx 0 = highest. Walk down from the top of the chord.
         const pick = sel[Math.max(0, n - 1 - idx)]!;
         const part = partByVoice.get(bvId)!;
-        pushMappedNote(part.measures[mi], pick.ev, clampToBrassSweetSpot(pick.midi, bvId), bvId, bvId, ++seq, onset);
+        pushMappedNote(part.measures[mi], pick.ev, clampToBrassSweetSpot(pick.midi, bvId), bvId, bvId, ++seq, Number(pick.ev?.t), marks);
       });
     }
 
     // ── LH → Trombone (top) / Tuba (bottom) ──────────────────────────────────
     for (const k of Array.from(lhByOnset.keys()).sort()) {
-      const onset = Number(k);
       const sel = selectNotesForOnset(lhByOnset.get(k) ?? []); // ascending by midi
       if (!sel.length) continue;
       const n = sel.length;
       const topEv = sel[n - 1]!;   // highest LH note → Trombone
       const botEv = sel[0]!;       // lowest LH note  → Tuba
-      pushMappedNote(partByVoice.get("tbn")!.measures[mi],  topEv.ev, clampToBrassSweetSpot(topEv.midi, "tbn"),  "tbn",  "tbn",  ++seq, onset);
-      pushMappedNote(partByVoice.get("tuba")!.measures[mi], botEv.ev, clampToBrassSweetSpot(botEv.midi, "tuba"), "tuba_c", "tuba", ++seq, onset);
+      const marks = chordArticulations(sel.map((s) => s.ev));
+      // No treble-hand exemption here, unlike the winds. Where the piano's left
+      // hand climbs into treble register it is an inner line rather than bass,
+      // but neither low brass voice can hold it: the trombone's ceiling sits
+      // below the point at which the fold slack would even fire, and the tuba
+      // tops out a fourth under the material. Exempting them was measured and
+      // changed not one note, so it is not pretended at here.
+      pushMappedNote(partByVoice.get("tbn")!.measures[mi],  topEv.ev, clampToBrassSweetSpot(topEv.midi, "tbn"),  "tbn",  "tbn",  ++seq, Number(topEv.ev?.t), marks);
+      pushMappedNote(partByVoice.get("tuba")!.measures[mi], botEv.ev, clampToBrassSweetSpot(botEv.midi, "tuba"), "tuba_c", "tuba", ++seq, Number(botEv.ev?.t), marks);
     }
 
+    // One player, one note at a time: release a held tone where the next
+    // attack falls rather than letting the export choose between them.
+    for (const bvId of allIds) clipOverlaps(partByVoice.get(bvId)!.measures[mi].events as any[]);
     for (const bvId of allIds) (partByVoice.get(bvId)!.measures[mi].events as any[]).sort(measureEventSort);
   }
 
@@ -323,6 +389,16 @@ export function arrangeBrassQuintetFromPianoInstrumentation(
 
   // Keep the upper voices ordered top-to-bottom (no crossings) at shared onsets.
   enforceBrassVoiceOrder(upperIds.map((bvId) => partByVoice.get(bvId)!), upperIds);
+
+  // Last, so it judges what actually reached the page: the de-crossing pass
+  // moves octaves, and a tie between two different pitches is no more a tie
+  // than one whose continuation was never written.
+  const untied = resolveTies(brassParts, pitchToMidi);
+  if (untied) {
+    warn(warnings, untied === 1
+      ? "[brass] 1 tie could not follow its pitch into a single instrument and became a re-attack."
+      : `[brass] ${untied} ties could not follow their pitch into a single instrument and became re-attacks.`);
+  }
 
   warn(warnings, `[brass] Faithful copy: RH chord→${upperIds.map((b) => BRASS_PART_META[b].name).join("/")}, LH→Trombone/Tuba; voices rest where the piano rests.`);
 
