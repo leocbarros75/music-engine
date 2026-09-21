@@ -1,6 +1,7 @@
 import { inspectPhrases, validatePhrasePlan, applyPhrasePlan } from "../ai/phrasePlan";
 import { synchronizePerformance } from "../exporters/synchronizePerformance";
 import { auditNoteConservation, TRANSCRIPTION_ENSEMBLES, type ConservationReport } from "../preservation/noteConservation";
+import { buildNoteMap, type NoteMap } from "../preservation/noteMap";
 import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
 import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
@@ -40,6 +41,12 @@ export type PipelineResult = {
     preservation?: PreservationReport;
     /** Note-level audit; present only for the transcription ensembles. */
     noteConservation?: ConservationReport;
+    /**
+     * Where every source note went, one row per note. Only when the caller
+     * asks — it is as long as the piece and most callers want the count, not
+     * the ledger.
+     */
+    noteMap?: NoteMap;
     performance?: { status: string; reason?: string; durationSeconds?: number; warnings?: string[] };
   };
 };
@@ -338,6 +345,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
     // the piano's every note, and measuring it against that invariant would
     // report a fault where there is none.
     let noteConservation: ConservationReport | undefined;
+    let noteMap: NoteMap | undefined;
     if (TRANSCRIPTION_ENSEMBLES.has(ensembleRaw)) {
       try {
         noteConservation = auditNoteConservation(musicxml, outputXml);
@@ -351,6 +359,12 @@ export function pipelineMusicxmlToArrangedMusicxml(
             `[transcription] ${noteConservation.lost} of ${noteConservation.sourceSegments} source notes ` +
             `(${pct}%) have no destination in the arrangement` + (where ? `; first at ${where}` : "") + "."
           );
+        }
+        if (req.options?.noteMap === true) {
+          // One row per source note: which instrument took it and at what
+          // octave, or that nothing did. Asked for explicitly because it is
+          // as long as the piece.
+          noteMap = buildNoteMap(musicxml, outputXml);
         }
       } catch {
         // An audit that cannot run must never take the arrangement down with it.
@@ -372,6 +386,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
         phraseCollaboration: phrasePlan ? { status: "applied", phraseCount: phrasePlan.phrases.length, sourceFingerprint: phrasePlan.sourceFingerprint, plan: phrasePlan } : undefined,
         preservation,
         noteConservation,
+        noteMap,
         performance: synchronized.report,
         ensemble: ensembleRaw,
         styleUsed: appResult.styleUsed,

@@ -61,7 +61,27 @@ export type ConservationReport = {
   examples: Array<{ measure: number; beat: number; midi: number; durationBeats: number }>;
 };
 
-type Note = { measure: number; onset: number; midi: number; dur: number };
+type Note = {
+  measure: number;
+  onset: number;
+  midi: number;
+  dur: number;
+  /** The part this note is written in — its MusicXML id, and its printed name. */
+  partId: string;
+  partName: string;
+  /** Which staff of a grand-staff part, when the source says. */
+  staff: number | null;
+};
+
+/** Printed part names, keyed by the id the <part> elements use. */
+function partNames(doc: any): Map<string, string> {
+  const names = new Map<string, string>();
+  for (const sp of el(doc.documentElement, "score-part")) {
+    const id = sp.getAttribute("id");
+    if (id) names.set(id, (text(sp, "part-name") ?? id).trim());
+  }
+  return names;
+}
 
 const el = (n: any, tag: string): any[] =>
   Array.from(n.getElementsByTagName(tag) ?? []);
@@ -92,7 +112,10 @@ function soundingMidi(note: any, chromatic: number, octaveChange: number): numbe
 export function collectNotes(xml: string): Note[] {
   const doc = new DOMParser({ onError: () => {} } as any).parseFromString(xml, "application/xml");
   const out: Note[] = [];
+  const names = partNames(doc);
   for (const part of el(doc.documentElement, "part")) {
+    const partId = part.getAttribute("id") ?? "";
+    const partName = names.get(partId) ?? partId;
     const transpose = el(part, "transpose")[0];
     const chromatic = transpose ? Number(text(transpose, "chromatic") ?? 0) || 0 : 0;
     const octaveChange = transpose ? Number(text(transpose, "octave-change") ?? 0) || 0 : 0;
@@ -113,7 +136,9 @@ export function collectNotes(xml: string): Note[] {
         const isChordMember = el(node, "chord").length > 0;
         const onset = isChordMember ? previousOnset : cursor;
         const midi = soundingMidi(node, chromatic, octaveChange);
-        if (midi !== null) out.push({ measure: number, onset, midi, dur });
+        const staffText = text(node, "staff");
+        const staff = staffText === null ? null : Number(staffText) || null;
+        if (midi !== null) out.push({ measure: number, onset, midi, dur, partId, partName, staff });
         if (!isChordMember) { previousOnset = cursor; cursor += dur; }
       }
     }
@@ -125,43 +150,70 @@ export function collectNotes(xml: string): Note[] {
 const key = (n: { measure: number; onset: number; midi: number }) =>
   `${n.measure}|${Math.round(n.onset * 1000)}|${((n.midi % 12) + 12) % 12}`;
 
-/** Bar + beat + exact sounding pitch, for the stricter same-octave figure. */
-const exactKey = (n: { measure: number; onset: number; midi: number }) =>
-  `${n.measure}|${Math.round(n.onset * 1000)}|${n.midi}`;
+/**
+ * Pair each source note with the output note that plays it, in two passes.
+ *
+ * Notes that kept their exact sounding pitch are claimed FIRST, across the
+ * whole score; only what remains is paired by pitch class. The order matters
+ * whenever a moment holds several notes of one pitch class in different
+ * octaves, which a piano chord does constantly: bar 25 of the reference sounds
+ * D2, D4 and D6 over a quartet playing D6 and D2, and a single greedy pass in
+ * source order lets the D4 help itself to the D6.
+ *
+ * Returns, for each source note by index, its destination or undefined. How
+ * MANY notes find a destination does not depend on the passes — each bucket is
+ * drained either way — but WHICH note goes where does, and so does the count
+ * of notes that kept their own octave.
+ *
+ * One function, so the conservation figures and the note map can never
+ * disagree about the same score.
+ */
+export function pairSourceToOutput(
+  source: Note[],
+  output: Note[]
+): Array<Note | undefined> {
+  const buckets = new Map<string, Note[]>();
+  for (const n of output) {
+    const k = key(n);
+    const list = buckets.get(k);
+    if (list) list.push(n);
+    else buckets.set(k, [n]);
+  }
+
+  const taken: Array<Note | undefined> = new Array(source.length);
+  source.forEach((n, i) => {
+    const bucket = buckets.get(key(n));
+    if (!bucket?.length) return;
+    const exact = bucket.findIndex((c) => c.midi === n.midi);
+    if (exact >= 0) taken[i] = bucket.splice(exact, 1)[0];
+  });
+  source.forEach((n, i) => {
+    if (taken[i]) return;
+    const bucket = buckets.get(key(n));
+    if (bucket?.length) taken[i] = bucket.shift();
+  });
+  return taken;
+}
 
 export function auditNoteConservation(sourceXml: string, outputXml: string): ConservationReport {
   const source = collectNotes(sourceXml);
-  const output = collectNotes(outputXml);
-
-  const counted = (xs: Note[], f: (n: Note) => string) => {
-    const m = new Map<string, number>();
-    for (const n of xs) m.set(f(n), (m.get(f(n)) ?? 0) + 1);
-    return m;
-  };
-  const byClass = counted(output, key);
-  const byPitch = counted(output, exactKey);
-
-  const take = (m: Map<string, number>, k: string): boolean => {
-    const have = m.get(k) ?? 0;
-    if (have <= 0) return false;
-    m.set(k, have - 1);
-    return true;
-  };
+  const taken = pairSourceToOutput(source, collectNotes(outputXml));
 
   let preserved = 0;
   let sameOctave = 0;
   const examples: ConservationReport["examples"] = [];
 
-  for (const n of source) {
-    if (take(byClass, key(n))) {
+  source.forEach((n, i) => {
+    const dest = taken[i];
+    if (dest) {
       preserved++;
-      // Counted independently: a note can be present at the right moment while
+      // Counted separately: a note can be present at the right moment while
       // the transcription has moved its octave to fit an instrument.
-      if (take(byPitch, exactKey(n))) sameOctave++;
+      if (dest.midi === n.midi) sameOctave++;
     } else if (examples.length < 8) {
       examples.push({ measure: n.measure, beat: n.onset, midi: n.midi, durationBeats: n.dur });
     }
-  }
+  });
 
   return {
     sourceSegments: source.length,
