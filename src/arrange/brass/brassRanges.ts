@@ -22,11 +22,20 @@ export type BrassVoiceId = "tpt1" | "tpt2" | "hn" | "tbn" | "tuba";
 export type BrassRange = { absMin: number; absMax: number; prefMin: number; prefMax: number };
 
 // pref = reliable/characteristic register; abs = full practical range (concert).
+//
+// These are EDITORIAL ranges and must narrow the instrument catalog, never
+// widen it: the catalog says what the instrument can play, this table says how
+// much of that we choose to write. Where an arranger clamps against both — the
+// piano-copy paths do — a table that claims more than the catalog allows is
+// simply a lie about what the code does, and it hides real bugs. The
+// trombone's ceiling used to read C5 while the catalog capped it at Bb4, so a
+// rule written against C5 could never fire and looked correct for it.
+// `brassRanges.test.ts` now fails if any of these steps outside the catalog.
 export const BRASS_RANGES: Record<BrassVoiceId, BrassRange> = {
   tpt1: { absMin: 52, absMax: 86, prefMin: 57, prefMax: 82 }, // E3..D6  pref A3..Bb5
   tpt2: { absMin: 52, absMax: 84, prefMin: 55, prefMax: 79 }, // E3..C6  pref G3..G5
   hn:   { absMin: 35, absMax: 77, prefMin: 48, prefMax: 72 }, // B1..F5  pref C3..C5
-  tbn:  { absMin: 40, absMax: 72, prefMin: 43, prefMax: 67 }, // E2..C5  pref G2..G4
+  tbn:  { absMin: 40, absMax: 70, prefMin: 43, prefMax: 67 }, // E2..Bb4 pref G2..G4
   tuba: { absMin: 26, absMax: 58, prefMin: 31, prefMax: 53 }, // D1..Bb3 pref G1..F3
 };
 
