@@ -3,6 +3,7 @@ import { getInstrumentSpec, midiToPitch, pitchToMidi } from "../instruments/inst
 import { arrangeStringQuartetFromPianoInstrumentation } from "./arrangeStringQuartetFromPianoInstrumentation";
 import { WOODWIND_RANGES, type WoodwindVoiceId } from "./woodwinds/woodwindRanges";
 import { resolveTies } from "./tieResolution";
+import { collapseToSinglePlayer } from "./divisi";
 
 /**
  * Place a pitch in a woodwind's sweet-spot register by octave. Keeps the pitch
@@ -434,7 +435,20 @@ export function arrangeWoodwindQuartetFromPianoInstrumentation(
       }) }));
       return { ...src, part_id: map.partId, name: map.name, instrument: map.instrument, staves: 1, measures };
     }).filter((p): p is PartLike => !!p);
+    // The string arranger writes for SECTIONS — chord stacks, and divided
+    // voices where a line and the figure over it coexist. One flute is not a
+    // section. Reduce each part to the single line its player can hold.
+    // The bassoon holds the bottom of its stack; the upper winds hold the top.
+    const shed = collapseToSinglePlayer(remapped, (_p, i) =>
+      WW_FROM_STRING[i]?.wvId === "bn" ? "bottom" : "top");
+    if (shed) {
+      warn(warnings, `[woodwinds] ${shed} divisi note${shed === 1 ? "" : "s"} dropped: the string arrangement divides its sections, and one wind player cannot.`);
+    }
     enforceWoodwindVoiceOrder(remapped);
+    const untiedChoral = resolveTies(remapped, pitchToMidi);
+    if (untiedChoral) {
+      warn(warnings, `[woodwinds] ${untiedChoral} tie${untiedChoral === 1 ? "" : "s"} left dangling by that reduction and became re-attacks.`);
+    }
     return { ...(score as any), meta: { ...(score.meta ?? {}), ensemble: "woodwind_ensemble" }, parts: remapped } as ScoreModel;
   }
 

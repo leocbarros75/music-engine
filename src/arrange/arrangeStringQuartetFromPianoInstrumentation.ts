@@ -5,6 +5,7 @@ import {
   pitchToMidi
 } from "../instruments/instrumentCatalog";
 import { resolveTies } from "./tieResolution";
+import { applyDivisi, staffingNote } from "./divisi";
 
 type PartLike = any;
 type MeasureLike = any;
@@ -928,6 +929,14 @@ export function arrangeStringQuartetFromPianoInstrumentation(
     vam.events.sort(measureEventSort);
     vcm.events.sort(measureEventSort);
   }
+
+  // Divide the sections before anything judges what reached the page. A piano
+  // chord and the figure running over it both arrive in one part, and one
+  // notated voice cannot hold both: the export keeps the chord and the figure
+  // disappears. Two desks can hold both, which is what a string section is for.
+  const divisi = applyDivisi([violin1, violin2, viola, cello]);
+  const staffing = staffingNote([violin1, violin2, viola, cello], divisi);
+  if (staffing) warn(warnings, `[strings] ${staffing}`);
 
   // A held pitch changes rank as the harmony moves under it, so a tie can be
   // handed to a different instrument halfway through — leaving the first with a

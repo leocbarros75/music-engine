@@ -42,6 +42,7 @@ async function main() {
       'tests/import/extractLeadSheet.test.ts',
       'tests/score/scoreStandard.test.ts',
       'tests/preservation/sourcePreservation.test.ts',
+      'tests/preservation/noteMap.test.ts',
       'tests/preservation/serverPreservation.test.ts',
       'tests/performance/performance.test.ts',
       'tests/runner/runner.test.ts'
@@ -63,7 +64,8 @@ async function main() {
       'tests/arrange/woodwindOverlap.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
-      'tests/arrange/rangeTables.test.ts'
+      'tests/arrange/rangeTables.test.ts',
+      'tests/arrange/divisi.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {
