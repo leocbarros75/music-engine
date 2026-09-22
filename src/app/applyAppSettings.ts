@@ -15,7 +15,7 @@ import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
-import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf } from "../arrange/complementary";
+import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures } from "../arrange/complementary";
 
 /**
  * Hold a note rather than re-striking it, at whatever rate the tempo makes
@@ -34,6 +34,21 @@ function sustainComplement(
     warnings.push(
       `[piano+${label}] ${removed} repeated attack${removed === 1 ? "" : "s"} held instead` +
       (bpm ? ` — at ${Math.round(bpm)} to the quarter a bow carries ${beats} beat${beats === 1 ? "" : "s"}` : "") + "."
+    );
+  }
+}
+
+/**
+ * Let the top voice answer at the end of a phrase. A line that only ever holds
+ * is furniture; this is the one place it sounds like a voice.
+ */
+function answerComplement(warnings: string[], label: string, parts: any[], arc: any[]): void {
+  const added = addAnsweringGestures(parts, arc as any);
+  if (added > 0) {
+    const gestures = Math.round(added / 3);
+    warnings.push(
+      `[piano+${label}] ${gestures} short answer${gestures === 1 ? "" : "s"} on phrase tails, ` +
+      "where the top line would otherwise only hold."
     );
   }
 }
@@ -1999,6 +2014,7 @@ export function applyAppSettings(
       });
       describeArc(warnings, "winds", wwParts, applyArc(wwParts, arc));
       sustainComplement(warnings, "winds", wwParts, frozenPianoPart?.measures ?? []);
+      answerComplement(warnings, "winds", wwParts, arc);
       (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
     }
     attachTextureAnalysis(wwResult.scoreModel, warnings);
@@ -2139,6 +2155,7 @@ export function applyAppSettings(
     const stringRests = applyArc(stringParts, stringArc);
     describeArc(warnings, "strings", stringParts, stringRests);
     sustainComplement(warnings, "strings", stringParts, pianoPart?.measures ?? []);
+    answerComplement(warnings, "strings", stringParts, stringArc);
     const finalScore: any = {
       ...(JSON.parse(JSON.stringify(stringScore)) as any),
       meta: { ...(stringScore as any).meta, ensemble: "piano_with_strings" },
@@ -2272,6 +2289,7 @@ export function applyAppSettings(
       });
       describeArc(warnings, "brass", brParts, applyArc(brParts, arc));
       sustainComplement(warnings, "brass", brParts, frozenPianoPart?.measures ?? []);
+      answerComplement(warnings, "brass", brParts, arc);
       (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);
     }
     attachTextureAnalysis(brResult.scoreModel, warnings);

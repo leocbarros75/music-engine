@@ -201,3 +201,134 @@ test('a single note is left exactly as it was', () => {
   assert.equal(sustainForBowing(p, 2), 0);
   assert.deepEqual(durs(p), ['0+4']);
 });
+
+// ── A short answer at the end of a phrase ───────────────────────────────────
+
+import { addAnsweringGestures } from '../../src/arrange/complementary';
+
+const held = (t: number, dur: number, midi: number) => ({
+  id: `h${midi}@${t}`, t, dur, midi, type: 'note' as const,
+  pitch: { step: 'E', octave: 5 }, voice: 1, staff: 1,
+});
+const mkPart = (id: string, bars: any[][]) =>
+  ({ part_id: id, name: id, measures: bars.map((events, i) => ({ number: i + 1, events })) });
+const fullArc = (n: number, intensity = 1) =>
+  Array.from({ length: n }, () => ({ playing: new Set(['V1', 'V2']), intensity }));
+/** A top voice holding two half notes per bar, over an inner voice. */
+const sustaining = (bars: number) => [
+  mkPart('V1', Array.from({ length: bars }, () => [held(0, 2, 76), held(2, 2, 76)])),
+  mkPart('V2', Array.from({ length: bars }, () => [held(0, 4, 72)])),
+];
+const barOf = (p: any, i: number) =>
+  p.measures[i].events.slice().sort((a: any, b: any) => a.t - b.t).map((e: any) => `${e.t}+${e.dur}:${e.midi}`);
+
+test('the answer is a quarter and two quavers over the last two beats', () => {
+  const parts = sustaining(1);
+  assert.equal(addAnsweringGestures(parts, fullArc(1)), 3);
+  assert.deepEqual(barOf(parts[0], 0), ['0+2:76', '2+1:76', '3+0.5:72', '3.5+0.5:76']);
+});
+
+test('it steps away and comes back', () => {
+  const parts = sustaining(1);
+  addAnsweringGestures(parts, fullArc(1));
+  const tail = parts[0].measures[0].events.filter((e: any) => e.t >= 2);
+  assert.equal(tail[0].midi, 76, 'starts on the note it was holding');
+  assert.notEqual(tail[1].midi, 76, 'leans away');
+  assert.equal(tail[2].midi, 76, 'and returns');
+});
+
+test('one slur covers the whole gesture', () => {
+  const parts = sustaining(1);
+  addAnsweringGestures(parts, fullArc(1));
+  const tail = parts[0].measures[0].events.filter((e: any) => e.t >= 2);
+  assert.equal(tail[0].slurStart, true);
+  assert.equal(tail[2].slurStop, true);
+  assert(!tail[1].slurStart && !tail[1].slurStop, 'the middle note is inside it');
+});
+
+test('the step-away note gets a spelling of its own', () => {
+  // Reusing the held note's pitch would print the wrong notehead at the right
+  // sounding pitch.
+  const parts = sustaining(1);
+  addAnsweringGestures(parts, fullArc(1));
+  const away = parts[0].measures[0].events.find((e: any) => e.midi !== 76);
+  assert(away.pitch && away.pitch.step, 'has a pitch');
+  assert.notDeepEqual(away.pitch, { step: 'E', octave: 5 }, 'and not the held note\'s');
+});
+
+test('it answers every other opportunity, not every bar', () => {
+  // Answering constantly is another accompaniment competing with the melody.
+  const parts = sustaining(4);
+  addAnsweringGestures(parts, fullArc(4));
+  const answered = [0, 1, 2, 3].filter((i) => parts[0].measures[i].events.length > 2);
+  assert.deepEqual(answered, [0, 2]);
+});
+
+test('thin writing gets no answer at all', () => {
+  const parts = sustaining(2);
+  assert.equal(addAnsweringGestures(parts, fullArc(2, 0.2)), 0, 'the music has not opened up');
+  assert.deepEqual(barOf(parts[0], 0), ['0+2:76', '2+2:76']);
+});
+
+test('a bar the top voice is resting gets no answer', () => {
+  const parts = sustaining(1);
+  const arc = [{ playing: new Set(['V2']), intensity: 1 }];
+  assert.equal(addAnsweringGestures(parts, arc as any), 0);
+});
+
+test('a part already moving in the tail is left to say its own thing', () => {
+  const parts = [
+    mkPart('V1', [[held(0, 2, 76), held(2, 1, 76), held(3, 1, 74)]]),
+    mkPart('V2', [[held(0, 4, 72)]]),
+  ];
+  assert.equal(addAnsweringGestures(parts, fullArc(1)), 0);
+});
+
+test('the step-away pitch comes from what the ensemble is sounding', () => {
+  // Not from a chord symbol: drawn from the other parts, it cannot disagree
+  // with the harmony as actually voiced.
+  const parts = [
+    mkPart('V1', [[held(0, 2, 76), held(2, 2, 76)]]),
+    mkPart('V2', [[held(0, 4, 77)]]),      // F5 — a semitone above
+  ];
+  addAnsweringGestures(parts, fullArc(1));
+  const away = parts[0].measures[0].events.find((e: any) => e.midi !== 76);
+  assert.equal(away.midi % 12, 77 % 12, 'it leans to the pitch class the ensemble has');
+});
+
+test('no harmony under it means no invented neighbour', () => {
+  const parts = [mkPart('V1', [[held(0, 2, 76), held(2, 2, 76)]])];
+  const arc = [{ playing: new Set(['V1']), intensity: 1 }];
+  assert.equal(addAnsweringGestures(parts, arc as any), 0);
+});
+
+test('the bar still adds up after the answer', () => {
+  const parts = sustaining(1);
+  addAnsweringGestures(parts, fullArc(1));
+  const total = parts[0].measures[0].events.reduce((s: number, e: any) => s + Number(e.dur), 0);
+  assert.equal(total, 4);
+});
+
+test('a note carrying only its spelling is still read as a pitch', () => {
+  // `midi` is a cache the model fills in later. Reading it alone treats every
+  // note as unpitched, which silently disabled this pass entirely: eleven
+  // eligible phrase tails, every one rejected for having no pitch.
+  const noMidi = (t: number, dur: number, step: string, octave: number) => ({
+    id: `x${step}${octave}@${t}`, t, dur, type: 'note' as const,
+    pitch: { step, octave }, voice: 1, staff: 1,
+  });
+  const parts = [
+    { part_id: 'V1', name: 'V1', measures: [{ number: 1, events: [noMidi(0, 2, 'E', 5), noMidi(2, 2, 'E', 5)] }] },
+    { part_id: 'V2', name: 'V2', measures: [{ number: 1, events: [noMidi(0, 4, 'C', 5)] }] },
+  ];
+  const arc = [{ playing: new Set(['V1', 'V2']), intensity: 1 }];
+  assert.equal(addAnsweringGestures(parts, arc as any), 3, 'the gesture is written');
+});
+
+test('sustain also reads a spelling-only note', () => {
+  const noMidi = (t: number, dur: number) => ({
+    id: `y@${t}`, t, dur, type: 'note' as const, pitch: { step: 'C', octave: 4 }, voice: 1, staff: 1,
+  });
+  const p = [{ part_id: 'V1', name: 'V1', measures: [{ number: 1, events: [noMidi(0, 1), noMidi(1, 1), noMidi(2, 1), noMidi(3, 1)] }] }];
+  assert.equal(sustainForBowing(p, 2), 2, 'four repeats of one pitch become two');
+});

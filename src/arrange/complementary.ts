@@ -20,8 +20,26 @@
  * parameter, and the engine had no way to express it.
  */
 
+import { midiToPitch, pitchToMidi } from "../instruments/instrumentCatalog";
+
 type PartLike = any;
 type MeasureLike = any;
+
+/**
+ * An event's sounding pitch. `midi` is a cache the model fills in later, so at
+ * arranging time a note may carry only its spelling — reading the field alone
+ * silently treats every note as unpitched.
+ */
+function soundingMidi(ev: any): number | null {
+  const cached = Number(ev?.midi);
+  if (Number.isFinite(cached)) return cached;
+  if (!ev?.pitch) return null;
+  try {
+    return pitchToMidi(ev.pitch);
+  } catch {
+    return null;
+  }
+}
 
 /** Score order: added players above, the piano they accompany at the foot. */
 export function withPianoPart(arrangedParts: PartLike[], pianoPart: PartLike | null): PartLike[] {
@@ -187,7 +205,7 @@ export function sustainForBowing(parts: PartLike[], maxBeats: number): number {
       // happen to share onsets, and each is held or re-struck on its own.
       const byPitch = new Map<string, any[]>();
       for (const n of notes) {
-        const k = `${n.voice ?? 1}|${n.midi ?? JSON.stringify(n.pitch)}`;
+        const k = `${n.voice ?? 1}|${soundingMidi(n) ?? JSON.stringify(n.pitch)}`;
         const list = byPitch.get(k);
         if (list) list.push(n);
         else byPitch.set(k, [n]);
@@ -249,4 +267,126 @@ export function applyArc(parts: PartLike[], arc: ArcDecision[]): Map<string, num
     rested.set(id, count);
   }
   return rested;
+}
+
+// ── A short answer at the end of a phrase ───────────────────────────────────
+
+/**
+ * Give the top voice something to say at the end of a phrase.
+ *
+ * Sustaining is the right default for an accompaniment, and the pass above
+ * makes it one — but a line that only ever holds is furniture. The reference
+ * edition lets its first violin answer on selected phrase tails: a quarter and
+ * two quavers over the last two beats, slurred, stepping away to a neighbouring
+ * chord tone and back. Thirty-two notes in a 62-bar song. Not much, and the
+ * only place the part sounds like a voice rather than a pad.
+ *
+ * WHICH BARS. The reference names them outright — 16, 18, 20, 23, 26 — which
+ * its own guide admits is a decision about that score and not a rule. But the
+ * shape of the list gives the rule away: it is every other bar once the music
+ * has opened up. So the condition here is the density already measured for the
+ * arc, plus alternation, which needs no section labels and invents none.
+ *
+ * WHICH NOTE. The step-away pitch is taken from what the rest of the ensemble
+ * is actually sounding in that bar, not from a chord symbol. That keeps the
+ * inflection inside the harmony as voiced rather than as named — and it cannot
+ * disagree with the other parts, because it is drawn from them.
+ */
+export function addAnsweringGestures(
+  parts: PartLike[],
+  arc: ArcDecision[],
+  options?: { minIntensity?: number; beats?: number; everyNth?: number }
+): number {
+  const top = parts[0];
+  if (!top) return 0;
+  const topId = String(top.part_id ?? "");
+  const minIntensity = options?.minIntensity ?? 0.6;
+  const span = options?.beats ?? 2;
+  const everyNth = Math.max(1, options?.everyNth ?? 2);
+
+  let added = 0;
+  let eligibleSeen = 0;
+
+  const measures: MeasureLike[] = top.measures ?? [];
+  for (let i = 0; i < measures.length; i++) {
+    const decision = arc[i];
+    if (!decision || decision.intensity < minIntensity || !decision.playing.has(topId)) continue;
+
+    const measure = measures[i]!;
+    const notes = (measure.events ?? []).filter((e: any) => e?.type === "note");
+    if (!notes.length) continue;
+
+    // How long the bar is, taken from what is written in it.
+    const barBeats = notes.reduce((m: number, e: any) => Math.max(m, Number(e.t) + Number(e.dur)), 0);
+    if (barBeats < span * 2) continue;          // too short to answer within
+
+    // The note holding the tail of the bar. Only a HELD note is replaced: a
+    // part already moving there is saying something of its own.
+    const tailStart = barBeats - span;
+    const held = notes.find((e: any) =>
+      Number(e.t) <= tailStart + 1e-9 && Number(e.t) + Number(e.dur) >= barBeats - 1e-9);
+    if (!held) continue;
+    const others = notes.filter((e: any) => e !== held);
+    if (others.some((e: any) => Number(e.t) > tailStart + 1e-9)) continue;  // already busy
+
+    eligibleSeen++;
+    if ((eligibleSeen - 1) % everyNth !== 0) continue;
+
+    const p = soundingMidi(held);
+    if (p === null) continue;
+
+    // What the rest of the ensemble is sounding in this bar.
+    const pcs = new Set<number>();
+    for (const part of parts) {
+      if (part === top) continue;
+      for (const e of (part?.measures?.[i]?.events ?? []) as any[]) {
+        if (e?.type !== "note") continue;
+        const m = soundingMidi(e);
+        if (m !== null) pcs.add(((m % 12) + 12) % 12);
+      }
+    }
+    if (!pcs.size) continue;
+
+    // The nearest other chord tone, a step or so away — near enough to be an
+    // inflection rather than a leap into a new line.
+    let q: number | null = null;
+    for (let d = 1; d <= 4; d++) {
+      for (const cand of [p + d, p - d]) {
+        if (cand !== p && pcs.has(((cand % 12) + 12) % 12)) { q = cand; break; }
+      }
+      if (q !== null) break;
+    }
+    if (q === null) continue;
+
+    // Quarter, quaver, quaver — under one slur, back where it started.
+    const shorten = tailStart - Number(held.t);
+    if (shorten > 1e-9) held.dur = shorten;
+    else measure.events = (measure.events ?? []).filter((e: any) => e !== held);
+
+    const half = span / 2;
+    const quarterPiece = half;
+    const eighthPiece = half / 2;
+    const gesture = [
+      { t: tailStart, dur: quarterPiece, midi: p, slurStart: true },
+      { t: tailStart + quarterPiece, dur: eighthPiece, midi: q },
+      { t: tailStart + quarterPiece + eighthPiece, dur: eighthPiece, midi: p, slurStop: true },
+    ];
+    gesture.forEach((g, k) => {
+      (measure.events as any[]).push({
+        ...held,
+        id: `${held.id}-ans${k}`,
+        t: g.t,
+        dur: g.dur,
+        midi: g.midi,
+        // The step-away note needs a spelling of its own; reusing the held
+        // note's pitch would write the wrong notehead at the right MIDI.
+        pitch: g.midi === p ? held.pitch : midiToPitch(g.midi),
+        ...(g.slurStart ? { slurStart: true } : {}),
+        ...(g.slurStop ? { slurStop: true } : {}),
+      });
+    });
+    (measure.events as any[]).sort((a: any, b: any) => Number(a.t) - Number(b.t));
+    added += 3;
+  }
+  return added;
 }
