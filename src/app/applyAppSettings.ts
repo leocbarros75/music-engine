@@ -15,6 +15,27 @@ import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
+import { withPianoPart, planArc, applyArc } from "../arrange/complementary";
+
+/**
+ * Say what the arc did. A player looking at a part with 24 bars of rest should
+ * be able to see that it was a decision, not a failure.
+ */
+function describeArc(
+  warnings: string[],
+  label: string,
+  parts: any[],
+  rested: Map<string, number>
+): void {
+  const resting = parts
+    .map((p) => ({ name: String(p?.name ?? p?.part_id ?? ""), n: rested.get(String(p?.part_id ?? "")) ?? 0 }))
+    .filter((x) => x.n > 0);
+  if (!resting.length) return;
+  warnings.push(
+    `[piano+${label}] The piano carries the song, so the added parts come and go with it: ` +
+    resting.map((x) => `${x.name} rests ${x.n} bar${x.n === 1 ? "" : "s"}`).join(", ") + "."
+  );
+}
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import type { ProfileId } from "../arrange/strings/types";
@@ -1950,6 +1971,14 @@ export function applyAppSettings(
       rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
       warnings,
     });
+    {
+      const wwParts: any[] = (wwResult.scoreModel as any).parts ?? [];
+      const arc = planArc(frozenPianoPart?.measures ?? wwParts[0]?.measures ?? [], {
+        voicesTopDown: wwParts.map((p: any) => String(p.part_id)),
+      });
+      describeArc(warnings, "winds", wwParts, applyArc(wwParts, arc));
+      (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
+    }
     attachTextureAnalysis(wwResult.scoreModel, warnings);
     return {
       scoreModel: wwResult.scoreModel as ScoreModel,
@@ -2075,12 +2104,22 @@ export function applyAppSettings(
       );
     }
 
-    // ── Output: strings only (piano used as harmony source, not in output) ──
+    // ── Output: the piano, with strings around it ───────────────────────────
+    // The pianist keeps the music. These players are added to it, so the piano
+    // belongs in the score — and they do not all play all of the time.
     const stringParts: any[] = (stringScore as any).parts ?? [];
+    // Density comes from the PIANO, not from the parts just generated: those
+    // are uniformly busy by construction and say nothing about where the song
+    // opens up.
+    const stringArc = planArc(pianoPart?.measures ?? stringParts[0]?.measures ?? [], {
+      voicesTopDown: stringParts.map((p: any) => String(p.part_id)),
+    });
+    const stringRests = applyArc(stringParts, stringArc);
+    describeArc(warnings, "strings", stringParts, stringRests);
     const finalScore: any = {
       ...(JSON.parse(JSON.stringify(stringScore)) as any),
-      meta: { ...(stringScore as any).meta, ensemble: "string_ensemble" },
-      parts: stringParts
+      meta: { ...(stringScore as any).meta, ensemble: "piano_with_strings" },
+      parts: withPianoPart(stringParts, pianoPart)
     };
 
     attachTextureAnalysis(finalScore, warnings);
@@ -2203,6 +2242,14 @@ export function applyAppSettings(
       rhythmSourcePart: frozenPianoPart,   // use piano RH onsets as rhythm grid
       warnings,
     });
+    {
+      const brParts: any[] = (brResult.scoreModel as any).parts ?? [];
+      const arc = planArc(frozenPianoPart?.measures ?? brParts[0]?.measures ?? [], {
+        voicesTopDown: brParts.map((p: any) => String(p.part_id)),
+      });
+      describeArc(warnings, "brass", brParts, applyArc(brParts, arc));
+      (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);
+    }
     attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
       scoreModel: brResult.scoreModel as ScoreModel,
