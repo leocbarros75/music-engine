@@ -101,3 +101,45 @@ test('every voice stays inside its own range', () => {
     for (const m of midisIn(out, id))
       assert(m >= lo && m <= hi, `${id} played ${m}, outside ${lo}-${hi}`);
 });
+
+// ── A left hand with no bass in it ──────────────────────────────────────────
+
+test('the horn takes a treble-register left hand, and the tuba rests', () => {
+  // Bars 33-38 of the reference put the whole left hand at B3 and above: an
+  // inner line, not a bass line. The tuba cannot reach it — the material sits
+  // a fourth over its ceiling — so folding it down invents a bass the piece
+  // does not have. The horn plays it where it stands.
+  const out = arrangeBrassQuintetFromPianoInstrumentation(piano([{
+    rh: [note(0, 4, 78), note(0, 4, 81)],
+    lh: [note(0, 4, 71), note(0, 4, 74)],
+  }]), {});
+  assert.deepEqual(midisIn(out, 'P_HN'), [71], 'the horn holds B3 at pitch');
+  assert.deepEqual(midisIn(out, 'P_TUBA'), [], 'the tuba is silent, not inventing a bass');
+});
+
+test('a left hand that does contain bass still goes to the tuba', () => {
+  const out = arrangeBrassQuintetFromPianoInstrumentation(piano([{
+    rh: [note(0, 4, 78), note(0, 4, 81)],
+    lh: [note(0, 4, 40), note(0, 4, 55)],
+  }]), {});
+  assert.deepEqual(midisIn(out, 'P_TUBA'), [40], 'a real bass note is the tuba\'s');
+});
+
+test('a busy right hand keeps the horn, so the tuba carries on as before', () => {
+  // The horn only moves when it was doubling something a trumpet already had.
+  // With three distinct right-hand notes it is doing its own work.
+  const out = arrangeBrassQuintetFromPianoInstrumentation(piano([{
+    rh: [note(0, 4, 74), note(0, 4, 78), note(0, 4, 81)],
+    lh: [note(0, 4, 71), note(0, 4, 74)],
+  }]), {});
+  assert.deepEqual(midisIn(out, 'P_HN'), [74], 'the horn still has the right hand\'s third note');
+  assert.equal(midisIn(out, 'P_TUBA').length, 1, 'and the tuba keeps the left-hand bottom');
+});
+
+test('one low note in the left hand means it is still a bass group', () => {
+  const out = arrangeBrassQuintetFromPianoInstrumentation(piano([{
+    rh: [note(0, 4, 78)],
+    lh: [note(0, 4, 43), note(0, 4, 64)],
+  }]), {});
+  assert.deepEqual(midisIn(out, 'P_TUBA'), [43]);
+});

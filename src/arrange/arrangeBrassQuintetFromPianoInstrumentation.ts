@@ -70,6 +70,20 @@ function clampToBrassSweetSpot(midi: number, bvId: BrassVoiceId): number {
 }
 
 /**
+ * Does this left-hand group contain bass at all, or has the texture lifted?
+ *
+ * A left-hand staff is not a bass clef by another name. Where the piano's left
+ * hand climbs into treble register it is an inner line and the passage has no
+ * bass in it — bars 33-38 of the reference and the three places that material
+ * returns put the whole left hand at B3 and above.
+ */
+const TREBLE_HAND_FLOOR = 60; // C4
+
+function handHasNoBass(midis: number[]): boolean {
+  return midis.length > 0 && midis.every((m) => m >= TREBLE_HAND_FLOOR);
+}
+
+/**
  * The articulations of a chord, gathered from all of its notes. A piano
  * engraver marks a stack once; split across brass voices, only the player who
  * happened to get that notehead saw it.
@@ -317,6 +331,7 @@ export function arrangeBrassQuintetFromPianoInstrumentation(
   for (const bvId of allIds) partByVoice.set(bvId, makePart(bvId, sourceMeasures));
 
   let seq = 0;
+  let tubaRested = 0;
   for (let mi = 0; mi < sourceMeasures.length; mi++) {
     const srcMeasure = sourceMeasures[mi] ?? {};
     const noteEvents = (Array.isArray(srcMeasure?.events) ? srcMeasure.events : [])
@@ -357,13 +372,31 @@ export function arrangeBrassQuintetFromPianoInstrumentation(
       const topEv = sel[n - 1]!;   // highest LH note → Trombone
       const botEv = sel[0]!;       // lowest LH note  → Tuba
       const marks = chordArticulations(sel.map((s) => s.ev));
-      // No treble-hand exemption here, unlike the winds. Where the piano's left
-      // hand climbs into treble register it is an inner line rather than bass,
-      // but neither low brass voice can hold it: the trombone's ceiling sits
-      // below the point at which the fold slack would even fire, and the tuba
-      // tops out a fourth under the material. Exempting them was measured and
-      // changed not one note, so it is not pretended at here.
       pushMappedNote(partByVoice.get("tbn")!.measures[mi],  topEv.ev, clampToBrassSweetSpot(topEv.midi, "tbn"),  "tbn",  "tbn",  ++seq, Number(topEv.ev?.t), marks);
+
+      // Where the left hand has no bass in it, the tuba has no bass to play.
+      // It cannot hold that line either — the material sits a fourth above its
+      // ceiling — so folding it down is not a register choice but an invented
+      // bass, one the piece does not have, for twenty-four bars.
+      //
+      // The horn can hold it, at pitch, inside its own preferred register. And
+      // it is free to: at nearly all of these moments the right hand has fewer
+      // than three notes, so the horn was only doubling something a trumpet
+      // already had. So the line moves up to the horn and the tuba rests,
+      // which is what a brass section does when the music lifts.
+      const noBass = handHasNoBass(sel.map((s) => s.midi));
+      const rhHere = selectNotesForOnset(rhByOnset.get(k) ?? []);
+      const hornIsFree = quintet && rhHere.length < upperIds.length;
+      if (noBass && hornIsFree) {
+        const hornMeasure = partByVoice.get("hn")!.measures[mi];
+        const onset = Number(botEv.ev?.t);
+        hornMeasure.events = (hornMeasure.events as any[]).filter(
+          (e: any) => !(e?.type === "note" && Math.abs(Number(e.t) - onset) < 1e-9)
+        );
+        pushMappedNote(hornMeasure, botEv.ev, clampToBrassSweetSpot(botEv.midi, "hn"), "hn", "hn", ++seq, onset, marks);
+        tubaRested++;
+        continue;
+      }
       pushMappedNote(partByVoice.get("tuba")!.measures[mi], botEv.ev, clampToBrassSweetSpot(botEv.midi, "tuba"), "tuba_c", "tuba", ++seq, Number(botEv.ev?.t), marks);
     }
 
@@ -393,6 +426,10 @@ export function arrangeBrassQuintetFromPianoInstrumentation(
   // Last, so it judges what actually reached the page: the de-crossing pass
   // moves octaves, and a tie between two different pitches is no more a tie
   // than one whose continuation was never written.
+  if (tubaRested > 0) {
+    warn(warnings, `[brass] The left hand has no bass for ${tubaRested} attack${tubaRested === 1 ? "" : "s"}; the horn takes that line at pitch and the tuba rests rather than inventing a bass an octave or two below it.`);
+  }
+
   const untied = resolveTies(brassParts, pitchToMidi);
   if (untied) {
     warn(warnings, untied === 1
