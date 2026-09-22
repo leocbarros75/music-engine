@@ -124,3 +124,80 @@ test('a part the arc says nothing about keeps all its notes', () => {
   assert.equal(p.measures[0]!.events.length, 3);
   assert.equal(p.measures[1]!.events.length, 3);
 });
+
+// ── Holding a note rather than re-striking it ───────────────────────────────
+
+import { sustainForBowing, bowLengthBeats, quarterBpmOf } from '../../src/arrange/complementary';
+
+test('a bow length follows the tempo, not a constant', () => {
+  // The same couple of seconds is a different note value at each speed.
+  assert.equal(bowLengthBeats(71), 2, 'a half note at 71 runs about 1.7 seconds');
+  assert.equal(bowLengthBeats(120), 3, 'faster, and a dotted half fills the same bow');
+  assert.equal(bowLengthBeats(60), 1.5, 'slower, and a dotted quarter already does');
+  assert.equal(bowLengthBeats(0), 2, 'a nonsense tempo falls back to a sane default, not to nothing');
+});
+
+test('the tempo is read from the score when it says', () => {
+  assert.equal(quarterBpmOf([{ number: 1, performance: { tempos: [{ t: 0, bpm: 71 }] }, events: [] }]), 71);
+  assert.equal(quarterBpmOf([{ number: 1, events: [] }]), null, 'and is not invented when it does not');
+});
+
+const at = (t: number, dur: number, midi: number) => ({
+  id: `n${midi}@${t}`, t, dur, midi, type: 'note' as const,
+  pitch: { step: 'C', octave: 4 }, voice: 1, staff: 1,
+});
+const onePart = (events: any[]) => [{ part_id: 'V1', name: 'V1', measures: [{ number: 1, events }] }];
+const durs = (p: any[]) => p[0].measures[0].events.map((e: any) => `${e.t}+${e.dur}`);
+
+test('a note struck four times becomes two bow lengths', () => {
+  const p = onePart([at(0, 1, 60), at(1, 1, 60), at(2, 1, 60), at(3, 1, 60)]);
+  const removed = sustainForBowing(p, 2);
+  assert.deepEqual(durs(p), ['0+2', '2+2']);
+  assert.equal(removed, 2, 'four attacks became two');
+});
+
+test('the last piece takes the remainder, so the span still ends where it did', () => {
+  const p = onePart([at(0, 1, 60), at(1, 1, 60), at(2, 1, 60)]);
+  sustainForBowing(p, 2);
+  assert.deepEqual(durs(p), ['0+2', '2+1'], 'three beats, not four');
+});
+
+test('a part that is actually moving keeps every note', () => {
+  // Only REPEATED pitches are held. Melody is not thinned.
+  const p = onePart([at(0, 1, 60), at(1, 1, 62), at(2, 1, 64), at(3, 1, 65)]);
+  assert.equal(sustainForBowing(p, 2), 0);
+  assert.deepEqual(durs(p), ['0+1', '1+1', '2+1', '3+1']);
+});
+
+test('a gap breaks the hold — a rest is not something to play through', () => {
+  const p = onePart([at(0, 1, 60), at(2, 1, 60)]);
+  assert.equal(sustainForBowing(p, 2), 0, 'not contiguous, so not one note');
+  assert.deepEqual(durs(p), ['0+1', '2+1']);
+});
+
+test('two pitches sounding together are held independently', () => {
+  // A divisi stack is several streams that happen to share onsets.
+  const p = onePart([at(0, 1, 60), at(0, 1, 67), at(1, 1, 60), at(1, 1, 67)]);
+  sustainForBowing(p, 2);
+  const events = p[0].measures[0].events;
+  assert.equal(events.length, 2, 'one held note per pitch');
+  assert.deepEqual(events.map((e: any) => e.midi).sort(), [60, 67]);
+  assert(events.every((e: any) => e.dur === 2));
+});
+
+test('a held note is written as separate strokes, never as a tie', () => {
+  // A renewed bow is the point. A tie would ask one player to hold the phrase
+  // in a single stroke.
+  const p = onePart([at(0, 1, 60), at(1, 1, 60), at(2, 1, 60), at(3, 1, 60)]);
+  sustainForBowing(p, 2);
+  for (const e of p[0].measures[0].events) {
+    assert(!e.tieStart, 'no tie out');
+    assert(!e.tieStop, 'no tie in');
+  }
+});
+
+test('a single note is left exactly as it was', () => {
+  const p = onePart([at(0, 4, 60)]);
+  assert.equal(sustainForBowing(p, 2), 0);
+  assert.deepEqual(durs(p), ['0+4']);
+});

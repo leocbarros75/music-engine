@@ -15,7 +15,28 @@ import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
-import { withPianoPart, planArc, applyArc } from "../arrange/complementary";
+import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf } from "../arrange/complementary";
+
+/**
+ * Hold a note rather than re-striking it, at whatever rate the tempo makes
+ * readable. The piano supplies the movement; these parts supply the sustain.
+ */
+function sustainComplement(
+  warnings: string[],
+  label: string,
+  parts: any[],
+  sourceMeasures: any[]
+): void {
+  const bpm = quarterBpmOf(sourceMeasures);
+  const beats = bowLengthBeats(bpm ?? 90);
+  const removed = sustainForBowing(parts, beats);
+  if (removed > 0) {
+    warnings.push(
+      `[piano+${label}] ${removed} repeated attack${removed === 1 ? "" : "s"} held instead` +
+      (bpm ? ` — at ${Math.round(bpm)} to the quarter a bow carries ${beats} beat${beats === 1 ? "" : "s"}` : "") + "."
+    );
+  }
+}
 
 /**
  * Say what the arc did. A player looking at a part with 24 bars of rest should
@@ -1977,6 +1998,7 @@ export function applyAppSettings(
         voicesTopDown: wwParts.map((p: any) => String(p.part_id)),
       });
       describeArc(warnings, "winds", wwParts, applyArc(wwParts, arc));
+      sustainComplement(warnings, "winds", wwParts, frozenPianoPart?.measures ?? []);
       (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
     }
     attachTextureAnalysis(wwResult.scoreModel, warnings);
@@ -2116,6 +2138,7 @@ export function applyAppSettings(
     });
     const stringRests = applyArc(stringParts, stringArc);
     describeArc(warnings, "strings", stringParts, stringRests);
+    sustainComplement(warnings, "strings", stringParts, pianoPart?.measures ?? []);
     const finalScore: any = {
       ...(JSON.parse(JSON.stringify(stringScore)) as any),
       meta: { ...(stringScore as any).meta, ensemble: "piano_with_strings" },
@@ -2248,6 +2271,7 @@ export function applyAppSettings(
         voicesTopDown: brParts.map((p: any) => String(p.part_id)),
       });
       describeArc(warnings, "brass", brParts, applyArc(brParts, arc));
+      sustainComplement(warnings, "brass", brParts, frozenPianoPart?.measures ?? []);
       (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);
     }
     attachTextureAnalysis(brResult.scoreModel, warnings);

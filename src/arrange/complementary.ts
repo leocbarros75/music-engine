@@ -129,6 +129,106 @@ export function planArc(measures: MeasureLike[], options: ArcOptions): ArcDecisi
   return raw.map((playing, i) => ({ playing, intensity: density[i] ?? 0 }));
 }
 
+// ── How often a sustaining part re-attacks ──────────────────────────────────
+
+/** Note values a player reads without counting, longest first. */
+const BOW_LENGTHS = [4, 3, 2, 1.5, 1];
+
+/**
+ * The longest note worth writing at this tempo, in beats.
+ *
+ * A bow lasts a couple of seconds at a comfortable speed, so the value that
+ * fills one is a function of tempo, not a constant. At 71 to the quarter a
+ * half note runs about 1.7 seconds and is exactly right; at 120 the same
+ * duration wants a dotted half; at 60, a dotted quarter. Picking a note value
+ * rather than a raw duration keeps the result readable.
+ */
+export function bowLengthBeats(quarterBpm: number, secondsPerBow = 1.8): number {
+  const bpm = Number.isFinite(quarterBpm) && quarterBpm > 0 ? quarterBpm : 90;
+  const beats = (secondsPerBow * bpm) / 60;
+  return BOW_LENGTHS.find((v) => v <= beats + 1e-9) ?? 1;
+}
+
+/** The tempo the score asks for, or null when it does not say. */
+export function quarterBpmOf(measures: MeasureLike[]): number | null {
+  for (const m of measures ?? []) {
+    const bpm = Number((m as any)?.performance?.tempos?.[0]?.bpm);
+    if (Number.isFinite(bpm) && bpm > 0) return bpm;
+  }
+  return null;
+}
+
+/**
+ * Stop a sustaining part from re-striking a note it is already holding.
+ *
+ * Our complementary parts were built on the piano's own onsets — the branch
+ * says as much, "use piano RH onsets as rhythm grid" — which for a ballad
+ * means the strings hammer out every quaver the pianist plays. On the
+ * reference song that is 1,367 attacks against a reference edition's 606, and
+ * the difference is almost entirely repeated notes: 671 quarters and 547
+ * eighths where the reference writes 421 half notes.
+ *
+ * Adjacent notes of the SAME pitch are merged and re-emitted at a bow's
+ * length. Only the same pitch: a part that is actually moving keeps every note
+ * it had, so this thins repetition without touching melody. The pieces are
+ * separate notes rather than ties, because a renewed bow is what is wanted —
+ * a tie would ask one player to hold a whole phrase in a single stroke.
+ */
+export function sustainForBowing(parts: PartLike[], maxBeats: number): number {
+  let removed = 0;
+  for (const part of parts) {
+    for (const measure of part?.measures ?? []) {
+      const events: any[] = (measure?.events ?? []) as any[];
+      const notes = events.filter((e) => e?.type === "note" && Number.isFinite(Number(e?.t)));
+      if (notes.length < 2) continue;
+      const others = events.filter((e) => e?.type !== "note");
+
+      // One stream per sounding pitch; a divisi stack is several streams that
+      // happen to share onsets, and each is held or re-struck on its own.
+      const byPitch = new Map<string, any[]>();
+      for (const n of notes) {
+        const k = `${n.voice ?? 1}|${n.midi ?? JSON.stringify(n.pitch)}`;
+        const list = byPitch.get(k);
+        if (list) list.push(n);
+        else byPitch.set(k, [n]);
+      }
+
+      const kept: any[] = [];
+      for (const stream of byPitch.values()) {
+        stream.sort((a, b) => Number(a.t) - Number(b.t));
+        let i = 0;
+        while (i < stream.length) {
+          // Gather everything contiguous at this pitch.
+          const first = stream[i]!;
+          let end = Number(first.t) + Number(first.dur);
+          let j = i + 1;
+          while (j < stream.length && Math.abs(Number(stream[j]!.t) - end) < 1e-9) {
+            end += Number(stream[j]!.dur);
+            j++;
+          }
+          const wasCount = j - i;
+          // Re-emit that span as bow lengths, the last piece taking the
+          // remainder so the span still ends exactly where it did.
+          let at = Number(first.t);
+          let piece = 0;
+          while (at < end - 1e-9) {
+            const dur = Math.min(maxBeats, end - at);
+            kept.push({ ...first, id: `${first.id}-b${piece}`, t: at, dur });
+            at += dur;
+            piece++;
+          }
+          // How many attacks this span cost, against how many it now costs.
+          removed += wasCount - piece;
+          i = j;
+        }
+      }
+      kept.sort((a, b) => (Math.abs(Number(a.t) - Number(b.t)) > 1e-9 ? Number(a.t) - Number(b.t) : Number(a.midi ?? 0) - Number(b.midi ?? 0)));
+      measure.events = [...others, ...kept];
+    }
+  }
+  return removed;
+}
+
 /**
  * Silence the bars the arc does not call for. Notes are removed, not muted:
  * the exporter fills an empty measure with a rest, which is what a player
