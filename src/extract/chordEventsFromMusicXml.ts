@@ -91,6 +91,37 @@ function chordSuffixFromKind(kind: string, warnings: string[]): string {
   return "";
 }
 
+/**
+ * Added tones a `<kind>` cannot express, read from the harmony's `<degree>`
+ * elements.
+ *
+ * MusicXML says an A-flat add2 twice over: `<kind text="2">major</kind>`, and
+ * separately a `<degree>` of value 2, type "add". Reading only the kind turns
+ * it into a plain major triad and the added second is gone before anything
+ * downstream can see it — Living Hope is built on that chord, twelve of its
+ * hundred symbols, and every one of them reached the arranger as a bare A-flat.
+ *
+ * Only ADDED degrees are read here. A `subtract` removes a tone and an `alter`
+ * bends one; both change the chord in ways the suffix vocabulary cannot carry,
+ * so they are left to the existing behaviour rather than half-described.
+ */
+function addedDegrees(harmonyEl: Element): string {
+  const degrees = Array.from(harmonyEl.getElementsByTagName("degree") ?? []);
+  const added: string[] = [];
+  for (const d of degrees) {
+    const type = textOf(firstChild(d as Element, "degree-type")).toLowerCase();
+    if (type !== "add") continue;
+    const value = intOf(firstChild(d as Element, "degree-value"), 0);
+    const alter = intOf(firstChild(d as Element, "degree-alter"), 0);
+    if (!value) continue;
+    // A raised or lowered addition is a different colour again; spell it out
+    // so the symbol stays honest rather than promising a natural one.
+    const acc = alter > 0 ? "#" : alter < 0 ? "b" : "";
+    added.push(`add${acc}${value}`);
+  }
+  return added.join("");
+}
+
 function parseHarmonySymbol(harmonyEl: Element, warnings: string[]): { symbol: string } | null {
   const rootEl = firstChild(harmonyEl, "root");
   const rootStep = rootEl ? textOf(firstChild(rootEl, "root-step")) : "";
@@ -102,7 +133,7 @@ function parseHarmonySymbol(harmonyEl: Element, warnings: string[]): { symbol: s
 
   const kindEl = firstChild(harmonyEl, "kind");
   const kindText = kindEl ? textOf(kindEl) : "";
-  const suffix = chordSuffixFromKind(kindText, warnings);
+  const suffix = chordSuffixFromKind(kindText, warnings) + addedDegrees(harmonyEl);
 
   const bassEl = firstChild(harmonyEl, "bass");
   const bassStep = bassEl ? textOf(firstChild(bassEl, "bass-step")) : "";

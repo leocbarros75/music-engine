@@ -127,8 +127,15 @@ export function classifyQuality(rest: string): ChordQuality {
   if (lo.includes("sus4") || lo === "sus") return "sus4";
 
   // ── add9 / madd9 (before 9 / m9 catches) ──
+  // A second above the root and a ninth above it are the same pitch class, and
+  // chart writers use both spellings — PraiseCharts prints "Ab2" for the chord
+  // MusicXML encodes as major plus an added degree 2. They resolve to the same
+  // chord here; only the name differs. Without this, an add2 fell through to a
+  // plain triad and lost the very tone it is named for.
   if (lo.includes("madd9") || lo.includes("m add9") || lo.includes("m(add9)")) return "madd9";
+  if (lo.includes("madd2") || lo.includes("m add2") || lo.includes("m(add2)")) return "madd9";
   if (lo.includes("add9") || lo.includes("add 9") || lo.includes("(add9)")) return "add9";
+  if (lo.includes("add2") || lo.includes("add 2") || lo.includes("(add2)")) return "add9";
 
   // ── Major extended ──
   if (lo.includes("maj13") || lo.includes("ma13") || lo.includes("△13")) return "maj13";

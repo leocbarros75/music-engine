@@ -41,6 +41,7 @@ async function main() {
       'tests/import/midiTranscribe.test.ts',
       'tests/import/extractLeadSheet.test.ts',
       'tests/score/scoreStandard.test.ts',
+      'tests/harmony/addedDegrees.test.ts',
       'tests/preservation/sourcePreservation.test.ts',
       'tests/preservation/noteMap.test.ts',
       'tests/preservation/serverPreservation.test.ts',
