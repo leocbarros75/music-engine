@@ -1,0 +1,26 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-piano-and-strings.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-piano-and-strings.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-V1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-V1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-V2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-V2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-VA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-VA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-VC.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-VC.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-CB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-piano-and-strings/last-train-CB.pdf"
+  }
+]

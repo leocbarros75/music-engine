@@ -1,0 +1,457 @@
+{
+  "checks": {
+    "melody_notes_and_rests": 147,
+    "measures": 21,
+    "neighbor_figures": 6,
+    "source_sha256": "95daa6ed9423988b333256896a4f6678e2172e38c3c23e4799c37c6ce4a4ed8a",
+    "rh_max_voice_transition_semitones": 3
+  },
+  "harmonic_plan": [
+    {
+      "measure": 1,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "B3",
+        "D4",
+        "G4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 2,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "C",
+      "rh_voicing": [
+        "C4",
+        "E4",
+        "G4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 2,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G/B",
+      "rh_voicing": [
+        "B3",
+        "D4",
+        "G4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 3,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "Am",
+      "rh_voicing": [
+        "C4",
+        "E4",
+        "A4"
+      ],
+      "texture": "answer",
+      "neighbor": {
+        "anchor": "A4",
+        "neighbor": "B4",
+        "resolution": "A4",
+        "onset_beat": 3.5
+      }
+    },
+    {
+      "measure": 4,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Dm",
+      "rh_voicing": [
+        "D4",
+        "F4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 4,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "D4",
+        "G4",
+        "B4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 5,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "Am",
+      "rh_voicing": [
+        "C4",
+        "E4",
+        "A4"
+      ],
+      "texture": "answer",
+      "neighbor": {
+        "anchor": "A4",
+        "neighbor": "B4",
+        "resolution": "A4",
+        "onset_beat": 3.5
+      }
+    },
+    {
+      "measure": 6,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Dm",
+      "rh_voicing": [
+        "D4",
+        "F4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 6,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "Em",
+      "rh_voicing": [
+        "B3",
+        "E4",
+        "G4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 7,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "F",
+      "rh_voicing": [
+        "C4",
+        "F4",
+        "A4"
+      ],
+      "texture": "answer",
+      "neighbor": {
+        "anchor": "A4",
+        "neighbor": "B4",
+        "resolution": "A4",
+        "onset_beat": 3.5
+      }
+    },
+    {
+      "measure": 8,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Dm",
+      "rh_voicing": [
+        "D4",
+        "F4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 8,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "D4",
+        "G4",
+        "B4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 9,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "E",
+      "rh_voicing": [
+        "E4",
+        "G#4",
+        "B4"
+      ],
+      "texture": "answer",
+      "neighbor": null
+    },
+    {
+      "measure": 10,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Am",
+      "rh_voicing": [
+        "E4",
+        "A4",
+        "C5"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 10,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "D4",
+        "G4",
+        "B4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 11,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "F",
+      "rh_voicing": [
+        "C4",
+        "F4",
+        "A4"
+      ],
+      "texture": "answer",
+      "neighbor": {
+        "anchor": "A4",
+        "neighbor": "B4",
+        "resolution": "A4",
+        "onset_beat": 3.5
+      }
+    },
+    {
+      "measure": 12,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Dm",
+      "rh_voicing": [
+        "D4",
+        "F4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 12,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "Em",
+      "rh_voicing": [
+        "B3",
+        "E4",
+        "G4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 13,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "Am",
+      "rh_voicing": [
+        "C4",
+        "E4",
+        "A4"
+      ],
+      "texture": "answer",
+      "neighbor": {
+        "anchor": "A4",
+        "neighbor": "B4",
+        "resolution": "A4",
+        "onset_beat": 3.5
+      }
+    },
+    {
+      "measure": 14,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Am",
+      "rh_voicing": [
+        "C4",
+        "E4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 14,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "B3",
+        "D4",
+        "G4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 15,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "G#dim",
+      "rh_voicing": [
+        "B3",
+        "D4",
+        "G#4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 15,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "Am",
+      "rh_voicing": [
+        "C4",
+        "E4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 16,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Dm",
+      "rh_voicing": [
+        "D4",
+        "F4",
+        "A4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 16,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "D4",
+        "G4",
+        "B4"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 17,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "C",
+      "rh_voicing": [
+        "E4",
+        "G4",
+        "C5"
+      ],
+      "texture": "answer",
+      "neighbor": null
+    },
+    {
+      "measure": 18,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "C",
+      "rh_voicing": [
+        "E4",
+        "G4",
+        "C5"
+      ],
+      "texture": "answer",
+      "neighbor": {
+        "anchor": "C5",
+        "neighbor": "D5",
+        "resolution": "C5",
+        "onset_beat": 3.5
+      }
+    },
+    {
+      "measure": 19,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Dm",
+      "rh_voicing": [
+        "F4",
+        "A4",
+        "D5"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 19,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "G",
+      "rh_voicing": [
+        "G4",
+        "B4",
+        "D5"
+      ],
+      "texture": "flow",
+      "neighbor": null
+    },
+    {
+      "measure": 20,
+      "onset": 0.0,
+      "duration": 2.0,
+      "source_chord": "Ab",
+      "rh_voicing": [
+        "Ab4",
+        "C5",
+        "Eb5"
+      ],
+      "texture": "broad",
+      "neighbor": null
+    },
+    {
+      "measure": 20,
+      "onset": 2.0,
+      "duration": 2.0,
+      "source_chord": "Bb",
+      "rh_voicing": [
+        "F4",
+        "Bb4",
+        "D5"
+      ],
+      "texture": "broad",
+      "neighbor": null
+    },
+    {
+      "measure": 21,
+      "onset": 0.0,
+      "duration": 4.0,
+      "source_chord": "C",
+      "rh_voicing": [
+        "E4",
+        "G4",
+        "C5"
+      ],
+      "texture": "final",
+      "neighbor": null
+    }
+  ]
+}

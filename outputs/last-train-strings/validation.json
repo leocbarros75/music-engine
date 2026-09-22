@@ -1,0 +1,16 @@
+{
+  "measures": 123,
+  "source_pitched_note_segments": 1942,
+  "primary_segments_preserved": 1942,
+  "omitted_segments": 0,
+  "octave_adjusted_primary_segments": 63,
+  "added_bass_segments": 274,
+  "maximum_simultaneous_notes_per_section": {
+    "V1": 2,
+    "V2": 2,
+    "VA": 4,
+    "VC": 3,
+    "CB": 1
+  },
+  "source_sha256": "6e6253f5ab30f6d552d04319f9443333526161cd4e0f173dc8e937b17f550690"
+}

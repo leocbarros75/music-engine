@@ -1,0 +1,7662 @@
+[
+  {
+    "part": "CB",
+    "bar": 9,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 11,
+    "on": 0,
+    "dur": 60,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 13,
+    "on": 0,
+    "dur": 60,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 15,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 17,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 19,
+    "on": 0,
+    "dur": 60,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 21,
+    "on": 0,
+    "dur": 60,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 23,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 24,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 25,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 26,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 27,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 28,
+    "on": 0,
+    "dur": 120,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 29,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 30,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 31,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 32,
+    "on": 0,
+    "dur": 120,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 39,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 41,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 43,
+    "on": 0,
+    "dur": 60,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 45,
+    "on": 0,
+    "dur": 60,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 47,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 49,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 51,
+    "on": 0,
+    "dur": 60,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 53,
+    "on": 0,
+    "dur": 60,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 55,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 56,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 57,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 58,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 59,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 60,
+    "on": 0,
+    "dur": 120,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 61,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 62,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 63,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 64,
+    "on": 0,
+    "dur": 120,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 71,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 73,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 75,
+    "on": 0,
+    "dur": 60,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 77,
+    "on": 0,
+    "dur": 60,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 79,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 81,
+    "on": 0,
+    "dur": 60,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 83,
+    "on": 0,
+    "dur": 60,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 85,
+    "on": 0,
+    "dur": 60,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 87,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 88,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 89,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 90,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 91,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 92,
+    "on": 0,
+    "dur": 120,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 93,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 94,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 95,
+    "on": 0,
+    "dur": 120,
+    "midi": 38,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 96,
+    "on": 0,
+    "dur": 120,
+    "midi": 40,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 111,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 112,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 113,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 114,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 115,
+    "on": 0,
+    "dur": 120,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 116,
+    "on": 0,
+    "dur": 120,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 117,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 118,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 119,
+    "on": 0,
+    "dur": 120,
+    "midi": 31,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 120,
+    "on": 0,
+    "dur": 120,
+    "midi": 36,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 121,
+    "on": 0,
+    "dur": 120,
+    "midi": 35,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "CB",
+    "bar": 122,
+    "on": 0,
+    "dur": 120,
+    "midi": 33,
+    "role": "harmonic punctuation",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 2,
+    "on": 120,
+    "dur": 120,
+    "midi": 74,
+    "role": "delayed upper entry",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 4,
+    "on": 120,
+    "dur": 120,
+    "midi": 74,
+    "role": "delayed upper entry",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 10,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 10,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 10,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 12,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 12,
+    "on": 180,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 12,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 14,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 14,
+    "on": 180,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 14,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 16,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 16,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 16,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 18,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 18,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 18,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 20,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 20,
+    "on": 180,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 20,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 22,
+    "on": 120,
+    "dur": 60,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 22,
+    "on": 180,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 22,
+    "on": 210,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 23,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 23,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 23,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 24,
+    "on": 0,
+    "dur": 120,
+    "midi": 74,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 24,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 24,
+    "on": 180,
+    "dur": 60,
+    "midi": 74,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 25,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 25,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 26,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 26,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 26,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 27,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 27,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 28,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 28,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 28,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 29,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 29,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 30,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 30,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 30,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 31,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 31,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 32,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 32,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 32,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 40,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 40,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 40,
+    "on": 210,
+    "dur": 30,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 42,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 42,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 42,
+    "on": 210,
+    "dur": 30,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 44,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 44,
+    "on": 180,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 44,
+    "on": 210,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 46,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 46,
+    "on": 180,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 46,
+    "on": 210,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 48,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 48,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 48,
+    "on": 210,
+    "dur": 30,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 50,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 50,
+    "on": 180,
+    "dur": 30,
+    "midi": 79,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 50,
+    "on": 210,
+    "dur": 30,
+    "midi": 76,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 52,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 52,
+    "on": 180,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 52,
+    "on": 210,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 54,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 54,
+    "on": 180,
+    "dur": 30,
+    "midi": 74,
+    "role": "short answering figure",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 54,
+    "on": 210,
+    "dur": 30,
+    "midi": 78,
+    "role": "short answering figure",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 55,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 55,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 55,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 56,
+    "on": 0,
+    "dur": 120,
+    "midi": 74,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 56,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 56,
+    "on": 180,
+    "dur": 60,
+    "midi": 74,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 57,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 57,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 58,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 58,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 58,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 59,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 59,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 60,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 60,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 60,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 61,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 61,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 62,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 62,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 62,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 63,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 63,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 64,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 64,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 64,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 73,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "restrained upper cushion",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 77,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "restrained upper cushion",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 81,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "restrained upper cushion",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 85,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "restrained upper cushion",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 87,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 87,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 87,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 88,
+    "on": 0,
+    "dur": 120,
+    "midi": 74,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 88,
+    "on": 120,
+    "dur": 60,
+    "midi": 78,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 88,
+    "on": 180,
+    "dur": 60,
+    "midi": 74,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 89,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 89,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 90,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 90,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 90,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 91,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 91,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 92,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 92,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 92,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 93,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 93,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 94,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 94,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 94,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 95,
+    "on": 0,
+    "dur": 180,
+    "midi": 74,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 95,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 96,
+    "on": 0,
+    "dur": 120,
+    "midi": 76,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 96,
+    "on": 120,
+    "dur": 60,
+    "midi": 79,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 96,
+    "on": 180,
+    "dur": 60,
+    "midi": 76,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 111,
+    "on": 0,
+    "dur": 180,
+    "midi": 78,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 111,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 112,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 112,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 112,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 113,
+    "on": 0,
+    "dur": 180,
+    "midi": 78,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 113,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 114,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 114,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 114,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 115,
+    "on": 0,
+    "dur": 180,
+    "midi": 78,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 115,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 116,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 116,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 116,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 117,
+    "on": 0,
+    "dur": 180,
+    "midi": 78,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 117,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 118,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 118,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 118,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 119,
+    "on": 0,
+    "dur": 180,
+    "midi": 78,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 119,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 120,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 120,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 120,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V1",
+    "bar": 121,
+    "on": 0,
+    "dur": 180,
+    "midi": 78,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 121,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "harmonic arrival",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 122,
+    "on": 0,
+    "dur": 120,
+    "midi": 79,
+    "role": "lyrical arch",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V1",
+    "bar": 122,
+    "on": 120,
+    "dur": 60,
+    "midi": 76,
+    "role": "chord-tone inflection",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V1",
+    "bar": 122,
+    "on": 180,
+    "dur": 60,
+    "midi": 79,
+    "role": "arch resolution",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 1,
+    "on": 0,
+    "dur": 240,
+    "midi": 66,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 2,
+    "on": 0,
+    "dur": 240,
+    "midi": 66,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 3,
+    "on": 0,
+    "dur": 240,
+    "midi": 66,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 4,
+    "on": 0,
+    "dur": 240,
+    "midi": 64,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 9,
+    "on": 0,
+    "dur": 120,
+    "midi": 64,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 10,
+    "on": 0,
+    "dur": 120,
+    "midi": 64,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 11,
+    "on": 0,
+    "dur": 120,
+    "midi": 66,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 12,
+    "on": 0,
+    "dur": 120,
+    "midi": 66,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 13,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 14,
+    "on": 0,
+    "dur": 120,
+    "midi": 66,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 15,
+    "on": 0,
+    "dur": 120,
+    "midi": 64,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 16,
+    "on": 0,
+    "dur": 120,
+    "midi": 64,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 17,
+    "on": 0,
+    "dur": 120,
+    "midi": 64,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 18,
+    "on": 0,
+    "dur": 120,
+    "midi": 64,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 19,
+    "on": 0,
+    "dur": 120,
+    "midi": 66,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 20,
+    "on": 0,
+    "dur": 120,
+    "midi": 66,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 21,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 22,
+    "on": 0,
+    "dur": 120,
+    "midi": 66,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 23,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 24,
+    "on": 0,
+    "dur": 240,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 25,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 25,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 26,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 27,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 27,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 28,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 29,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 29,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 30,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 31,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 31,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 32,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 34,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 34,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 34,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 36,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 36,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 36,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 38,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 38,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 38,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 39,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 40,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 41,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 42,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 43,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 44,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 45,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 46,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 47,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 48,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 49,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 50,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 51,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 52,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 53,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 54,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 55,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 56,
+    "on": 0,
+    "dur": 240,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 57,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 57,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 58,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 59,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 59,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 60,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 61,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 61,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 62,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 63,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 63,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 64,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 66,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 66,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 66,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 68,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 68,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 68,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 70,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 70,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 70,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 71,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 72,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 73,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 74,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 75,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 76,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 77,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 78,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 79,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 80,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 81,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 82,
+    "on": 0,
+    "dur": 120,
+    "midi": 67,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 83,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 84,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 85,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 86,
+    "on": 0,
+    "dur": 120,
+    "midi": 69,
+    "role": "quiet inner pedal",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 87,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 88,
+    "on": 0,
+    "dur": 240,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 89,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 89,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 90,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 91,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 91,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 92,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 93,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 93,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 94,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 95,
+    "on": 0,
+    "dur": 180,
+    "midi": 66,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 95,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 96,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 98,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 98,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 98,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 100,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 100,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 100,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 102,
+    "on": 120,
+    "dur": 30,
+    "midi": 67,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "start"
+  },
+  {
+    "part": "V2",
+    "bar": 102,
+    "on": 150,
+    "dur": 30,
+    "midi": 71,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 102,
+    "on": 180,
+    "dur": 60,
+    "midi": 64,
+    "role": "middle-register answer",
+    "art": null,
+    "slur": "stop"
+  },
+  {
+    "part": "V2",
+    "bar": 111,
+    "on": 0,
+    "dur": 180,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 111,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 112,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 113,
+    "on": 0,
+    "dur": 180,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 113,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 114,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 115,
+    "on": 0,
+    "dur": 180,
+    "midi": 69,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 115,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 116,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 117,
+    "on": 0,
+    "dur": 180,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 117,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 118,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 119,
+    "on": 0,
+    "dur": 180,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 119,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 120,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 121,
+    "on": 0,
+    "dur": 180,
+    "midi": 69,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 121,
+    "on": 180,
+    "dur": 60,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "V2",
+    "bar": 122,
+    "on": 0,
+    "dur": 240,
+    "midi": 67,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 1,
+    "on": 0,
+    "dur": 240,
+    "midi": 57,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 2,
+    "on": 0,
+    "dur": 240,
+    "midi": 57,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 3,
+    "on": 0,
+    "dur": 240,
+    "midi": 57,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 4,
+    "on": 0,
+    "dur": 240,
+    "midi": 55,
+    "role": "opening harmonic veil",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 8,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "anticipatory offbeats",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 8,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "anticipatory offbeats",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 9,
+    "on": 30,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 9,
+    "on": 90,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 9,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 9,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 10,
+    "on": 30,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 10,
+    "on": 90,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 10,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 10,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 11,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 11,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 11,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 11,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 12,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 12,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 12,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 12,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 13,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 13,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 13,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 13,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 14,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 14,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 14,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 14,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 15,
+    "on": 30,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 15,
+    "on": 90,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 15,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 15,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 16,
+    "on": 30,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 16,
+    "on": 90,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 16,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 16,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 17,
+    "on": 30,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 17,
+    "on": 90,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 17,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 17,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 18,
+    "on": 30,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 18,
+    "on": 90,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 18,
+    "on": 150,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 18,
+    "on": 210,
+    "dur": 30,
+    "midi": 55,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 19,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 19,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 19,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 19,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 20,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 20,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 20,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 20,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 21,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 21,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 21,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 21,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 22,
+    "on": 30,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 22,
+    "on": 90,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 22,
+    "on": 150,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 22,
+    "on": 210,
+    "dur": 30,
+    "midi": 57,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 23,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 24,
+    "on": 0,
+    "dur": 240,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 25,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 25,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 26,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 27,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 27,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 28,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 29,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 29,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 30,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 31,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 31,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 32,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 33,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 33,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 34,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 35,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 35,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 36,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 37,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 37,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 38,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 39,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 39,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 39,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 39,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 40,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 40,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 40,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 40,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 41,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 41,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 41,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 41,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 42,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 42,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 42,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 42,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 43,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 43,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 43,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 43,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 44,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 44,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 44,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 44,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 45,
+    "on": 30,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 45,
+    "on": 90,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 45,
+    "on": 150,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 45,
+    "on": 210,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 46,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 46,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 46,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 46,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 47,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 47,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 47,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 47,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 48,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 48,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 48,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 48,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 49,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 49,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 49,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 49,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 50,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 50,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 50,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 50,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 51,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 51,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 51,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 51,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 52,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 52,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 52,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 52,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 53,
+    "on": 30,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 53,
+    "on": 90,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 53,
+    "on": 150,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 53,
+    "on": 210,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 54,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 54,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 54,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 54,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 55,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 56,
+    "on": 0,
+    "dur": 240,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 57,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 57,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 58,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 59,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 59,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 60,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 61,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 61,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 62,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 63,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 63,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 64,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 65,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 65,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 66,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 67,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 67,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 68,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 69,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 69,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 70,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 71,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 71,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 71,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 71,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 72,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 72,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 72,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 72,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 73,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 73,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 73,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 73,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 74,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 74,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 74,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 74,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 75,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 75,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 75,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 75,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 76,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 76,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 76,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 76,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 77,
+    "on": 30,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 77,
+    "on": 90,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 77,
+    "on": 150,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 77,
+    "on": 210,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 78,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 78,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 78,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 78,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 79,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 79,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 79,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 79,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 80,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 80,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 80,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 80,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 81,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 81,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 81,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 81,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 82,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 82,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 82,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 82,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 83,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 83,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 83,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 83,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 84,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 84,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 84,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 84,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 85,
+    "on": 30,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 85,
+    "on": 90,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 85,
+    "on": 150,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 85,
+    "on": 210,
+    "dur": 30,
+    "midi": 60,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 86,
+    "on": 30,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 86,
+    "on": 90,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 86,
+    "on": 150,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 86,
+    "on": 210,
+    "dur": 30,
+    "midi": 59,
+    "role": "offbeat pulse",
+    "art": "staccato",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 87,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 88,
+    "on": 0,
+    "dur": 240,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 89,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 89,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 90,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 91,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 91,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 92,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 93,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 93,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 94,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 95,
+    "on": 0,
+    "dur": 180,
+    "midi": 57,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 95,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 96,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 97,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 97,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 98,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 99,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 99,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 100,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 101,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 101,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 102,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 104,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 104,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 105,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 106,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 106,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 107,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 108,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 108,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 109,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 111,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 111,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 112,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 113,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 113,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 114,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 115,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 115,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 116,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 117,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 117,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 118,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 119,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 119,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 120,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 121,
+    "on": 0,
+    "dur": 180,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 121,
+    "on": 180,
+    "dur": 60,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VA",
+    "bar": 122,
+    "on": 0,
+    "dur": 240,
+    "midi": 59,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 9,
+    "on": 0,
+    "dur": 120,
+    "midi": 47,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 11,
+    "on": 0,
+    "dur": 120,
+    "midi": 47,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 13,
+    "on": 0,
+    "dur": 120,
+    "midi": 48,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 15,
+    "on": 0,
+    "dur": 120,
+    "midi": 47,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 17,
+    "on": 0,
+    "dur": 120,
+    "midi": 47,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 19,
+    "on": 0,
+    "dur": 120,
+    "midi": 47,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 21,
+    "on": 0,
+    "dur": 120,
+    "midi": 48,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 23,
+    "on": 0,
+    "dur": 240,
+    "midi": 48,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 24,
+    "on": 0,
+    "dur": 240,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 25,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 25,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 26,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 27,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 27,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 28,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 29,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 29,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 30,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 31,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 31,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 32,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 33,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 33,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 34,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 35,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 35,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 36,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 37,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 37,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 38,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 39,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 41,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 43,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 45,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 47,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 49,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 51,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 53,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 55,
+    "on": 0,
+    "dur": 240,
+    "midi": 48,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 56,
+    "on": 0,
+    "dur": 240,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 57,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 57,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 58,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 59,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 59,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 60,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 61,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 61,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 62,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 63,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 63,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 64,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 65,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 65,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 66,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 67,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 67,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 68,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 69,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 69,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 70,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 71,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 73,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 75,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 77,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 79,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 81,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 83,
+    "on": 0,
+    "dur": 120,
+    "midi": 50,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 85,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "low half-note support",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 87,
+    "on": 0,
+    "dur": 240,
+    "midi": 48,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 88,
+    "on": 0,
+    "dur": 240,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 89,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 89,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 90,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 91,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 91,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 92,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 93,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 93,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 94,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 95,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 95,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 96,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 97,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 97,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 98,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 99,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 99,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 100,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 101,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 101,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 102,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 104,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 104,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 105,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 106,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 106,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 107,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 108,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 108,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 109,
+    "on": 0,
+    "dur": 240,
+    "midi": 52,
+    "role": "low sustained contrast",
+    "art": null,
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 111,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 111,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 112,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 113,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 113,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 114,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 115,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 115,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 116,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 117,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 117,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 118,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 119,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 119,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 120,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 121,
+    "on": 0,
+    "dur": 180,
+    "midi": 50,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 121,
+    "on": 180,
+    "dur": 60,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  },
+  {
+    "part": "VC",
+    "bar": 122,
+    "on": 0,
+    "dur": 120,
+    "midi": 52,
+    "role": "broad harmonic support",
+    "art": "tenuto",
+    "slur": null
+  }
+]

@@ -1,0 +1,1991 @@
+[
+  {
+    "bar": 1,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Opening",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 2,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Opening",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 3,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Opening",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 4,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Opening",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 5,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano groove",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 6,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano groove",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 7,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano groove",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 8,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano groove",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 9,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 10,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 11,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 12,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 13,
+    "on": 0,
+    "dur": 240,
+    "chord": "Am7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 14,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 15,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 16,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 17,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 18,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 55,
+      "V2": 64,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 19,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 20,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 21,
+    "on": 0,
+    "dur": 240,
+    "chord": "Am7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 22,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Light offbeats",
+    "voicing": {
+      "VC": 47,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 23,
+    "on": 0,
+    "dur": 240,
+    "chord": "Cmaj7",
+    "texture": "Lift",
+    "voicing": {
+      "VC": 48,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 24,
+    "on": 0,
+    "dur": 240,
+    "chord": "D",
+    "texture": "Lift",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 25,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 25,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 26,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 27,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 27,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 28,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 29,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 29,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 30,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 31,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 31,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 32,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Broad refrain",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 33,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 33,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 34,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 35,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 35,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 36,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 37,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 37,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 38,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 39,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 40,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 41,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 42,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 43,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 44,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 45,
+    "on": 0,
+    "dur": 240,
+    "chord": "Am7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 52,
+      "VA": 60,
+      "V2": 69,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 46,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 47,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 48,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 49,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 50,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 51,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 52,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 53,
+    "on": 0,
+    "dur": 240,
+    "chord": "Am7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 52,
+      "VA": 60,
+      "V2": 69,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 54,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Groove - developing",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 55,
+    "on": 0,
+    "dur": 240,
+    "chord": "Cmaj7",
+    "texture": "Lift",
+    "voicing": {
+      "VC": 48,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 56,
+    "on": 0,
+    "dur": 240,
+    "chord": "D",
+    "texture": "Lift",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 57,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 57,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 58,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 59,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 59,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 60,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 61,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 61,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 62,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 63,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 64,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - fuller",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 65,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 65,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 66,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 67,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 67,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 68,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 69,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 69,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 70,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Air and space",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 71,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 72,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 73,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 74,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 75,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 76,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 77,
+    "on": 0,
+    "dur": 240,
+    "chord": "Am7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 52,
+      "VA": 60,
+      "V2": 69,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 78,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 79,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 80,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 81,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 82,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 83,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 84,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 85,
+    "on": 0,
+    "dur": 240,
+    "chord": "Am7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 52,
+      "VA": 60,
+      "V2": 69,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 86,
+    "on": 0,
+    "dur": 240,
+    "chord": "Bm7",
+    "texture": "Piano solo - strings underneath",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 87,
+    "on": 0,
+    "dur": 240,
+    "chord": "Cmaj7",
+    "texture": "Lift",
+    "voicing": {
+      "VC": 48,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 88,
+    "on": 0,
+    "dur": 240,
+    "chord": "D",
+    "texture": "Lift",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 89,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 89,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 90,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 91,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 91,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 92,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 93,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 93,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 94,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 95,
+    "on": 0,
+    "dur": 180,
+    "chord": "D",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 50,
+      "VA": 57,
+      "V2": 66,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 95,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 96,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Refrain - full",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 97,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 97,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 98,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 99,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 99,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 100,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 101,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 101,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 102,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 103,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano break",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 104,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 104,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 105,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 106,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 106,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 107,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 108,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 108,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 109,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Final echoes",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 110,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano break",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  },
+  {
+    "bar": 111,
+    "on": 0,
+    "dur": 180,
+    "chord": "Gmaj9",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 111,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 112,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 113,
+    "on": 0,
+    "dur": 180,
+    "chord": "Gmaj9",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 113,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 114,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 115,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 115,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 116,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 117,
+    "on": 0,
+    "dur": 180,
+    "chord": "Gmaj9",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 117,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 118,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 119,
+    "on": 0,
+    "dur": 180,
+    "chord": "Gmaj9",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 119,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 120,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 121,
+    "on": 0,
+    "dur": 180,
+    "chord": "Bm7",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 69,
+      "V1": 78
+    }
+  },
+  {
+    "bar": 121,
+    "on": 180,
+    "dur": 60,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 122,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em",
+    "texture": "Coda - broad",
+    "voicing": {
+      "VC": 52,
+      "VA": 59,
+      "V2": 67,
+      "V1": 79
+    }
+  },
+  {
+    "bar": 123,
+    "on": 0,
+    "dur": 240,
+    "chord": "Em7",
+    "texture": "Piano tag",
+    "voicing": {
+      "VC": 50,
+      "VA": 59,
+      "V2": 67,
+      "V1": 76
+    }
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "piano_musical_xml_preserved": true,
+  "measures": 123,
+  "piano_pitched_segments": 1942,
+  "new_string_notes": 766,
+  "string_notes_by_part": {
+    "CB": 65,
+    "V1": 159,
+    "V2": 137,
+    "VA": 286,
+    "VC": 119
+  },
+  "monophonic_string_parts": true,
+  "measure_durations_and_repeats_valid": true,
+  "original_mxl_sha256": "a7abb3f8787da2b295a340ecb233a6a15f284f480804b818bb0539dc80deb421"
+}

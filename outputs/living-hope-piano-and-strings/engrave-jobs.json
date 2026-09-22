@@ -1,0 +1,26 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-piano-and-strings.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-piano-and-strings.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-V1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-V1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-V2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-V2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-VA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-VA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-VC.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-VC.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-CB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-strings/living-hope-CB.pdf"
+  }
+]

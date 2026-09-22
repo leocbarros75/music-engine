@@ -1,0 +1,26 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-string-score.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-string-score.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-V1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-V1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-V2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-V2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-VA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-VA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-VC.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-VC.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-CB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/last-train-strings/last-train-CB.pdf"
+  }
+]
