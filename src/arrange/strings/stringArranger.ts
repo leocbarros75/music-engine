@@ -344,6 +344,7 @@ export function arrangeStringEnsemble(
   const dpResult = runDp({
     slices, candidatesBySlice, profileId: profile,
     scoreOffChordTones: options.innerVoiceMotion === true,
+    beamWidth: options.beamWidth,
   });
   const bestStates = dpResult.best;
   const bestVoicings = bestStates.map((s) => s.voicing);

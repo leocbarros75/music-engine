@@ -21,8 +21,22 @@ export function runDp(params: {
   profileId: keyof typeof PROFILE_WEIGHTS;
   /** True when candidates.ts has offered off-chord steps that need costing. */
   scoreOffChordTones?: boolean;
+  /**
+   * Carry only the N cheapest states out of each slice instead of all of them.
+   *
+   * The search costs slices × candidates², and a caller that leaves Violin I
+   * free offers several hundred candidates per slice. Keeping the best N makes
+   * that slices × N × candidates.
+   *
+   * This is an approximation: a state that looks dear at one slice can begin
+   * the cheapest path overall, and once dropped it cannot come back. Omitted —
+   * the default — searches exhaustively exactly as before, so every caller that
+   * does not ask for a beam is unaffected.
+   */
+  beamWidth?: number;
 }): { best: CandidateState[]; penalties: Array<{ measure: number; t: number; penalties: TransitionScore["penalties"] }> } {
-  const { slices, candidatesBySlice, profileId, scoreOffChordTones } = params;
+  const { slices, candidatesBySlice, profileId, scoreOffChordTones, beamWidth } = params;
+  const beam = Number.isFinite(beamWidth) && (beamWidth as number) > 0 ? Math.floor(beamWidth as number) : 0;
   const profile = PROFILE_WEIGHTS[profileId];
   if (!slices.length || !candidatesBySlice.length) return { best: [], penalties: [] };
 
@@ -79,9 +93,15 @@ export function runDp(params: {
       });
     }
 
-    const bestPenalty = nextLayer.reduce((best, n) => (n.cost < best.cost ? n : best), nextLayer[0]!);
-    prevLayer = nextLayer;
-    layers.push(nextLayer);
+    // Prune before this layer becomes the next one's predecessor, and push the
+    // SAME array that is kept: prevIndex is an index into it, and the backtrack
+    // below reads layers[i][cursor]. Pushing one array and walking another
+    // would rebuild the path out of the wrong states.
+    const kept = beam && nextLayer.length > beam
+      ? nextLayer.slice().sort((a, b) => a.cost - b.cost).slice(0, beam)
+      : nextLayer;
+    prevLayer = kept;
+    layers.push(kept);
   }
 
   let bestIdx = 0;

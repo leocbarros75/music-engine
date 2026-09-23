@@ -2092,7 +2092,23 @@ export function applyAppSettings(
     // post-processor below (applyPianoMelodyRhythm), exactly as done for
     // Cello/Bass (applyPianoBassRhythm).
     const templateScore = buildPianoTemplateScore(scoreModel);
-    const stringResult = arrangeStringEnsemble(templateScore, pianoChords, { profile });
+    // Carry the 200 cheapest voicings out of each slice rather than all ~440.
+    //
+    // This is the one caller that needs it. Its template is deliberately
+    // rest-only (see buildPianoTemplateScore) so Violin I is free to take any
+    // chord tone instead of doubling the piano — which is what makes the
+    // arrangement complementary, and also what makes the search enormous: 48
+    // million transition evaluations, some 39 seconds, the slowest thing the
+    // engine does by a wide margin. Beam 200 brings that to about twelve.
+    //
+    // It is an approximation and it is set here, not in the arranger, because
+    // brass, woodwinds and the orchestras run the same DP and must keep the
+    // exhaustive search. On the reference material 200 returned byte-identical
+    // arrangements; on a third piece two notes of a hundred and sixty were
+    // voiced differently — a slightly dearer path by the engine's own cost
+    // function, not a wrong note. Narrower beams are markedly faster and
+    // diverge much more: 100 moved one note in seven.
+    const stringResult = arrangeStringEnsemble(templateScore, pianoChords, { profile, beamWidth: 200 });
 
     warnings.push(...(stringResult.warnings ?? []));
     const stringScore = stringResult.scoreModel;

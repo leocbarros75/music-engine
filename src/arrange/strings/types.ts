@@ -122,6 +122,21 @@ export type StringArrangerOptions = {
    */
   innerVoiceMotion?: boolean;
   /**
+   * Carry only the N cheapest voicings out of each slice instead of every one.
+   *
+   * The search costs slices × candidates², and a caller that leaves Violin I
+   * free — piano+strings, where the whole point is that the strings do not
+   * double the piano — offers several hundred candidates per slice. That is
+   * where the engine spends most of its time.
+   *
+   * Unset by default, and unset means the exhaustive search every caller has
+   * always had: brass, woodwinds and the orchestras run this same DP and none
+   * of them asked for an approximation. It IS an approximation — a voicing
+   * that looks dear at one slice can begin the cheapest path overall, and once
+   * dropped it cannot return — so the result may differ from the optimum.
+   */
+  beamWidth?: number;
+  /**
    * Print bow directions where a section would otherwise agree them by hand —
    * the first note, and each retake after a rest. Off by default: the brass and
    * woodwind arrangers run this DP, and a down-bow on a trumpet is nonsense.
