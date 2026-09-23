@@ -1,0 +1,22 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-wind-quartet.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-wind-quartet.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-FL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-FL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-OB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-OB.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-CL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-CL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-BN.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-wind-quartet/living-hope-BN.pdf"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "measures": 62,
+  "source_pitched_segments": 1005,
+  "retained_source_segments": 870,
+  "unselected_source_segments": 135,
+  "wind_events_before_notational_splitting": 863,
+  "octave_shifted_wind_events": 502,
+  "written_breath_rests": 48,
+  "breath_marks": 63,
+  "new_pitch_classes": 0,
+  "clarinet_written_major_second_above_sounding": true,
+  "source_sha256": "e1e98c10577ad9e31c5f6a5f5d53e8fed1bcd7a494c65d558e5d5aae7483c948"
+}
