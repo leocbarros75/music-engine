@@ -95,13 +95,32 @@ test('a chord at the barline moves as one — a breath is not a way to split it'
 
 // ── Staggering ──────────────────────────────────────────────────────────────
 
-test('the lower parts of a quartet never come up for air in the same bar', () => {
-  const seen = new Map<number, number>();
-  for (let i = 1; i < 4; i++) {
-    for (const b of breathBars(i, 4, 48)) seen.set(b, (seen.get(b) ?? 0) + 1);
+test('a breath bar is never shared by more than two of the lower parts', () => {
+  // The four-bar cycle has two offsets, so in a quartet one pair doubles up.
+  // Three at once would leave the texture on the top line alone.
+  for (const count of [4, 5]) {
+    const seen = new Map<number, number>();
+    for (let i = 1; i < count; i++) {
+      for (const b of breathBars(i, count, 48)) seen.set(b, (seen.get(b) ?? 0) + 1);
+    }
+    const worst = Math.max(...seen.values());
+    assert(worst <= 2, `${worst} lower parts share a bar in a ${count}-part ensemble`);
   }
-  const shared = [...seen.entries()].filter(([, n]) => n > 1);
-  assert.deepEqual(shared, [], `bars shared by two lower parts: ${JSON.stringify(shared)}`);
+});
+
+test('the pair that doubles up is the outer one, not two neighbours', () => {
+  // Oboe (1) and bassoon (3) are the furthest apart of the lower three, so
+  // what keeps sounding is a top and a middle.
+  const share = (a: number, b: number) =>
+    [...breathBars(a, 4, 48)].some((x) => breathBars(b, 4, 48).has(x));
+  assert(share(1, 3), 'oboe and bassoon share');
+  assert(!share(1, 2), 'oboe and clarinet do not');
+  assert(!share(2, 3), 'clarinet and bassoon do not');
+});
+
+test('the lower parts get air roughly twice as often as a six-bar cycle gave', () => {
+  const gaps = [...breathBars(1, 4, 48)].slice(1).map((b, i) => b - [...breathBars(1, 4, 48)][i]);
+  assert(gaps.every((g) => g === 4), `candidate gaps: ${JSON.stringify(gaps)}`);
 });
 
 test('the top line, most exposed, gets an opportunity every other bar', () => {
@@ -134,8 +153,36 @@ test('the engine used to write a part nobody could play, and no longer does', ()
   const parts = ['Flute', 'Oboe', 'Clarinet', 'Bassoon'].map((n, i) => held(`P${i}`, n, 62));
   assert.equal(longestBreathlessBeats(parts[0] as any), 248, 'the part as it was');
   const plan = applyBreathing(parts as any);
-  assert(plan.longestBreathlessBeats <= 24,
+  assert(plan.longestBreathlessBeats <= 16,
     `still ${plan.longestBreathlessBeats} beats without air`);
+});
+
+test('where the planned bars are unusable, it asks again rather than giving up', () => {
+  // The cycle offers this part bars 1, 5, 9… and every one of them is tied
+  // onward. A purely positional plan leaves the player with nothing; the
+  // choral bassoon ran 32 beats that way.
+  const p = held('P_BN', 'Bassoon', 24);
+  p.measures.forEach((m: any, i: number) => {
+    if ((i + 1) % 4 === 1) (m.events[0] as any).tieStart = true;
+  });
+  const plan = applyBreathing([p] as any);
+  assert(plan.longestBreathlessBeats <= 16,
+    `${plan.longestBreathlessBeats} beats without air despite usable bars nearby`);
+  // and it still refused to break any of the ties it was told not to touch
+  p.measures.forEach((m: any, i: number) => {
+    if ((i + 1) % 4 === 1) assert.equal(m.events[0].dur, 4, `bar ${i + 1} tie was broken`);
+  });
+});
+
+test('a part with nowhere legal to breathe is left alone, not forced', () => {
+  // Every bar ties onward: there is no lawful breath anywhere, and inventing
+  // one would mean breaking a tie the arranger meant.
+  const p = held('P_BN', 'Bassoon', 12);
+  for (const m of p.measures) (m.events[0] as any).tieStart = true;
+  const plan = applyBreathing([p] as any);
+  assert.equal(plan.releases, 0);
+  assert.equal(plan.marks, 0);
+  assert(p.measures.every((m: any) => m.events[0].dur === 4), 'nothing touched');
 });
 
 // ── Serialization ───────────────────────────────────────────────────────────

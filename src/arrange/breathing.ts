@@ -73,10 +73,16 @@ function barLengths(measures: Measure[], fallback = 4): number[] {
  * Which bars a part may breathe in.
  *
  * The top line gets an opportunity every other bar — it is the most exposed
- * and usually the busiest. The lower parts take a longer cycle on odd-numbered
- * offsets, which keeps them clear both of each other and of the top. A quintet
- * has one more part than there are offsets, so its two outer lower voices
- * share a cycle; four of the five still carry the texture.
+ * and usually the busiest. The lower parts run a four-bar cycle on the odd
+ * offsets, which keeps them clear of the top line's even bars.
+ *
+ * Four bars rather than six is a deliberate trade. Six kept every part clear
+ * of every other, but left the lower voices up to twenty seconds between
+ * breaths, which is playable only just. Four brings that to about thirteen,
+ * at the cost of two offsets for three or four lower parts: in a quartet the
+ * oboe and bassoon come up together. They are the two furthest apart, so what
+ * is left sounding is a top and a middle rather than two neighbours, and the
+ * flute is on the even bars either way.
  */
 export function breathBars(partIndex: number, partCount: number, bars: number): Set<number> {
   const out = new Set<number>();
@@ -85,9 +91,9 @@ export function breathBars(partIndex: number, partCount: number, bars: number): 
     for (let b = 2; b <= bars; b += 2) out.add(b);
     return out;
   }
-  const cycle = Math.min(6, Math.max(2, 2 * Math.max(1, partCount - 1)));
-  const offsets = [1, 3, 5].filter((o) => o < cycle);
-  const offset = offsets.length ? offsets[(partIndex - 1) % offsets.length]! : 1;
+  const cycle = 4;
+  const offsets = [1, 3];
+  const offset = offsets[(partIndex - 1) % offsets.length]!;
   for (let b = offset; b <= bars; b += cycle) out.add(b);
   return out;
 }
@@ -154,15 +160,74 @@ export function longestBreathlessBeats(part: Part): number {
  * `parts` must be wind or brass only — a string section has no such need and a
  * piano none at all, and passing one in would punch holes in it for nothing.
  */
+/**
+ * Try to take a breath at the end of one bar. Returns what it managed, or null
+ * if this bar offers nowhere legal to do it.
+ *
+ * This is the whole rule set in one place, so the planned breaths and the
+ * repaired ones below are taken on identical terms.
+ */
+function tryBreathAtBar(
+  part: Part,
+  lengths: number[],
+  i: number,
+  release: number,
+  minKept: number
+): "release" | "mark" | null {
+  if (i < 0 || i >= part.measures.length - 1) return null;  // never the closing bar
+  const barEnd = lengths[i] ?? 4;
+  const notes = (part.measures[i]?.events ?? []).filter(
+    (e): e is NoteEvent & { type: "note" } => e?.type === "note" && !(e as any).grace
+  );
+  if (!notes.length) return null;                            // already silent here
+
+  // Everything that runs to the barline — a chord ends as one gesture, so
+  // shortening one of its notes and not the others would split it.
+  const atBarline = notes.filter((e) => Number(e.t) + Number(e.dur) >= barEnd - EPS);
+  if (!atBarline.length) return null;                        // the bar already ends in air
+  if (atBarline.some((e) => e.tieStart === true)) return null;  // sounding into the next bar
+  if (atBarline.some((e) => Array.isArray(e.articulations) && e.articulations.includes("breath-mark"))) {
+    return null;                                             // already breathing here
+  }
+
+  const shortest = Math.min(...atBarline.map((e) => Number(e.dur)));
+  // Never take more than half a note: an eighth off a whole note is a breath,
+  // an eighth off an eighth is a deletion.
+  const room = Math.min(release, shortest / 2);
+  if (shortest - room >= minKept - EPS && room >= minKept - EPS) {
+    for (const e of atBarline) e.dur = Number(e.dur) - room;
+    return "release";
+  }
+  // Too short to shorten without losing the note. Ask for the breath and let
+  // the player borrow the time.
+  for (const e of atBarline) {
+    const on = Array.isArray(e.articulations) ? [...e.articulations] : [];
+    on.push("breath-mark");
+    e.articulations = on;
+  }
+  return "mark";
+}
+
+/** The absolute beat at which each bar ends. */
+function barEnds(lengths: number[]): number[] {
+  const out: number[] = [];
+  let at = 0;
+  for (const l of lengths) { at += l; out.push(at); }
+  return out;
+}
+
 export function applyBreathing(
   parts: Part[],
-  options?: { releaseBeats?: number; minKeptBeats?: number }
+  options?: { releaseBeats?: number; minKeptBeats?: number; maxBreathlessBeats?: number }
 ): BreathPlan {
   const release = Math.max(0, options?.releaseBeats ?? 0.5);   // an eighth
   // A note must keep at least an eighth, so a quarter can still give up half
   // its length: quarter becomes eighth-note-plus-eighth-rest, which is how a
   // breath is normally written. Anything shorter takes a mark instead.
   const minKept = options?.minKeptBeats ?? 0.5;
+  // About sixteen seconds at 60 to the quarter, thirteen at 71 — the far end
+  // of a comfortable phrase, not a limit anyone should be working at.
+  const maxBreathless = options?.maxBreathlessBeats ?? 16;
   const usable = (parts ?? []).filter((p) => (p?.measures?.length ?? 0) > 0);
   const bars = Math.max(0, ...usable.map((p) => p.measures.length));
   let releases = 0;
@@ -174,37 +239,44 @@ export function applyBreathing(
 
     for (let i = 0; i < part.measures.length; i++) {
       if (!candidates.has(i + 1)) continue;
-      if (i === part.measures.length - 1) continue;   // the closing bar is a cutoff, not a breath
+      const took = tryBreathAtBar(part, lengths, i, release, minKept);
+      if (took === "release") releases++;
+      else if (took === "mark") marks++;
+    }
 
-      const barEnd = lengths[i] ?? 4;
-      const notes = (part.measures[i]?.events ?? []).filter(
-        (e): e is NoteEvent & { type: "note" } => e?.type === "note" && !(e as any).grace
-      );
-      if (!notes.length) continue;                     // already silent here
-
-      // Everything that runs to the barline — a chord ends as one gesture, so
-      // shortening one of its notes and not the others would split it.
-      const atBarline = notes.filter((e) => Number(e.t) + Number(e.dur) >= barEnd - EPS);
-      if (!atBarline.length) continue;                 // the bar already ends in air
-      if (atBarline.some((e) => e.tieStart === true)) continue;  // still sounding into the next bar
-
-      const shortest = Math.min(...atBarline.map((e) => Number(e.dur)));
-      // Never take more than half a note: an eighth off a whole note is a
-      // breath, an eighth off an eighth is a deletion.
-      const room = Math.min(release, shortest / 2);
-      if (shortest - room >= minKept - EPS && room >= minKept - EPS) {
-        for (const e of atBarline) e.dur = Number(e.dur) - room;
-        releases++;
-      } else {
-        // Too short to shorten without losing the note. Ask for the breath and
-        // let the player borrow the time.
-        for (const e of atBarline) {
-          const on = Array.isArray(e.articulations) ? [...e.articulations] : [];
-          if (!on.includes("breath-mark")) on.push("breath-mark");
-          e.articulations = on;
-        }
-        marks++;
+    // ── Repair ────────────────────────────────────────────────────────────
+    // The plan above is positional: it offers each player a breath on a fixed
+    // cycle and moves on. Where those bars happen to be tied or to end in air
+    // already, the player simply goes without, and two failures in a row leave
+    // a longer gap than the cycle promised — the choral bassoon ran 32 beats
+    // that way, worse than the wider cycle it replaced.
+    //
+    // So having asked politely, ask again where it matters: find any stretch
+    // still longer than a player can hold, and take the latest legal breath
+    // that splits it. This targets the thing that actually matters — nobody
+    // goes too long without air — instead of trusting the grid to cover it.
+    const ends = barEnds(lengths);
+    for (let guard = 0; guard < part.measures.length; guard++) {
+      const tooLong = soundingSpans(part, true).find(([s, e]) => e - s > maxBreathless + EPS);
+      if (!tooLong) break;
+      const [spanStart, spanEnd] = tooLong;
+      // Bars whose barline falls strictly inside the stretch.
+      const inside: number[] = [];
+      for (let i = 0; i < ends.length; i++) {
+        if (ends[i]! > spanStart + EPS && ends[i]! < spanEnd - EPS) inside.push(i);
       }
+      // Prefer the last one that still lands within a playable span; failing
+      // that, the earliest available — late air beats none.
+      const within = inside.filter((i) => ends[i]! <= spanStart + maxBreathless + EPS);
+      const order = [...within.reverse(), ...inside];
+      let took: "release" | "mark" | null = null;
+      for (const i of order) {
+        took = tryBreathAtBar(part, lengths, i, release, minKept);
+        if (took) break;
+      }
+      if (!took) break;                    // nothing legal in there; it stands
+      if (took === "release") releases++;
+      else marks++;
     }
   });
 
