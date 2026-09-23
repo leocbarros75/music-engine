@@ -284,7 +284,11 @@ export function buildPerformance(score: {
                     });
                     playedGrace.add(graceKey);
                 }
-                const gate = articulations.includes('staccatissimo') ? 0.25 : articulations.includes('staccato') ? 0.5 : 1;
+                // A breath mark is a small cut, not an articulation of attack:
+                // the player takes air by giving up the end of the note. Left
+                // ungated, playback would sustain through a breath the score
+                // asks for.
+                const gate = articulations.includes('staccatissimo') ? 0.25 : articulations.includes('staccato') ? 0.5 : articulations.includes('breath-mark') ? 0.85 : 1;
                 const note: PerformanceNote = { partIdx, measureIndex: visit.index, startBeat: startBeat + steal, durationBeats: (e.dur - steal) * (e.tieStart ? 1 : gate), midi, velocity: vel, startSec: 0, durationSec: 0 };
                 notes.push(note);
                 if (e.tieStart)

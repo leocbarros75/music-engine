@@ -1559,7 +1559,15 @@ function renderMusicXML(scoreModel: ScoreModel): string {
 
                 // A chord member sounds WITH the note before it, so it does not
                 // advance the cursor and its duration is not "written" time.
-                const isChordMember = (gi > 0 || evAny.chord === true);
+                // <chord/> attaches a note to the one before it, so the note
+                // that OPENS a time slot can never be a chord member: there is
+                // nothing there to attach to, and MusicXML readers fall over.
+                // Events are sorted by onset above, so every genuine chord
+                // member is consecutive and already has gi > 0. A `chord` flag
+                // on a slot-opening note is always stale — carried along when a
+                // line was lifted out of a piano stack into a part of its own,
+                // where it turned a melody into an unplayable stack.
+                const isChordMember = gi > 0;
                 if (!isChordMember) writtenDivs += cd;
 
                 out += `<note>`;

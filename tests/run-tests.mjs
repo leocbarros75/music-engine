@@ -67,7 +67,8 @@ async function main() {
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',
       'tests/arrange/divisi.test.ts',
-      'tests/arrange/complementary.test.ts'
+      'tests/arrange/complementary.test.ts',
+      'tests/arrange/breathing.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {
@@ -77,7 +78,8 @@ async function main() {
       'tests/musicxml/tempoRounding.test.ts',
       'tests/musicxml/tiedChordDuration.test.ts',
       'tests/musicxml/transposedKeySpelling.test.ts',
-      'tests/musicxml/tupletDivisions.test.ts']) add(file, file);
+      'tests/musicxml/tupletDivisions.test.ts',
+      'tests/musicxml/chordFlag.test.ts']) add(file, file);
   }
   if (group === 'all' || group === 'harmony') {
     for (const file of Object.keys(EXPECTATIONS_BY_BASENAME).sort()) {

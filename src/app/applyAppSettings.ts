@@ -16,6 +16,33 @@ import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleF
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures } from "../arrange/complementary";
+import { applyBreathing } from "../arrange/breathing";
+
+/**
+ * Wind and brass parts must have somewhere to breathe, or nobody can play
+ * them. Applied to the wind and brass parts of a finished arrangement, and to
+ * nothing else — a string section has no such need and a piano none at all.
+ *
+ * Deliberately NOT applied to the orchestras, whose winds have the same
+ * problem: those ensembles are held fixed, and are a separate change.
+ */
+function breatheWinds(warnings: string[], label: string, parts: any[]): void {
+  const winds = (parts ?? []).filter((p) =>
+    /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium/i
+      .test(`${p?.name ?? ""} ${p?.instrument ?? ""} ${p?.part_id ?? ""}`)
+  );
+  if (!winds.length) return;
+  const plan = applyBreathing(winds as any);
+  if (!plan.releases && !plan.marks) return;
+  const bpm = quarterBpmOf(parts?.[0]?.measures ?? []);
+  const seconds = bpm ? ` — about ${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s` : "";
+  warnings.push(
+    `[${label}] Staggered breathing: ${plan.releases} early release${plan.releases === 1 ? "" : "s"} ` +
+    `and ${plan.marks} breath mark${plan.marks === 1 ? "" : "s"}, so the players never stop together. ` +
+    `Longest stretch without air now ${plan.longestBreathlessBeats.toFixed(0)} beats${seconds}. ` +
+    "Move them to suit the phrase; the plan is a starting point, not a prescription."
+  );
+}
 
 /**
  * Hold a note rather than re-striking it, at whatever rate the tempo makes
@@ -1958,6 +1985,7 @@ export function applyAppSettings(
           ? "always"
           : "auto";
     const finalScore = arrangeWoodwindQuartetFromPianoInstrumentation(scoreModel, { warnings, bassoonEntry });
+    breatheWinds(warnings, "piano→winds", (finalScore as any).parts ?? []);
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -1972,6 +2000,7 @@ export function applyAppSettings(
   if (useSatbToWoodwindInstrumentation) {
     // Choral-wind: SATB transcription → Soprano→Flute, Alto→Oboe, Tenor→Clarinet, Bass→Bassoon
     const finalScore = arrangeSatbToWoodwindQuartetDirect(scoreModel, { warnings });
+    breatheWinds(warnings, "choral→winds", (finalScore as any).parts ?? []);
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2015,6 +2044,7 @@ export function applyAppSettings(
       describeArc(warnings, "winds", wwParts, applyArc(wwParts, arc));
       sustainComplement(warnings, "winds", wwParts, frozenPianoPart?.measures ?? []);
       answerComplement(warnings, "winds", wwParts, arc);
+      breatheWinds(warnings, "piano+winds", wwParts);   // wind parts only; the piano joins below
       (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
     }
     attachTextureAnalysis(wwResult.scoreModel, warnings);
@@ -2206,6 +2236,7 @@ export function applyAppSettings(
       warnings,
     });
 
+    breatheWinds(warnings, "winds", (wwResult.scoreModel as any).parts ?? []);
     attachTextureAnalysis(wwResult.scoreModel, warnings);
     return {
       scoreModel: wwResult.scoreModel as ScoreModel,
@@ -2232,6 +2263,7 @@ export function applyAppSettings(
       quintet: brQuintet,
       tubaEntry,
     });
+    breatheWinds(warnings, "piano→brass", (finalScore as any).parts ?? []);
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2246,6 +2278,7 @@ export function applyAppSettings(
   if (wantsChoralBrass) {
     // Choral-brass: SATB → Soprano→Trumpet 1, Alto→Trumpet 2, Tenor→Trombone, Bass→Tuba.
     const finalScore = arrangeSatbToBrassQuartetDirect(scoreModel, { warnings });
+    breatheWinds(warnings, "choral→brass", (finalScore as any).parts ?? []);
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2290,6 +2323,7 @@ export function applyAppSettings(
       describeArc(warnings, "brass", brParts, applyArc(brParts, arc));
       sustainComplement(warnings, "brass", brParts, frozenPianoPart?.measures ?? []);
       answerComplement(warnings, "brass", brParts, arc);
+      breatheWinds(warnings, "piano+brass", brParts);   // brass parts only; the piano joins below
       (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);
     }
     attachTextureAnalysis(brResult.scoreModel, warnings);
@@ -2432,6 +2466,7 @@ export function applyAppSettings(
       level:      settings.level,
       warnings,
     });
+    breatheWinds(warnings, "brass", (brResult.scoreModel as any).parts ?? []);
     attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
       scoreModel: brResult.scoreModel as ScoreModel,

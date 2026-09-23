@@ -119,6 +119,21 @@ function findSaTbParts(score: ScoreModel): SaTbParts | null {
 // Grand-staff single-part SATB (piano-choral layout, 4 voices)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Take a note out of a chord stack and give it a line of its own.
+ *
+ * `chord` means "this notehead attaches to the one before it" — true of the
+ * soprano while it sat on top of a piano stack, false the moment it becomes
+ * the only note in a flute part. Carried along, the flag makes the exporter
+ * write a melody as a single stack: four separate notes printed as a chord on
+ * beat one, which is unreadable and not valid MusicXML.
+ */
+function lift(ev: EventLike): EventLike {
+  const copy: any = clone(ev);
+  delete copy.chord;
+  return copy;
+}
+
 function splitGrandStaffSatb(pianoLikePart: PartLike): SatbParts {
   // Grand-staff SATB is usually engraved as CHORD STACKS, not 4 separate voices:
   //   Treble staff = a chord {Soprano(top), Alto(bottom)} at each onset
@@ -172,9 +187,9 @@ function splitGrandStaffSatb(pianoLikePart: PartLike): SatbParts {
         if (!sorted.length) continue;
         const top = sorted[sorted.length - 1]!.ev;
         const bottom = sorted[0]!.ev;
-        topPart.measures[mi]?.events.push(clone(top));
+        topPart.measures[mi]?.events.push(lift(top));
         // When only one note sounds, both voices double it
-        bottomPart.measures[mi]?.events.push(clone(bottom));
+        bottomPart.measures[mi]?.events.push(lift(bottom));
       }
     };
 

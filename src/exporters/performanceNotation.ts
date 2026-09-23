@@ -127,7 +127,10 @@ export function writePerformanceNotation(xml: string, input: any): string {
                     }
                     const a = make('articulations');
                     for (const name of sourceNote.articulations)
-                        if (['staccato', 'staccatissimo', 'tenuto', 'accent', 'strong-accent'].includes(name))
+                        // breath-mark is an articulation in MusicXML, alongside
+                        // the attack marks — it asks the player to take air here
+                        // by borrowing a little time from the note it sits on.
+                        if (['staccato', 'staccatissimo', 'tenuto', 'accent', 'strong-accent', 'breath-mark', 'caesura'].includes(name))
                             a.appendChild(make(name));
                     if (a.childNodes.length)
                         notations.appendChild(a);

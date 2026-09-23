@@ -1,0 +1,217 @@
+import type { Measure, NoteEvent, Part } from "../score/types";
+
+/**
+ * Wind and brass players have to breathe.
+ *
+ * A piano sustains as long as a key is held and a pedal is down. A flute does
+ * not, and neither does a trumpet. Transcribing keyboard texture onto wind
+ * parts without saying where the air comes from produces music that cannot be
+ * played at all — not awkward, not unidiomatic: unperformable.
+ *
+ * The engine was doing exactly that. Every wind and brass part it produced ran
+ * from the first bar to the last without a single rest — 248 beats on one
+ * reference song, 492 on another, which at 71 to the quarter is three and a
+ * half minutes of continuous tone in the first case and seven in the second.
+ * A player needs air every five to fifteen seconds. A reference edition of the
+ * same song breaks its flute at 48 beats and its oboe at 16, and writes 63
+ * breath marks; ours wrote none.
+ *
+ * The rules:
+ *
+ *   1. Breaths are STAGGERED. The point is not that everyone rests — it is
+ *      that the ensemble never stops together, so the texture carries on while
+ *      any one player refills.
+ *   2. A breath is taken where a note already ends at a barline, so no phrase
+ *      is cut in half to find one.
+ *   3. Never out of a tie: the note is still sounding into the next bar.
+ *   4. Never out of the final bar, where the players agree a cutoff instead.
+ *   5. A note long enough to give up its tail releases early, and the bar is
+ *      filled with a rest. One too short to shorten keeps its full value and
+ *      takes a breath mark, which asks the player to borrow a little time
+ *      rather than lose the note.
+ *
+ * This is a starting plan, not a physiological guarantee: air varies with
+ * instrument, dynamic, register and player, and a section will move these
+ * breaths to suit the room. What it does guarantee is that there is somewhere
+ * to move them from.
+ */
+
+const EPS = 1e-9;
+
+export type BreathPlan = {
+  /** Notes shortened to leave an audible gap before the barline. */
+  releases: number;
+  /** Notes left whole, marked for the player to snatch a breath. */
+  marks: number;
+  /** The longest unbroken stretch of notated sound left in any part, in beats. */
+  longestRunBeats: number;
+  /** The longest any player is asked to go without air, counting breath marks. */
+  longestBreathlessBeats: number;
+};
+
+/**
+ * How long each bar is, in quarter-note beats.
+ *
+ * Meter is inherited: a time signature holds until another replaces it, and a
+ * pickup or other irregular bar states its own length outright.
+ */
+function barLengths(measures: Measure[], fallback = 4): number[] {
+  const out: number[] = [];
+  let meter = fallback;
+  for (const m of measures) {
+    const time = m?.attributes?.time;
+    if (time && Number(time.beats) > 0 && Number(time.beat_type) > 0) {
+      meter = (Number(time.beats) * 4) / Number(time.beat_type);
+    }
+    const stated = Number(m?.durationBeats);
+    out.push(Number.isFinite(stated) && stated > 0 ? stated : meter);
+  }
+  return out;
+}
+
+/**
+ * Which bars a part may breathe in.
+ *
+ * The top line gets an opportunity every other bar — it is the most exposed
+ * and usually the busiest. The lower parts take a longer cycle on odd-numbered
+ * offsets, which keeps them clear both of each other and of the top. A quintet
+ * has one more part than there are offsets, so its two outer lower voices
+ * share a cycle; four of the five still carry the texture.
+ */
+export function breathBars(partIndex: number, partCount: number, bars: number): Set<number> {
+  const out = new Set<number>();
+  if (bars <= 0) return out;
+  if (partIndex === 0) {
+    for (let b = 2; b <= bars; b += 2) out.add(b);
+    return out;
+  }
+  const cycle = Math.min(6, Math.max(2, 2 * Math.max(1, partCount - 1)));
+  const offsets = [1, 3, 5].filter((o) => o < cycle);
+  const offset = offsets.length ? offsets[(partIndex - 1) % offsets.length]! : 1;
+  for (let b = offset; b <= bars; b += cycle) out.add(b);
+  return out;
+}
+
+/**
+ * Every stretch of unbroken sound in a part, in absolute beats, merged.
+ *
+ * With `breathMarksBreak`, a note carrying a breath mark also ends a stretch.
+ * The two answer different questions: without it you get how long the part
+ * LOOKS unbroken, with it you get how long the player actually goes without
+ * air, which is the number that decides whether the part can be played. A
+ * breath mark makes no gap in the notation but the player takes one anyway.
+ */
+function soundingSpans(part: Part, breathMarksBreak = false): Array<[number, number]> {
+  const lengths = barLengths(part?.measures ?? []);
+  const spans: Array<[number, number, boolean]> = [];
+  let barStart = 0;
+  (part?.measures ?? []).forEach((m, i) => {
+    for (const ev of m?.events ?? []) {
+      if (ev?.type !== "note" || (ev as any).grace) continue;
+      const t = Number(ev.t);
+      const dur = Number(ev.dur);
+      if (!Number.isFinite(t) || !Number.isFinite(dur) || dur <= 0) continue;
+      const breathes = Array.isArray(ev.articulations) && ev.articulations.includes("breath-mark");
+      spans.push([barStart + t, barStart + t + dur, breathes]);
+    }
+    barStart += lengths[i] ?? 4;
+  });
+  spans.sort((a, b) => a[0] - b[0]);
+  const merged: Array<[number, number]> = [];
+  let cut = false;   // the previous note ended in a breath, so start a new stretch
+  for (const [s, e, breathes] of spans) {
+    const last = merged[merged.length - 1];
+    // Adjacent counts as continuous: one note ending exactly where the next
+    // begins gives the player no air, whatever the notation suggests.
+    if (last && !cut && s <= last[1] + EPS) last[1] = Math.max(last[1], e);
+    else merged.push([s, e]);
+    cut = breathMarksBreak && breathes;
+  }
+  return merged;
+}
+
+/** The longest unbroken stretch of NOTATED sound in a part, in beats. */
+export function longestRunBeats(part: Part): number {
+  let longest = 0;
+  for (const [s, e] of soundingSpans(part)) longest = Math.max(longest, e - s);
+  return longest;
+}
+
+/**
+ * The longest a player is asked to go without air, in beats — counting breath
+ * marks as breaths, because that is what they are. This is the number that
+ * says whether a part is playable.
+ */
+export function longestBreathlessBeats(part: Part): number {
+  let longest = 0;
+  for (const [s, e] of soundingSpans(part, true)) longest = Math.max(longest, e - s);
+  return longest;
+}
+
+/**
+ * Give every part somewhere to breathe.
+ *
+ * `parts` must be wind or brass only — a string section has no such need and a
+ * piano none at all, and passing one in would punch holes in it for nothing.
+ */
+export function applyBreathing(
+  parts: Part[],
+  options?: { releaseBeats?: number; minKeptBeats?: number }
+): BreathPlan {
+  const release = Math.max(0, options?.releaseBeats ?? 0.5);   // an eighth
+  // A note must keep at least an eighth, so a quarter can still give up half
+  // its length: quarter becomes eighth-note-plus-eighth-rest, which is how a
+  // breath is normally written. Anything shorter takes a mark instead.
+  const minKept = options?.minKeptBeats ?? 0.5;
+  const usable = (parts ?? []).filter((p) => (p?.measures?.length ?? 0) > 0);
+  const bars = Math.max(0, ...usable.map((p) => p.measures.length));
+  let releases = 0;
+  let marks = 0;
+
+  usable.forEach((part, index) => {
+    const candidates = breathBars(index, usable.length, bars);
+    const lengths = barLengths(part.measures);
+
+    for (let i = 0; i < part.measures.length; i++) {
+      if (!candidates.has(i + 1)) continue;
+      if (i === part.measures.length - 1) continue;   // the closing bar is a cutoff, not a breath
+
+      const barEnd = lengths[i] ?? 4;
+      const notes = (part.measures[i]?.events ?? []).filter(
+        (e): e is NoteEvent & { type: "note" } => e?.type === "note" && !(e as any).grace
+      );
+      if (!notes.length) continue;                     // already silent here
+
+      // Everything that runs to the barline — a chord ends as one gesture, so
+      // shortening one of its notes and not the others would split it.
+      const atBarline = notes.filter((e) => Number(e.t) + Number(e.dur) >= barEnd - EPS);
+      if (!atBarline.length) continue;                 // the bar already ends in air
+      if (atBarline.some((e) => e.tieStart === true)) continue;  // still sounding into the next bar
+
+      const shortest = Math.min(...atBarline.map((e) => Number(e.dur)));
+      // Never take more than half a note: an eighth off a whole note is a
+      // breath, an eighth off an eighth is a deletion.
+      const room = Math.min(release, shortest / 2);
+      if (shortest - room >= minKept - EPS && room >= minKept - EPS) {
+        for (const e of atBarline) e.dur = Number(e.dur) - room;
+        releases++;
+      } else {
+        // Too short to shorten without losing the note. Ask for the breath and
+        // let the player borrow the time.
+        for (const e of atBarline) {
+          const on = Array.isArray(e.articulations) ? [...e.articulations] : [];
+          if (!on.includes("breath-mark")) on.push("breath-mark");
+          e.articulations = on;
+        }
+        marks++;
+      }
+    }
+  });
+
+  return {
+    releases,
+    marks,
+    longestRunBeats: Math.max(0, ...usable.map((p) => longestRunBeats(p))),
+    longestBreathlessBeats: Math.max(0, ...usable.map((p) => longestBreathlessBeats(p))),
+  };
+}
