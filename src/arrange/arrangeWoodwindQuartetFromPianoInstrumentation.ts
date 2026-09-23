@@ -194,14 +194,41 @@ function clampMidiToAbsoluteRange(midi: number, instrumentId: string): number {
   return m;
 }
 
+const KEYBOARD_WORDS = ["piano", "pno", "keyboard", "keys", "accomp", "organ", "harpsichord"];
+
+/** A grand staff gives itself away: its left hand writes staff 2. */
+function partHasStaff2Notes(p: any): boolean {
+  for (const m of p?.measures ?? []) {
+    for (const ev of m?.events ?? []) {
+      if (Number(ev?.staff) === 2) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Find the piano in a score that may not say where it is.
+ *
+ * The last two tests are what make this work on real files. A score exported
+ * without a <part-name> — which is common — has its name and instrument
+ * defaulted to the part id, so every keyword test misses, and this arranger
+ * fell through to the choral path without saying so. The string quartet has
+ * had these two steps all along; winds never got them.
+ */
 function findPianoPart(score: ScoreModel): PartLike | null {
   const parts = score.parts ?? [];
-  const byInstrument = parts.find((p: any) => String(p?.instrument ?? "").toLowerCase().includes("piano"));
+  const named = (p: any, field: string) => {
+    const s = String(p?.[field] ?? "").toLowerCase();
+    return KEYBOARD_WORDS.some((k) => s.includes(k));
+  };
+  const byInstrument = parts.find((p: any) => named(p, "instrument"));
   if (byInstrument) return byInstrument;
-  const byName = parts.find((p: any) => String(p?.name ?? "").toLowerCase().includes("piano"));
+  const byName = parts.find((p: any) => named(p, "name"));
   if (byName) return byName;
   const byStaves = parts.find((p: any) => Number(p?.staves ?? 1) >= 2);
   if (byStaves) return byStaves;
+  const byStaff2 = parts.find((p: any) => partHasStaff2Notes(p));
+  if (byStaff2) return byStaff2;
   return null;
 }
 

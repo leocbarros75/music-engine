@@ -69,7 +69,8 @@ async function main() {
       'tests/arrange/divisi.test.ts',
       'tests/arrange/complementary.test.ts',
       'tests/arrange/breathing.test.ts',
-      'tests/arrange/satbLift.test.ts'
+      'tests/arrange/satbLift.test.ts',
+      'tests/arrange/pianoDetection.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {

@@ -237,6 +237,12 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
     let currentTime = resolveTimeSignature(null);
     let currentKey: number | undefined;
     let currentMode: string | undefined;
+    // How many staves this part is engraved on. A piano says two, and until now
+    // nobody read it: the field existed on Part, every arranger tested it, and
+    // it was never once set. Scores that name their piano got found by name
+    // anyway; a score with no <part-name> at all — which is common enough —
+    // fell through every test and the arrangement came back untouched.
+    let curStaves = 1;
 
     for (let mi = 0; mi < measureEls.length; mi++) {
       const mEl = measureEls[mi] as Element;
@@ -249,6 +255,11 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
         const divEl = firstChild(attrsEl, "divisions");
         const d = intOf(divEl, curDivisions);
         if (d > 0) curDivisions = d;
+        const stavesEl = firstChild(attrsEl, "staves");
+        if (stavesEl) {
+          const s = intOf(stavesEl, curStaves);
+          if (s > 0) curStaves = Math.max(curStaves, s);
+        }
       }
 
       // Read time/key early so we can compute measure length heuristic
@@ -481,6 +492,7 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
       pitchSpace: "written",
       name: partNames.get(partId) ?? partId,
       instrument: partNames.get(partId) ?? partId,
+      ...(curStaves > 1 ? { staves: curStaves } : {}),
       measures,
       ...(partTranspose ? { transpose: partTranspose } : {}),
     });
