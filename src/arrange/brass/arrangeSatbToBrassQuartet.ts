@@ -116,10 +116,17 @@ function findSaTbParts(score: ScoreModel): SaTbParts | null {
  * the only note in a trumpet part. Carried along, the flag makes the exporter
  * write a melody as a single stack: four separate notes printed as a chord on
  * beat one, which is unreadable and not valid MusicXML.
+ *
+ * `staff` is stale for the same reason. A tenor or bass lifted off the piano's
+ * lower staff still says it belongs on staff 2, but a trombone part has only
+ * one staff to stand on. The exporter duly writes staff 1, the event still
+ * claims 2, and anything matched back by position — breath marks, accents,
+ * mutes — is silently dropped for want of an agreeing staff number.
  */
 function lift(ev: EventLike): EventLike {
   const copy: any = clone(ev);
   delete copy.chord;
+  copy.staff = 1;
   return copy;
 }
 
