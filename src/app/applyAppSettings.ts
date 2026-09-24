@@ -28,9 +28,14 @@ import { applyBreathing, isSectionPart, markStaggeredBreathing } from "../arrang
  * between them; the soloists, who have nobody to hide behind, still need the
  * line to give way.
  *
- * Applied to the SYMPHONIC orchestra only. The worship orchestra shares none
- * of this by deliberate policy, and its own winds are still written without
- * anywhere to breathe.
+ * Applied to both orchestras. The worship roster is where the section rule
+ * earns its keep: five of its eight wind and brass parts are shared desks —
+ * Flute/Oboe, Horn 1-2, Trumpet 2-3, Trombone 1-2, Trombone 3/Tuba — so they
+ * keep every note and are simply told to stagger, and only the Clarinet,
+ * Bassoon and Trumpet 1 have their lines opened up.
+ *
+ * These are church volunteers as often as professionals. A player who can
+ * busk a breath where none is written is not the player this is for.
  */
 function breatheOrchestra(warnings: string[], label: string, parts: any[]): void {
   const winds = (parts ?? []).filter((p) =>
@@ -2404,6 +2409,7 @@ export function applyAppSettings(
     const finalScore = arrangeWorshipOrchestraFromPiano(scoreModel, {
       warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default", partRanges: settings.orchestraPartRanges,
     }).scoreModel;
+    breatheOrchestra(warnings, "orchestra", (finalScore as any).parts ?? []);
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2420,6 +2426,7 @@ export function applyAppSettings(
     const finalScore = arrangeWorshipOrchestraFromSatb(scoreModel, {
       warnings, intensity: settings.orchestraIntensity ?? "build", parts: settings.orchestraParts, balance: settings.orchestraBalance ?? "default", partRanges: settings.orchestraPartRanges,
     }).scoreModel;
+    breatheOrchestra(warnings, "orchestra", (finalScore as any).parts ?? []);
     attachTextureAnalysis(finalScore, warnings);
     return {
       scoreModel: finalScore,
@@ -2456,6 +2463,7 @@ export function applyAppSettings(
       partRanges: settings.orchestraPartRanges,
       warnings,
     });
+    breatheOrchestra(warnings, "orchestra", (orchResult.scoreModel as any).parts ?? []);
     attachTextureAnalysis(orchResult.scoreModel, warnings);
     return {
       scoreModel: orchResult.scoreModel as ScoreModel,
