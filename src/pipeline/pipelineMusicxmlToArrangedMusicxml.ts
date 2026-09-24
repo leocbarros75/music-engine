@@ -2,6 +2,7 @@ import { inspectPhrases, validatePhrasePlan, applyPhrasePlan } from "../ai/phras
 import { synchronizePerformance } from "../exporters/synchronizePerformance";
 import { auditNoteConservation, TRANSCRIPTION_ENSEMBLES, type ConservationReport } from "../preservation/noteConservation";
 import { buildNoteMap, type NoteMap } from "../preservation/noteMap";
+import { buildOmissions, omissionsSentence, type OmissionsRecord } from "../preservation/omissions";
 import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
 import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
@@ -47,6 +48,7 @@ export type PipelineResult = {
      * the ledger.
      */
     noteMap?: NoteMap;
+    omissions?: OmissionsRecord;
     performance?: { status: string; reason?: string; durationSeconds?: number; warnings?: string[] };
   };
 };
@@ -346,6 +348,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
     // report a fault where there is none.
     let noteConservation: ConservationReport | undefined;
     let noteMap: NoteMap | undefined;
+    let omissions: OmissionsRecord | undefined;
     if (TRANSCRIPTION_ENSEMBLES.has(ensembleRaw)) {
       try {
         noteConservation = auditNoteConservation(musicxml, outputXml);
@@ -359,6 +362,14 @@ export function pipelineMusicxmlToArrangedMusicxml(
             `[transcription] ${noteConservation.lost} of ${noteConservation.sourceSegments} source notes ` +
             `(${pct}%) have no destination in the arrangement` + (where ? `; first at ${where}` : "") + "."
           );
+        }
+        // What was left out, and why. The conservation warning above says how
+        // many notes did not arrive; this says which ones and gives each a
+        // reason, so an absence can be read as a decision or caught as a bug
+        // instead of being diffed out of two scores by eye.
+        if (noteConservation && noteConservation.lost > 0) {
+          omissions = buildOmissions(musicxml, outputXml);
+          warnings.push(`[omissions] ${omissionsSentence(omissions)}`);
         }
         if (req.options?.noteMap === true) {
           // One row per source note: which instrument took it and at what
@@ -387,6 +398,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
         preservation,
         noteConservation,
         noteMap,
+        omissions,
         performance: synchronized.report,
         ensemble: ensembleRaw,
         styleUsed: appResult.styleUsed,

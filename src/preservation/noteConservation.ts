@@ -61,7 +61,7 @@ export type ConservationReport = {
   examples: Array<{ measure: number; beat: number; midi: number; durationBeats: number }>;
 };
 
-type Note = {
+export type Note = {
   measure: number;
   onset: number;
   midi: number;
@@ -71,6 +71,10 @@ type Note = {
   partName: string;
   /** Which staff of a grand-staff part, when the source says. */
   staff: number | null;
+  /** The written voice, when the source says. A dropped voice is the single
+   *  commonest reason a note does not reach the arrangement, and without this
+   *  an omissions record can only say "some inner note". */
+  voice: number | null;
 };
 
 /** Printed part names, keyed by the id the <part> elements use. */
@@ -138,7 +142,9 @@ export function collectNotes(xml: string): Note[] {
         const midi = soundingMidi(node, chromatic, octaveChange);
         const staffText = text(node, "staff");
         const staff = staffText === null ? null : Number(staffText) || null;
-        if (midi !== null) out.push({ measure: number, onset, midi, dur, partId, partName, staff });
+        const voiceText = text(node, "voice");
+        const voice = voiceText === null ? null : Number(voiceText) || null;
+        if (midi !== null) out.push({ measure: number, onset, midi, dur, partId, partName, staff, voice });
         if (!isChordMember) { previousOnset = cursor; cursor += dur; }
       }
     }
