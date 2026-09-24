@@ -1,0 +1,22 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-piano-and-winds.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-piano-and-winds.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-FL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-FL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-OB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-OB.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-CL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-CL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-BN.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-winds/living-hope-BN.pdf"
+  }
+]
