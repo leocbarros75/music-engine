@@ -84,17 +84,23 @@ type PartDef = {
 // yields roughly: strings 100%, winds ~70%, brass ~37%, timpani ~24%.
 const SYMPHONIC_PARTS: PartDef[] = [
   // ── Woodwinds — colour and solo lines (target ~70% of measures) ──
-  { partId: "SY_FL",   name: "Flute",           instrument: "flute",        family: "ww",    src: "vln1", enterAt: 0.52 },
-  { partId: "SY_OB",   name: "Oboe",            instrument: "oboe",         family: "ww",    src: "vln1", enterAt: 0.50 },
-  { partId: "SY_CL",   name: "Clarinet in Bb",  instrument: "clarinet_bb",  family: "ww",    src: "vln2", enterAt: 0.49 },
+  // Thresholds are 0.06 below the 2026-08-03 calibration (Fl .52 Ob .50 Cl .49
+  // Bsn .47). The solo pass below rests two of the three melodic winds whenever
+  // one takes a line, which cost 8 points of wind participation — 68% measured
+  // against the real scores, 60% once solos were added. Lowering entry by 0.06
+  // buys those bars back and lands on 68% again. The winds are not playing more
+  // than they were; they are playing the same amount, differently arranged.
+  { partId: "SY_FL",   name: "Flute",           instrument: "flute",        family: "ww",    src: "vln1", enterAt: 0.46 },
+  { partId: "SY_OB",   name: "Oboe",            instrument: "oboe",         family: "ww",    src: "vln2", enterAt: 0.44 },
+  { partId: "SY_CL",   name: "Clarinet in Bb",  instrument: "clarinet_bb",  family: "ww",    src: "vla",  enterAt: 0.43 },
   // Bassoon doubles the CELLO line (its Romantic role), not the double bass —
   // that independence is exactly what the worship roster collapses into one part.
-  { partId: "SY_BSN",  name: "Bassoon",         instrument: "bassoon",      family: "ww",    src: "vc",   enterAt: 0.47 },
+  { partId: "SY_BSN",  name: "Bassoon",         instrument: "bassoon",      family: "ww",    src: "vc",   enterAt: 0.41 },
 
   // ── Brass — horns are the glue (~55%), trumpets/trombones reserved (~20-33%) ──
   { partId: "SY_HN12", name: "Horn 1-2",        instrument: "horn_f",       family: "brass", src: "vla",  enterAt: 0.56 },
   { partId: "SY_HN34", name: "Horn 3-4",        instrument: "horn_f",       family: "brass", src: "vc",   enterAt: 0.60, romanticOnly: true },
-  { partId: "SY_TPT",  name: "Trumpet 1-2",     instrument: "trumpet_bb_1", family: "brass", src: "vln1", enterAt: 0.69 },
+  { partId: "SY_TPT",  name: "Trumpet 1-2",     instrument: "trumpet_bb_1", family: "brass", src: "vln2", enterAt: 0.69 },
   { partId: "SY_TBN12",name: "Trombone 1-2",    instrument: "trombone",     family: "brass", src: "vla",  enterAt: 0.75, romanticOnly: true },
   { partId: "SY_TBN3", name: "Trombone 3/Tuba", instrument: "tuba_c",       family: "brass", src: "cb",   enterAt: 0.76, romanticOnly: true },
 
@@ -261,6 +267,88 @@ export type SymphonicOptions = {
  * Runs this module's own DP fork for a 5-voice core, then scores it across the
  * period roster with strings leading and brass reserved for climaxes.
  */
+/** The winds that carry a melodic line, in the order a solo passes between them. */
+const SOLO_WINDS = ["SY_OB", "SY_FL", "SY_CL"] as const;
+/** A phrase quiet enough for one player to be heard, and not yet the climax. */
+const SOLO_MIN_INTENSITY = 0.40;
+const SOLO_MAX_INTENSITY = 0.72;
+
+/**
+ * Give a wind the line on its own, and get the orchestra out of its way.
+ *
+ * Flute, oboe, trumpet and the first violins all read the same core voice, so
+ * by construction they play the same tune: measured against Violin I, the oboe
+ * was identical in 90% of its bars and the flute in 76%. That is doubling, not
+ * scoring. A symphony's winds are not a brighter layer of the violins — they
+ * step out, take the tune alone, and hand it back.
+ *
+ * So in a few middle phrases — past the transparent opening, short of the
+ * climax where everyone belongs — one wind keeps its line while the other
+ * melodic winds rest and the first violins fall back to a held note. The
+ * bassoon stays: it reads the cello and is accompaniment here, not a rival.
+ * This is Tovey's opposition, which this file's own header has always claimed
+ * and never did: the orchestra recedes for a solo line.
+ *
+ * Returns what it placed, so the arrangement can say who plays where.
+ */
+function applyWindSolos(
+  outParts: any[],
+  intens: number[],
+  nMeasures: number
+): Array<{ partId: string; name: string; fromBar: number }> {
+  const byId = new Map<string, any>(outParts.map((p) => [p.part_id, p]));
+  const vln1 = byId.get("SY_VLN1");
+  const placed: Array<{ partId: string; name: string; fromBar: number }> = [];
+  const nPhrases = Math.ceil(nMeasures / PHRASE_LEN);
+  if (nPhrases < 4 || !vln1) return placed;
+
+  const sounds = (part: any, mi: number) =>
+    (part?.measures?.[mi]?.events ?? []).some((e: any) => e?.type === "note");
+
+  let turn = 0;
+  // Never the first phrase (the opening is thin already) nor the last (the
+  // close is everyone's), and never two in a row — a solo answered by another
+  // solo is a duet, and the texture stops being an opposition.
+  for (let pi = 1; pi < nPhrases - 1; pi++) {
+    const intensity = intens[pi] ?? 0.5;
+    if (intensity < SOLO_MIN_INTENSITY || intensity > SOLO_MAX_INTENSITY) continue;
+    if (placed.length && pi - (placed[placed.length - 1]!.fromBar - 1) / PHRASE_LEN < 2) continue;
+
+    const bars: number[] = [];
+    for (let mi = pi * PHRASE_LEN; mi < Math.min((pi + 1) * PHRASE_LEN, nMeasures); mi++) bars.push(mi);
+
+    // Whoever is actually playing here takes it; a rest cannot have a solo.
+    const candidates = SOLO_WINDS.filter((id) => bars.some((mi) => sounds(byId.get(id), mi)));
+    if (!candidates.length) continue;
+    const soloId = candidates[turn % candidates.length]!;
+    const solo = byId.get(soloId);
+    turn++;
+
+    for (const mi of bars) {
+      for (const id of SOLO_WINDS) {
+        if (id === soloId) continue;
+        const p = byId.get(id);
+        if (p?.measures?.[mi]) p.measures[mi].events = [];
+      }
+      // The first violins hold instead of moving: the harmony stays, the
+      // competition for the ear goes.
+      const bar = vln1.measures?.[mi];
+      const notes = (bar?.events ?? []).filter((e: any) => e?.type === "note");
+      if (!bar || !notes.length) continue;
+      const barBeats = notes.reduce((m: number, e: any) => Math.max(m, Number(e.t) + Number(e.dur)), 0);
+      const first = notes[0];
+      bar.events = [{
+        ...first,
+        id: `${vln1.part_id}-${mi + 1}-sustain`,
+        t: 0,
+        dur: barBeats,
+      }];
+    }
+    placed.push({ partId: soloId, name: solo.name, fromBar: bars[0]! + 1 });
+  }
+  return placed;
+}
+
 export function arrangeSymphonicOrchestra(
   score: ScoreModel,
   chords: ChordEvent[],
@@ -359,6 +447,14 @@ export function arrangeSymphonicOrchestra(
     parts: outParts,
     meta: { ...(core as any).meta, ensemble: "symphonic_orchestra", symphonicPeriod: period },
   };
+
+  const solos = applyWindSolos(outParts, intens, nM);
+  if (solos.length) {
+    warnings.push(
+      `[symphonic] Wind solos: ${solos.map((s) => `${s.name} from bar ${s.fromBar}`).join(", ")} — ` +
+      "the other winds rest and the first violins sustain under them."
+    );
+  }
 
   // Advanced: honour explicit per-instrument measure ranges before spacing.
   applyManualRanges(out as ScoreModel, options.partRanges);
