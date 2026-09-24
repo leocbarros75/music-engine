@@ -845,12 +845,40 @@ export function arrangeWorshipOrchestraFromPiano(
  * SATB → worship orchestra. Faithful S/A/T/B → V1/V2/Vla/Vc transcription
  * (orchestra's own forked copy), then orchestrate. Self-contained.
  */
+/**
+ * Did the SATB split actually produce a quartet?
+ *
+ * When it cannot find four voices it returns the source score untouched, which
+ * looks like success — a ScoreModel with parts and notes — and is not. The tell
+ * is the roster: a real core is the four string voices it builds by name.
+ */
+function builtSatbCore(core: ScoreModel): boolean {
+  const parts = (core as any)?.parts ?? [];
+  if (parts.length < 4) return false;
+  const named = (re: RegExp) => parts.some((p: any) => re.test(String(p?.name ?? "")));
+  return named(/violin\s*(i\b|1)/i) && named(/violin\s*(ii\b|2)/i) && named(/viola/i) && named(/cello|bass/i);
+}
+
 export function arrangeWorshipOrchestraFromSatb(
   score: ScoreModel,
   options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance; partRanges?: PartRange[] } = {}
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const core = arrangeSatbToStringQuartetDirect(score, { warnings });
+  // The quartet core is what the whole orchestra is built from: every wind and
+  // brass part reads a string voice. When the source has no four voices to find
+  // — a piano score, a single vocal line — that call hands the score straight
+  // back, and the orchestration then has one line to spread across fourteen
+  // parts. The result was ten silent staves and not one word about why.
+  if (!builtSatbCore(core)) {
+    const found = ((score as any)?.parts ?? []).map((p: any) => p?.name ?? "?").join(", ") || "none";
+    warnings.push(
+      `[satb→orchestra] Your uploaded file does not appear to be an SATB score. ` +
+      `Found parts: ${found}. The "SATB → orchestra" mode expects four vocal parts ` +
+      `(soprano, alto, tenor, bass), or a closed score with two per staff. Most of ` +
+      `the orchestra will be silent. For a piano source use "piano → orchestra" instead.`
+    );
+  }
   const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }

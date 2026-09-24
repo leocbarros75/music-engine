@@ -71,7 +71,8 @@ async function main() {
       'tests/arrange/breathing.test.ts',
       'tests/arrange/satbLift.test.ts',
       'tests/arrange/pianoDetection.test.ts',
-      'tests/arrange/beamSearch.test.ts'
+      'tests/arrange/beamSearch.test.ts',
+      'tests/arrange/satbOrchestra.test.ts'
     ]) add(file, file);
   }
   if (group === 'all' || group === 'musicxml') {
