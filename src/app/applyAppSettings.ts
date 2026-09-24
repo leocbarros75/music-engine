@@ -16,7 +16,53 @@ import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleF
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures } from "../arrange/complementary";
-import { applyBreathing } from "../arrange/breathing";
+import { applyBreathing, isSectionPart, markStaggeredBreathing } from "../arrange/breathing";
+
+/**
+ * Breathing for an orchestra, where most wind parts are shared.
+ *
+ * A quartet is four soloists and every one of them needs the line to stop. An
+ * orchestra is mostly sections — Horn 1-2, Trumpet 1-2, Trombone 3/Tuba — and
+ * a section breathes by staggering within itself while the line carries on.
+ * Writing rests into those parts would silence music two players can hold
+ * between them; the soloists, who have nobody to hide behind, still need the
+ * line to give way.
+ *
+ * Applied to the SYMPHONIC orchestra only. The worship orchestra shares none
+ * of this by deliberate policy, and its own winds are still written without
+ * anywhere to breathe.
+ */
+function breatheOrchestra(warnings: string[], label: string, parts: any[]): void {
+  const winds = (parts ?? []).filter((p) =>
+    /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium/i
+      .test(`${p?.name ?? ""} ${p?.instrument ?? ""} ${p?.part_id ?? ""}`)
+  );
+  if (!winds.length) return;
+  const sections = winds.filter((p) => isSectionPart(p));
+  const soloists = winds.filter((p) => !isSectionPart(p));
+
+  const staggered = markStaggeredBreathing(sections);
+  const plan = soloists.length ? applyBreathing(soloists as any) : null;
+
+  const said: string[] = [];
+  if (plan && (plan.releases || plan.marks)) {
+    const bpm = quarterBpmOf(parts?.[0]?.measures ?? []);
+    const seconds = bpm ? ` (~${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s)` : "";
+    said.push(
+      `${soloists.length} solo wind part${soloists.length === 1 ? "" : "s"} given ` +
+      `${plan.releases} early release${plan.releases === 1 ? "" : "s"} and ${plan.marks} ` +
+      `breath mark${plan.marks === 1 ? "" : "s"} — longest stretch without air now ` +
+      `${plan.longestBreathlessBeats.toFixed(0)} beats${seconds}`
+    );
+  }
+  if (staggered) {
+    said.push(
+      `${staggered} section part${staggered === 1 ? "" : "s"} marked "stagger breathing" ` +
+      "and left unbroken, since the players cover for each other"
+    );
+  }
+  if (said.length) warnings.push(`[${label}] Breathing: ${said.join("; ")}.`);
+}
 
 /**
  * Wind and brass parts must have somewhere to breathe, or nobody can play
@@ -2443,6 +2489,7 @@ export function applyAppSettings(
       partRanges: settings.orchestraPartRanges as any,
       warnings,
     });
+    breatheOrchestra(warnings, "symphonic", (symResult.scoreModel as any).parts ?? []);
     attachTextureAnalysis(symResult.scoreModel, warnings);
     return {
       scoreModel: symResult.scoreModel as ScoreModel,

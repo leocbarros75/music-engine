@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { applyBreathing, breathBars, longestRunBeats, longestBreathlessBeats } from '../../src/arrange/breathing';
+import { applyBreathing, breathBars, longestRunBeats, longestBreathlessBeats,
+         isSectionPart, markStaggeredBreathing } from '../../src/arrange/breathing';
 import { exportScoreModelToMusicXML } from '../../src/exporters/musicxmlExporter';
 
 const note = (t: number, dur: number, midi: number, extra: any = {}) => ({
@@ -183,6 +184,55 @@ test('a part with nowhere legal to breathe is left alone, not forced', () => {
   assert.equal(plan.releases, 0);
   assert.equal(plan.marks, 0);
   assert(p.measures.every((m: any) => m.events[0].dur === 4), 'nothing touched');
+});
+
+// ── Sections ────────────────────────────────────────────────────────────────
+
+test('two players on one staff are a section; one player is not', () => {
+  const named = (name: string) => ({ part_id: 'X', name, instrument: name, measures: [] } as any);
+  for (const n of ['Horn 1-2', 'Horn 3-4', 'Trumpet 1-2', 'Trumpet 2-3 (Alto Sax)',
+                   'Trombone 3/Tuba', 'Flute/Oboe', 'Horn a 2']) {
+    assert(isSectionPart(named(n)), `"${n}" shares a staff`);
+  }
+  for (const n of ['Flute', 'Oboe', 'Clarinet in Bb', 'Bassoon', 'Trumpet 1', 'Tuba']) {
+    assert(!isSectionPart(named(n)), `"${n}" is one player`);
+  }
+});
+
+test('a section is told to stagger, and its music is left alone', () => {
+  const p = held('P_HN', 'Horn 1-2', 24);
+  const before = p.measures.map((m: any) => m.events[0].dur);
+  const marked = markStaggeredBreathing([p] as any);
+  assert.equal(marked, 1);
+  assert.deepEqual(p.measures.map((m: any) => m.events[0].dur), before,
+    'not a single note was shortened — the players cover for each other');
+  assert.equal((p.measures[0] as any).performance.words[0].text, 'stagger breathing');
+});
+
+test('asking twice does not print it twice', () => {
+  const p = held('P_HN', 'Horn 1-2', 8);
+  markStaggeredBreathing([p] as any);
+  assert.equal(markStaggeredBreathing([p] as any), 0, 'already marked');
+  assert.equal((p.measures[0] as any).performance.words.length, 1);
+});
+
+test('the direction reaches the MusicXML over that part, and no other', () => {
+  const part = (id: string, name: string) => ({
+    part_id: id, name, instrument: name, staves: 1, pitchSpace: 'sounding',
+    measures: [bar(1, [{ ...note(0, 4, 72), pitch: { step: 'C', octave: 5 } }])],
+  });
+  const score: any = {
+    score_id: 's', meta: { ensemble: 'symphonic_orchestra' }, global: { divisions: 4 },
+    parts: [part('P_HN', 'Horn 1-2'), part('P_FL', 'Flute')],
+  };
+  markStaggeredBreathing([score.parts[0]]);
+  const xml = exportScoreModelToMusicXML(score);
+  assert(xml.includes('<words>stagger breathing</words>'), 'the direction is written');
+  const horn = xml.split('<part id="P_HN"')[1]!.split('</part>')[0];
+  const flute = xml.split('<part id="P_FL"')[1]!.split('</part>')[0];
+  assert(horn.includes('stagger breathing'), 'over the horns');
+  assert(!flute.includes('stagger breathing'),
+    'and NOT over the flute, who has written rests instead');
 });
 
 // ── Serialization ───────────────────────────────────────────────────────────

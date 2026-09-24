@@ -60,6 +60,18 @@ export function writePerformanceNotation(xml: string, input: any): string {
                 sound.setAttribute('dynamics', String(d.velocity * 100 / 127));
                 direction(d.t, dyn, sound);
             }
+            // Text over this part's staff only. A section sharing a stand is
+            // told to stagger its breathing; the soloist two staves down is
+            // not, because the soloist has written rests instead.
+            for (const w of marks.words ?? []) {
+                const words = make('words', w.text);
+                const d = make('direction'), dt = make('direction-type');
+                d.setAttribute('placement', w.placement ?? 'above');
+                dt.appendChild(words);
+                d.appendChild(dt);
+                if (w.t) d.appendChild(make('offset', w.t * divisions));
+                bar.insertBefore(d, anchor);
+            }
             const barline = (location: string) => { let b = children(bar, 'barline').find(x => x.getAttribute('location') === location); if (!b) {
                 b = make('barline');
                 b.setAttribute('location', location);

@@ -14,6 +14,17 @@ export type MeasurePerformance = {
         numbers: number[];
         type: 'start' | 'stop' | 'discontinue';
     }>;
+    /**
+     * Free text printed over this part's staff — "stagger breathing", a mute
+     * instruction, a playing direction. Per PART, unlike the cadence
+     * annotations, which are keyed by measure number and so appear over every
+     * staff at once. A direction meant for the horns has to be able to say so.
+     */
+    words?: Array<{
+        t: number;
+        text: string;
+        placement?: 'above' | 'below';
+    }>;
     issues?: string[];
 };
 export type PerformanceNote = {

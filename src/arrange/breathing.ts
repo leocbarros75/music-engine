@@ -155,6 +155,51 @@ export function longestBreathlessBeats(part: Part): number {
 }
 
 /**
+ * Is this part played by more than one person?
+ *
+ * "Horn 1-2", "Trumpet 2-3", "Trombone 3/Tuba", "Flute/Oboe" — orchestral
+ * scores put several players on one staff, and the distinction decides how
+ * they breathe. A section staggers within itself: one player lifts while the
+ * others hold, and the written line never breaks. Cutting a hole in such a
+ * part would silence music the section can perfectly well sustain.
+ *
+ * A soloist has no one to hide behind, so the line itself has to give way.
+ */
+export function isSectionPart(part: Part): boolean {
+  const name = `${part?.name ?? ""}`;
+  // Two players named on one staff: "Horn 1-2", "Trumpet 2-3", "Violin I-II".
+  if (/\d\s*[-–]\s*\d/.test(name)) return true;
+  // Two instruments sharing a staff: "Flute/Oboe", "Trombone 3/Tuba".
+  if (name.includes("/")) return true;
+  // Explicitly plural desks.
+  if (/\b(a\s*2|div\.?|soli)\b/i.test(name)) return true;
+  return false;
+}
+
+/**
+ * Tell a section to stagger its breathing, which is how one is asked for.
+ *
+ * The music is left exactly as written: the players sort it out between
+ * themselves, and the line continues because someone is always holding it.
+ */
+export function markStaggeredBreathing(
+  parts: Part[],
+  text = "stagger breathing"
+): number {
+  let marked = 0;
+  for (const part of parts ?? []) {
+    const first = part?.measures?.[0];
+    if (!first) continue;
+    const perf: any = (first as any).performance ?? ((first as any).performance = {});
+    const words: any[] = Array.isArray(perf.words) ? perf.words : (perf.words = []);
+    if (words.some((w) => String(w?.text ?? "") === text)) continue;
+    words.push({ t: 0, text, placement: "above" });
+    marked++;
+  }
+  return marked;
+}
+
+/**
  * Give every part somewhere to breathe.
  *
  * `parts` must be wind or brass only — a string section has no such need and a
