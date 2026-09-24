@@ -267,8 +267,153 @@ export type SymphonicOptions = {
  * Runs this module's own DP fork for a 5-voice core, then scores it across the
  * period roster with strings leading and brass reserved for climaxes.
  */
+/**
+ * Fill a melodic third with the step between it.
+ *
+ * The plainest wind decoration there is, and the one that most separates a
+ * wind line from a string line: where the violins sustain, the winds run. Our
+ * winds were reading a string voice and playing its rhythm exactly, so they
+ * moved like violins — independent in pitch after the source remap, still
+ * string-shaped in motion.
+ *
+ * Only thirds, and only from a note long enough to give up half its length.
+ * A passing tone between two chord tones on a weak division is safe against
+ * any harmony underneath, which is why it needs no chord lookup to be correct.
+ * Wider gaps would want two or three notes and a decision about which, and
+ * that is a scale run — a real device, but not this one.
+ *
+ * Applied where the texture is thin enough to hear it: under a solo, or in a
+ * quiet phrase. In a tutti the winds are reinforcement and a decorated line
+ * there is just more noise.
+ */
+function scalePitchClasses(fifths: number): Set<number> {
+  const tonic = ((fifths * 7) % 12 + 12) % 12;
+  return new Set([0, 2, 4, 5, 7, 9, 11].map((s) => (tonic + s) % 12));
+}
+
+const FIGURATION_WINDS = ["SY_FL", "SY_OB", "SY_CL"] as const;
+/** Below this the phrase is transparent enough for decoration to read. */
+const FIGURATION_MAX_INTENSITY = 0.72;
+/** A note must be at least this long to give up half of itself. */
+const FIGURATION_MIN_DUR = 0.5;
+
+/**
+ * Hold the note instead of striking it again.
+ *
+ * The figuration below turned out to have almost nothing to work on: of 655
+ * adjacent pairs in the wind parts, 573 were the SAME PITCH — 87% repeated
+ * notes, and the same on every source tested (84%, 84%, 72%). The wind lines
+ * were not melodies to decorate, they were one pitch hammered six times a bar.
+ *
+ * That is an artefact of the voicing grid rather than a decision: the DP gives
+ * each voice a pitch per slice, and a voice that holds its note across four
+ * slices comes out as four identical notes. Strings can live with that — a
+ * section re-bows a held chord all the time. A wind player does not tongue the
+ * same note six times to sustain it; they hold it and breathe.
+ *
+ * So: merge runs of the same pitch into one note, within the bar. This makes
+ * the winds sound like winds, and it lowers their note count — away from the
+ * 38-43% note-share the real scores show. That target is not reachable by
+ * post-processing and chasing it here would be backwards: real winds hit it by
+ * playing figuration, and ours have no melodic motion to figure. Fixing that
+ * means composing the wind lines differently, upstream in the voicing.
+ */
+function holdRepeatedWindNotes(outParts: any[], nMeasures: number): number {
+  const byId = new Map<string, any>(outParts.map((p) => [p.part_id, p]));
+  let merged = 0;
+  for (const id of FIGURATION_WINDS) {
+    const part = byId.get(id);
+    if (!part) continue;
+    for (let mi = 0; mi < nMeasures; mi++) {
+      const bar = part.measures?.[mi];
+      const notes = (bar?.events ?? [])
+        .filter((e: any) => e?.type === "note")
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      if (notes.length < 2) continue;
+      const out: any[] = [];
+      for (const n of notes) {
+        const prev = out[out.length - 1];
+        const touches = prev && Math.abs(Number(prev.t) + Number(prev.dur) - Number(n.t)) < 1e-9;
+        if (prev && touches && Number(prev.midi) === Number(n.midi)) {
+          prev.dur = Number(prev.dur) + Number(n.dur);
+          merged++;
+          continue;
+        }
+        out.push(n);
+      }
+      bar.events = out;
+    }
+  }
+  return merged;
+}
+
+function addWindFiguration(
+  outParts: any[],
+  intens: number[],
+  nMeasures: number,
+  fifths: number
+): number {
+  const scale = scalePitchClasses(fifths);
+  const byId = new Map<string, any>(outParts.map((p) => [p.part_id, p]));
+  let added = 0;
+
+  for (const id of FIGURATION_WINDS) {
+    const part = byId.get(id);
+    if (!part) continue;
+    for (let mi = 0; mi < nMeasures; mi++) {
+      if ((intens[Math.floor(mi / PHRASE_LEN)] ?? 1) > FIGURATION_MAX_INTENSITY) continue;
+      const bar = part.measures?.[mi];
+      const notes = (bar?.events ?? [])
+        .filter((e: any) => e?.type === "note")
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      if (notes.length < 2) continue;
+
+      const out: any[] = [];
+      for (let i = 0; i < notes.length; i++) {
+        const a = notes[i];
+        const b = notes[i + 1];
+        out.push(a);
+        if (!b) continue;
+        // Only between notes that actually touch — a gap is a rest, and a rest
+        // is there to be heard.
+        if (Math.abs(Number(a.t) + Number(a.dur) - Number(b.t)) > 1e-9) continue;
+        if (Number(a.dur) < FIGURATION_MIN_DUR) continue;
+        const from = Number(a.midi), to = Number(b.midi);
+        const gap = Math.abs(to - from);
+        if (gap !== 3 && gap !== 4) continue;
+        const step = to > from ? 1 : -1;
+        // The scale tone strictly between them; a third spans one or two, and
+        // only one of those belongs to the key.
+        let passing: number | null = null;
+        for (let m = from + step; m !== to; m += step) {
+          if (scale.has(((m % 12) + 12) % 12)) { passing = m; break; }
+        }
+        if (passing === null) continue;
+        const placed = clampToInstrument(passing, part.instrument);
+        if (placed === null || placed !== passing) continue;
+
+        const half = Number(a.dur) / 2;
+        a.dur = half;
+        out.push({
+          ...a,
+          id: `${part.part_id}-${mi + 1}-${Number(a.t) + half}-pass`,
+          t: Number(a.t) + half,
+          dur: half,
+          midi: placed,
+          pitch: midiToPitch(placed),
+        });
+        added++;
+      }
+      bar.events = out.sort((x: any, y: any) => Number(x.t) - Number(y.t));
+    }
+  }
+  return added;
+}
+
 /** The winds that carry a melodic line, in the order a solo passes between them. */
 const SOLO_WINDS = ["SY_OB", "SY_FL", "SY_CL"] as const;
+/** Fewer distinct pitches than this over the phrase is a drone, not a melody. */
+const SOLO_MIN_DISTINCT_PITCHES = 3;
 /** A phrase quiet enough for one player to be heard, and not yet the climax. */
 const SOLO_MIN_INTENSITY = 0.40;
 const SOLO_MAX_INTENSITY = 0.72;
@@ -317,8 +462,23 @@ function applyWindSolos(
     const bars: number[] = [];
     for (let mi = pi * PHRASE_LEN; mi < Math.min((pi + 1) * PHRASE_LEN, nMeasures); mi++) bars.push(mi);
 
-    // Whoever is actually playing here takes it; a rest cannot have a solo.
-    const candidates = SOLO_WINDS.filter((id) => bars.some((mi) => sounds(byId.get(id), mi)));
+    // Whoever is actually playing here takes it; a rest cannot have a solo —
+    // and neither can a drone. Exposing a line that holds one pitch for four
+    // bars does not make a solo of it, it makes the flaw audible: strings drop
+    // away, everyone looks at the oboe, and the oboe has nothing to say. The
+    // first version of this shipped without the test and did exactly that.
+    const melodic = (id: string) => {
+      const pitches = new Set<number>();
+      for (const mi of bars) {
+        for (const e of (byId.get(id)?.measures?.[mi]?.events ?? [])) {
+          if (e?.type === "note") pitches.add(Number(e.midi));
+        }
+      }
+      return pitches.size >= SOLO_MIN_DISTINCT_PITCHES;
+    };
+    const candidates = SOLO_WINDS.filter(
+      (id) => bars.some((mi) => sounds(byId.get(id), mi)) && melodic(id)
+    );
     if (!candidates.length) continue;
     const soloId = candidates[turn % candidates.length]!;
     const solo = byId.get(soloId);
@@ -449,6 +609,22 @@ export function arrangeSymphonicOrchestra(
   };
 
   const solos = applyWindSolos(outParts, intens, nM);
+  // Hold before decorating: a run of repeated notes offers no interval to fill,
+  // and merging them first is what turns the line into one that can be figured.
+  const held = holdRepeatedWindNotes(outParts, nM);
+  if (held) {
+    warnings.push(
+      `[symphonic] Wind lines: ${held} repeated note${held === 1 ? "" : "s"} held rather than re-tongued — ` +
+      "a wind sustains a pitch, it does not restrike it."
+    );
+  }
+  const figured = addWindFiguration(outParts, intens, nM, fifths);
+  if (figured) {
+    warnings.push(
+      `[symphonic] Wind figuration: ${figured} passing tone${figured === 1 ? "" : "s"} filling melodic ` +
+      "thirds in the transparent phrases — where the strings sustain, the winds move."
+    );
+  }
   if (solos.length) {
     warnings.push(
       `[symphonic] Wind solos: ${solos.map((s) => `${s.name} from bar ${s.fromBar}`).join(", ")} — ` +
