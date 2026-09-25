@@ -3,6 +3,7 @@ import { synchronizePerformance } from "../exporters/synchronizePerformance";
 import { auditNoteConservation, TRANSCRIPTION_ENSEMBLES, type ConservationReport } from "../preservation/noteConservation";
 import { buildNoteMap, type NoteMap } from "../preservation/noteMap";
 import { buildOmissions, omissionsSentence, type OmissionsRecord } from "../preservation/omissions";
+import { carrySourceMarks } from "../preservation/sourceMarks";
 import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
 import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
@@ -237,6 +238,16 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const appResult = applyAppSettings(harmonizedScore, settings, finalChords as any);
     let scoreModelOut = appResult.scoreModel as any;
     if (Array.isArray(appResult.warnings)) warnings.push(...appResult.warnings);
+
+    // The source's repeats, endings and dynamics belong on the parts written
+    // from it, whatever the ensemble. Done here rather than in each arranger
+    // because it is an invariant of the whole pipeline, and because the
+    // arrangers that DID keep them only did so by accident of building on the
+    // source's own measures — the ones that build fresh measures all dropped
+    // them. Only fills marks a part does not already carry, so an arranger
+    // that has said something specific keeps the last word.
+    const carried = carrySourceMarks(writtenInput, scoreModelOut?.parts ?? []);
+    if (carried) warnings.push(`[marks] Repeats, endings and dynamics carried from the source onto ${carried} bar(s).`);
 
     const protectedTargetId = protection.lock ? lockSourceInModel(protection.lock, scoreModelOut, settings) : undefined;
 
