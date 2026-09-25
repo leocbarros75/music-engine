@@ -41,7 +41,12 @@ export function readMeasurePerformance(measure: any, initialDivisions: number): 
             }
             const dynamic = all(e, 'dynamics')[0];
             if (sound?.hasAttribute('dynamics'))
-                dynamics.push({ t: at, velocity: Math.max(1, Math.min(127, Math.round(Number(sound.getAttribute('dynamics')) * 127 / 100))) });
+                // MusicXML defines this attribute as a percentage of the DEFAULT
+                // FORTE VALUE (90), not of the MIDI maximum. Reading it against
+                // 127 inflates everything by a factor of 1.41: a chart marked
+                // mp - mf, whose loudest <sound dynamics="98"> means about a
+                // forte, came back as velocity 124 and printed fff.
+                dynamics.push({ t: at, velocity: Math.max(1, Math.min(127, Math.round(Number(sound.getAttribute('dynamics')) * 90 / 100))) });
             else if (dynamic) {
                 const name = children(dynamic)[0]?.localName;
                 if (DYNAMICS[name])

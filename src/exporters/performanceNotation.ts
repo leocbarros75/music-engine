@@ -57,7 +57,11 @@ export function writePerformanceNotation(xml: string, input: any): string {
                 const nearest = levels.reduce((best, n, j) => Math.abs(n - d.velocity) < Math.abs(levels[best] - d.velocity) ? j : best, 0);
                 dyn.appendChild(make(labels[nearest]));
                 const sound = make('sound');
-                sound.setAttribute('dynamics', String(d.velocity * 100 / 127));
+                // The inverse of the parser's reading: a percentage of the
+                // default forte value (90), which is what MusicXML means by
+                // this attribute. The two must agree or a score loses a
+                // dynamic level every time it is read back.
+                sound.setAttribute('dynamics', String(d.velocity * 100 / 90));
                 direction(d.t, dyn, sound);
             }
             // Text over this part's staff only. A section sharing a stand is
