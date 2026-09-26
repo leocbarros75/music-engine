@@ -59,6 +59,8 @@ export type ArcOptions = {
   voicesTopDown: string[];
   /** Bars to leave to the piano entirely before anyone joins. */
   openBars?: number;
+  /** Which table of entrance thresholds to use; the families differ. */
+  family?: ArcFamily;
 };
 
 export type ArcDecision = {
@@ -101,8 +103,65 @@ export function densityCurve(measures: MeasureLike[]): number[] {
  * as mistakes rather than phrasing, so a part that has just entered is held in
  * for a minimum span.
  */
+
+/**
+ * How thin the writing has to get before this voice sits out.
+ *
+ * One threshold for everybody, applied only to the outer two voices, meant the
+ * inner parts never rested at all: the oboe played 61 bars of 62. The shape
+ * the rule was reaching for was right — the top competes with the melody the
+ * pianist already has, the bottom adds weight a thin passage did not ask for,
+ * and the inner pair can hold harmony without drawing attention. It just had
+ * no numbers behind it.
+ *
+ * These come from a hand-written accompaniment of the same song, read as the
+ * share of bars each part sits out — flute 44%, bassoon 26%, oboe 11%,
+ * clarinet 3% — and converted through this source's own density curve into the
+ * level each voice drops out below. So the curve is a V: outermost rests most,
+ * innermost rests least.
+ *
+ * A thin bar can end with no added parts at all. That is deliberate. The
+ * reference opens exactly that way — "piano first" — and the piano is carrying
+ * the song regardless.
+ */
+/**
+ * Fitted from hand-written accompaniments of the same song, read as the share
+ * of bars each part sits out and converted through the source's own density
+ * curve into the level it drops below.
+ *
+ * The two families are not the same shape and cannot share a table. In the
+ * wind quartet the FLUTE is the most reserved voice (44% of bars out) and the
+ * bassoon next; in the string cushion it is the DOUBLE BASS (39%) while the
+ * first violin plays far more (24%). Winds rest from the top down, strings
+ * from the bottom up. Applying the wind numbers to strings rested Violin I in
+ * 44% of bars against a target of 24% — the cushion stopped cushioning.
+ *
+ *   winds    flute 44%   oboe 11%   clarinet 3%   bassoon 26%
+ *   strings  vln1 24%    vln2 2%    viola 2%      cello 13%   bass 39%
+ */
+export type ArcFamily = "winds" | "strings";
+
+const REST_PROFILE: Record<ArcFamily, { top: number; bottom: number; innerOuter: number; innerCore: number }> = {
+  // Outermost rests most, innermost least — a V.
+  winds:   { top: 0.52, bottom: 0.44, innerOuter: 0.32, innerCore: 0.20 },
+  // The bass is the reserved voice here and the top line carries; inner desks
+  // hold the cushion almost throughout.
+  strings: { top: 0.40, bottom: 0.50, innerOuter: 0.20, innerCore: 0.33 },
+};
+
+function restBelow(rank: number, count: number, family: ArcFamily): number {
+  const p = REST_PROFILE[family];
+  if (rank <= 0) return p.top;
+  if (rank >= count - 1) return p.bottom;
+  const inner = count - 2;
+  if (inner <= 1) return p.innerOuter;
+  const f = (rank - 1) / (inner - 1);
+  return p.innerOuter + f * (p.innerCore - p.innerOuter);
+}
+
 export function planArc(measures: MeasureLike[], options: ArcOptions): ArcDecision[] {
   const voices = options.voicesTopDown;
+  const family: ArcFamily = options.family ?? "winds";
   const open = Math.max(0, options.openBars ?? 1);
   const density = densityCurve(measures);
   const n = measures.length;
@@ -116,21 +175,30 @@ export function planArc(measures: MeasureLike[], options: ArcOptions): ArcDecisi
   entryOrder.forEach((v, i) => entryBar.set(v, open + i));
 
   const raw: Array<Set<string>> = [];
+  // Bars each voice has played. An entrance that lasts one bar is not an
+  // entrance — the smoother deletes it as flicker, and it deserves to.
+  const played = new Map<string, number>();
+  const ARRIVAL_BARS = 2;
   for (let i = 0; i < n; i++) {
     const bar = i + 1;
     const d = density[i] ?? 0;
     const playing = new Set<string>();
     for (const v of voices) {
       if (bar < (entryBar.get(v) ?? 0) + 1) continue;      // has not entered yet
+      // An INNER voice's first appearance is its arrival and is not up for
+      // debate: that is what makes the ensemble gather rather than switch on,
+      // and a thin opening is exactly where it is audible — "piano first, then
+      // quiet clarinet colour, a little bassoon, then oboe". Gating it by
+      // density collapsed all four onto one bar.
+      //
+      // The outer voices get no such exemption. The top competes with the
+      // melody the pianist already has and the bottom adds weight, so if the
+      // writing is thin when their turn comes, they wait for it to open out.
       const rank = voices.indexOf(v);
-      const isTop = rank === 0;
-      const isBottom = rank === voices.length - 1;
-      // Thin writing keeps the inner voices and rests the outer ones. The top
-      // competes with the melody the pianist is already playing; the bottom
-      // adds weight a thin passage has not asked for. What is left is the pair
-      // that can hold harmony without drawing attention — which is the whole
-      // job of an accompaniment under a piano that already has the song.
-      if (d < 0.35 && (isTop || isBottom)) continue;
+      const isOuter = rank === 0 || rank === voices.length - 1;
+      const settled = (played.get(v) ?? 0) >= ARRIVAL_BARS;
+      if ((isOuter || settled) && d < restBelow(rank, voices.length, family)) continue;
+      played.set(v, (played.get(v) ?? 0) + 1);
       playing.add(v);
     }
     raw.push(playing);
@@ -389,4 +457,115 @@ export function addAnsweringGestures(
     added += 3;
   }
   return added;
+}
+
+// ── Phrasing the accompaniment ──────────────────────────────────────────────
+
+/** How long a complementary line may sound before it has to let go. */
+const PHRASE_SPAN_BEATS = 6;
+/** The silence that opens when it does — long enough to be a rest, not a blip. */
+const PHRASE_REST_BEATS = 2.5;
+/** Never leave a note shorter than this behind. */
+const PHRASE_MIN_KEPT = 0.5;
+
+/**
+ * Break the added lines into gestures.
+ *
+ * The parts around a piano were playing continuously — 15 to 31 beats of
+ * unbroken sound, against 4.5 to 6 in a careful hand-written accompaniment of
+ * the same song. That is not a breathing problem, which we fixed by taking an
+ * eighth here and there; it is a phrasing one. An accompaniment under a piano
+ * that already has the tune should speak in short gestures and then stop, so
+ * the ear keeps returning to the piano. Ours never stopped, so it stopped
+ * being an accompaniment and became a pad.
+ *
+ * The device is the plainest one there is: where a line has sounded for longer
+ * than it should, end the gesture early and leave a rest. Repeat until nothing
+ * runs too long. Notes are shortened, never deleted outright, and never below
+ * an eighth — the point is to open air between phrases, not to thin the line
+ * until it disappears.
+ *
+ * Rests are not gaps to be filled. They are what makes the next entry audible.
+ */
+export function phraseComplement(
+  parts: PartLike[],
+  maxSpanBeats = PHRASE_SPAN_BEATS,
+  restBeats = PHRASE_REST_BEATS
+): number {
+  let opened = 0;
+  for (const part of parts ?? []) {
+    const lengths = (part?.measures ?? []).map((m: any) => {
+      const notes = (m?.events ?? []).filter((e: any) => e?.type === "note");
+      const t = m?.attributes?.time;
+      if (t && Number(t.beats) > 0 && Number(t.beat_type) > 0) return (Number(t.beats) * 4) / Number(t.beat_type);
+      return notes.reduce((a: number, e: any) => Math.max(a, Number(e.t) + Number(e.dur)), 4) || 4;
+    });
+    // Absolute start of each bar, so a span can be followed across barlines.
+    const starts: number[] = [];
+    let at = 0;
+    for (const l of lengths) { starts.push(at); at += l; }
+
+    let skipBefore = 0;
+    for (let guard = 0; guard < (part?.measures?.length ?? 0) * 8; guard++) {
+      // Every note, in order, with where it sits on the whole timeline.
+      const all: Array<{ ev: any; from: number; to: number }> = [];
+      (part.measures ?? []).forEach((m: any, i: number) => {
+        for (const ev of (m?.events ?? [])) {
+          if (ev?.type !== "note" || ev.grace) continue;
+          const from = (starts[i] ?? 0) + Number(ev.t);
+          all.push({ ev, from, to: from + Number(ev.dur) });
+        }
+      });
+      all.sort((a, b) => a.from - b.from || a.to - b.to);
+      if (!all.length) break;
+
+      // Walk forward to the first stretch that has run longer than it may,
+      // ignoring any we have already failed to break — a span we cannot cut is
+      // a reason to move on, not to abandon the rest of the part. Giving up on
+      // the whole line at the first awkward span is what made the first version
+      // of this open eight rests in a piece and stop.
+      let spanStart = all[0]!.from;
+      let reach = all[0]!.to;
+      let found: { start: number; end: number } | null = null;
+      for (let i = 1; i <= all.length; i++) {
+        const n = all[i];
+        if (!n || n.from > reach + 1e-9) {
+          if (reach - spanStart > maxSpanBeats + 1e-9 && spanStart >= skipBefore - 1e-9) {
+            found = { start: spanStart, end: reach };
+            break;
+          }
+          if (!n) break;
+          spanStart = n.from; reach = n.to; continue;
+        }
+        reach = Math.max(reach, n.to);
+        if (reach - spanStart > maxSpanBeats + 1e-9 && spanStart >= skipBefore - 1e-9) {
+          found = { start: spanStart, end: reach };
+          break;
+        }
+      }
+      if (!found) break;
+
+      // End the gesture at the note boundary nearest the limit, not at whatever
+      // note happened to cross it — that note can be an eighth with nothing to
+      // give. Walk back through the candidates until one can spare the rest.
+      const aim = found.start + maxSpanBeats;
+      const inSpan = all
+        .filter((n) => n.to > found!.start + 1e-9 && n.from < found!.end - 1e-9)
+        .sort((a, b) => Math.abs(a.to - aim) - Math.abs(b.to - aim));
+      let changed = false;
+      for (const anchor of inSpan) {
+        if (anchor.to - restBeats <= found.start + PHRASE_MIN_KEPT) continue;
+        const cut = anchor.to - restBeats;
+        for (const n of all) {
+          if (n.to <= cut + 1e-9 || n.from >= anchor.to - 1e-9) continue;
+          const kept = Math.max(PHRASE_MIN_KEPT, cut - n.from);
+          if (kept < Number(n.ev.dur) - 1e-9) { n.ev.dur = kept; n.ev.tieStart = false; changed = true; }
+        }
+        if (changed) break;
+      }
+      if (!changed) { skipBefore = found.end; continue; }   // nothing to give here; look past it
+      opened++;
+    }
+  }
+  return opened;
 }

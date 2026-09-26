@@ -15,7 +15,7 @@ import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
-import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures } from "../arrange/complementary";
+import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures, phraseComplement } from "../arrange/complementary";
 import { applyBreathing, isSectionPart, markStaggeredBreathing } from "../arrange/breathing";
 
 
@@ -2096,6 +2096,12 @@ export function applyAppSettings(
       describeArc(warnings, "winds", wwParts, applyArc(wwParts, arc));
       sustainComplement(warnings, "winds", wwParts, frozenPianoPart?.measures ?? []);
       answerComplement(warnings, "winds", wwParts, arc);
+      {
+        const gestures = phraseComplement(wwParts);
+        if (gestures) warnings.push(
+          `[piano+winds] ${gestures} phrase break(s): the added parts speak and stop, `+
+          "so the ear keeps returning to the piano.");
+      }
       breatheWinds(warnings, "piano+winds", wwParts);   // wind parts only; the piano joins below
       (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
     }
@@ -2248,6 +2254,7 @@ export function applyAppSettings(
     // are uniformly busy by construction and say nothing about where the song
     // opens up.
     const stringArc = planArc(pianoPart?.measures ?? stringParts[0]?.measures ?? [], {
+      family: "strings",
       voicesTopDown: stringParts.map((p: any) => String(p.part_id)),
     });
     const stringRests = applyArc(stringParts, stringArc);
@@ -2391,6 +2398,12 @@ export function applyAppSettings(
       describeArc(warnings, "brass", brParts, applyArc(brParts, arc));
       sustainComplement(warnings, "brass", brParts, frozenPianoPart?.measures ?? []);
       answerComplement(warnings, "brass", brParts, arc);
+      {
+        const gestures = phraseComplement(brParts);
+        if (gestures) warnings.push(
+          `[piano+brass] ${gestures} phrase break(s): the added parts speak and stop, `+
+          "so the ear keeps returning to the piano.");
+      }
       breatheWinds(warnings, "piano+brass", brParts);   // brass parts only; the piano joins below
       (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);
     }
