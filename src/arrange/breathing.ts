@@ -235,16 +235,19 @@ function tryBreathAtBar(
     return null;                                             // already breathing here
   }
 
-  const shortest = Math.min(...atBarline.map((e) => Number(e.dur)));
-  // Never take more than half a note: an eighth off a whole note is a breath,
-  // an eighth off an eighth is a deletion.
-  const room = Math.min(release, shortest / 2);
-  if (shortest - room >= minKept - EPS && room >= minKept - EPS) {
-    for (const e of atBarline) e.dur = Number(e.dur) - room;
-    return "release";
-  }
-  // Too short to shorten without losing the note. Ask for the breath and let
-  // the player borrow the time.
+  // A BREATH MARK, always — never a shortened note.
+  //
+  // This used to take an eighth off the note and let a rest fill the bar, on
+  // the reasoning that a written gap guarantees the air. It does, and it also
+  // rewrites the rhythm: a line peppered with clipped note-ends stops sounding
+  // like a phrase and starts sounding like STACCATO, which is a different
+  // instruction entirely. A dot over a note says play it short; a comma says
+  // take a breath. We were writing the first and meaning the second.
+  //
+  // So the note keeps its written value and the player takes the time — which
+  // is the whole point of the mark, and where to breathe is theirs to judge.
+  // They know the room, the dynamic and their own lungs. Rests belong to
+  // phrasing, which is a musical decision, not to physiology.
   for (const e of atBarline) {
     const on = Array.isArray(e.articulations) ? [...e.articulations] : [];
     on.push("breath-mark");

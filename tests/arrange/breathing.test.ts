@@ -21,13 +21,36 @@ const marksIn = (p: any) => p.measures.flatMap((m: any) =>
 
 // ── The rules ───────────────────────────────────────────────────────────────
 
-test('a long note at the barline gives up its tail, leaving a gap to breathe in', () => {
+test('a long note at the barline is marked, and keeps every bit of its value', () => {
+  // Breathing writes a COMMA, not a shorter note. A dot over a note says play
+  // it short; a comma says take a breath. Leo heard the difference immediately
+  // — clipped note-ends read as staccato, which is an articulation and a
+  // different instruction from "breathe here".
   const p = held('P_FL', 'Flute', 4);
+  const before = p.measures.map((m: any) => m.events[0].dur);
   const plan = applyBreathing([p] as any);
-  assert(plan.releases > 0, 'something was released');
-  const shortened = p.measures.filter((m: any) => m.events[0].dur < 4);
-  assert(shortened.length > 0, 'at least one bar ends early');
-  assert.equal(shortened[0].events[0].dur, 3.5, 'an eighth, not more');
+  assert.equal(plan.releases, 0, 'nothing is ever shortened for air');
+  assert(plan.marks > 0, 'the breath is asked for with a mark');
+  assert.deepEqual(p.measures.map((m: any) => m.events[0].dur), before,
+    'not one written duration changed');
+});
+
+test('breathing never alters a duration, whatever the note values', () => {
+  // The invariant, across a bar of quarters, a bar of eighths and whole notes:
+  // where the player breathes is their judgement, and the rhythm is not ours
+  // to rewrite on their behalf.
+  for (const dur of [4, 2, 1, 0.5]) {
+    const p = {
+      part_id: 'P_FL', name: 'Flute', instrument: 'flute', staves: 1,
+      measures: Array.from({ length: 6 }, (_, i) =>
+        bar(i + 1, Array.from({ length: 4 / dur }, (_, j) => note(j * dur, dur, 72)))),
+    };
+    const before = JSON.stringify(p.measures.map((m: any) => m.events.map((e: any) => e.dur)));
+    const plan = applyBreathing([p] as any);
+    assert.equal(plan.releases, 0, `dur=${dur}: a note was shortened`);
+    assert.equal(JSON.stringify(p.measures.map((m: any) => m.events.map((e: any) => e.dur))), before,
+      `dur=${dur}: durations changed`);
+  }
 });
 
 test('never out of a tie — the note is still sounding into the next bar', () => {
@@ -58,18 +81,6 @@ test('a note too short to shorten keeps its value and takes a breath mark', () =
   assert(plan.marks > 0, 'so it asked for a breath instead');
   const marked = marksIn(p);
   assert(marked.every((e: any) => e.dur === 0.5), 'no note lost any of its value');
-});
-
-test('a quarter becomes an eighth plus an eighth rest — never more than half', () => {
-  const p = {
-    part_id: 'P_FL', name: 'Flute', instrument: 'flute', staves: 1,
-    measures: Array.from({ length: 4 }, (_, i) =>
-      bar(i + 1, [0, 1, 2, 3].map((t) => note(t, 1, 72)))),
-  };
-  applyBreathing([p] as any);
-  const shortened = p.measures.flatMap((m: any) => m.events).filter((e: any) => e.dur < 1);
-  assert(shortened.length > 0, 'the bar-ending quarter released');
-  assert(shortened.every((e: any) => e.dur === 0.5), 'down to an eighth, not below');
 });
 
 test('a bar that already ends in air is left alone', () => {

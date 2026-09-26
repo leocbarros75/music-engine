@@ -15,7 +15,7 @@ import type { LhPatternId } from "../arrange/pianoAccompPatterns";
 import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleFromSatb";
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
-import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures, phraseComplement } from "../arrange/complementary";
+import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures, releaseBeforeNextAttack } from "../arrange/complementary";
 import { applyBreathing, isSectionPart, markStaggeredBreathing } from "../arrange/breathing";
 
 
@@ -2097,10 +2097,10 @@ export function applyAppSettings(
       sustainComplement(warnings, "winds", wwParts, frozenPianoPart?.measures ?? []);
       answerComplement(warnings, "winds", wwParts, arc);
       {
-        const gestures = phraseComplement(wwParts);
-        if (gestures) warnings.push(
-          `[piano+winds] ${gestures} phrase break(s): the added parts speak and stop, `+
-          "so the ear keeps returning to the piano.");
+        const released = releaseBeforeNextAttack(wwParts);
+        if (released) warnings.push(
+          `[piano+winds] ${released} note(s) release just before the next attack — `+
+          "a detached accompaniment, not a phrase chopped into pieces.");
       }
       breatheWinds(warnings, "piano+winds", wwParts);   // wind parts only; the piano joins below
       (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
@@ -2399,10 +2399,10 @@ export function applyAppSettings(
       sustainComplement(warnings, "brass", brParts, frozenPianoPart?.measures ?? []);
       answerComplement(warnings, "brass", brParts, arc);
       {
-        const gestures = phraseComplement(brParts);
-        if (gestures) warnings.push(
-          `[piano+brass] ${gestures} phrase break(s): the added parts speak and stop, `+
-          "so the ear keeps returning to the piano.");
+        const released = releaseBeforeNextAttack(brParts);
+        if (released) warnings.push(
+          `[piano+brass] ${released} note(s) release just before the next attack — `+
+          "a detached accompaniment, not a phrase chopped into pieces.");
       }
       breatheWinds(warnings, "piano+brass", brParts);   // brass parts only; the piano joins below
       (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);

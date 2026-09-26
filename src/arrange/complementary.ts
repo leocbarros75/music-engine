@@ -138,12 +138,21 @@ export function densityCurve(measures: MeasureLike[]): number[] {
  *
  *   winds    flute 44%   oboe 11%   clarinet 3%   bassoon 26%
  *   strings  vln1 24%    vln2 2%    viola 2%      cello 13%   bass 39%
+ *
+ * PULLED BACK for the winds after listening (2026-09-26). Matching those wind
+ * figures exactly sounded too thin in the room — the flute out of half the
+ * piece, and short gestures inside the bars it did play, compound into an
+ * accompaniment that keeps disappearing. The reference is one arranger's
+ * judgement about one song, not a standard, and Leo's ear is the one that
+ * counts. Wind thresholds are about 0.08 lower than the fitted values and the
+ * gesture rest is 1.5 beats rather than 2.5. The strings were not the
+ * complaint and keep their fitted profile.
  */
 export type ArcFamily = "winds" | "strings";
 
 const REST_PROFILE: Record<ArcFamily, { top: number; bottom: number; innerOuter: number; innerCore: number }> = {
   // Outermost rests most, innermost least — a V.
-  winds:   { top: 0.52, bottom: 0.44, innerOuter: 0.32, innerCore: 0.20 },
+  winds:   { top: 0.44, bottom: 0.36, innerOuter: 0.26, innerCore: 0.16 },
   // The bass is the reserved voice here and the top line carries; inner desks
   // hold the cushion almost throughout.
   strings: { top: 0.40, bottom: 0.50, innerOuter: 0.20, innerCore: 0.33 },
@@ -464,7 +473,7 @@ export function addAnsweringGestures(
 /** How long a complementary line may sound before it has to let go. */
 const PHRASE_SPAN_BEATS = 6;
 /** The silence that opens when it does — long enough to be a rest, not a blip. */
-const PHRASE_REST_BEATS = 2.5;
+const PHRASE_REST_BEATS = 1.5;
 /** Never leave a note shorter than this behind. */
 const PHRASE_MIN_KEPT = 0.5;
 
@@ -568,4 +577,51 @@ export function phraseComplement(
     }
   }
   return opened;
+}
+
+/** A complementary note lets go this much before the next attack arrives. */
+const RELEASE_SHARE = 0.75;
+
+/**
+ * Let go a little before the next attack.
+ *
+ * This is how the reference accompaniment actually breathes: a note of a beat
+ * and a half followed by a half-beat gap, over and over — thirty-three such
+ * gaps in the oboe and every one of them the same length. Not a phrase break;
+ * just a line that does not lean on the piano.
+ *
+ * I built this once, measured the longest unbroken span, saw it fall to a beat
+ * and a half, and deleted it for shattering the phrasing. The metric was
+ * wrong: it counts any silence as a break, so it scored the reference's own
+ * texture as badly as ours. What actually sounded wrong was the OTHER thing —
+ * holes of a beat and a half dropped into the middle of phrases, which read as
+ * chopping rather than as air.
+ *
+ * Nothing is deleted and nothing moves; notes only get shorter, never below an
+ * eighth, and never a note tied onward.
+ */
+export function releaseBeforeNextAttack(parts: PartLike[], share = RELEASE_SHARE): number {
+  let shortened = 0;
+  for (const part of parts ?? []) {
+    for (const m of part?.measures ?? []) {
+      const notes = (m?.events ?? [])
+        .filter((e: any) => e?.type === "note" && !e.grace)
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      if (!notes.length) continue;
+      const time = m?.attributes?.time;
+      const barBeats = time && Number(time.beats) > 0 && Number(time.beat_type) > 0
+        ? (Number(time.beats) * 4) / Number(time.beat_type)
+        : notes.reduce((a: number, e: any) => Math.max(a, Number(e.t) + Number(e.dur)), 4) || 4;
+      for (let i = 0; i < notes.length; i++) {
+        const ev = notes[i]!;
+        if (ev.tieStart === true) continue;
+        const nextAt = i + 1 < notes.length ? Number(notes[i + 1]!.t) : barBeats;
+        const room = nextAt - Number(ev.t);
+        if (room <= 0) continue;
+        const want = Math.max(PHRASE_MIN_KEPT, room * share);
+        if (want < Number(ev.dur) - 1e-9) { ev.dur = want; shortened++; }
+      }
+    }
+  }
+  return shortened;
 }
