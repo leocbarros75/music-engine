@@ -1,0 +1,38 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-piano-and-brass.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-piano-and-brass.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-T1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-T1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-T2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-T2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-H1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-H1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-H2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-H2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-TB1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-TB1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-TB2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-TB2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-BT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-BT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-TU.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-piano-and-brass/living-hope-TU.pdf"
+  }
+]

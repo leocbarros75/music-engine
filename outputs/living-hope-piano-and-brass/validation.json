@@ -1,0 +1,19 @@
+{
+  "piano_musical_content_preserved": true,
+  "measures": 62,
+  "wind_notes": 596,
+  "notes_by_part": {
+    "BT": 27,
+    "H1": 110,
+    "H2": 99,
+    "T1": 90,
+    "T2": 55,
+    "TB1": 70,
+    "TB2": 60,
+    "TU": 85
+  },
+  "all_wind_parts_monophonic": true,
+  "source_repeats_and_endings_preserved": true,
+  "source_sha256": "e1e98c10577ad9e31c5f6a5f5d53e8fed1bcd7a494c65d558e5d5aae7483c948",
+  "piano_pitched_segments": 1005
+}

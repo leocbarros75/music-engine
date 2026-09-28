@@ -1,0 +1,50 @@
+{
+  "T1": {
+    "events": 191,
+    "low_sounding_midi": 55,
+    "high_sounding_midi": 75,
+    "max_continuous_beats_except_final": 7.75
+  },
+  "T2": {
+    "events": 91,
+    "low_sounding_midi": 63,
+    "high_sounding_midi": 72,
+    "max_continuous_beats_except_final": 4.5
+  },
+  "H1": {
+    "events": 131,
+    "low_sounding_midi": 55,
+    "high_sounding_midi": 70,
+    "max_continuous_beats_except_final": 7.5
+  },
+  "H2": {
+    "events": 198,
+    "low_sounding_midi": 51,
+    "high_sounding_midi": 68,
+    "max_continuous_beats_except_final": 7.5
+  },
+  "TB1": {
+    "events": 175,
+    "low_sounding_midi": 48,
+    "high_sounding_midi": 63,
+    "max_continuous_beats_except_final": 7.5
+  },
+  "TB2": {
+    "events": 138,
+    "low_sounding_midi": 43,
+    "high_sounding_midi": 53,
+    "max_continuous_beats_except_final": 7.5
+  },
+  "BT": {
+    "events": 88,
+    "low_sounding_midi": 39,
+    "high_sounding_midi": 58,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "TU": {
+    "events": 259,
+    "low_sounding_midi": 27,
+    "high_sounding_midi": 51,
+    "max_continuous_beats_except_final": 7.75
+  }
+}

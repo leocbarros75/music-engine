@@ -1,0 +1,38 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-brass-ensemble.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-brass-ensemble.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-T1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-T1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-T2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-T2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-H1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-H1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-H2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-H2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-TB1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-TB1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-TB2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-TB2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-BT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-BT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-TU.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/living-hope-brass-ensemble/living-hope-TU.pdf"
+  }
+]

@@ -1,0 +1,812 @@
+[
+  {
+    "source": "m1-n8",
+    "bar": 1,
+    "midi": 51,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m1-n10",
+    "bar": 1,
+    "midi": 51,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m2-n22",
+    "bar": 2,
+    "midi": 56,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m2-n24",
+    "bar": 2,
+    "midi": 56,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m3-n37",
+    "bar": 3,
+    "midi": 51,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m3-n39",
+    "bar": 3,
+    "midi": 51,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m4-n46",
+    "bar": 4,
+    "midi": 56,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m5-n60",
+    "bar": 5,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m5-n61",
+    "bar": 5,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m6-n69",
+    "bar": 6,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m6-n70",
+    "bar": 6,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m7-n85",
+    "bar": 7,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m7-n86",
+    "bar": 7,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m7-n87",
+    "bar": 7,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m8-n98",
+    "bar": 8,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m8-n99",
+    "bar": 8,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m9-n110",
+    "bar": 9,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m9-n111",
+    "bar": 9,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m10-n122",
+    "bar": 10,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m10-n123",
+    "bar": 10,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m11-n138",
+    "bar": 11,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m11-n139",
+    "bar": 11,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m11-n140",
+    "bar": 11,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m12-n152",
+    "bar": 12,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m12-n153",
+    "bar": 12,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m13-n165",
+    "bar": 13,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m13-n166",
+    "bar": 13,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m14-n177",
+    "bar": 14,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m14-n178",
+    "bar": 14,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m15-n190",
+    "bar": 15,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m15-n191",
+    "bar": 15,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m16-n200",
+    "bar": 16,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m16-n201",
+    "bar": 16,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m17-n212",
+    "bar": 17,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m17-n213",
+    "bar": 17,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m18-n224",
+    "bar": 18,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m18-n225",
+    "bar": 18,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m20-n245",
+    "bar": 20,
+    "midi": 51,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m21-n255",
+    "bar": 21,
+    "midi": 51,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m23-n283",
+    "bar": 23,
+    "midi": 58,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m24-n306",
+    "bar": 24,
+    "midi": 58,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m24-n312",
+    "bar": 24,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n313",
+    "bar": 24,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n314",
+    "bar": 24,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n315",
+    "bar": 24,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n316",
+    "bar": 24,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n317",
+    "bar": 24,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n318",
+    "bar": 24,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m24-n319",
+    "bar": 24,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n337",
+    "bar": 25,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n338",
+    "bar": 25,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n339",
+    "bar": 25,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n340",
+    "bar": 25,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n341",
+    "bar": 25,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n342",
+    "bar": 25,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n343",
+    "bar": 25,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m25-n344",
+    "bar": 25,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n357",
+    "bar": 26,
+    "midi": 58,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m26-n363",
+    "bar": 26,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n364",
+    "bar": 26,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n365",
+    "bar": 26,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n366",
+    "bar": 26,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n367",
+    "bar": 26,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n368",
+    "bar": 26,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n369",
+    "bar": 26,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m26-n370",
+    "bar": 26,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n388",
+    "bar": 27,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n389",
+    "bar": 27,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n390",
+    "bar": 27,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n391",
+    "bar": 27,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n392",
+    "bar": 27,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n393",
+    "bar": 27,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n394",
+    "bar": 27,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m27-n395",
+    "bar": 27,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n408",
+    "bar": 28,
+    "midi": 58,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m28-n414",
+    "bar": 28,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n415",
+    "bar": 28,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n416",
+    "bar": 28,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n417",
+    "bar": 28,
+    "midi": 32,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n418",
+    "bar": 28,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n419",
+    "bar": 28,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n420",
+    "bar": 28,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m28-n421",
+    "bar": 28,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n439",
+    "bar": 29,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n440",
+    "bar": 29,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n441",
+    "bar": 29,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n442",
+    "bar": 29,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n443",
+    "bar": 29,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n444",
+    "bar": 29,
+    "midi": 36,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n445",
+    "bar": 29,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m29-n446",
+    "bar": 29,
+    "midi": 34,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m33-n505",
+    "bar": 33,
+    "midi": 58,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m33-n512",
+    "bar": 33,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m34-n517",
+    "bar": 34,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m35-n521",
+    "bar": 35,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m35-n522",
+    "bar": 35,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m35-n523",
+    "bar": 35,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m35-n524",
+    "bar": 35,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m36-n529",
+    "bar": 36,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m36-n530",
+    "bar": 36,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m36-n531",
+    "bar": 36,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m36-n532",
+    "bar": 36,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m37-n541",
+    "bar": 37,
+    "midi": 44,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m37-n542",
+    "bar": 37,
+    "midi": 44,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m37-n543",
+    "bar": 37,
+    "midi": 48,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m37-n544",
+    "bar": 37,
+    "midi": 48,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m38-n549",
+    "bar": 38,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m38-n550",
+    "bar": 38,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m38-n551",
+    "bar": 38,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m38-n552",
+    "bar": 38,
+    "midi": 46,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m39-n557",
+    "bar": 39,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m39-n558",
+    "bar": 39,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m39-n559",
+    "bar": 39,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m39-n560",
+    "bar": 39,
+    "midi": 39,
+    "reason": "alternate LH voice 4 omitted"
+  },
+  {
+    "source": "m41-n572",
+    "bar": 41,
+    "midi": 56,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m41-n574",
+    "bar": 41,
+    "midi": 53,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m42-n583",
+    "bar": 42,
+    "midi": 55,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m44-n617",
+    "bar": 44,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m44-n619",
+    "bar": 44,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m44-n621",
+    "bar": 44,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m44-n623",
+    "bar": 44,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m45-n638",
+    "bar": 45,
+    "midi": 48,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m45-n640",
+    "bar": 45,
+    "midi": 48,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m45-n642",
+    "bar": 45,
+    "midi": 48,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m45-n644",
+    "bar": 45,
+    "midi": 48,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m46-n666",
+    "bar": 46,
+    "midi": 44,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m46-n668",
+    "bar": 46,
+    "midi": 44,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m46-n670",
+    "bar": 46,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m46-n672",
+    "bar": 46,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m46-n674",
+    "bar": 46,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m46-n676",
+    "bar": 46,
+    "midi": 46,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m48-n703",
+    "bar": 48,
+    "midi": 63,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m48-n706",
+    "bar": 48,
+    "midi": 63,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m62-n1000",
+    "bar": 62,
+    "midi": 63,
+    "reason": "octave doubling or unselected interior voice"
+  },
+  {
+    "source": "m62-n1005",
+    "bar": 62,
+    "midi": 39,
+    "reason": "octave doubling or unselected interior voice"
+  }
+]

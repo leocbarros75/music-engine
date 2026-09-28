@@ -52,6 +52,8 @@ outputs/living-hope-piano-and-strings/living-hope-piano-and-strings/
 outputs/o-espirito-piano/o-espirito-piano-complete/
 outputs/living-hope-wind-quartet/living-hope-wind-quartet/
 outputs/living-hope-piano-and-winds/living-hope-piano-and-winds/
+outputs/living-hope-brass-ensemble/living-hope-brass-ensemble/
+outputs/living-hope-piano-and-brass/living-hope-piano-and-brass/
 # An .mxl is a zip under another extension, and its score.xml is the same music
 # as the .musicxml extracted beside it — 2,081 notes either way. The PDFs are
 # what engrave-jobs.json regenerates from that MusicXML, so they are the
