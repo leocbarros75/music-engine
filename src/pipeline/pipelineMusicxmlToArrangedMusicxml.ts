@@ -4,6 +4,7 @@ import { auditNoteConservation, TRANSCRIPTION_ENSEMBLES, type ConservationReport
 import { buildNoteMap, type NoteMap } from "../preservation/noteMap";
 import { buildOmissions, omissionsSentence, type OmissionsRecord } from "../preservation/omissions";
 import { carrySourceMarks } from "../preservation/sourceMarks";
+import { buildPlayabilityAudit, playabilitySentence, type PlayabilityAudit } from "../preservation/playability";
 import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
 import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
@@ -50,6 +51,7 @@ export type PipelineResult = {
      */
     noteMap?: NoteMap;
     omissions?: OmissionsRecord;
+    playability?: PlayabilityAudit;
     performance?: { status: string; reason?: string; durationSeconds?: number; warnings?: string[] };
   };
 };
@@ -249,6 +251,19 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const carried = carrySourceMarks(writtenInput, scoreModelOut?.parts ?? []);
     if (carried) warnings.push(`[marks] Repeats, endings and dynamics carried from the source onto ${carried} bar(s).`);
 
+    // Can a person play this? Every number was already being computed and
+    // thrown away, and the engine spent months shipping parts that ran three
+    // and a half minutes without a rest while saying nothing about it. Runs
+    // for every ensemble, because the question applies to all of them.
+    let playability: PlayabilityAudit | undefined;
+    try {
+      playability = buildPlayabilityAudit(scoreModelOut);
+      const line = playabilitySentence(playability, Number(scoreModelOut?.meta?.tempo_bpm) || undefined);
+      if (playability.totalOutOfRange > 0) warnings.push(`[playability] ${line}`);
+    } catch {
+      // A report on the work must never take the work down with it.
+    }
+
     const protectedTargetId = protection.lock ? lockSourceInModel(protection.lock, scoreModelOut, settings) : undefined;
 
     // 6. Choral rule check (skip for non-SATB ensembles)
@@ -410,6 +425,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
         noteConservation,
         noteMap,
         omissions,
+        playability,
         performance: synchronized.report,
         ensemble: ensembleRaw,
         styleUsed: appResult.styleUsed,
