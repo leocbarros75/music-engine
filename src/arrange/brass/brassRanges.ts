@@ -39,6 +39,26 @@ export const BRASS_RANGES: Record<BrassVoiceId, BrassRange> = {
   tuba: { absMin: 26, absMax: 58, prefMin: 31, prefMax: 53 }, // D1..Bb3 pref G1..F3
 };
 
+
+/**
+ * Where each voice actually lives, as MIDI — the documented sweet spot in a
+ * form the code can use.
+ *
+ * `BRASS_CHARACTER.sweetSpot` has always carried this ("G4–G5" for the first
+ * trumpet) and nothing has ever read it: placement used prefMin/prefMax, which
+ * run far wider and far lower. A first trumpet whose preferred range starts at
+ * A3 will happily sit there if the voicing it inherits is low, and ours did —
+ * 58 to 70 against 74 to 79 in a hand-written edition of the same song. In
+ * range, and nowhere near the register the instrument is for.
+ */
+export const BRASS_SWEET_SPOT: Record<BrassVoiceId, { lo: number; hi: number }> = {
+  tpt1: { lo: 67, hi: 79 },  // G4–G5
+  tpt2: { lo: 64, hi: 76 },  // E4–E5
+  hn:   { lo: 48, hi: 67 },  // C3–G4
+  tbn:  { lo: 43, hi: 58 },  // G2–Bb3
+  tuba: { lo: 31, hi: 50 },  // G1–D3
+};
+
 export type BrassCharacter = {
   agility: number;           // 0–1 technical agility for fast passagework
   defaultActivity: "grounded" | "less_active" | "active" | "high_active";

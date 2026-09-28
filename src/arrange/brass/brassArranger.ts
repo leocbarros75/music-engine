@@ -19,7 +19,7 @@ import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId, Slice, Voicing, VoiceId } from "../strings/types";
 import { buildCandidatesForSlice } from "../strings/candidates";
 import {
-  BRASS_RANGES, BRASS_TO_STRING_VOICE, BRASS_PART_META, BRASS_CHARACTER,
+  BRASS_RANGES, BRASS_SWEET_SPOT, BRASS_TO_STRING_VOICE, BRASS_PART_META, BRASS_CHARACTER,
   BRASS_QUARTET_VOICES, BRASS_QUINTET_VOICES, type BrassVoiceId,
 } from "./brassRanges";
 
@@ -194,6 +194,126 @@ export type BrassArrangerOptions = {
 /**
  * Arrange a score as a brass quintet (Tpt1/Tpt2/Horn/Trombone/Tuba) or quartet.
  */
+
+
+/**
+ * Put each voice in the register the instrument is for.
+ *
+ * The brass inherit their pitches from the string voicing, so a low Violin I
+ * gives a low first trumpet: ours ran 58 to 70 where a hand-written edition of
+ * the same song has 74 to 79. Both are inside the trumpet, but only one is the
+ * bright register a lead part is written in. The sweet spot has been recorded
+ * in BRASS_CHARACTER since the file was written and nothing read it.
+ *
+ * The whole line moves by whole octaves, so every interval inside it survives
+ * — this decides where the part sits, not what it plays. A shift is taken only
+ * if it brings the line's median closer to the middle of the sweet spot AND
+ * leaves every note inside the instrument.
+ */
+function centreOnSweetSpot(score: ScoreModel, voices: BrassVoiceId[]): number {
+  let shifted = 0;
+  for (const v of voices) {
+    const part = ((score as any).parts ?? []).find((p: any) => p.part_id === BRASS_PART_META[v].part_id);
+    if (!part) continue;
+    const notes = (part.measures ?? []).flatMap((m: any) =>
+      (m.events ?? []).filter((e: any) => e?.type === "note"));
+    const midis = notes.map((e: any) => eventMidi(e)).filter((x: any): x is number => x !== null);
+    if (midis.length < 4) continue;
+
+    const sorted = [...midis].sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)]!;
+    const spot = BRASS_SWEET_SPOT[v];
+    const centre = (spot.lo + spot.hi) / 2;
+    const range = BRASS_RANGES[v];
+
+    let best = 0;
+    let bestGap = Math.abs(median - centre);
+    for (const oct of [-24, -12, 12, 24]) {
+      if (Math.min(...midis) + oct < range.absMin || Math.max(...midis) + oct > range.absMax) continue;
+      const gap = Math.abs(median + oct - centre);
+      if (gap < bestGap - 1e-9) { bestGap = gap; best = oct; }
+    }
+    if (!best) continue;
+
+    for (const e of notes) {
+      const m = eventMidi(e);
+      if (m === null) continue;
+      e.midi = m + best;
+      e.pitch = midiToPitch(m + best);
+      shifted++;
+    }
+  }
+  return shifted;
+}
+
+/**
+ * Put the section back in order.
+ *
+ * Trumpet 2 was sounding ABOVE Trumpet 1 in every bar of the piece, and the
+ * Horn above both. Each brass part is scored independently here — one voice at
+ * a time, nearest its own anchor, clamped to its own range — so nothing ever
+ * compared them against each other, and the crossing in the underlying string
+ * voicing (Violin II above Violin I in two bars out of three) came through
+ * untouched.
+ *
+ * A second trumpet playing over the first is not a stylistic choice, it is a
+ * mistake a section would query on sight. So at every onset the voices are
+ * walked top down and any that sits above the one over it drops by octaves
+ * until it does not — never below its own floor, and nothing moves if the
+ * order is already right.
+ *
+ * The deeper fault is in the shared string DP, which crosses its violins
+ * despite a crossing penalty. Fixing it there reaches strings, winds, brass
+ * and both orchestras at once and is a separate piece of work; this keeps the
+ * brass readable in the meantime.
+ */
+function uncrossBrassSection(score: ScoreModel, voices: BrassVoiceId[]): number {
+  const parts = voices
+    .map((v) => ({ v, part: ((score as any).parts ?? []).find((p: any) => p.part_id === BRASS_PART_META[v].part_id) }))
+    .filter((x) => x.part);
+  if (parts.length < 2) return 0;
+  const bars = Math.max(0, ...parts.map((x) => (x.part.measures ?? []).length));
+  let moved = 0;
+
+  for (let mi = 0; mi < bars; mi++) {
+    // Every onset at which anyone sounds in this bar.
+    const onsets = new Set<number>();
+    for (const { part } of parts) {
+      for (const ev of (part.measures?.[mi]?.events ?? [])) {
+        if (ev?.type === "note") onsets.add(Math.round(Number(ev.t) * 1000) / 1000);
+      }
+    }
+    for (const t of [...onsets].sort((a, b) => a - b)) {
+      let ceiling: number | null = null;
+      for (const { v, part } of parts) {
+        const ev = (part.measures?.[mi]?.events ?? []).find(
+          (e: any) => e?.type === "note" && Math.abs(Number(e.t) - t) < 1e-6
+        );
+        if (!ev) continue;
+        let midi = eventMidi(ev);
+        if (midi === null) { ceiling = ceiling; continue; }
+        if (ceiling !== null && midi > ceiling) {
+          // Drop only as far as the voice's PREFERRED floor, not its absolute
+          // one. Using absMin put the horn at 46 — inside the instrument, well
+          // below where a horn lives, and a section reordered into its own
+          // cellar is not an improvement on a section out of order. If it
+          // cannot get under the voice above without leaving its register, it
+          // stays where it is and the crossing stands.
+          const floor = BRASS_RANGES[v].prefMin;
+          while (midi > ceiling && midi - 12 >= floor) midi -= 12;
+          if (midi !== eventMidi(ev)) {
+            ev.midi = midi;
+            ev.pitch = midiToPitch(midi);
+            moved++;
+          }
+        }
+        ceiling = midi;
+      }
+    }
+  }
+  return moved;
+}
+
 export function arrangeBrassEnsemble(
   score: ScoreModel,
   chords: ChordEvent[],
@@ -240,6 +360,24 @@ export function arrangeBrassEnsemble(
 
   if (melodyPart && chords.length) {
     applyBrassRhythm(brassScore, melodyPart, chords, key, options.activity ?? {});
+  }
+
+  // Register first, then order: moving a whole line by an octave would undo
+  // any tidying done before it.
+  const centred = centreOnSweetSpot(brassScore, voices);
+  if (centred) {
+    warnings.push(
+      `[brass] ${centred} note(s) moved by octave into the instrument's own register — ` +
+      "the voicing came from the strings and sat below where brass is written."
+    );
+  }
+
+  const uncrossed = uncrossBrassSection(brassScore, voices);
+  if (uncrossed) {
+    warnings.push(
+      `[brass] ${uncrossed} note(s) dropped an octave to keep the section in order — ` +
+      "a second trumpet does not play above the first."
+    );
   }
 
   return { scoreModel: brassScore, warnings };
