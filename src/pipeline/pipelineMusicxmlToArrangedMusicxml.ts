@@ -237,6 +237,12 @@ export function pipelineMusicxmlToArrangedMusicxml(
     }
 
     // 5. Apply app settings (key transposition, tempo, time signature, etc.)
+    // Whether a melody is under lock decides what the arrangers may do with its
+    // register: the string route moves a low melody into the violins' own
+    // octave, and must not when the lock guarantees the pitches are unchanged.
+    if (harmonizedScore && typeof harmonizedScore === "object") {
+      (harmonizedScore as any).meta = { ...((harmonizedScore as any).meta ?? {}), melodyIsProtected: !!protection.lock };
+    }
     const appResult = applyAppSettings(harmonizedScore, settings, finalChords as any);
     let scoreModelOut = appResult.scoreModel as any;
     if (Array.isArray(appResult.warnings)) warnings.push(...appResult.warnings);

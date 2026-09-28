@@ -116,6 +116,16 @@ export type StringArrangerOptions = {
    */
   keepInnerVoicesBelowMelody?: boolean;
   /**
+   * Move a melody that sits below Violin I's register up by whole octaves
+   * before voicing the accompaniment under it.
+   *
+   * Off by default, and the caller must confirm the melody is not under a
+   * preservation lock: this changes sounding pitch, which the lock exists to
+   * forbid. It is safe on the routes that replace the piano outright, where a
+   * piano source yields no protected melody part in the first place.
+   */
+  liftMelodyIntoRegister?: boolean;
+  /**
    * Offer the second violin and viola a scale tone a step away, so they have
    * somewhere to move when the chord's own tones are a third apart. Off by
    * default, like the rest: brass and woodwinds read vln2/vla from this DP.

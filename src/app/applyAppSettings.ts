@@ -2788,7 +2788,7 @@ export function applyAppSettings(
                 : styleRaw === "baroque"
                   ? "bach_chorale"
                   : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
-              const stringResult = arrangeStringEnsemble(scoreModel, chords, { profile, sustainAccompaniment: true, keepInnerVoicesBelowMelody: true, innerVoiceMotion: true, bowDirections: true });
+              const stringResult = arrangeStringEnsemble(scoreModel, chords, { profile, sustainAccompaniment: true, keepInnerVoicesBelowMelody: true, innerVoiceMotion: true, bowDirections: true, liftMelodyIntoRegister: (scoreModel as any)?.meta?.melodyIsProtected !== true });
               warnings.push(...(stringResult.warnings ?? []));
               const stringScore = stringResult.scoreModel;
               if (usePolyphonic) {
@@ -2966,7 +2966,7 @@ export function applyAppSettings(
                 : (settings.stringTexture ?? "melody_harmony")) as ProfileId;
             const stringResult = usePolyphonic
               ? arrangeStringPolyphonic(scoreModel, chords, { level: settings.level })
-              : arrangeStringEnsemble(scoreModel, chords, { profile, sustainAccompaniment: true, keepInnerVoicesBelowMelody: true, innerVoiceMotion: true, bowDirections: true });
+              : arrangeStringEnsemble(scoreModel, chords, { profile, sustainAccompaniment: true, keepInnerVoicesBelowMelody: true, innerVoiceMotion: true, bowDirections: true, liftMelodyIntoRegister: (scoreModel as any)?.meta?.melodyIsProtected !== true });
             warnings.push(...(stringResult.warnings ?? []));
             const stringScore = stringResult.scoreModel;
             if (usePolyphonic) {

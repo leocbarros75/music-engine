@@ -59,6 +59,7 @@ async function main() {
       'tests/arrange/voiceLedVoicing.test.ts',
       'tests/arrange/stringSustain.test.ts',
       'tests/arrange/stringRegister.test.ts',
+      'tests/arrange/melodySelection.test.ts',
       'tests/arrange/innerVoiceMotion.test.ts',
       'tests/arrange/bowing.test.ts',
       'tests/arrange/altoUnderMelody.test.ts',

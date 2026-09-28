@@ -132,7 +132,25 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
       // whole notes and then adds a ghost rest → "Found 17/16" error.
       const rawDur = Math.min(capDur, Math.max(0.25, next - t));
       const dur = snapToStandardDuration(rawDur);
-      const active = melEvents.find((e: any) => e.type === "note" && Number(e.t) <= t && t < Number(e.t) + Number(e.dur));
+      // The tune is the top line, not whichever note the event list happens to
+      // hold first. A keyboard source is ONE part carrying two staves, and its
+      // events arrive sorted by time alone, so `find` returned a left-hand note
+      // whenever one was still sounding under the right hand. Violin I is
+      // locked to this pitch, so the section then voiced the chord correctly
+      // ABOVE what it had been told was the melody — and the DP's crossing
+      // penalty, which was working the whole time, had nothing it could do.
+      const sounding = melEvents.filter(
+        (e: any) => e.type === "note" && Number(e.t) <= t && t < Number(e.t) + Number(e.dur)
+      );
+      const upper = sounding.filter((e: any) => Number(e.staff ?? 1) === 1);
+      const pool = upper.length ? upper : sounding;
+      let active: any = null;
+      for (const e of pool) {
+        const m = eventMidi(e);
+        if (m === null) continue;
+        const cur = active ? eventMidi(active) : null;
+        if (cur === null || m > cur) active = e;
+      }
       const melodyMidi = active ? eventMidi(active) : null;
       slices.push({
         measure: mNum,
@@ -312,6 +330,58 @@ function buildPart(
   };
 }
 
+/**
+ * Put the tune where a first violin actually plays it.
+ *
+ * A piano source carries its melody in the right hand, at whatever octave suits
+ * two hands on one keyboard. Handed to a string section unchanged, that lands
+ * the first violins on the G string — below their own preferred floor of D4 —
+ * and the second violins and violas, voicing the same chord in the registers
+ * they are comfortable in, correctly end up ABOVE the tune.
+ *
+ * The DP is not at fault for that. Its crossing penalty is real and it pays it;
+ * there is simply no arrangement of the chord that fits under a melody already
+ * sitting at the bottom of the section. Squeezing the accompaniment down
+ * instead was tried, and the result is recorded in the candidate-stage comment:
+ * it drove the double bass under Forsyth's floor, where the basses "stir up the
+ * mud". The melody is what has to move.
+ *
+ * Whole octaves only, so the tune is unchanged as music — the same notes, in
+ * the register the instrument is written in. Returns the octaves moved.
+ */
+function liftMelodyIntoViolinRegister(slices: Slice[]): number {
+  const notes = slices
+    .map((s) => s.melodyMidi)
+    .filter((m): m is number => typeof m === "number");
+  if (!notes.length) return 0;
+
+  const { absMin, absMax, prefMin, prefMax } = STRING_RANGES.vln1;
+  // How far outside the comfortable register the whole line would sit. A shift
+  // that puts any note off the instrument is not a candidate at all.
+  const strain = (octaves: number): number => {
+    let total = 0;
+    for (const m of notes) {
+      const p = m + 12 * octaves;
+      if (p < absMin || p > absMax) return Infinity;
+      total += p < prefMin ? prefMin - p : p > prefMax ? p - prefMax : 0;
+    }
+    return total;
+  };
+
+  let best = 0;
+  let bestStrain = strain(0);
+  for (const octaves of [1, 2]) {
+    const s = strain(octaves);
+    if (s < bestStrain) { bestStrain = s; best = octaves; }
+  }
+  if (best) {
+    for (const s of slices) {
+      if (typeof s.melodyMidi === "number") s.melodyMidi += 12 * best;
+    }
+  }
+  return best;
+}
+
 export function arrangeStringEnsemble(
   score: ScoreModel,
   chords: ChordEvent[],
@@ -326,6 +396,7 @@ export function arrangeStringEnsemble(
 
   const slices = buildSlices(melodyPart, chords);
   const key = getKeyInfo(score);
+  const liftedOctaves = options.liftMelodyIntoRegister ? liftMelodyIntoViolinRegister(slices) : 0;
 
   const profile = options.profile ?? "melody_harmony";
   const candidatesBySlice: Voicing[][] = [];
@@ -353,17 +424,33 @@ export function arrangeStringEnsemble(
   // The candidate stage keeps the accompaniment under Violin I, but it can only
   // do that with the pitches the chord offers inside each voice's own range. A
   // melody lying in the violin's bottom octave leaves the inner voices nowhere
-  // to go, and they are forced above the tune. That is a register decision the
-  // player's "Melody register" setting already owns, so say so rather than
-  // silently transposing a melody the source-preservation contract protects.
+  // to go, and they are forced above the tune.
+  //
+  // This used to tell the player to set "Melody register" an octave higher.
+  // No such control reaches this route: the octave shift is applied at the
+  // source boundary, and it requires a single monophonic melody part — which a
+  // two-stave piano source, the very thing that causes a low melody, does not
+  // have. The advice errored out on exactly the scores that triggered it. When
+  // the melody is not under a preservation lock the arranger now moves it
+  // itself, and says what it did rather than what the player should do.
   const crossed = bestVoicings.filter(
     (v) => v.vln1 !== null && ((v.vln2 !== null && v.vln2 > v.vln1) || (v.vla !== null && v.vla > v.vln1))
   ).length;
+  if (liftedOctaves) {
+    warnings.push(
+      `[strings] The melody sat below Violin I's register, so it was moved up ` +
+      `${liftedOctaves === 1 ? "an octave" : `${liftedOctaves} octaves`} — the same notes, ` +
+      `where a first violin plays them, leaving Violin II and Viola room underneath.`
+    );
+  }
   if (options.keepInnerVoicesBelowMelody && bestVoicings.length && crossed / bestVoicings.length > 0.2) {
     warnings.push(
       `[strings] The melody sits low for Violin I: the inner voices are forced above it in ` +
-      `${Math.round((100 * crossed) / bestVoicings.length)}% of the score. ` +
-      `Set "Melody register" to one octave higher to give Violin II and Viola room underneath.`
+      `${Math.round((100 * crossed) / bestVoicings.length)}% of the score` +
+      (liftedOctaves
+        ? `, even after moving it up. The tune spans more than the section can voice under.`
+        : `. It is held at its written octave because the source melody is protected; ` +
+          `lifting it would break the preservation guarantee.`)
     );
   }
 
