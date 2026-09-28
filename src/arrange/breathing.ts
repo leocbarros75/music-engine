@@ -217,7 +217,8 @@ function tryBreathAtBar(
   lengths: number[],
   i: number,
   release: number,
-  minKept: number
+  minKept: number,
+  writeRests: boolean
 ): "release" | "mark" | null {
   if (i < 0 || i >= part.measures.length - 1) return null;  // never the closing bar
   const barEnd = lengths[i] ?? 4;
@@ -235,19 +236,35 @@ function tryBreathAtBar(
     return null;                                             // already breathing here
   }
 
-  // A BREATH MARK, always — never a shortened note.
+  // THE COMMA IS ALWAYS WRITTEN. Whether a rest is written with it depends on
+  // whether the part has anywhere else to breathe.
   //
-  // This used to take an eighth off the note and let a rest fill the bar, on
-  // the reasoning that a written gap guarantees the air. It does, and it also
-  // rewrites the rhythm: a line peppered with clipped note-ends stops sounding
-  // like a phrase and starts sounding like STACCATO, which is a different
-  // instruction entirely. A dot over a note says play it short; a comma says
-  // take a breath. We were writing the first and meaning the second.
+  // A dot over a note says play it short; a comma says take a breath. Writing
+  // clipped note-ends everywhere and calling it breathing produced something
+  // that sounded staccato, which is a different instruction — so the
+  // complementary parts, which get their air from the arc and from releasing
+  // before the next attack, take the comma alone and keep every written value.
   //
-  // So the note keeps its written value and the player takes the time — which
-  // is the whole point of the mark, and where to breathe is theirs to judge.
-  // They know the room, the dynamic and their own lungs. Rests belong to
-  // phrasing, which is a musical decision, not to physiology.
+  // A transcription has neither of those. Marks alone there leave a part that
+  // is 62 bars of unbroken notation with a few commas over it — the reference
+  // edition of the same song writes a rest AND a comma at alternating bar
+  // ends, staggered between players, and its longest notated run is under
+  // eight beats against our two hundred and forty-eight. So where there is no
+  // other air, the note gives up its tail as well: an eighth, or half its
+  // value when it is already short, with the attack kept.
+  if (writeRests) {
+    const shortest = Math.min(...atBarline.map((e) => Number(e.dur)));
+    const room = Math.min(release, shortest / 2);
+    if (shortest - room >= minKept - EPS && room >= minKept - EPS) {
+      for (const e of atBarline) {
+        e.dur = Number(e.dur) - room;
+        const on = Array.isArray(e.articulations) ? [...e.articulations] : [];
+        on.push("breath-mark");
+        e.articulations = on;
+      }
+      return "release";
+    }
+  }
   for (const e of atBarline) {
     const on = Array.isArray(e.articulations) ? [...e.articulations] : [];
     on.push("breath-mark");
@@ -266,16 +283,42 @@ function barEnds(lengths: number[]): number[] {
 
 export function applyBreathing(
   parts: Part[],
-  options?: { releaseBeats?: number; minKeptBeats?: number; maxBreathlessBeats?: number }
+  options?: {
+    releaseBeats?: number;
+    minKeptBeats?: number;
+    maxBreathlessBeats?: number;
+    /**
+     * Write a rest alongside the comma. TRUE for a part whose only air is the
+     * one we give it; FALSE where the writing already breathes — the
+     * complementary parts rest by the arc and release before each next attack,
+     * and clipping them as well is what read as staccato.
+     */
+    writeRests?: boolean;
+  }
 ): BreathPlan {
+  const writeRests = options?.writeRests !== false;
   const release = Math.max(0, options?.releaseBeats ?? 0.5);   // an eighth
   // A note must keep at least an eighth, so a quarter can still give up half
   // its length: quarter becomes eighth-note-plus-eighth-rest, which is how a
   // breath is normally written. Anything shorter takes a mark instead.
-  const minKept = options?.minKeptBeats ?? 0.5;
+  // How little a note may be left holding. An eighth where only a comma is
+  // written — nothing is being shortened, so the floor is about taste. A
+  // SIXTEENTH where a rest has to appear: a bar whose last note is already an
+  // eighth cannot give up an eighth, and refusing to halve it was leaving
+  // sixteen-bar stretches with no rest anywhere. The reference does the same
+  // and says so — "if it is already short, half its duration is released
+  // instead", and some of its rests are sixteenths.
+  const minKept = options?.minKeptBeats ?? (writeRests ? 0.25 : 0.5);
   // About sixteen seconds at 60 to the quarter, thirteen at 71 — the far end
   // of a comfortable phrase, not a limit anyone should be working at.
-  const maxBreathless = options?.maxBreathlessBeats ?? 16;
+  // How long a line may run before the repair pass insists on a break.
+  //
+  // Eight beats where a rest is written — about seven seconds at 71 to the
+  // quarter, and the figure the reference edition lands on for eight brass
+  // players. Sixteen where only a comma goes in: the player is taking the
+  // time either way, and clipping a complementary part that often is what
+  // read as staccato.
+  const maxBreathless = options?.maxBreathlessBeats ?? (writeRests ? 8 : 16);
   const usable = (parts ?? []).filter((p) => (p?.measures?.length ?? 0) > 0);
   const bars = Math.max(0, ...usable.map((p) => p.measures.length));
   let releases = 0;
@@ -287,7 +330,7 @@ export function applyBreathing(
 
     for (let i = 0; i < part.measures.length; i++) {
       if (!candidates.has(i + 1)) continue;
-      const took = tryBreathAtBar(part, lengths, i, release, minKept);
+      const took = tryBreathAtBar(part, lengths, i, release, minKept, writeRests);
       if (took === "release") releases++;
       else if (took === "mark") marks++;
     }
@@ -305,7 +348,12 @@ export function applyBreathing(
     // goes too long without air — instead of trusting the grid to cover it.
     const ends = barEnds(lengths);
     for (let guard = 0; guard < part.measures.length; guard++) {
-      const tooLong = soundingSpans(part, true).find(([s, e]) => e - s > maxBreathless + EPS);
+      // Which span to repair depends on what the part is allowed to write. If
+      // rests are going in, the NOTATION has to break — a comma over an
+      // unbroken line gives the player air but still prints sixty-two bars
+      // with nowhere to put the pencil. Where only commas are written, the
+      // comma IS the break and counting it is correct.
+      const tooLong = soundingSpans(part, !writeRests).find(([s, e]) => e - s > maxBreathless + EPS);
       if (!tooLong) break;
       const [spanStart, spanEnd] = tooLong;
       // Bars whose barline falls strictly inside the stretch.
@@ -319,7 +367,7 @@ export function applyBreathing(
       const order = [...within.reverse(), ...inside];
       let took: "release" | "mark" | null = null;
       for (const i of order) {
-        took = tryBreathAtBar(part, lengths, i, release, minKept);
+        took = tryBreathAtBar(part, lengths, i, release, minKept, writeRests);
         if (took) break;
       }
       if (!took) break;                    // nothing legal in there; it stands

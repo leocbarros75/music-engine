@@ -78,13 +78,24 @@ function breatheOrchestra(warnings: string[], label: string, parts: any[]): void
  * Deliberately NOT applied to the orchestras, whose winds have the same
  * problem: those ensembles are held fixed, and are a separate change.
  */
-function breatheWinds(warnings: string[], label: string, parts: any[]): void {
+function breatheWinds(
+  warnings: string[],
+  label: string,
+  parts: any[],
+  /**
+   * False where the writing already breathes. The complementary parts rest by
+   * the arc and release before each next attack, so clipping their note-ends
+   * as well is what read as staccato. A transcription has no other air and
+   * needs the rest written.
+   */
+  writeRests = true,
+): void {
   const winds = (parts ?? []).filter((p) =>
     /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium/i
       .test(`${p?.name ?? ""} ${p?.instrument ?? ""} ${p?.part_id ?? ""}`)
   );
   if (!winds.length) return;
-  const plan = applyBreathing(winds as any);
+  const plan = applyBreathing(winds as any, { writeRests });
   if (!plan.releases && !plan.marks) return;
   const bpm = quarterBpmOf(parts?.[0]?.measures ?? []);
   const seconds = bpm ? ` — about ${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s` : "";
@@ -2102,7 +2113,7 @@ export function applyAppSettings(
           `[piano+winds] ${released} note(s) release just before the next attack — `+
           "a detached accompaniment, not a phrase chopped into pieces.");
       }
-      breatheWinds(warnings, "piano+winds", wwParts);   // wind parts only; the piano joins below
+      breatheWinds(warnings, "piano+winds", wwParts, /* writeRests */ false);   // wind parts only; the piano joins below
       (wwResult.scoreModel as any).parts = withPianoPart(wwParts, frozenPianoPart);
     }
     attachTextureAnalysis(wwResult.scoreModel, warnings);
@@ -2404,7 +2415,7 @@ export function applyAppSettings(
           `[piano+brass] ${released} note(s) release just before the next attack — `+
           "a detached accompaniment, not a phrase chopped into pieces.");
       }
-      breatheWinds(warnings, "piano+brass", brParts);   // brass parts only; the piano joins below
+      breatheWinds(warnings, "piano+brass", brParts, /* writeRests */ false);   // brass parts only; the piano joins below
       (brResult.scoreModel as any).parts = withPianoPart(brParts, frozenPianoPart);
     }
     attachTextureAnalysis(brResult.scoreModel, warnings);

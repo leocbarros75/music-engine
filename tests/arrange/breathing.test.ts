@@ -21,33 +21,33 @@ const marksIn = (p: any) => p.measures.flatMap((m: any) =>
 
 // ── The rules ───────────────────────────────────────────────────────────────
 
-test('a long note at the barline is marked, and keeps every bit of its value', () => {
-  // Breathing writes a COMMA, not a shorter note. A dot over a note says play
-  // it short; a comma says take a breath. Leo heard the difference immediately
-  // — clipped note-ends read as staccato, which is an articulation and a
-  // different instruction from "breathe here".
+test('where a part has no other air: a rest AND a comma', () => {
+  // A transcription's only breath is the one we give it. The reference edition
+  // writes both at alternating bar ends — the note gives up its tail and the
+  // comma says what the gap is for.
   const p = held('P_FL', 'Flute', 4);
-  const before = p.measures.map((m: any) => m.events[0].dur);
   const plan = applyBreathing([p] as any);
-  assert.equal(plan.releases, 0, 'nothing is ever shortened for air');
-  assert(plan.marks > 0, 'the breath is asked for with a mark');
-  assert.deepEqual(p.measures.map((m: any) => m.events[0].dur), before,
-    'not one written duration changed');
+  assert(plan.releases > 0, 'the tail is given up');
+  const shortened = p.measures.filter((m: any) => m.events[0].dur < 4);
+  assert.equal(shortened[0].events[0].dur, 3.5, 'an eighth, not more');
+  assert(shortened.every((m: any) => (m.events[0].articulations ?? []).includes('breath-mark')),
+    'and every released note carries the comma — the rest alone does not say why it is there');
 });
 
-test('breathing never alters a duration, whatever the note values', () => {
-  // The invariant, across a bar of quarters, a bar of eighths and whole notes:
-  // where the player breathes is their judgement, and the rhythm is not ours
-  // to rewrite on their behalf.
-  for (const dur of [4, 2, 1, 0.5]) {
+test('where the writing already breathes: a comma alone, no duration touched', () => {
+  // The complementary parts rest by the arc and release before each next
+  // attack. Clipping their note-ends as well is what read as staccato, which
+  // is a dot's instruction and not a comma's.
+  for (const dur of [4, 2, 1]) {
     const p = {
       part_id: 'P_FL', name: 'Flute', instrument: 'flute', staves: 1,
       measures: Array.from({ length: 6 }, (_, i) =>
         bar(i + 1, Array.from({ length: 4 / dur }, (_, j) => note(j * dur, dur, 72)))),
     };
     const before = JSON.stringify(p.measures.map((m: any) => m.events.map((e: any) => e.dur)));
-    const plan = applyBreathing([p] as any);
+    const plan = applyBreathing([p] as any, { writeRests: false });
     assert.equal(plan.releases, 0, `dur=${dur}: a note was shortened`);
+    assert(plan.marks > 0, `dur=${dur}: no breath was asked for at all`);
     assert.equal(JSON.stringify(p.measures.map((m: any) => m.events.map((e: any) => e.dur))), before,
       `dur=${dur}: durations changed`);
   }
@@ -69,18 +69,34 @@ test('never out of the final bar — the players agree a cutoff there', () => {
   assert.equal((last.events[0] as any).articulations ?? undefined, undefined, 'and takes no mark');
 });
 
-test('a note too short to shorten keeps its value and takes a breath mark', () => {
-  // Eighths throughout: half of an eighth is a sixteenth, which is no breath.
+test('an eighth gives up half of itself rather than leave no rest at all', () => {
+  // The reference is explicit: "if it is already short, half its duration is
+  // released instead", and some of its rests are sixteenths. Refusing to halve
+  // an eighth left sixteen-bar stretches with no rest anywhere, because in a
+  // busy passage every barline lands on one.
   const p = {
     part_id: 'P_FL', name: 'Flute', instrument: 'flute', staves: 1,
     measures: Array.from({ length: 4 }, (_, i) =>
       bar(i + 1, Array.from({ length: 8 }, (_, j) => note(j * 0.5, 0.5, 72)))),
   };
+  applyBreathing([p] as any);
+  const halved = p.measures.flatMap((m: any) => m.events).filter((e: any) => e.dur === 0.25);
+  assert(halved.length > 0, 'the eighth at the barline was halved');
+  assert(halved.every((e: any) => (e.articulations ?? []).includes('breath-mark')),
+    'and still says why the gap is there');
+});
+
+test('a sixteenth is left whole — there is nothing left to give', () => {
+  const p = {
+    part_id: 'P_FL', name: 'Flute', instrument: 'flute', staves: 1,
+    measures: Array.from({ length: 4 }, (_, i) =>
+      bar(i + 1, Array.from({ length: 16 }, (_, j) => note(j * 0.25, 0.25, 72)))),
+  };
   const plan = applyBreathing([p] as any);
-  assert.equal(plan.releases, 0, 'nothing was long enough to shorten');
-  assert(plan.marks > 0, 'so it asked for a breath instead');
-  const marked = marksIn(p);
-  assert(marked.every((e: any) => e.dur === 0.5), 'no note lost any of its value');
+  assert.equal(plan.releases, 0, 'nothing was short enough to halve');
+  assert(plan.marks > 0, 'so it asked for the breath instead');
+  assert(p.measures.flatMap((m: any) => m.events).every((e: any) => e.dur === 0.25),
+    'no note lost any of its value');
 });
 
 test('a bar that already ends in air is left alone', () => {
