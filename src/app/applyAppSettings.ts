@@ -56,8 +56,8 @@ function breatheOrchestra(warnings: string[], label: string, parts: any[]): void
     const seconds = bpm ? ` (~${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s)` : "";
     said.push(
       `${soloists.length} solo wind part${soloists.length === 1 ? "" : "s"} given ` +
-      `${plan.releases} early release${plan.releases === 1 ? "" : "s"} and ${plan.marks} ` +
-      `breath mark${plan.marks === 1 ? "" : "s"} — longest stretch without air now ` +
+      `${plan.releases} breath rest${plan.releases === 1 ? "" : "s"} (each with its comma) and ` +
+      `${plan.marks} comma${plan.marks === 1 ? "" : "s"} alone — longest stretch without air now ` +
       `${plan.longestBreathlessBeats.toFixed(0)} beats${seconds}`
     );
   }
@@ -100,8 +100,9 @@ function breatheWinds(
   const bpm = quarterBpmOf(parts?.[0]?.measures ?? []);
   const seconds = bpm ? ` — about ${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s` : "";
   warnings.push(
-    `[${label}] Staggered breathing: ${plan.releases} early release${plan.releases === 1 ? "" : "s"} ` +
-    `and ${plan.marks} breath mark${plan.marks === 1 ? "" : "s"}, so the players never stop together. ` +
+    `[${label}] Staggered breathing: ${plan.releases} breath rest${plan.releases === 1 ? "" : "s"} ` +
+    `(each carrying its comma) and ${plan.marks} comma${plan.marks === 1 ? "" : "s"} alone, ` +
+    "so the players never stop together. " +
     `Longest stretch without air now ${plan.longestBreathlessBeats.toFixed(0)} beats${seconds}. ` +
     "Move them to suit the phrase; the plan is a starting point, not a prescription."
   );
