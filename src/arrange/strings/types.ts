@@ -18,6 +18,15 @@ export type Slice = {
   t: number; // divisions
   dur: number; // divisions
   melodyMidi: number | null;
+  /**
+   * The id of the SOURCE note this slice's melody pitch was read from.
+   *
+   * Slices are cut at every chord change and every onset anywhere in the part,
+   * so one held melody note becomes several slices. Carrying the source note's
+   * identity is what lets the melody voice tell those apart from a note the
+   * composer genuinely repeated: same id means literally the same note.
+   */
+  melodySourceId?: string | null;
   chordSymbol?: string | null;
 };
 

@@ -152,8 +152,11 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
         if (cur === null || m > cur) active = e;
       }
       const melodyMidi = active ? eventMidi(active) : null;
+      const melodySourceId =
+        active && active.id !== undefined && active.id !== null ? String(active.id) : null;
       slices.push({
         measure: mNum,
+        melodySourceId,
         t,
         dur,
         melodyMidi: melodyMidi === null ? null : melodyMidi,
@@ -243,7 +246,20 @@ function splitIntoStandardDurations(total: number): number[] {
   return pieces;
 }
 
-function sustainRepeatedPitches(events: NoteEvent[]): NoteEvent[] {
+/**
+ * Merge neighbouring events into one sustained sound wherever `continues` says
+ * they are the same sound, notating the result as ties when no single note value
+ * spans it. The two callers differ only in that question:
+ *
+ *  - the accompanying voices merge any repeat of the same pitch, because their
+ *    re-articulation is the arranger's own and carries no meaning;
+ *  - the melody merges ONLY slices cut from one source note, because a tune
+ *    that repeats a pitch means it, and flattening that rewrites the melody.
+ */
+function mergeRuns(
+  events: NoteEvent[],
+  continues: (prev: any, ev: any, index: number) => boolean
+): NoteEvent[] {
   const out: NoteEvent[] = [];
   let run: NoteEvent[] = [];
 
@@ -275,27 +291,68 @@ function sustainRepeatedPitches(events: NoteEvent[]): NoteEvent[] {
     run = [];
   };
 
-  for (const ev of events) {
+  for (let i = 0; i < events.length; i++) {
+    const ev = events[i]!;
     const prev = run[run.length - 1] as any;
-    const evAny = ev as any;
-    const continues =
-      prev &&
-      evAny.type === "note" &&
-      prev.type === "note" &&
-      pitchToMidi(evAny.pitch) === pitchToMidi(prev.pitch) &&
-      // Slice ids carry the measure; merging across a bar line would rewrite
-      // the measure grouping that groupEventsByMeasure relies on.
-      String(evAny.id).split("-")[1] === String(prev.id).split("-")[1] &&
-      Math.abs(Number(prev.t) + Number(prev.dur) - Number(evAny.t)) < 1e-9 &&
-      // A tie the arranger already placed is not ours to re-cut.
-      prev.tieStart !== true &&
-      evAny.tieStop !== true;
-
-    if (!continues) flush();
+    if (!continues(prev, ev as any, i)) flush();
     run.push(ev);
   }
   flush();
   return out;
+}
+
+/** True when both events are notes that abut inside one bar and carry no tie. */
+function joinable(prev: any, evAny: any): boolean {
+  return (
+    !!prev &&
+    evAny.type === "note" &&
+    prev.type === "note" &&
+    // Slice ids carry the measure; merging across a bar line would rewrite
+    // the measure grouping that groupEventsByMeasure relies on.
+    String(evAny.id).split("-")[1] === String(prev.id).split("-")[1] &&
+    Math.abs(Number(prev.t) + Number(prev.dur) - Number(evAny.t)) < 1e-9 &&
+    // A tie the arranger already placed is not ours to re-cut.
+    prev.tieStart !== true &&
+    evAny.tieStop !== true
+  );
+}
+
+/** The accompaniment's rule: any repeat of the same pitch is one held note. */
+function sustainRepeatedPitches(events: NoteEvent[]): NoteEvent[] {
+  return mergeRuns(events, (prev, evAny) =>
+    joinable(prev, evAny) && pitchToMidi(evAny.pitch) === pitchToMidi(prev.pitch)
+  );
+}
+
+/**
+ * The melody's rule: rejoin only what the slicer cut apart.
+ *
+ * Violin I is written one event per slice, and slices are cut at every chord
+ * change and every onset anywhere in the source part — so a melody note held
+ * through a chord change came out as two struck notes at the same pitch. On the
+ * reference piano source, 255 of Violin I's 354 notes repeated the pitch before
+ * them with no tie anywhere: the tune, machine-gunned.
+ *
+ * Merging by pitch the way the accompaniment does would be wrong here. That
+ * same melody genuinely repeats a pitch 132 times — a worship song declaims
+ * syllables on a repeated note — and joining those would rewrite it. So the
+ * test is not the pitch but the provenance: two slices may become one sound
+ * only when they were cut from ONE source note. A re-articulation the composer
+ * wrote is a different note, and survives however the slice grid falls.
+ */
+function rejoinSlicedMelody(events: NoteEvent[], slices: Slice[]): NoteEvent[] {
+  return mergeRuns(events, (prev, evAny, i) => {
+    if (!joinable(prev, evAny)) return false;
+    const here = slices[i]?.melodySourceId ?? null;
+    const before = slices[i - 1]?.melodySourceId ?? null;
+    if (here === null || here !== before) return false;
+    // One source note can only sound as one pitch, so this holds wherever the
+    // melody voice is locked to the melody — measured, and it never once
+    // differed. It is stated anyway: merging keeps the FIRST event's pitch, so
+    // if a caller ever hands this voice a free line, provenance alone would
+    // silently discard the second note instead of tying it.
+    return pitchToMidi(evAny.pitch) === pitchToMidi(prev.pitch);
+  });
 }
 
 function groupEventsByMeasure(events: NoteEvent[], template: any[]): any[] {
@@ -461,7 +518,12 @@ export function arrangeStringEnsemble(
   );
   const voiceEvents = (voice: VoiceId): NoteEvent[] => {
     const raw = makeEventsFromVoicing(slices, bestVoicings, voice);
-    return sustained.has(voice) ? sustainRepeatedPitches(raw) : raw;
+    if (sustained.has(voice)) return sustainRepeatedPitches(raw);
+    // Violin I carries the tune in the textures that sustain at all, and is not
+    // in the sustained set because its repeats must not be merged by pitch.
+    // It still deserves not to re-strike a note the slicer merely cut in two.
+    if (voice === "vln1" && options.sustainAccompaniment) return rejoinSlicedMelody(raw, slices);
+    return raw;
   };
 
   const vln1 = voiceEvents("vln1");

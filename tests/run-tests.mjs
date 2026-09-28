@@ -60,6 +60,7 @@ async function main() {
       'tests/arrange/stringSustain.test.ts',
       'tests/arrange/stringRegister.test.ts',
       'tests/arrange/melodySelection.test.ts',
+      'tests/arrange/melodySustain.test.ts',
       'tests/arrange/innerVoiceMotion.test.ts',
       'tests/arrange/bowing.test.ts',
       'tests/arrange/altoUnderMelody.test.ts',
