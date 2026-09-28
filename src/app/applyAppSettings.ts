@@ -165,6 +165,7 @@ function describeArc(
 }
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
+import { restThinBars, restArcSentence } from "../arrange/strings/restArc";
 import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
 import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrangeSatbToWoodwindQuartet";
@@ -2831,6 +2832,17 @@ export function applyAppSettings(
                   suzukiVolume: typeof settings.suzukiVolume === "number" ? settings.suzukiVolume : undefined,
                 });
               }
+              if (!usePolyphonic) {
+                // Nobody rested: all five parts played all 62 bars. The source
+                // has no air to inherit — this piano never stops in either hand
+                // — so the thinness of its writing is what decides who sits out.
+                const rested = restThinBars(
+                  (stringScore as any).parts ?? [],
+                  (scoreModel as any)?.parts?.[0]
+                );
+                const sentence = restArcSentence(rested);
+                if (sentence) warnings.push(sentence);
+              }
               return stringScore;
             })()
           : arrangeStringEnsembleFromSatb(scoreModel, { level: settings.level, warnings })
@@ -3027,6 +3039,17 @@ export function applyAppSettings(
                   events: (melodyEvents[m.number] ?? m.events ?? []).sort((a, b) => Number(a.t) - Number(b.t))
                 }));
               }
+            }
+            if (!usePolyphonic) {
+              // Nobody rested: all five parts played all 62 bars. The source has
+              // no air to inherit — this piano never stops in either hand — so
+              // the thinness of its writing is what decides who sits out.
+              const rested = restThinBars(
+                (stringScore as any).parts ?? [],
+                (scoreModel as any)?.parts?.[0]
+              );
+              const sentence = restArcSentence(rested);
+              if (sentence) warnings.push(sentence);
             }
             return stringScore;
           })()
