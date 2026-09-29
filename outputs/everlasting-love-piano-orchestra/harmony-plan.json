@@ -1,0 +1,3182 @@
+[
+  {
+    "bar": 1,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 2,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 3,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 4,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 4,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 5,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 5,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 6,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 6,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 7,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 7,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 8,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 8,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 9,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 9,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 10,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 10,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 11,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 12,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 13,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 14,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 14,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 15,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 15,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 16,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 16,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 17,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 17,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 17,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 18,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 18,
+    "on": 16,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 19,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 19,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 19,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 20,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 20,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 20,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 21,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 21,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 22,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 22,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 23,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 23,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 24,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 24,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 25,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 25,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 26,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 26,
+    "on": 16,
+    "root": 5,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 27,
+    "on": 0,
+    "root": 5,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 27,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 28,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 28,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 28,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 29,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 29,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 30,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 30,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 31,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 31,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 32,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 32,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 33,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 33,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 34,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 34,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 34,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 35,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 35,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 36,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 36,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 37,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 37,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 37,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 38,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 38,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 39,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 70
+    }
+  },
+  {
+    "bar": 39,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 39,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 40,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 40,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 41,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 41,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 42,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 42,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 43,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 43,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 44,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 44,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 45,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 45,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 46,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 46,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 47,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 47,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 48,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 48,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 49,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 49,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 50,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 50,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 46,
+      "VA": 58,
+      "V2": 65,
+      "V1": 70
+    }
+  },
+  {
+    "bar": 51,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 51,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 51,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 52,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 52,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 52,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 46,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 53,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 53,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 0,
+    "root": 7,
+    "bass": 7,
+    "kind": "minor-seventh",
+    "pcs": [
+      2,
+      5,
+      7,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 46,
+      "VA": 55,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 8,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 45,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 54,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 24,
+    "root": 10,
+    "bass": 2,
+    "kind": "major",
+    "pcs": [
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 46,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 55,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 56,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 57,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 57,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 58,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 58,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 59,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 59,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 60,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 60,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 61,
+    "on": 0,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor",
+    "pcs": [
+      0,
+      4,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 61,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 62,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 62,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 64,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 64,
+    "on": 8,
+    "root": 5,
+    "bass": 5,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 64,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 65,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 65,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 66,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 66,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 67,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 57,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 67,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 58,
+      "V2": 65,
+      "V1": 74
+    }
+  },
+  {
+    "bar": 68,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 68,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 69,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major-seventh",
+    "pcs": [
+      0,
+      4,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 64,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 69,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-seventh",
+    "pcs": [
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 46,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 70,
+    "on": 0,
+    "root": 5,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      7,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 65,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 70,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 71,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 71,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 70
+    }
+  },
+  {
+    "bar": 71,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 60,
+      "V1": 67
+    }
+  },
+  {
+    "bar": 71,
+    "on": 24,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 64,
+      "V1": 67
+    }
+  },
+  {
+    "bar": 72,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 73,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 73,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 70
+    }
+  },
+  {
+    "bar": 73,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 60,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 74,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 60,
+      "V1": 72
+    }
+  },
+  {
+    "bar": 75,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 75,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 70
+    }
+  },
+  {
+    "bar": 76,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 60,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 76,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 60,
+      "V1": 67
+    }
+  },
+  {
+    "bar": 77,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 77,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 62,
+      "V1": 70
+    }
+  },
+  {
+    "bar": 78,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 60,
+      "V1": 69
+    }
+  },
+  {
+    "bar": 78,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 24,
+    "voicing": {
+      "VC": 48,
+      "VA": 55,
+      "V2": 60,
+      "V1": 67
+    }
+  },
+  {
+    "bar": 79,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "voicing": {
+      "VC": 48,
+      "VA": 53,
+      "V2": 60,
+      "V1": 69
+    }
+  }
+]

@@ -1,0 +1,286 @@
+{
+  "whole_piece": {
+    "strings": {
+      "notes": 843,
+      "part_beats": 1345.0,
+      "mean_part_activity_percent": 89.97
+    },
+    "woodwinds": {
+      "notes": 178,
+      "part_beats": 152.0,
+      "mean_part_activity_percent": 10.17
+    },
+    "brass": {
+      "notes": 32,
+      "part_beats": 32.0,
+      "mean_part_activity_percent": 1.34
+    },
+    "percussion": {
+      "notes": 5,
+      "part_beats": 2.5,
+      "mean_part_activity_percent": 0.84
+    }
+  },
+  "sections": [
+    {
+      "first_bar": 1,
+      "last_bar": 3,
+      "families": {
+        "strings": {
+          "notes": 14,
+          "part_beats": 52.0,
+          "mean_part_activity_percent": 86.67
+        },
+        "woodwinds": {
+          "notes": 2,
+          "part_beats": 2.0,
+          "mean_part_activity_percent": 3.33
+        },
+        "brass": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 4,
+      "last_bar": 13,
+      "families": {
+        "strings": {
+          "notes": 77,
+          "part_beats": 168.0,
+          "mean_part_activity_percent": 88.42
+        },
+        "woodwinds": {
+          "notes": 18,
+          "part_beats": 16.0,
+          "mean_part_activity_percent": 8.42
+        },
+        "brass": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 14,
+      "last_bar": 21,
+      "families": {
+        "strings": {
+          "notes": 85,
+          "part_beats": 143.0,
+          "mean_part_activity_percent": 89.38
+        },
+        "woodwinds": {
+          "notes": 18,
+          "part_beats": 15.0,
+          "mean_part_activity_percent": 9.38
+        },
+        "brass": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 22,
+      "last_bar": 30,
+      "families": {
+        "strings": {
+          "notes": 116,
+          "part_beats": 155.0,
+          "mean_part_activity_percent": 91.18
+        },
+        "woodwinds": {
+          "notes": 26,
+          "part_beats": 22.0,
+          "mean_part_activity_percent": 12.94
+        },
+        "brass": {
+          "notes": 6,
+          "part_beats": 6.0,
+          "mean_part_activity_percent": 2.21
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 31,
+      "last_bar": 39,
+      "families": {
+        "strings": {
+          "notes": 93,
+          "part_beats": 160.0,
+          "mean_part_activity_percent": 88.89
+        },
+        "woodwinds": {
+          "notes": 18,
+          "part_beats": 16.0,
+          "mean_part_activity_percent": 8.89
+        },
+        "brass": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 40,
+      "last_bar": 45,
+      "families": {
+        "strings": {
+          "notes": 70,
+          "part_beats": 84.0,
+          "mean_part_activity_percent": 93.33
+        },
+        "woodwinds": {
+          "notes": 16,
+          "part_beats": 12.0,
+          "mean_part_activity_percent": 13.33
+        },
+        "brass": {
+          "notes": 6,
+          "part_beats": 6.0,
+          "mean_part_activity_percent": 4.17
+        },
+        "percussion": {
+          "notes": 2,
+          "part_beats": 1.0,
+          "mean_part_activity_percent": 5.56
+        }
+      }
+    },
+    {
+      "first_bar": 46,
+      "last_bar": 56,
+      "families": {
+        "strings": {
+          "notes": 110,
+          "part_beats": 188.0,
+          "mean_part_activity_percent": 89.52
+        },
+        "woodwinds": {
+          "notes": 28,
+          "part_beats": 20.0,
+          "mean_part_activity_percent": 9.52
+        },
+        "brass": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 57,
+      "last_bar": 64,
+      "families": {
+        "strings": {
+          "notes": 110,
+          "part_beats": 146.0,
+          "mean_part_activity_percent": 91.25
+        },
+        "woodwinds": {
+          "notes": 22,
+          "part_beats": 20.0,
+          "mean_part_activity_percent": 12.5
+        },
+        "brass": {
+          "notes": 4,
+          "part_beats": 4.0,
+          "mean_part_activity_percent": 1.56
+        },
+        "percussion": {
+          "notes": 0,
+          "part_beats": 0.0,
+          "mean_part_activity_percent": 0.0
+        }
+      }
+    },
+    {
+      "first_bar": 65,
+      "last_bar": 74,
+      "families": {
+        "strings": {
+          "notes": 127,
+          "part_beats": 173.0,
+          "mean_part_activity_percent": 91.05
+        },
+        "woodwinds": {
+          "notes": 20,
+          "part_beats": 20.0,
+          "mean_part_activity_percent": 10.53
+        },
+        "brass": {
+          "notes": 8,
+          "part_beats": 8.0,
+          "mean_part_activity_percent": 2.63
+        },
+        "percussion": {
+          "notes": 2,
+          "part_beats": 1.0,
+          "mean_part_activity_percent": 2.63
+        }
+      }
+    },
+    {
+      "first_bar": 75,
+      "last_bar": 79,
+      "families": {
+        "strings": {
+          "notes": 41,
+          "part_beats": 76.0,
+          "mean_part_activity_percent": 89.41
+        },
+        "woodwinds": {
+          "notes": 10,
+          "part_beats": 9.0,
+          "mean_part_activity_percent": 10.59
+        },
+        "brass": {
+          "notes": 8,
+          "part_beats": 8.0,
+          "mean_part_activity_percent": 5.88
+        },
+        "percussion": {
+          "notes": 1,
+          "part_beats": 0.5,
+          "mean_part_activity_percent": 2.94
+        }
+      }
+    }
+  ]
+}
