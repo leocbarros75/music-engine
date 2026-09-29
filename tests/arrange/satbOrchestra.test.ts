@@ -63,7 +63,8 @@ test('a real SATB score fills the orchestra', () => {
 test('the string cushion is never left silent on a valid source', () => {
   const out: any = arrangeWorshipOrchestraFromSatb(
     parseMusicXMLToScoreModel(SATB_SCORE), { warnings: [] }).scoreModel;
-  for (const id of ['P_VLN1', 'P_VLN2', 'P_VLA', 'P_CELBS']) {
+  // P_CELBS is now split into its two players, so the cushion is five staves.
+  for (const id of ['P_VLN1', 'P_VLN2', 'P_VLA', 'P_VC', 'P_CB']) {
     const p = out.parts.find((x: any) => x.part_id === id);
     assert(p, `${id} is missing`);
     assert(p.measures.some((m: any) => (m.events ?? []).some((e: any) => e.type === 'note')),

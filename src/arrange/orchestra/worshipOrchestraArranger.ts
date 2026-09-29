@@ -82,11 +82,11 @@ const WORSHIP_PARTS: PartDef[] = [
   // ── Brass ──
   { partId: "P_TPT1", name: "Trumpet 1", instrument: "trumpet_bb_1",
     voices: [{ src: "vln1", reg: "tpt1", voice: 1 }] },
-  { partId: "P_TPT23", name: "Trumpet 2-3 (Alto Sax)", instrument: "trumpet_bb_2",
+  { partId: "P_TPT23", name: "Trumpet 2-3", instrument: "trumpet_bb_2",
     voices: [{ src: "vln2", reg: "tpt2", voice: 1 }, { src: "vla", reg: "tpt3", voice: 2 }] },
-  { partId: "P_TBN12", name: "Trombone 1-2 (Tenor Sax)", instrument: "trombone",
+  { partId: "P_TBN12", name: "Trombone 1-2", instrument: "trombone",
     voices: [{ src: "vc", reg: "tbn1", voice: 1 }, { src: "vla", reg: "tbn2", voice: 2 }] },
-  { partId: "P_LOWBR", name: "Trombone 3/Tuba (Bari Sax)", instrument: "tuba_c",
+  { partId: "P_LOWBR", name: "Trombone 3/Tuba", instrument: "tuba_c",
     voices: [{ src: "cb", reg: "lowbr", voice: 1 }] },
 
   // ── Strings (the cushion) — percussion is spliced in before these ──
@@ -142,9 +142,9 @@ export const WORSHIP_ROSTER: Array<{ id: string; name: string; section: "Woodwin
   { id: "P_BSN", name: "Bassoon", section: "Woodwinds" },
   { id: "P_HN12", name: "Horn 1-2", section: "Brass" },
   { id: "P_TPT1", name: "Trumpet 1", section: "Brass" },
-  { id: "P_TPT23", name: "Trumpet 2-3 (Alto Sax)", section: "Brass" },
-  { id: "P_TBN12", name: "Trombone 1-2 (Tenor Sax)", section: "Brass" },
-  { id: "P_LOWBR", name: "Trombone 3/Tuba (Bari Sax)", section: "Brass" },
+  { id: "P_TPT23", name: "Trumpet 2-3", section: "Brass" },
+  { id: "P_TBN12", name: "Trombone 1-2", section: "Brass" },
+  { id: "P_LOWBR", name: "Trombone 3/Tuba", section: "Brass" },
   { id: "P_TIMP", name: "Timpani", section: "Percussion" },
   { id: "P_PERC", name: "Percussion (Crash/Triangle)", section: "Percussion" },
   { id: "P_VLN1", name: "Violin 1", section: "Strings" },
@@ -231,6 +231,17 @@ export function orchestrateStringCore(
       warnings.push(`[orchestra] Custom ensemble: ${kept} of ${before} parts selected.`);
     }
   }
+  // Last, so everything above still works on the chart's own part ids — the
+  // user's part selection, the manual ranges and the intensity gating all name
+  // the combined staves. Only the score that comes out is one player per staff.
+  const splitCount = splitSectionParts(orch);
+  if (splitCount) {
+    warnings.push(
+      `[orchestra] ${splitCount} shared staves split so every player has their own: ` +
+      `Horn 1 and 2, Trumpet 2 and 3, Trombone 1 and 2, Trombone 3 and Tuba, Flute and Oboe, Cello and Double Bass. ` +
+      `Each can now be given written breaths rather than an instruction to stagger them.`
+    );
+  }
   return orch;
 }
 
@@ -253,16 +264,30 @@ function remapAndRebuildFallback(stringScore: ScoreModel, intensity: IntensityMo
 // low brass lowest-start→highest-end, flute descant ~50%.
 const SECTION_THRESHOLD: Record<string, number> = {
   P_VLN1: 0.10, P_VLN2: 0.12, P_VLA: 0.14, P_CELBS: 0.12, // strings — near-constant
-  P_HN12: 0.30,                                            // horn — present inner glue
+  P_HN12: 0.50,                                            // horn — present inner glue
   // Clarinet/Bassoon pulled back (was 0.40/0.34) to hit the pro family balance —
   // 3 doubling wind parts were over-weighting winds (21% vs 16% target). Reserving
   // them drops winds toward 16% and lifts strings' relative share toward 36%.
   P_BSN: 0.52,                                             // bassoon — woodwind bass, reserved for fuller sections
   P_CL: 0.55,                                              // clarinet — warm woodwind, comes in for lifts
-  P_TPT1: 0.42, P_TBN12: 0.50,                             // lead trumpet / trombones — build to lifts
-  P_TPT23: 0.50, P_FLOB: 0.50,                             // 2-3 trumpets + flute descant — for lifts
-  P_LOWBR: 0.62,                                           // low brass — biggest moments only
+  P_TPT1: 0.62, P_TBN12: 0.70,                             // lead trumpet / trombones — build to lifts
+  P_TPT23: 0.70, P_FLOB: 0.50,                             // 2-3 trumpets + flute descant — for lifts
+  P_LOWBR: 0.82,                                           // low brass — biggest moments only
 };
+// Brass raised by 0.20 across the board (horn 0.30->0.50, lead trumpet
+// 0.42->0.62, trombones and 2-3 trumpets 0.50->0.70, low brass 0.62->0.82).
+// +0.12 was enough to pass the ordering but left only 2.8 points between brass
+// and winds, which is too thin to hold across other sources.
+//
+// The note above targets a chart balance of Brass 48 / Strings 36 / Winds 16 by
+// share of note count, which put the brass ABOVE the woodwinds: 53.0% of the
+// piece against 47.6%, measured per part. Both Codex editions of the same song
+// keep brass under the winds and the winds under the strings — 76.96 / 35.89 /
+// 25.16 in their transcription — and that is the order a texture wants when
+// anything else is carrying the tune. Leo chose that order for this engine too.
+//
+// Note-count share was the wrong measure to calibrate against in the first
+// place: it stays correct however loud the whole room gets. See familyBalance.ts.
 
 // ── User-controllable family balance ─────────────────────────────────────────
 // The engine default targets the pro balance (Brass 48 / Strings 36 / Winds 16).
@@ -660,6 +685,163 @@ export function tuningLabel(tonic: number, dominant: number): string {
   const NAMES = ["C", "C#", "D", "E-flat", "E", "F", "F#", "G", "A-flat", "A", "B-flat", "B"];
   const name = (m: number) => `${NAMES[((m % 12) + 12) % 12]}${Math.floor(m / 12) - 1}`;
   return `${name(tonic)}, ${name(dominant)}`;
+}
+
+/**
+ * Give every player their own staff.
+ *
+ * The chart layout puts two players on one line — "Horn 1-2", "Trumpet 2-3",
+ * "Cello-Bass" — which is how worship charts are engraved and is fine there.
+ * In an orchestral score it costs two things. A player reading a two-note staff
+ * has to work out which note is theirs, and, more concretely, a shared staff
+ * cannot be given written breaths: the breathing pass sees a section, marks
+ * "stagger breathing" and leaves the line unbroken, so our winds and brass ran
+ * 74 beats without a written break where the reference edition never exceeds
+ * 3.875.
+ *
+ * Two shapes to split, and they are not the same:
+ *
+ *  - CHORDAL staves really do carry two parts at once — Horn 1-2 has two notes
+ *    on 423 onsets. The upper note is the first player, the lower the second.
+ *    Where only one note is written, both players have it.
+ *  - UNISON staves carry a single shared line: Flute/Oboe and Trombone 3/Tuba
+ *    have exactly one note per onset. Both players take that line, each moved
+ *    by octaves into their own instrument's range — which matters, because the
+ *    flute line reaches A6 and an oboe cannot play it.
+ */
+type SplitTake = "upper" | "lower" | "copy";
+type SplitTarget = { id: string; name: string; instrument: string; take: SplitTake };
+
+const SECTION_SPLITS: Record<string, SplitTarget[]> = {
+  P_FLOB: [
+    { id: "P_FL", name: "Flute", instrument: "flute", take: "copy" },
+    { id: "P_OB", name: "Oboe", instrument: "oboe", take: "copy" },
+  ],
+  P_HN12: [
+    { id: "P_HN1", name: "Horn 1", instrument: "horn_f", take: "upper" },
+    { id: "P_HN2", name: "Horn 2", instrument: "horn_f", take: "lower" },
+  ],
+  P_TPT23: [
+    { id: "P_TPT2", name: "Trumpet 2", instrument: "trumpet_bb_2", take: "upper" },
+    { id: "P_TPT3", name: "Trumpet 3", instrument: "trumpet_bb_2", take: "lower" },
+  ],
+  P_TBN12: [
+    { id: "P_TBN1", name: "Trombone 1", instrument: "trombone", take: "upper" },
+    { id: "P_TBN2", name: "Trombone 2", instrument: "trombone", take: "lower" },
+  ],
+  P_LOWBR: [
+    { id: "P_TBN3", name: "Trombone 3", instrument: "trombone", take: "copy" },
+    { id: "P_TU", name: "Tuba", instrument: "tuba_c", take: "copy" },
+  ],
+  P_CELBS: [
+    { id: "P_VC", name: "Cello", instrument: "cello", take: "upper" },
+    { id: "P_CB", name: "Double Bass", instrument: "double_bass", take: "lower" },
+  ],
+};
+
+/** Move a pitch by whole octaves until the instrument can play it at all. */
+function intoRange(midi: number, instrument: string): number {
+  const spec = getInstrumentSpec(instrument);
+  if (!spec) return midi;
+  let m = midi;
+  while (m < spec.midi_low) m += 12;
+  while (m > spec.midi_high) m -= 12;
+  return m;
+}
+
+/**
+ * Where a copied line should sit for the second player.
+ *
+ * Both players on a unison staff take the same line, but not necessarily in the
+ * same octave: the Flute/Oboe line reaches A6, which is the very top of what an
+ * oboe can play and a fourth above where it is comfortable. Clamping note by
+ * note would drop only the high ones and tear octave holes in the middle of a
+ * phrase, so the shift is chosen once for the whole line — the octave that
+ * leaves the least of it outside the register the instrument is happy in.
+ */
+function placeLineForInstrument(midis: number[], instrument: string): number {
+  const spec = getInstrumentSpec(instrument);
+  if (!spec || !midis.length) return 0;
+  const lo = spec.preferred_low ?? spec.midi_low;
+  const hi = spec.preferred_high ?? spec.midi_high;
+  const strain = (shift: number): number => {
+    let total = 0;
+    for (const m of midis) {
+      const p = m + shift;
+      if (p < spec.midi_low || p > spec.midi_high) return Infinity;
+      total += p < lo ? lo - p : p > hi ? p - hi : 0;
+    }
+    return total;
+  };
+  let best = 0;
+  let bestStrain = strain(0);
+  for (const shift of [-24, -12, 12, 24]) {
+    const v = strain(shift);
+    if (v < bestStrain) { bestStrain = v; best = shift; }
+  }
+  return best;
+}
+
+export function splitSectionParts(orch: ScoreModel): number {
+  const parts: any[] = (orch as any).parts ?? [];
+  const out: any[] = [];
+  let split = 0;
+
+  for (const part of parts) {
+    const targets = SECTION_SPLITS[String(part?.part_id)];
+    if (!targets) { out.push(part); continue; }
+    split++;
+
+    for (const target of targets) {
+      // A copied line is placed once, as a line. A split chord is already in
+      // the register the voicing put it in.
+      let lineShift = 0;
+      if (target.take === "copy") {
+        const all: number[] = [];
+        for (const m of part.measures ?? []) {
+          for (const e of m?.events ?? []) {
+            if (e?.type !== "note" || e.grace) continue;
+            const v = eventMidi(e);
+            if (v !== null) all.push(v);
+          }
+        }
+        lineShift = placeLineForInstrument(all, target.instrument);
+      }
+      const measures = (part.measures ?? []).map((m: any) => {
+        const events: any[] = m?.events ?? [];
+        const notes = events.filter((e) => e?.type === "note" && !e.grace);
+        const others = events.filter((e) => !(e?.type === "note" && !e.grace));
+        if (!notes.length) return JSON.parse(JSON.stringify(m));
+
+        // Group by onset so "upper" and "lower" mean the same instant.
+        const byT = new Map<number, any[]>();
+        for (const e of notes) {
+          const t = Number(e.t);
+          if (!byT.has(t)) byT.set(t, []);
+          byT.get(t)!.push(e);
+        }
+        const kept: any[] = [];
+        for (const [, group] of byT) {
+          group.sort((a, b) => (eventMidi(b) ?? 0) - (eventMidi(a) ?? 0)); // high to low
+          let chosen: any;
+          if (target.take === "copy" || group.length === 1) chosen = group[0];
+          else chosen = target.take === "upper" ? group[0] : group[group.length - 1];
+          const midi = eventMidi(chosen);
+          const placed = midi === null ? null : intoRange(midi + lineShift, target.instrument);
+          kept.push({
+            ...JSON.parse(JSON.stringify(chosen)),
+            id: `${target.id}-${chosen.id}`,
+            ...(placed !== null && placed !== midi ? { pitch: midiToPitch(placed) } : {}),
+          });
+        }
+        kept.sort((a, b) => Number(a.t) - Number(b.t));
+        return { ...JSON.parse(JSON.stringify(m)), events: [...others, ...kept].sort((a, b) => Number(a.t) - Number(b.t)) };
+      });
+      out.push({ part_id: target.id, name: target.name, instrument: target.instrument, staves: 1, measures });
+    }
+  }
+  (orch as any).parts = out;
+  return split;
 }
 
 /**

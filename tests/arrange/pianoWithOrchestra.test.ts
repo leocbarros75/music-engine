@@ -74,12 +74,26 @@ test('strings, then winds, then brass', { skip: !have }, () => {
   assert.equal(b.hierarchyHolds, true, `out of order: ${b.violations.join('; ')}`);
 });
 
-test('the transcription route is left exactly as it was', { skip: !have }, () => {
-  // The new mode must not quietly re-balance the existing one: that orchestra
-  // is written brass-forward on purpose.
+test('the transcription route keeps the order too, and keeps no piano', { skip: !have }, () => {
+  // This asserted the opposite until Leo decided it: the orchestra was written
+  // to a chart balance in which brass leads, and its hierarchy was inverted by
+  // design. Both Codex editions of this song put brass under the winds, and
+  // that is now the order here as well — so the transcription route passes the
+  // same check the piano mode does. What still separates them is how far the
+  // winds and brass hold back, not whether the order is right.
   const b = buildFamilyBalance(arrange('piano_orchestra'));
-  assert.equal(b.hierarchyHolds, false,
-    'piano_orchestra changed — its brass-forward balance is deliberate');
+  assert.equal(b.hierarchyHolds, true, `out of order: ${b.violations.join('; ')}`);
   const piano = arrange('piano_orchestra').parts.find((p: any) => /piano|keyboard/i.test(String(p.name)));
   assert(!piano, 'piano_orchestra is a transcription and must not emit a piano part');
+});
+
+test('the piano mode still holds back further than the transcription', { skip: !have }, () => {
+  // Both orders are right now, so this is what keeps the two modes distinct.
+  const withPiano = buildFamilyBalance(arrange('piano_with_orchestra'));
+  const transcription = buildFamilyBalance(arrange('piano_orchestra'));
+  const brass = (b: any) => b.families.find((f: any) => f.family === 'brass')?.averageActivity ?? 0;
+  assert(
+    brass(withPiano) < brass(transcription) / 2,
+    `brass ${brass(withPiano)} vs ${brass(transcription)} — the piano mode is not holding back`
+  );
 });
