@@ -1,0 +1,116 @@
+{
+  "FL1": {
+    "events": 296,
+    "low_sounding_midi": 64,
+    "high_sounding_midi": 84,
+    "max_continuous_beats_except_final": 3.875
+  },
+  "FL2": {
+    "events": 38,
+    "low_sounding_midi": 64,
+    "high_sounding_midi": 84,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "OB": {
+    "events": 77,
+    "low_sounding_midi": 60,
+    "high_sounding_midi": 74,
+    "max_continuous_beats_except_final": 3.875
+  },
+  "CL": {
+    "events": 166,
+    "low_sounding_midi": 53,
+    "high_sounding_midi": 77,
+    "max_continuous_beats_except_final": 3.75
+  },
+  "BN": {
+    "events": 286,
+    "low_sounding_midi": 34,
+    "high_sounding_midi": 60,
+    "max_continuous_beats_except_final": 3.875
+  },
+  "H1": {
+    "events": 154,
+    "low_sounding_midi": 48,
+    "high_sounding_midi": 65,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "H2": {
+    "events": 38,
+    "low_sounding_midi": 43,
+    "high_sounding_midi": 60,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "T1": {
+    "events": 218,
+    "low_sounding_midi": 55,
+    "high_sounding_midi": 79,
+    "max_continuous_beats_except_final": 3.75
+  },
+  "T2": {
+    "events": 109,
+    "low_sounding_midi": 55,
+    "high_sounding_midi": 72,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "TB1": {
+    "events": 38,
+    "low_sounding_midi": 43,
+    "high_sounding_midi": 60,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "TB3": {
+    "events": 109,
+    "low_sounding_midi": 40,
+    "high_sounding_midi": 60,
+    "max_continuous_beats_except_final": 3.5
+  },
+  "BT": {
+    "events": 49,
+    "low_sounding_midi": 34,
+    "high_sounding_midi": 57,
+    "max_continuous_beats_except_final": 1.5
+  },
+  "TU": {
+    "events": 174,
+    "low_sounding_midi": 29,
+    "high_sounding_midi": 45,
+    "max_continuous_beats_except_final": 3.75
+  },
+  "TI": {
+    "events": 12,
+    "low_sounding_midi": 41,
+    "high_sounding_midi": 48,
+    "max_continuous_beats_except_final": 1.5
+  },
+  "V1": {
+    "events": 525,
+    "low_sounding_midi": 55,
+    "high_sounding_midi": 82,
+    "max_continuous_beats_except_final": 295.0
+  },
+  "V2": {
+    "events": 212,
+    "low_sounding_midi": 55,
+    "high_sounding_midi": 77,
+    "max_continuous_beats_except_final": 30.0
+  },
+  "VA": {
+    "events": 121,
+    "low_sounding_midi": 48,
+    "high_sounding_midi": 72,
+    "max_continuous_beats_except_final": 5.5
+  },
+  "VC": {
+    "events": 381,
+    "low_sounding_midi": 36,
+    "high_sounding_midi": 60,
+    "max_continuous_beats_except_final": 291.0
+  },
+  "CB": {
+    "events": 381,
+    "low_sounding_midi": 29,
+    "high_sounding_midi": 48,
+    "max_continuous_beats_except_final": 291.0
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "measures": 79,
+  "source_pitched_segments": 1345,
+  "retained_source_segments": 1168,
+  "unselected_source_segments": 177,
+  "wind_events_before_notational_splitting": 3384,
+  "octave_shifted_wind_events": 1131,
+  "written_breath_rests": 298,
+  "breath_marks": 298,
+  "new_pitch_classes": 0,
+  "trumpets_written_major_second_above_sounding": true,
+  "horns_written_perfect_fifth_above_sounding": true,
+  "source_sha256": "cdad3b123fca952a06fb52b74ba49e2f971c9dc0733f463f51999ec87f2b0b39"
+}

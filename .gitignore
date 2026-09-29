@@ -54,6 +54,11 @@ outputs/living-hope-wind-quartet/living-hope-wind-quartet/
 outputs/living-hope-piano-and-winds/living-hope-piano-and-winds/
 outputs/living-hope-brass-ensemble/living-hope-brass-ensemble/
 outputs/living-hope-piano-and-brass/living-hope-piano-and-brass/
+# This one shipped TWO nested copies rather than one. Both verified byte-for-byte
+# against the canonical files beside them, and the tracked original-piano.musicxml
+# hashes to the source_sha256 the edition's own validation.json records.
+outputs/everlasting-love-orchestra/everlasting-love-orchestra/
+outputs/everlasting-love-orchestra/everlasting-love-orchestra 2/
 # An .mxl is a zip under another extension, and its score.xml is the same music
 # as the .musicxml extracted beside it — 2,081 notes either way. The PDFs are
 # what engrave-jobs.json regenerates from that MusicXML, so they are the
