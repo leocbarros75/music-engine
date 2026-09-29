@@ -5,6 +5,7 @@ import { buildNoteMap, type NoteMap } from "../preservation/noteMap";
 import { buildOmissions, omissionsSentence, type OmissionsRecord } from "../preservation/omissions";
 import { carrySourceMarks } from "../preservation/sourceMarks";
 import { buildPlayabilityAudit, playabilitySentence, type PlayabilityAudit } from "../preservation/playability";
+import { buildFamilyBalance, familyBalanceSentence } from "../preservation/familyBalance";
 import { prepareSourceLock, lockSourceInModel, preserveAndVerifyXml, verifySourceOutput, type PreservationReport } from "../preservation/sourcePreservation";
 import { toSoundingScore, transposeChordSymbol } from "../score/pitch";
 // src/pipeline/pipelineMusicxmlToArrangedMusicxml.ts
@@ -268,6 +269,21 @@ export function pipelineMusicxmlToArrangedMusicxml(
       if (playability.totalOutOfRange > 0) warnings.push(`[playability] ${line}`);
     } catch {
       // A report on the work must never take the work down with it.
+    }
+
+    // How much does each family actually play? Share of note count could not
+    // see the fault it existed to catch — 49/32/18 against a target of 48/36/16
+    // while nobody ever rested, because everyone over-played in proportion.
+    // Average activity per part moves when that is true, and it puts eight
+    // brass parts on the same footing as five wind ones.
+    try {
+      const balance = buildFamilyBalance(scoreModelOut);
+      if (balance.hierarchyHolds === false) {
+        const line = familyBalanceSentence(balance);
+        if (line) warnings.push(line);
+      }
+    } catch {
+      // Same rule: the audit never takes the arrangement down with it.
     }
 
     const protectedTargetId = protection.lock ? lockSourceInModel(protection.lock, scoreModelOut, settings) : undefined;

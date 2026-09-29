@@ -46,6 +46,7 @@ async function main() {
       'tests/preservation/noteMap.test.ts',
       'tests/preservation/omissions.test.ts',
       'tests/preservation/playability.test.ts',
+      'tests/preservation/familyBalance.test.ts',
       'tests/preservation/serverPreservation.test.ts',
       'tests/performance/performance.test.ts',
       'tests/runner/runner.test.ts'
