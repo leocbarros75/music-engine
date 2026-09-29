@@ -207,6 +207,9 @@ export function orchestrateStringCore(
   // Climaxes: the flute descant lifts an octave (its brilliant register) so the
   // final choruses gain a true top instead of sitting in the narrow melody octave.
   liftFluteAtClimaxes(orch, phraseInt, phraseLen);
+  // Three sections were playing one rhythm: let the inner strings hold.
+  const held = holdInnerStrings(orch);
+  if (held) warnings.push(`[orchestra] Inner strings hold rather than re-bow the piano's repeated chords: ${held} re-articulations tied into held notes.`);
   // Percussion (Timpani + Crash/Triangle) — driven by the same intensity curve.
   addPercussion(orch, phraseInt, phraseLen, pianoLeads);
 
@@ -657,6 +660,101 @@ export function tuningLabel(tonic: number, dominant: number): string {
   const NAMES = ["C", "C#", "D", "E-flat", "E", "F", "F#", "G", "A-flat", "A", "B-flat", "B"];
   const name = (m: number) => `${NAMES[((m % 12) + 12) % 12]}${Math.floor(m / 12) - 1}`;
   return `${name(tonic)}, ${name(dominant)}`;
+}
+
+/**
+ * Let the inner strings hold a note instead of re-bowing it.
+ *
+ * The orchestra's string core copies the piano's notes straight into four
+ * parts. So every time the pianist re-strikes a chord, all four sections
+ * re-articulate with them — and the inner voices, which mostly sit still while
+ * the tune moves above, came out re-striking the same pitch on 65% of Violin
+ * 2's notes, 58% of the Viola's and 74% of the Cello-Bass's, with not one tie
+ * anywhere in the score. All three then had exactly 563 events and byte-identical
+ * onset rhythms: three sections playing one rhythm.
+ *
+ * The Codex transcription of the same source gives its inner voices a fraction
+ * of the activity of its first violin — 525 / 212 / 121 across V1, V2 and viola
+ * — because it follows the piano's INTERIOR voices, which change far less often
+ * than its top line does.
+ *
+ * Violin 1 is left out of this deliberately. It carries the tune, and a tune
+ * that repeats a pitch means it; merging those would rewrite the melody. That
+ * distinction is the same one the string route draws, and it cost a whole
+ * round of work to get right there.
+ *
+ * A held note is written as one note, tied across the standard values when no
+ * single note value spans it, and never across a barline.
+ */
+const INNER_STRING_PARTS = new Set(["P_VLN2", "P_VLA", "P_CELBS"]);
+
+export function holdInnerStrings(orch: ScoreModel): number {
+  let merged = 0;
+  for (const part of ((orch as any).parts ?? []) as any[]) {
+    if (!INNER_STRING_PARTS.has(String(part?.part_id))) continue;
+    for (const m of part.measures ?? []) {
+      const events: any[] = m?.events ?? [];
+      const notes = events.filter((e) => e?.type === "note" && !e.grace);
+      if (notes.length < 2) continue;
+      const others = events.filter((e) => !(e?.type === "note" && !e.grace));
+      notes.sort((a, b) => Number(a.t) - Number(b.t));
+
+      const out: any[] = [];
+      let run: any[] = [];
+      const flush = () => {
+        if (!run.length) return;
+        const first = run[0];
+        if (run.length === 1) { out.push(first); run = []; return; }
+        const total = run.reduce((sum, e) => sum + Number(e.dur), 0);
+        merged += run.length - 1;
+        // One sound. Split only where no single written value spans it, and
+        // tie the pieces so the bow is not retaken.
+        const pieces = splitIntoStandardValues(total);
+        let t = Number(first.t);
+        pieces.forEach((dur, i) => {
+          out.push({
+            ...JSON.parse(JSON.stringify(first)),
+            id: `${first.id}-h${i}`,
+            t, dur,
+            ...(i > 0 ? { tieStop: true } : {}),
+            ...(i < pieces.length - 1 ? { tieStart: true } : {}),
+          });
+          t += dur;
+        });
+        run = [];
+      };
+      for (const ev of notes) {
+        const prev = run[run.length - 1];
+        const same =
+          prev &&
+          eventMidi(prev) !== null &&
+          eventMidi(prev) === eventMidi(ev) &&
+          Math.abs(Number(prev.t) + Number(prev.dur) - Number(ev.t)) < 1e-9 &&
+          prev.tieStart !== true &&
+          ev.tieStop !== true;
+        if (!same) flush();
+        run.push(ev);
+      }
+      flush();
+      m.events = [...others, ...out].sort((a, b) => Number(a.t) - Number(b.t));
+    }
+  }
+  return merged;
+}
+
+/** Largest standard note values first, to be tied together. */
+function splitIntoStandardValues(total: number): number[] {
+  const VALUES = [4, 3, 2, 1.5, 1, 0.75, 0.5, 0.25];
+  const pieces: number[] = [];
+  let left = total;
+  let guard = 0;
+  while (left > 1e-9 && guard++ < 32) {
+    const piece = VALUES.find((v) => v <= left + 1e-9);
+    if (piece === undefined) break;
+    pieces.push(piece);
+    left -= piece;
+  }
+  return pieces.length ? pieces : [total];
 }
 
 function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number, pianoLeads = false): void {
