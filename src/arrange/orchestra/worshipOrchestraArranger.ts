@@ -234,7 +234,7 @@ export function orchestrateStringCore(
   // Last, so everything above still works on the chart's own part ids — the
   // user's part selection, the manual ranges and the intensity gating all name
   // the combined staves. Only the score that comes out is one player per staff.
-  const splitCount = splitSectionParts(orch);
+  const splitCount = splitSectionParts(orch, phraseInt, phraseLen);
   if (splitCount) {
     warnings.push(
       `[orchestra] ${splitCount} shared staves split so every player has their own: ` +
@@ -271,7 +271,7 @@ const SECTION_THRESHOLD: Record<string, number> = {
   P_BSN: 0.52,                                             // bassoon — woodwind bass, reserved for fuller sections
   P_CL: 0.55,                                              // clarinet — warm woodwind, comes in for lifts
   P_TPT1: 0.62, P_TBN12: 0.70,                             // lead trumpet / trombones — build to lifts
-  P_TPT23: 0.70, P_FLOB: 0.50,                             // 2-3 trumpets + flute descant — for lifts
+  P_TPT23: 0.70, P_FLOB: 0.34,                             // 2-3 trumpets + flute/oboe line — see FLUTE_OBOE_SPLIT
   P_LOWBR: 0.82,                                           // low brass — biggest moments only
 };
 // Brass raised by 0.20 across the board (horn 0.30->0.50, lead trumpet
@@ -709,13 +709,41 @@ export function tuningLabel(tonic: number, dominant: number): string {
  *    by octaves into their own instrument's range — which matters, because the
  *    flute line reaches A6 and an oboe cannot play it.
  */
+/**
+ * Where the flute takes over from the oboe.
+ *
+ * The combined line's own entrance threshold sits at this value, so everything
+ * the flute plays today it still plays. What changes is below it: the line now
+ * sounds in quieter passages too, and all of that goes to the oboe, which is
+ * the voice for it.
+ */
+const FLUTE_OBOE_SPLIT = 0.50;
+
 type SplitTake = "upper" | "lower" | "copy";
-type SplitTarget = { id: string; name: string; instrument: string; take: SplitTake };
+type SplitTarget = {
+  id: string;
+  name: string;
+  instrument: string;
+  take: SplitTake;
+  /** Only sound where the phrase is at least this intense. */
+  minIntensity?: number;
+  /** Only sound where the phrase is below this. */
+  maxIntensity?: number;
+};
 
 const SECTION_SPLITS: Record<string, SplitTarget[]> = {
+  // Flute and oboe do not double: they trade. The reference edition of this
+  // source gives its oboe eleven bars and its first flute forty-seven, and the
+  // two share NOT ONE bar — "oboe colors verse passages in measures 4-13 and
+  // 46-56; Flute 1 takes the other selected melodic passages".
+  //
+  // The same line in unison was the alternative, and it read badly for the
+  // oboe: 12% of its notes above its comfortable top, and an octave lower put
+  // 43% below the bottom. Neither octave is a good answer to a line written for
+  // a flute. Giving each its own passages is.
   P_FLOB: [
-    { id: "P_FL", name: "Flute", instrument: "flute", take: "copy" },
-    { id: "P_OB", name: "Oboe", instrument: "oboe", take: "copy" },
+    { id: "P_FL", name: "Flute", instrument: "flute", take: "copy", minIntensity: FLUTE_OBOE_SPLIT },
+    { id: "P_OB", name: "Oboe", instrument: "oboe", take: "copy", maxIntensity: FLUTE_OBOE_SPLIT },
   ],
   P_HN12: [
     { id: "P_HN1", name: "Horn 1", instrument: "horn_f", take: "upper" },
@@ -782,10 +810,16 @@ function placeLineForInstrument(midis: number[], instrument: string): number {
   return best;
 }
 
-export function splitSectionParts(orch: ScoreModel): number {
+export function splitSectionParts(
+  orch: ScoreModel,
+  phraseInt: number[] = [],
+  phraseLen = 4
+): number {
   const parts: any[] = (orch as any).parts ?? [];
   const out: any[] = [];
   let split = 0;
+  const intensityAt = (barIndex: number): number =>
+    phraseInt.length ? (phraseInt[Math.floor(barIndex / phraseLen)] ?? 1) : 1;
 
   for (const part of parts) {
     const targets = SECTION_SPLITS[String(part?.part_id)];
@@ -807,11 +841,24 @@ export function splitSectionParts(orch: ScoreModel): number {
         }
         lineShift = placeLineForInstrument(all, target.instrument);
       }
-      const measures = (part.measures ?? []).map((m: any) => {
+      const measures = (part.measures ?? []).map((m: any, barIndex: number) => {
         const events: any[] = m?.events ?? [];
         const notes = events.filter((e) => e?.type === "note" && !e.grace);
         const others = events.filter((e) => !(e?.type === "note" && !e.grace));
         if (!notes.length) return JSON.parse(JSON.stringify(m));
+
+        // This player's passage, or the other's?
+        const intensity = intensityAt(barIndex);
+        const mine =
+          (target.minIntensity === undefined || intensity >= target.minIntensity) &&
+          (target.maxIntensity === undefined || intensity < target.maxIntensity);
+        if (!mine) {
+          const len = measureLenOf(m);
+          return {
+            ...JSON.parse(JSON.stringify(m)),
+            events: [{ id: `${target.id}-r-${barIndex}`, t: 0, dur: len, type: "rest", isRest: true, voice: 1, staff: 1 }],
+          };
+        }
 
         // Group by onset so "upper" and "lower" mean the same instant.
         const byT = new Map<number, any[]>();
