@@ -169,7 +169,7 @@ export const WORSHIP_ROSTER: Array<{ id: string; name: string; section: "Woodwin
 export function orchestrateStringCore(
   stringScore: ScoreModel,
   warnings: string[] = [],
-  options: { intensity?: IntensityMode; parts?: string[]; melodyRests?: boolean[]; balance?: OrchestraBalance; partRanges?: PartRange[] } = {}
+  options: { intensity?: IntensityMode; parts?: string[]; melodyRests?: boolean[]; balance?: OrchestraBalance; partRanges?: PartRange[]; pianoLeads?: boolean } = {}
 ): ScoreModel {
   const orch = remapToWorship(stringScore);
   const intensity = options.intensity ?? "build";
@@ -181,11 +181,21 @@ export function orchestrateStringCore(
   const gaps = detectInstrumentalGaps(orch, options.melodyRests);
   // Parts the user controls manually are excluded from the automatic build.
   const manual = new Set((options.partRanges ?? []).filter((r) => r.ranges?.length).map((r) => r.part));
+  const pianoLeads = options.pianoLeads === true;
   if (intensity === "build") {
-    gateSections(orch, phraseInt, phraseLen, gaps, balance, manual);
-    warnings.push("[orchestra] Worship orchestra (build): strings cushion throughout, brass/winds enter and build to the climaxes.");
+    gateSections(orch, phraseInt, phraseLen, gaps, balance, manual, pianoLeads);
+    warnings.push(
+      pianoLeads
+        ? "[orchestra] The pianist is playing the song, so the orchestra accompanies it: strings cushion throughout, winds answer, brass is held back for the arrivals."
+        : "[orchestra] Worship orchestra (build): strings cushion throughout, brass/winds enter and build to the climaxes."
+    );
   } else {
     warnings.push("[orchestra] Worship orchestra (tutti): full ensemble throughout.");
+    if (pianoLeads) {
+      // Worth saying plainly rather than quietly overriding a setting the
+      // player chose: a tutti orchestra does not stay under a piano.
+      warnings.push("[orchestra] Tutti was requested with the piano kept, so nothing is held back — the orchestra will cover the pianist.");
+    }
   }
   // Open spacing: widen muddy low intervals + spread excessive unison piles
   // (overtone-series principle — wide at the bottom, closer at the top).
@@ -198,7 +208,7 @@ export function orchestrateStringCore(
   // final choruses gain a true top instead of sitting in the narrow melody octave.
   liftFluteAtClimaxes(orch, phraseInt, phraseLen);
   // Percussion (Timpani + Crash/Triangle) — driven by the same intensity curve.
-  addPercussion(orch, phraseInt, phraseLen);
+  addPercussion(orch, phraseInt, phraseLen, pianoLeads);
 
   // Advanced: manual per-instrument measure ranges (overrides everything above).
   applyManualRanges(orch, options.partRanges);
@@ -270,12 +280,42 @@ const BALANCE_ADJ: Record<OrchestraBalance, { wind: number; brass: number; strin
   more_winds:   { wind: -0.25, brass: +0.10, strings: +0.08 },
   more_brass:   { wind: +0.12, brass: -0.15, strings: +0.06 },
 };
-function adjustedThreshold(partId: string, balance: OrchestraBalance): number | undefined {
+/**
+ * How much further each family holds back when a piano is playing the song.
+ *
+ * This orchestra is written to a worship-chart balance in which the brass is a
+ * leading voice. That is right when the orchestra IS the arrangement. It is
+ * wrong the moment a pianist is playing the piece underneath: the brass then
+ * competes with the thing it is supposed to be accompanying.
+ *
+ * The size of the difference is not a guess. The Codex editions of the same
+ * song, one a transcription and one with the piano kept, differ like this:
+ *
+ *   transcription    strings 76.96%  winds 35.89%  brass 25.16%
+ *   piano kept       strings 89.97%  winds 10.17%  brass  1.34%
+ *
+ * The strings hold their ground and even gain; the winds fall to a third of
+ * their activity and the brass to a twentieth. So the strings are left alone
+ * here and the reservation falls on the winds and brass, which is also the
+ * order a texture needs when something else is carrying the tune.
+ */
+const PIANO_LEADS_ADJ: Record<"wind" | "brass" | "strings", number> = {
+  strings: 0.00,
+  wind: 0.34,
+  brass: 0.56,
+};
+
+function adjustedThreshold(
+  partId: string,
+  balance: OrchestraBalance,
+  pianoLeads = false
+): number | undefined {
   const base = SECTION_THRESHOLD[partId];
   if (base === undefined) return undefined;
   const fam = FAMILY_OF[partId];
   if (!fam) return base;
-  return Math.max(0, Math.min(1, base + BALANCE_ADJ[balance][fam]));
+  const reserved = pianoLeads ? PIANO_LEADS_ADJ[fam] : 0;
+  return Math.max(0, Math.min(1, base + BALANCE_ADJ[balance][fam] + reserved));
 }
 
 // ── Flute climax lift ─────────────────────────────────────────────────────────
@@ -453,12 +493,12 @@ const RITORNELLO_INTENSITY = 0.9;
  * Per-measure (not per-phrase) so the ritornello boost can lift individual
  * instrumental-gap measures to full while sung measures follow the build arc.
  */
-function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number, gaps: boolean[], balance: OrchestraBalance = "default", manual?: Set<string>): void {
+function gateSections(orch: ScoreModel, phraseIntensity: number[], phraseLen: number, gaps: boolean[], balance: OrchestraBalance = "default", manual?: Set<string>, pianoLeads = false): void {
   const parts: any[] = (orch as any).parts ?? [];
   const nMeasures = Math.max(0, ...parts.map((p) => (p.measures ?? []).length));
   for (const part of parts) {
     if (manual?.has(part.part_id)) continue; // user controls this part's measures manually
-    const thr = adjustedThreshold(part.part_id, balance);
+    const thr = adjustedThreshold(part.part_id, balance, pianoLeads);
     if (thr === undefined) continue;
     for (let mi = 0; mi < nMeasures; mi++) {
       const pi = Math.floor(mi / phraseLen);
@@ -619,7 +659,7 @@ export function tuningLabel(tonic: number, dominant: number): string {
   return `${name(tonic)}, ${name(dominant)}`;
 }
 
-function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number): void {
+function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number, pianoLeads = false): void {
   const parts: any[] = (orch as any).parts ?? [];
   const cello = parts.find((p) => p.part_id === "P_CELBS");
   if (!cello) return;
@@ -628,6 +668,11 @@ function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number)
 
   const timpMeasures: any[] = [];
   const percMeasures: any[] = [];
+  // Under a piano the drums are punctuation rather than a layer: the reference
+  // edition gives its timpanist five attacks in the whole piece.
+  const timpThr = TIMP_THRESHOLD + (pianoLeads ? 0.30 : 0);
+  const crashThr = CRASH_THRESHOLD + (pianoLeads ? 0.20 : 0);
+  const triThr = TRIANGLE_THRESHOLD + (pianoLeads ? 0.30 : 0);
   const TIMP_LO = 38, TIMP_HI = 57; // D2..A3
   const keyBar: any = parts.map((p: any) => p?.measures?.[0]?.attributes).find((a: any) => a?.key_fifths !== undefined);
   const tuning = timpaniTuning(Number(keyBar?.key_fifths ?? 0), keyBar?.key_mode, TIMP_LO, TIMP_HI);
@@ -642,7 +687,7 @@ function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number)
     // the harmony underneath is one the two drums can actually sound. Any other
     // bass note is a rest — the alternative is a third drum or a retuning.
     const timpEvents: any[] = [];
-    if (intensity >= TIMP_THRESHOLD) {
+    if (intensity >= timpThr) {
       const firstNote = (srcM?.events ?? []).find((e: any) => e?.type === "note" && e.pitch);
       const bassMidi = firstNote ? eventMidi(firstNote) : null;
       if (bassMidi !== null) {
@@ -659,10 +704,10 @@ function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number)
 
     // Percussion (unpitched): crash on climax phrase starts; triangle on lifts.
     const percEvents: any[] = [];
-    if (isPhraseStart && intensity >= CRASH_THRESHOLD) {
+    if (isPhraseStart && intensity >= crashThr) {
       percEvents.push({ id: `CRASH-${mi}`, t: 0, dur: len, type: "unpitched", instrumentId: "crash", voice: 1, staff: 1 });
     }
-    if (isPhraseStart && intensity >= TRIANGLE_THRESHOLD) {
+    if (isPhraseStart && intensity >= triThr) {
       percEvents.push({ id: `TRI-${mi}`, t: 0, dur: Math.min(len, 1), type: "unpitched", instrumentId: "triangle", voice: 1, staff: 1 });
     }
     if (!percEvents.length) percEvents.push({ id: `PERC-r-${mi}`, t: 0, dur: len, type: "rest", isRest: true, voice: 1, staff: 1 });
@@ -892,11 +937,11 @@ export function arrangeWorshipOrchestraFromRhythmChart(
  */
 export function arrangeWorshipOrchestraFromPiano(
   score: ScoreModel,
-  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance; partRanges?: PartRange[] } = {}
+  options: { warnings?: string[]; intensity?: IntensityMode; parts?: string[]; balance?: OrchestraBalance; partRanges?: PartRange[]; pianoLeads?: boolean } = {}
 ): { scoreModel: ScoreModel; warnings: string[] } {
   const warnings = options.warnings ?? [];
   const core = arrangeStringQuartetFromPianoInstrumentation(score, { warnings });
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, melodyRests: sourceMelodyRestMeasures(score) });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, pianoLeads: options.pianoLeads, melodyRests: sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
 

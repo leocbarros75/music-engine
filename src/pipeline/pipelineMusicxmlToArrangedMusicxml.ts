@@ -209,6 +209,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleLower === "reinstrument" ||
       // Piano/SATB → orchestra are direct transcriptions of existing harmony.
       ensembleLower === "piano_orchestra" ||
+      ensembleLower === "piano_with_orchestra" ||
       ensembleLower === "satb_orchestra" ||
       settings.instrumentation === "piano_copy_to_string_quartet" ||
       settings.instrumentation === "satb_to_string_quartet" ||
@@ -305,7 +306,8 @@ export function pipelineMusicxmlToArrangedMusicxml(
       ensembleRaw === "satb_brass_quartet" ||
       ensembleRaw === "piano_with_brass";
     const isOrchestra = ensembleRaw === "orchestra" || ensembleRaw === "full_orchestra" ||
-      ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra";
+      ensembleRaw === "piano_orchestra" || ensembleRaw === "satb_orchestra" ||
+      ensembleRaw === "piano_with_orchestra";
     const isReinstrument = ensembleRaw === "reinstrument";
     // Symphonic (Classical/Romantic) — like the orchestra: skip choral rule
     // checking and use the general exporter (it applies written transposition).

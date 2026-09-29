@@ -1836,6 +1836,10 @@ export function applyAppSettings(
   // Symphonic (Classical/Romantic) — its own engine, never routed through worship.
   const wantsSymphonic        = ensemble === "symphonic_orchestra";
   const wantsPianoOrchestra   = ensemble === "piano_orchestra";
+  // "piano_orchestra" is a TRANSCRIPTION — piano in, orchestra out, no piano in
+  // the score. This one keeps the pianist playing and writes an orchestra to
+  // accompany them, the way piano_with_strings does for a string section.
+  const wantsPianoWithOrchestra = ensemble === "piano_with_orchestra";
   const wantsSatbOrchestra    = ensemble === "satb_orchestra";
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
@@ -1872,7 +1876,7 @@ export function applyAppSettings(
   // so blindly taking parts[0] would capture the Violin I melody instead of the full
   // piano grand staff (1679 notes, 147 backups). We find the Piano part explicitly,
   // and only fall back to parts[0] if no piano-named/instrumented part exists.
-  const frozenPianoPart: any | null = (wantsPianoWithStrings || wantsPianoWithWoodwinds || wantsPianoWithBrass)
+  const frozenPianoPart: any | null = (wantsPianoWithStrings || wantsPianoWithWoodwinds || wantsPianoWithBrass || wantsPianoWithOrchestra)
     ? (() => {
         const allParts: any[] = (scoreModel as any).parts ?? [];
         const isPianoPart = (p: any): boolean => {
@@ -2423,6 +2427,38 @@ export function applyAppSettings(
     attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
       scoreModel: brResult.scoreModel as ScoreModel,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsPianoWithOrchestra) {
+    // The pianist keeps the music; the orchestra is written around it. Same
+    // shape as piano_with_strings: the orchestra is built from the piano as its
+    // harmony source, then the untouched piano part goes back into the score.
+    const orchResult = arrangeWorshipOrchestraFromPiano(scoreModel, {
+      warnings,
+      intensity: settings.orchestraIntensity ?? "build",
+      parts: settings.orchestraParts,
+      balance: settings.orchestraBalance ?? "default",
+      partRanges: settings.orchestraPartRanges,
+      // The whole difference between this and piano_orchestra: winds and brass
+      // hold back, because they are no longer carrying the song.
+      pianoLeads: true,
+    });
+    const orchScore: any = orchResult.scoreModel;
+    breatheOrchestra(warnings, "orchestra", (orchScore as any).parts ?? []);
+    const finalScore: any = {
+      ...(orchScore as any),
+      meta: { ...(orchScore as any).meta, ensemble: "piano_with_orchestra" },
+      parts: withPianoPart((orchScore as any).parts ?? [], frozenPianoPart),
+    };
+    attachTextureAnalysis(finalScore, warnings);
+    return {
+      scoreModel: finalScore as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,
