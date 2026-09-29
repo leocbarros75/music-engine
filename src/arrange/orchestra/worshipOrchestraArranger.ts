@@ -575,6 +575,50 @@ const TIMP_THRESHOLD = 0.50;   // timpani joins the fuller sections
 const TRIANGLE_THRESHOLD = 0.55;
 const CRASH_THRESHOLD = 0.72;
 
+/**
+ * Two drums, tuned once, and no retuning in the middle of the piece.
+ *
+ * The timpani part took whatever pitch the bar's bass happened to land on and
+ * shifted it into range. On a 79-bar piece in F that produced six different
+ * pitches — F2, G2, A2, B-flat2, C3, D3 — which is six drums, or a player
+ * retuning mid-performance, and the score said nothing about either. The Codex
+ * edition of the same source uses exactly two, F2 and C3, and rests on every
+ * other harmony.
+ *
+ * So: tonic and dominant, the classical pair, chosen from the key signature and
+ * placed low in the instrument. Everything else is a rest. This is the oldest
+ * convention there is for the instrument, and the reason it exists is that
+ * changing a drum's pitch takes a pedal, a foot and several seconds.
+ *
+ * The minor mode is read from the key signature's own mode rather than assumed:
+ * A minor and C major share a signature, and a timpanist in A minor wants A and
+ * E, not C and G.
+ */
+export function timpaniTuning(
+  fifths: number,
+  mode: string | undefined,
+  lo: number,
+  hi: number
+): { tonic: number; dominant: number; tonicPc: number; dominantPc: number } {
+  const majorPc = (((fifths * 7) % 12) + 12) % 12;
+  // The relative minor sits three semitones below its relative major.
+  const tonicPc = /minor|aeolian/i.test(String(mode ?? "")) ? (majorPc + 9) % 12 : majorPc;
+  const dominantPc = (tonicPc + 7) % 12;
+  // Lowest placement at or above E2, then drop an octave if the fifth above it
+  // would not fit — the pair has to sit on two real drums.
+  let tonic = 40 + ((((tonicPc - 40) % 12) + 12) % 12);
+  if (tonic + 7 > hi) tonic -= 12;
+  if (tonic < lo) tonic += 12;
+  return { tonic, dominant: tonic + 7, tonicPc, dominantPc };
+}
+
+/** "F2, C3" — what goes above the staff so the player can tune before playing. */
+export function tuningLabel(tonic: number, dominant: number): string {
+  const NAMES = ["C", "C#", "D", "E-flat", "E", "F", "F#", "G", "A-flat", "A", "B-flat", "B"];
+  const name = (m: number) => `${NAMES[((m % 12) + 12) % 12]}${Math.floor(m / 12) - 1}`;
+  return `${name(tonic)}, ${name(dominant)}`;
+}
+
 function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number): void {
   const parts: any[] = (orch as any).parts ?? [];
   const cello = parts.find((p) => p.part_id === "P_CELBS");
@@ -585,6 +629,8 @@ function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number)
   const timpMeasures: any[] = [];
   const percMeasures: any[] = [];
   const TIMP_LO = 38, TIMP_HI = 57; // D2..A3
+  const keyBar: any = parts.map((p: any) => p?.measures?.[0]?.attributes).find((a: any) => a?.key_fifths !== undefined);
+  const tuning = timpaniTuning(Number(keyBar?.key_fifths ?? 0), keyBar?.key_mode, TIMP_LO, TIMP_HI);
   for (let mi = 0; mi < nMeasures; mi++) {
     const srcM = cello.measures[mi];
     const len = measureLenOf(srcM);
@@ -592,14 +638,20 @@ function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number)
     const intensity = phraseInt[pi] ?? 1;
     const isPhraseStart = mi % phraseLen === 0;
 
-    // Timpani: bass root on beat 1 when the texture is full enough.
+    // Timpani: tonic or dominant on beat 1 when the texture is full enough AND
+    // the harmony underneath is one the two drums can actually sound. Any other
+    // bass note is a rest — the alternative is a third drum or a retuning.
     const timpEvents: any[] = [];
     if (intensity >= TIMP_THRESHOLD) {
       const firstNote = (srcM?.events ?? []).find((e: any) => e?.type === "note" && e.pitch);
       const bassMidi = firstNote ? eventMidi(firstNote) : null;
       if (bassMidi !== null) {
-        let m = bassMidi; while (m < TIMP_LO) m += 12; while (m > TIMP_HI) m -= 12;
-        timpEvents.push({ id: `TIMP-${mi}`, t: 0, dur: Math.min(len, 2), type: "note", pitch: midiToPitch(m), voice: 1, staff: 1 });
+        const pc = ((bassMidi % 12) + 12) % 12;
+        const drum =
+          pc === tuning.tonicPc ? tuning.tonic : pc === tuning.dominantPc ? tuning.dominant : null;
+        if (drum !== null) {
+          timpEvents.push({ id: `TIMP-${mi}`, t: 0, dur: Math.min(len, 2), type: "note", pitch: midiToPitch(drum), voice: 1, staff: 1 });
+        }
       }
     }
     if (!timpEvents.length) timpEvents.push({ id: `TIMP-r-${mi}`, t: 0, dur: len, type: "rest", isRest: true, voice: 1, staff: 1 });
@@ -617,6 +669,13 @@ function addPercussion(orch: ScoreModel, phraseInt: number[], phraseLen: number)
     percMeasures.push({ number: srcM?.number ?? mi + 1, ...(mi === 0 && srcM?.attributes ? { attributes: JSON.parse(JSON.stringify(srcM.attributes)) } : {}), events: percEvents });
   }
 
+  // Say what the drums are tuned to, above the first bar, so the player can set
+  // them before a note is played.
+  if (timpMeasures[0]) {
+    const perf: any = (timpMeasures[0] as any).performance ?? ((timpMeasures[0] as any).performance = {});
+    const words: any[] = Array.isArray(perf.words) ? perf.words : (perf.words = []);
+    words.push({ t: 0, text: `Timpani: ${tuningLabel(tuning.tonic, tuning.dominant)}`, placement: "above" });
+  }
   const timpPart = { part_id: "P_TIMP", name: "Timpani", instrument: "timpani", staves: 1, measures: timpMeasures };
   const percPart = { part_id: "P_PERC", name: "Percussion (Crash/Triangle)", instrument: "drums", staves: 1, measures: percMeasures };
 

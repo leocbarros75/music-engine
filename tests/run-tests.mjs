@@ -62,6 +62,7 @@ async function main() {
       'tests/arrange/melodySelection.test.ts',
       'tests/arrange/melodySustain.test.ts',
       'tests/arrange/restArc.test.ts',
+      'tests/arrange/timpaniTuning.test.ts',
       'tests/arrange/innerVoiceMotion.test.ts',
       'tests/arrange/bowing.test.ts',
       'tests/arrange/altoUnderMelody.test.ts',
