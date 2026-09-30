@@ -80,6 +80,17 @@ export type ScoreModel = {
   meta: {
     title?: string;
     composer?: string;
+    /** Who arranged the source, and who orchestrated it, as the file credits them. */
+    arranger?: string;
+    /**
+     * The source's copyright notice, carried through verbatim.
+     *
+     * Not decoration. These sources are published worship charts whose notice
+     * names the publishers, the licence and the terms of duplication; dropping
+     * it on the way through turns a licensed arrangement into an unattributed
+     * one.
+     */
+    rights?: string;
     ensemble: string;
     key?: string;
     time_signature?: string;

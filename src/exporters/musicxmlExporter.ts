@@ -1052,7 +1052,18 @@ export function exportScoreModelToMusicXML(scoreModel: ScoreModel): string {
 function renderMusicXML(scoreModel: ScoreModel): string {
   scoreModel = toSoundingScore(scoreModel);
   const timeline = buildMeasureTimeline(scoreModel);
-  const workTitle = xmlEscape((scoreModel as any)?.meta?.ensemble ?? "ensemble");
+  // The source's own title, not the name of the ensemble we happen to be
+  // writing it for. This said "full_orchestra" on the page, and the composer,
+  // the arranger and the copyright notice were not written out at all — the
+  // parser had the title and nothing read it, and it never had the rest.
+  const meta: any = (scoreModel as any)?.meta ?? {};
+  const workTitle = xmlEscape(String(meta.title || meta.ensemble || "ensemble"));
+  const composerText = String(meta.composer ?? "").trim();
+  const arrangerText = String(meta.arranger ?? "").trim();
+  const rightsText = String(meta.rights ?? "").trim();
+  // MusicXML credits are positioned in tenths from the bottom-left of the page,
+  // so they have to agree with the page the defaults below declare.
+  const PAGE_W = 2160, PAGE_H = 3055;
   const partsRaw = scoreModel?.parts ?? [];
   // The worship orchestra already emits its parts in deliberate score order
   // (woodwinds → horn → brass → percussion → strings); preserve it. The generic
@@ -1105,6 +1116,53 @@ function renderMusicXML(scoreModel: ScoreModel): string {
   out += `  "http://www.musicxml.org/dtds/partwise.dtd">\n`;
   out += `<score-partwise version="3.1">\n`;
   out += `  <work><work-title>${workTitle}</work-title></work>\n`;
+
+  // Who wrote it and on what terms. Carried through verbatim: these sources are
+  // published charts whose notice names the publishers and the licence.
+  if (composerText || arrangerText || rightsText) {
+    out += `  <identification>\n`;
+    if (composerText) out += `    <creator type="composer">${xmlEscape(composerText)}</creator>\n`;
+    if (arrangerText) out += `    <creator type="arranger">${xmlEscape(arrangerText)}</creator>\n`;
+    if (rightsText) out += `    <rights>${xmlEscape(rightsText)}</rights>\n`;
+    out += `    <encoding><software>music-engine</software><encoding-date>${new Date().toISOString().slice(0, 10)}</encoding-date></encoding>\n`;
+    out += `  </identification>\n`;
+  }
+
+  // A page big enough for the score, and a staff small enough to fit on it.
+  // Without any <defaults> a reader uses its own — A4 at full staff size — and
+  // a twenty-stave system does not fit, which is what left the first page
+  // blank. 5.5mm to 40 tenths on a 2160x3055 page is what the reference
+  // edition uses for nineteen staves.
+  out += `  <defaults>\n`;
+  out += `    <scaling><millimeters>${parts.length >= 12 ? "5.5" : "7"}</millimeters><tenths>40</tenths></scaling>\n`;
+  out += `    <page-layout><page-height>${PAGE_H}</page-height><page-width>${PAGE_W}</page-width>`;
+  out += `<page-margins type="both"><left-margin>70</left-margin><right-margin>70</right-margin><top-margin>70</top-margin><bottom-margin>70</bottom-margin></page-margins></page-layout>\n`;
+  out += `  </defaults>\n`;
+
+  // Credits are what actually appear on the page; <work-title> alone engraves
+  // nothing in most readers.
+  const credit = (type: string, text: string, size: number, y: number, x: number, justify: string) =>
+    `  <credit page="1"><credit-type>${type}</credit-type>` +
+    `<credit-words font-size="${size}" default-x="${x}" default-y="${y}" justify="${justify}" valign="top">` +
+    `${xmlEscape(text)}</credit-words></credit>\n`;
+  // credit-type is what a reader positions by; it largely ignores the
+  // coordinates. Giving the arranger the "subtitle" type printed it in the same
+  // top-right corner as the composer, one string over the other. The
+  // conventional layout, which readers follow: title centred, composer right,
+  // arranger left.
+  // Title and composer only, and the arranger stays in <identification> where
+  // it is metadata rather than ink.
+  //
+  // A subtitle was tried twice — carrying the arranger, then a descriptive line
+  // — and both times the reader dropped it onto the composer's own row and
+  // printed one string across the other, whatever default-y it was given.
+  // Credit placement is the reader's business, not the file's, so the file
+  // stops asking: two texts in two corners cannot collide.
+  const oneLine = (t: string) => t.replace(/\s*\n\s*/g, " ").trim();
+  const titleText = String(meta.title ?? "").trim();
+  if (titleText) out += credit("title", titleText, 24, PAGE_H - 65, PAGE_W / 2, "center");
+  if (composerText) out += credit("composer", oneLine(composerText), 10, PAGE_H - 130, PAGE_W - 70, "right");
+  if (rightsText) out += credit("rights", oneLine(rightsText), 7, 60, PAGE_W / 2, "center");
 
   out += `  <part-list>`;
   for (const p of parts) {

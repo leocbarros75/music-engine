@@ -202,6 +202,28 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
     if (credEls.length) scoreTitle = textOf(credEls[0] as Element);
   }
 
+  // Who wrote it, who arranged it, and on what terms. The engine carried the
+  // title and dropped the rest, so an arrangement of a published worship chart
+  // came out with no composer and no copyright notice at all.
+  let scoreComposer = "";
+  let scoreArranger = "";
+  let scoreRights = "";
+  const identEl = elementsByTagName(scorePartwise, "identification")[0] ?? null;
+  if (identEl) {
+    for (const c of elementsByTagName(identEl as Element, "creator")) {
+      const type = String((c as Element).getAttribute("type") ?? "").toLowerCase();
+      const text = textOf(c as Element);
+      if (!text) continue;
+      // Several files credit more than one arranger — "Jeff Moore" and
+      // "Orch. by Daniel Galbraith" arrive as separate entries. Keep both.
+      if (type === "composer") scoreComposer = scoreComposer ? `${scoreComposer}, ${text}` : text;
+      else if (type === "arranger" || type === "lyricist") scoreArranger = scoreArranger ? `${scoreArranger}; ${text}` : text;
+      else if (!scoreComposer) scoreComposer = text;
+    }
+    const rightsEl = elementsByTagName(identEl as Element, "rights")[0] ?? null;
+    if (rightsEl) scoreRights = textOf(rightsEl as Element);
+  }
+
   const partList = elementsByTagName(scorePartwise, "part-list")[0] ?? null;
 
   const partNames = new Map<string, string>();
@@ -517,6 +539,9 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
   const meta: any = {
     ensemble: "imported",
     title: scoreTitle || undefined,
+    composer: scoreComposer || undefined,
+    arranger: scoreArranger || undefined,
+    rights: scoreRights || undefined,
     inputKeyFifths: m0?.attributes?.key_fifths,
     inputKeyMode: m0?.attributes?.key_mode,
     inputTime: m0?.attributes?.time,

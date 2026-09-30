@@ -93,7 +93,8 @@ async function main() {
       'tests/musicxml/tiedChordDuration.test.ts',
       'tests/musicxml/transposedKeySpelling.test.ts',
       'tests/musicxml/tupletDivisions.test.ts',
-      'tests/musicxml/chordFlag.test.ts']) add(file, file);
+      'tests/musicxml/chordFlag.test.ts',
+      'tests/musicxml/scoreHeader.test.ts']) add(file, file);
   }
   if (group === 'all' || group === 'harmony') {
     for (const file of Object.keys(EXPECTATIONS_BY_BASENAME).sort()) {

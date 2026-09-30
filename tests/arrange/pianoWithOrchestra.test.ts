@@ -170,16 +170,10 @@ test('the score is laid out the way orchestration books set it out', { skip: !ha
   assert(piano < violin1, 'the piano sits above the strings');
 });
 
-test('the viola is a selected voice, and the rest of the cushion is not', { skip: !have }, () => {
-  // The viola played 71 of 79 bars — 256 events against the reference's 121
-  // across 47. The difference was never re-articulation: ours has FEWER
-  // repeated notes than theirs, 18 against 31. Their viola simply sits out a
-  // third of the piece, which their own table calls "selected octave support in
-  // larger sections". It thins the middle in the quiet music and fills it when
-  // the music opens up.
-  //
-  // The other four strings must NOT follow it. They are the cushion, and
-  // thinning the cushion is a mistake this repo has made once already.
+test('the viola plays with the rest of the cushion', () => {
+  // This asserted the opposite for one commit. Matching the reference's 47 of
+  // 79 bars measured well and sounded wrong, and the ear is what decides a
+  // question like this one. The viola is part of the cushion here.
   const out = arrange('piano_orchestra');
   const barsPlayed = (re: RegExp): number => {
     const p = out.parts.find((x: any) => re.test(String(x.name)));
@@ -187,15 +181,12 @@ test('the viola is a selected voice, and the rest of the cushion is not', { skip
     return (p.measures ?? []).filter((m: any) =>
       (m.events ?? []).some((e: any) => e.type === 'note')).length;
   };
-  const total = out.parts[0].measures.length;
   const viola = barsPlayed(/^viola/i);
-
-  assert(viola < total * 0.75, `the viola plays ${viola} of ${total} bars — it is not selective`);
-  assert(viola > total * 0.35, `the viola plays only ${viola} of ${total} bars — it has stopped supporting`);
-  for (const re of [/^violin 1/i, /^violin 2/i, /^cello/i]) {
-    const n = barsPlayed(re);
-    assert(n > viola, `${re} plays ${n} bars, no more than the viola's ${viola} — the cushion thinned with it`);
-  }
+  const violin2 = barsPlayed(/^violin 2/i);
+  assert(
+    viola >= violin2 - 2,
+    `the viola plays ${viola} bars against Violin 2's ${violin2} — it has dropped out of the cushion`
+  );
 });
 
 test('no bar of the transcription is left with a thin string section', { skip: !have }, () => {
