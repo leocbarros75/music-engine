@@ -48,7 +48,27 @@ function breatheOrchestra(warnings: string[], label: string, parts: any[]): void
   const soloists = winds.filter((p) => !isSectionPart(p));
 
   const staggered = markStaggeredBreathing(sections);
-  const plan = soloists.length ? applyBreathing(soloists as any) : null;
+  // How long a wind player may be asked to hold depends on whether anything
+  // else is holding the line. The default of eight beats came from the brass
+  // ensemble edition, where eight brass players ARE the arrangement and nobody
+  // else can cover a gap — it runs to 7.750 beats, which is exactly what we
+  // were producing. Every reference with something underneath breathes about
+  // twice as often:
+  //
+  //   brass alone          7.750 beats
+  //   piano and brass      3.500
+  //   piano and winds      3.500
+  //   orchestra            3.880
+  //   piano and orchestra  1.000
+  //
+  // The orchestral edition says why in as many words: "strings continue through
+  // these releases so the musical line is not dependent on every wind
+  // sustaining to the barline". An orchestra always has its string cushion, so
+  // four beats here rather than eight — roughly a bar, which is where the
+  // orchestral reference sits.
+  const plan = soloists.length
+    ? applyBreathing(soloists as any, { maxBreathlessBeats: 4 })
+    : null;
 
   const said: string[] = [];
   if (plan && (plan.releases || plan.marks)) {

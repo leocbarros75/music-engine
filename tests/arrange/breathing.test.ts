@@ -280,3 +280,64 @@ test('a breath mark reaches the MusicXML as <breath-mark/>, where a player sees 
   assert(/<articulations>\s*<breath-mark\s*\/>\s*<\/articulations>/.test(xml),
     'inside <articulations>, where MusicXML puts it');
 });
+
+test('a stretch with nowhere legal to breathe does not abandon the rest of the part', () => {
+  // The repair loop used to stop at the first stretch it could not fix, so one
+  // tied passage left every later stretch unrepaired. Tightening the orchestra's
+  // limit from eight beats to four made it visible rather than causing it: the
+  // bassoon and first horn came out at 15.75 beats where four had been asked
+  // for, WORSE than under the wider limit, which had simply not asked as often.
+  //
+  // Two false starts are baked into this fixture. The stretches must be
+  // SEPARATED by a rest, or they merge into one span, the repair finds a legal
+  // barline inside it and the failure path is never reached. And the assertion
+  // has to be about the resulting SPANS, not about whether breath marks appear:
+  // the planned pass puts marks in those bars on its own, so counting them
+  // passes against the bug.
+  const bar = (number: number, events: any[]) => ({
+    number, attributes: { divisions: 4, time: { beats: 4, beat_type: 4 } }, events,
+  });
+  const whole = (id: string, extra: any = {}) => ({
+    id, t: 0, dur: 4, midi: 72, type: 'note' as const, voice: 1, staff: 1,
+    pitch: { step: 'C', octave: 5 }, ...extra,
+  });
+  const silent = (id: string) => ({
+    id, t: 0, dur: 4, type: 'rest' as const, isRest: true, voice: 1, staff: 1,
+  });
+
+  const part: any = {
+    part_id: 'P_BSN', name: 'Bassoon', instrument: 'bassoon', staves: 1,
+    measures: [
+      // Bars 1-3: tied across every barline. Twelve beats, nowhere legal.
+      bar(1, [whole('a', { tieStart: true })]),
+      bar(2, [whole('b', { tieStart: true, tieStop: true })]),
+      bar(3, [whole('c', { tieStop: true })]),
+      bar(4, [silent('r')]),          // the gap that makes them two stretches
+      // Bars 5-9: ordinary whole notes, every barline legal.
+      bar(5, [whole('d')]), bar(6, [whole('e')]), bar(7, [whole('f')]),
+      bar(8, [whole('g')]), bar(9, [whole('h')]),
+    ],
+  };
+
+  applyBreathing([part], { maxBreathlessBeats: 4 });
+
+  // What a player is actually asked to hold in the LATER stretch, bars 5-9.
+  let longest = 0;
+  let run = 0;
+  for (let i = 4; i < part.measures.length; i++) {
+    const notes = (part.measures[i].events ?? []).filter((e: any) => e.type === 'note');
+    if (!notes.length) { run = 0; continue; }
+    run += notes.reduce((n: number, e: any) => n + Number(e.dur), 0);
+    longest = Math.max(longest, run);
+    const breathes = notes.some((e: any) =>
+      Array.isArray(e.articulations) && e.articulations.includes('breath-mark'));
+    if (breathes) run = 0;
+  }
+  assert(longest <= 4 + 1e-9,
+    `the stretch after the tied one still runs ${longest} beats — repair stopped at the tied passage`);
+
+  const breathsIn = (i: number) =>
+    (part.measures[i].events ?? []).filter((e: any) =>
+      Array.isArray(e.articulations) && e.articulations.includes('breath-mark')).length;
+  assert.equal(breathsIn(0) + breathsIn(1), 0, 'a tie was broken to force a breath');
+});

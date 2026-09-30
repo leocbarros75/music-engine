@@ -347,13 +347,23 @@ export function applyBreathing(
     // that splits it. This targets the thing that actually matters — nobody
     // goes too long without air — instead of trusting the grid to cover it.
     const ends = barEnds(lengths);
-    for (let guard = 0; guard < part.measures.length; guard++) {
+    // A stretch with no legal breath in it does not stop the search. It used to:
+    // the loop broke on the first span it could not fix and abandoned the rest
+    // of the part, so a single tied passage left every later stretch unrepaired.
+    // Tightening the limit made that visible rather than causing it — the
+    // bassoon and first horn came out at 15.75 beats where the limit asked for
+    // four, WORSE than the eight-beat limit they replaced, because the wider
+    // limit had simply not asked as often.
+    const giveUp = new Set<string>();
+    for (let guard = 0; guard < part.measures.length * 2; guard++) {
       // Which span to repair depends on what the part is allowed to write. If
       // rests are going in, the NOTATION has to break — a comma over an
       // unbroken line gives the player air but still prints sixty-two bars
       // with nowhere to put the pencil. Where only commas are written, the
       // comma IS the break and counting it is correct.
-      const tooLong = soundingSpans(part, !writeRests).find(([s, e]) => e - s > maxBreathless + EPS);
+      const tooLong = soundingSpans(part, !writeRests).find(
+        ([s, e]) => e - s > maxBreathless + EPS && !giveUp.has(`${s}:${e}`)
+      );
       if (!tooLong) break;
       const [spanStart, spanEnd] = tooLong;
       // Bars whose barline falls strictly inside the stretch.
@@ -370,7 +380,9 @@ export function applyBreathing(
         took = tryBreathAtBar(part, lengths, i, release, minKept, writeRests);
         if (took) break;
       }
-      if (!took) break;                    // nothing legal in there; it stands
+      // Nothing legal in this one — it stands, and the next stretch still gets
+      // its turn.
+      if (!took) { giveUp.add(`${spanStart}:${spanEnd}`); continue; }
       if (took === "release") releases++;
       else marks++;
     }
