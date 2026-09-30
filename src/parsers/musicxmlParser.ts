@@ -390,7 +390,35 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
                 tieStop: tieFlags.tieStop ? true : undefined
               } as any);
             } else {
-              events.push({ type: "rest", t: noteT, dur, voice, staff, source_t: rawT } as any);
+              // A drum is a note with <unpitched> where the pitch would be, and
+              // this branch used to file it as a REST. 224 drum hits became 224
+              // silences: reading a score back in deleted its drum part, and
+              // every audit built on the model reported the drums as empty —
+              // which is what made the orchestra's percussion and the jazz
+              // band's drums both look silent when they were not.
+              const unpitchedEl = firstChild(el, "unpitched");
+              if (unpitchedEl) {
+                const instEl = firstChild(el, "instrument");
+                const instRef = instEl ? String((instEl as Element).getAttribute("id") ?? "") : "";
+                // The exporter names the instrument "<part>-I<midiUnpitched>",
+                // which is where the drum's identity survives the round trip.
+                const midiUnpitched = Number(instRef.match(/-I(\d+)$/)?.[1] ?? NaN);
+                events.push({
+                  type: "unpitched",
+                  t: noteT,
+                  dur,
+                  voice,
+                  staff,
+                  source_t: rawT,
+                  displayStep: textOf(firstChild(unpitchedEl as Element, "display-step")) || undefined,
+                  displayOctave: Number(textOf(firstChild(unpitchedEl as Element, "display-octave"))) || undefined,
+                  ...(Number.isFinite(midiUnpitched) ? { midiUnpitched } : {}),
+                  grace: grace || undefined,
+                  chord: isChordTone ? true : undefined,
+                } as any);
+              } else {
+                events.push({ type: "rest", t: noteT, dur, voice, staff, source_t: rawT } as any);
+              }
             }
           }
 

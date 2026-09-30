@@ -1559,7 +1559,21 @@ function renderMusicXML(scoreModel: ScoreModel): string {
             }
 
             if (evAny.type === "unpitched") {
-              const pm = getPercussionMap(evAny.instrumentId ?? "");
+              // A drum read back in from MusicXML carries its own display
+              // position and midi number rather than one of our instrument
+              // names, so fall back to what the note itself says. Without this
+              // a parsed score re-exports its drums as rests.
+              const pm = getPercussionMap(evAny.instrumentId ?? "") ?? (
+                evAny.displayStep && Number.isFinite(Number(evAny.midiUnpitched))
+                  ? {
+                      instrumentId: String(evAny.instrumentId ?? "unpitched"),
+                      midiUnpitched: Number(evAny.midiUnpitched),
+                      displayStep: evAny.displayStep,
+                      displayOctave: Number(evAny.displayOctave ?? 4),
+                      notehead: "normal" as const,
+                    }
+                  : null
+              );
               if (!pm) {
                 writtenDivs += dur;
                 out += `<note><rest/><duration>${dur}</duration><voice>${voice}</voice>`;

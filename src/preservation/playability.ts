@@ -96,11 +96,22 @@ export function buildPlayabilityAudit(score: ScoreModel): PlayabilityAudit {
     let lo: number | null = null, hi: number | null = null;
 
     measures.forEach((m: any, i: number) => {
-      const notes = (m?.events ?? []).filter((e: any) => e?.type === "note" && !e.grace);
+      // A drum hit is something a player plays. It was not counted at all —
+      // only type "note" was — so a percussion part reported zero events and
+      // read as an empty staff. That claim was made twice in one session, once
+      // about the orchestra's percussion and once about the jazz band's drums,
+      // and both parts were full of music.
+      //
+      // What it must NOT do is join the pitch or the breathing figures: an
+      // unpitched note has no register to be outside of, and the breathing
+      // question is already asked only of players who breathe.
+      const notes = (m?.events ?? []).filter(
+        (e: any) => (e?.type === "note" || e?.type === "unpitched") && !e.grace
+      );
       if (!notes.length) silentBars++;
       for (const ev of notes) {
         events++;
-        const midi = soundingMidi(ev);
+        const midi = ev?.type === "unpitched" ? null : soundingMidi(ev);
         const dur = Number(ev.dur);
         const t = Number(ev.t);
         if (Number.isFinite(t) && Number.isFinite(dur) && dur > 0) {
