@@ -59,6 +59,9 @@ outputs/living-hope-piano-and-brass/living-hope-piano-and-brass/
 # hashes to the source_sha256 the edition's own validation.json records.
 outputs/everlasting-love-orchestra/everlasting-love-orchestra/
 outputs/everlasting-love-orchestra/everlasting-love-orchestra 2/
+# The piano-with-orchestra edition ships one too. Verified by file list: it
+# holds nothing the parent does not, so the tracked copy is complete.
+outputs/everlasting-love-piano-orchestra/everlasting-love-piano-orchestra/
 # An .mxl is a zip under another extension, and its score.xml is the same music
 # as the .musicxml extracted beside it — 2,081 notes either way. The PDFs are
 # what engrave-jobs.json regenerates from that MusicXML, so they are the
