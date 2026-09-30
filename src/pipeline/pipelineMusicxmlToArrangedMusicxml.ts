@@ -279,7 +279,9 @@ export function pipelineMusicxmlToArrangedMusicxml(
     // brass parts on the same footing as five wind ones.
     try {
       const balance = buildFamilyBalance(scoreModelOut);
-      if (balance.hierarchyHolds === false) {
+      // Either failure is worth saying. The whole-piece figure passing while
+      // four sections invert is precisely how this went unnoticed.
+      if (balance.hierarchyHolds === false || balance.sectionsOutOfOrder > 0) {
         const line = familyBalanceSentence(balance);
         if (line) warnings.push(line);
       }

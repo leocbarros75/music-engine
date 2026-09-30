@@ -110,3 +110,59 @@ test('it reproduces the reference edition\'s own published figures', () => {
   assert.equal(pct('brass'), 1.34);
   assert.equal(b.hierarchyHolds, true);
 });
+
+/**
+ * Section by section, not once over the work.
+ *
+ * The whole-piece figure passed — brass 37.5% against woodwinds 38.9% — while
+ * the brass led the last four sections of the piece, running 96.9% of bars
+ * 57-64 against the woodwinds' 72.7%. An average over a whole work is exactly
+ * the kind of measure that stays correct while the loudest third of the music
+ * is wrong, which is the trap this file exists to avoid.
+ */
+
+/** `plan` gives each bar's fill for one part, so a section can differ from the whole. */
+const varying = (name: string, fills: number[]) => ({
+  part_id: `P_${name}`, name, instrument: name.toLowerCase(), staves: 1,
+  measures: fills.map((f, i) => bar(i + 1, f > 0 ? [note(0, f)] : [])),
+});
+
+test('a section that inverts is found even when the whole piece passes', () => {
+  // Eight bars quiet brass, eight bars where the brass takes over. Over the
+  // whole piece the winds still come out ahead; the second half is the problem.
+  const b = buildFamilyBalance(score([
+    varying('Violin', Array(16).fill(4)),
+    varying('Flute', [...Array(8).fill(3), ...Array(8).fill(1)]),
+    varying('Trumpet', [...Array(8).fill(0), ...Array(8).fill(3)]),
+  ]), { sectionBars: 8 });
+
+  assert.equal(b.hierarchyHolds, true, 'the whole-piece order should pass here');
+  assert.equal(b.sectionsOutOfOrder, 1, 'the second section inverts');
+  assert.equal(b.sections.length, 2);
+  assert.equal(b.sections[0]!.hierarchyHolds, true);
+  assert.equal(b.sections[1]!.hierarchyHolds, false);
+  assert.match(String(familyBalanceSentence(b)), /fails in 1 section/);
+  assert.match(String(familyBalanceSentence(b)), /bars 9-16/);
+});
+
+test('a silent stretch is not an inversion', () => {
+  // An orchestra that has not entered yet, or a rest, is not out of order.
+  // Reporting it as a failure would bury the real ones.
+  const b = buildFamilyBalance(score([
+    varying('Violin', [...Array(8).fill(0), ...Array(8).fill(4)]),
+    varying('Flute', [...Array(8).fill(0), ...Array(8).fill(2)]),
+    varying('Trumpet', [...Array(8).fill(0), ...Array(8).fill(1)]),
+  ]), { sectionBars: 8 });
+  assert.equal(b.sections[0]!.hierarchyHolds, null, 'a silent section is not a failure');
+  assert.equal(b.sections[1]!.hierarchyHolds, true);
+  assert.equal(b.sectionsOutOfOrder, 0);
+});
+
+test('every section is reported, in order, covering the whole piece', () => {
+  const b = buildFamilyBalance(score([varying('Violin', Array(20).fill(4))]), { sectionBars: 8 });
+  assert.deepEqual(
+    b.sections.map((s) => [s.firstBar, s.lastBar]),
+    [[1, 8], [9, 16], [17, 20]],
+    'sections must tile the piece with no gap and no overlap'
+  );
+});

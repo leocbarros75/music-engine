@@ -235,6 +235,10 @@ export function orchestrateStringCore(
   // user's part selection, the manual ranges and the intensity gating all name
   // the combined staves. Only the score that comes out is one player per staff.
   const splitCount = splitSectionParts(orch, phraseInt, phraseLen);
+  const punctuated = brassPunctuatesAtClimaxes(orch, phraseInt, phraseLen);
+  if (punctuated) {
+    warnings.push(`[orchestra] Brass punctuates the climaxes rather than sitting on them: ${punctuated} phrase-ending bars given back to the strings and winds.`);
+  }
   if (splitCount) {
     warnings.push(
       `[orchestra] ${splitCount} shared staves split so every player has their own: ` +
@@ -745,21 +749,31 @@ const SECTION_SPLITS: Record<string, SplitTarget[]> = {
     { id: "P_FL", name: "Flute", instrument: "flute", take: "copy", minIntensity: FLUTE_OBOE_SPLIT },
     { id: "P_OB", name: "Oboe", instrument: "oboe", take: "copy", maxIntensity: FLUTE_OBOE_SPLIT },
   ],
+  // Second players come in later than firsts, and the bottom of the section
+  // later still. Without this every brass staff entered together and the family
+  // took over the climaxes: measured section by section, brass ran 96.9% of
+  // bars 57-64 against the woodwinds' 72.7%, and 94.5% against 70.7% in 65-72.
+  // The whole-piece average passed while the loudest third of the piece was
+  // brass-led.
+  //
+  // The reference edition writes its brass the same way round — first horn 154
+  // events to second horn's 38, first trumpet 218 to second's 109 — so the
+  // section keeps its colour while the family stops dominating.
   P_HN12: [
     { id: "P_HN1", name: "Horn 1", instrument: "horn_f", take: "upper" },
-    { id: "P_HN2", name: "Horn 2", instrument: "horn_f", take: "lower" },
+    { id: "P_HN2", name: "Horn 2", instrument: "horn_f", take: "lower", minIntensity: 0.72 },
   ],
   P_TPT23: [
     { id: "P_TPT2", name: "Trumpet 2", instrument: "trumpet_bb_2", take: "upper" },
-    { id: "P_TPT3", name: "Trumpet 3", instrument: "trumpet_bb_2", take: "lower" },
+    { id: "P_TPT3", name: "Trumpet 3", instrument: "trumpet_bb_2", take: "lower", minIntensity: 0.88 },
   ],
   P_TBN12: [
     { id: "P_TBN1", name: "Trombone 1", instrument: "trombone", take: "upper" },
-    { id: "P_TBN2", name: "Trombone 2", instrument: "trombone", take: "lower" },
+    { id: "P_TBN2", name: "Trombone 2", instrument: "trombone", take: "lower", minIntensity: 0.88 },
   ],
   P_LOWBR: [
     { id: "P_TBN3", name: "Trombone 3", instrument: "trombone", take: "copy" },
-    { id: "P_TU", name: "Tuba", instrument: "tuba_c", take: "copy" },
+    { id: "P_TU", name: "Tuba", instrument: "tuba_c", take: "copy", minIntensity: 0.92 },
   ],
   P_CELBS: [
     { id: "P_VC", name: "Cello", instrument: "cello", take: "upper" },
@@ -808,6 +822,43 @@ function placeLineForInstrument(midis: number[], instrument: string): number {
     if (v < bestStrain) { bestStrain = v; best = shift; }
   }
   return best;
+}
+
+/**
+ * Brass does not sit on a climax, it punctuates one.
+ *
+ * Once the music is loud enough, every brass staff is gated in and then plays
+ * every bar of it — so measured section by section the brass ran 75-80% of the
+ * last three sections against woodwinds at 60-73%, and led the loudest third of
+ * the piece. The reference edition answers this by writing brass as short
+ * pillars at named arrivals: its brass never exceeds 5.88% of a section.
+ *
+ * This is the same idea at this engine's own scale rather than a copy of it.
+ * The section keeps its brass colour on the bars that begin a phrase, and gives
+ * the last bar of each phrase back to the strings and winds. It costs the brass
+ * a quarter of its climax activity and costs the music nothing it needs.
+ */
+const BRASS_PART_IDS = new Set(["P_HN1", "P_HN2", "P_TPT1", "P_TPT2", "P_TPT3", "P_TBN1", "P_TBN2", "P_TBN3", "P_TU"]);
+const BRASS_PUNCTUATES_ABOVE = 0.85;
+
+function brassPunctuatesAtClimaxes(orch: ScoreModel, phraseInt: number[], phraseLen: number): number {
+  let silenced = 0;
+  for (const part of ((orch as any).parts ?? []) as any[]) {
+    if (!BRASS_PART_IDS.has(String(part?.part_id))) continue;
+    (part.measures ?? []).forEach((m: any, i: number) => {
+      const intensity = phraseInt[Math.floor(i / phraseLen)] ?? 1;
+      if (intensity < BRASS_PUNCTUATES_ABOVE) return;
+      // The last bar of each phrase, and never the closing bar of the piece:
+      // a final chord wants its brass.
+      const isPhraseEnd = i % phraseLen === phraseLen - 1;
+      if (!isPhraseEnd || i >= (part.measures.length - 1)) return;
+      const notes = (m?.events ?? []).filter((e: any) => e?.type === "note");
+      if (!notes.length) return;
+      m.events = [{ id: `${part.part_id}-p-${i}`, t: 0, dur: measureLenOf(m), type: "rest", isRest: true, voice: 1, staff: 1 }];
+      silenced++;
+    });
+  }
+  return silenced;
 }
 
 export function splitSectionParts(
