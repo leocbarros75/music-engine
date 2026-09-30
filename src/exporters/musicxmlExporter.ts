@@ -833,9 +833,15 @@ function orchestraWithinGroupRank(p: { instrument?: string; part_id?: string; na
   if (s.includes("clarinet")) return 4;
   if (s.includes("bassoon") || s.includes("contrabassoon")) return 5;
 
-  // Brass
-  if (s.includes("trumpet") || s.includes("cornet")) return 1;
-  if (s.includes("horn")) return 2;
+  // Brass. Horns first, then trumpets — the order every orchestration text
+  // sets the family out in, and not the order of pitch: the horn sits between
+  // the woodwinds and the rest of the brass because it blends with both.
+  // This used to rank trumpets first, which the comment beside the export's
+  // preserveOrder list called out as wrong while working around it for four
+  // ensembles rather than fixing it. Anything not on that list — piano_orchestra,
+  // satb_orchestra, piano_with_orchestra — got the wrong order.
+  if (s.includes("horn")) return 1;
+  if (s.includes("trumpet") || s.includes("cornet")) return 2;
   if (s.includes("trombone")) return 3;
   if (s.includes("tuba") || s.includes("euphonium") || s.includes("baritone")) return 4;
 
@@ -1058,8 +1064,9 @@ function renderMusicXML(scoreModel: ScoreModel): string {
   // "Melody" part (90) and flips the melody underneath the piano.
   const ensembleTag = String((scoreModel as any)?.meta?.ensemble ?? "").toLowerCase();
   // symphonic_orchestra also emits deliberate score order (Fl Ob Cl Bsn | Hn Tpt
-  // Tbn Tuba | Timp | strings). The generic sort ranks Trumpet above Horn, which
-  // is wrong for an orchestral score.
+  // Tbn Tuba | Timp | strings). The generic sort used to rank Trumpet above
+  // Horn, which is wrong for an orchestral score; that is fixed at the source
+  // now, so this list is about preserving deliberate order, not dodging a bug.
   const preserveOrder = ensembleTag === "orchestra" || ensembleTag === "full_orchestra" ||
     ensembleTag === "piano_with_melody" || ensembleTag === "symphonic_orchestra";
   const parts = preserveOrder ? partsRaw : sortPartsOrchestrally(partsRaw);

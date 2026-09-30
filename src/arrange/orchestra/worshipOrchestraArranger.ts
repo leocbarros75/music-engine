@@ -235,7 +235,7 @@ export function orchestrateStringCore(
   // user's part selection, the manual ranges and the intensity gating all name
   // the combined staves. Only the score that comes out is one player per staff.
   const splitCount = splitSectionParts(orch, phraseInt, phraseLen);
-  const punctuated = brassPunctuatesAtClimaxes(orch, phraseInt, phraseLen);
+  const punctuated = brassPunctuatesAtClimaxes(orch, phraseInt, phraseLen, pianoLeads);
   if (punctuated) {
     warnings.push(`[orchestra] Brass punctuates the climaxes rather than sitting on them: ${punctuated} phrase-ending bars given back to the strings and winds.`);
   }
@@ -841,17 +841,28 @@ function placeLineForInstrument(midis: number[], instrument: string): number {
 const BRASS_PART_IDS = new Set(["P_HN1", "P_HN2", "P_TPT1", "P_TPT2", "P_TPT3", "P_TBN1", "P_TBN2", "P_TBN3", "P_TU"]);
 const BRASS_PUNCTUATES_ABOVE = 0.85;
 
-function brassPunctuatesAtClimaxes(orch: ScoreModel, phraseInt: number[], phraseLen: number): number {
+function brassPunctuatesAtClimaxes(
+  orch: ScoreModel,
+  phraseInt: number[],
+  phraseLen: number,
+  pianoLeads = false
+): number {
   let silenced = 0;
   for (const part of ((orch as any).parts ?? []) as any[]) {
     if (!BRASS_PART_IDS.has(String(part?.part_id))) continue;
     (part.measures ?? []).forEach((m: any, i: number) => {
       const intensity = phraseInt[Math.floor(i / phraseLen)] ?? 1;
       if (intensity < BRASS_PUNCTUATES_ABOVE) return;
-      // The last bar of each phrase, and never the closing bar of the piece:
-      // a final chord wants its brass.
-      const isPhraseEnd = i % phraseLen === phraseLen - 1;
-      if (!isPhraseEnd || i >= (part.measures.length - 1)) return;
+      // Never the closing bar of the piece: a final chord wants its brass.
+      if (i >= part.measures.length - 1) return;
+      // With a pianist underneath, the brass marks the start of a phrase and
+      // then gets out of the way — which is what the reference means by short
+      // pillars at arrivals, and why its brass never passes 5.88% of a section
+      // even at the end. Without one, it only gives back the phrase's last bar.
+      const give = pianoLeads
+        ? i % phraseLen !== 0
+        : i % phraseLen === phraseLen - 1;
+      if (!give) return;
       const notes = (m?.events ?? []).filter((e: any) => e?.type === "note");
       if (!notes.length) return;
       m.events = [{ id: `${part.part_id}-p-${i}`, t: 0, dur: measureLenOf(m), type: "rest", isRest: true, voice: 1, staff: 1 }];
@@ -1194,6 +1205,8 @@ export type WorshipOrchestraOptions = {
   partRanges?: PartRange[];
   /** Override the per-measure "melody resting" signal (ritornello detection). */
   melodyRests?: boolean[];
+  /** A pianist is playing the piece: winds, brass and percussion hold back. */
+  pianoLeads?: boolean;
 };
 
 /**
@@ -1213,7 +1226,7 @@ export function arrangeWorshipOrchestra(
     ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
     : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
 
-  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, melodyRests: options.melodyRests ?? sourceMelodyRestMeasures(score) });
+  const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, pianoLeads: options.pianoLeads, melodyRests: options.melodyRests ?? sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };
 }
 

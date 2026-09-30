@@ -25,12 +25,19 @@ import { buildFamilyBalance } from '../../src/preservation/familyBalance';
 const SRC = 'outputs/everlasting-love-piano-orchestra/original-piano.musicxml';
 const have = existsSync(SRC);
 
+// Arranging this source now runs the string DP, which costs about half a
+// minute. Every test below wants the same two scores, so build each once.
+const cache = new Map<string, any>();
 const arrange = (ensemble: string) => {
+  const hit = cache.get(ensemble);
+  if (hit) return hit;
   const r: any = pipelineMusicxmlToArrangedMusicxml({
     musicxml: readFileSync(SRC, 'utf8'), settings: { ensemble } as any,
   });
   assert(r.ok, `${ensemble} failed: ${r.error}`);
-  return parseMusicXMLToScoreModel(r.musicxml) as any;
+  const out = parseMusicXMLToScoreModel(r.musicxml) as any;
+  cache.set(ensemble, out);
+  return out;
 };
 const activity = (score: any, family: string) =>
   buildFamilyBalance(score).families.find((f: any) => f.family === family)?.averageActivity ?? 0;
@@ -61,9 +68,14 @@ test('the orchestra gets out of the way', { skip: !have }, () => {
   // The strings are the cushion under the piano and must NOT thin out with the
   // rest — that was the mistake made once already, applying wind thresholds to
   // a string section until the cushion stopped cushioning.
+  //
+  // Compared against a floor rather than against the transcription's own
+  // figure: the two modes are no longer built the same way. This one voices its
+  // strings from the chords so it does not double the pianist, and that lands
+  // near but not on the transcription's value.
   assert(
-    Math.abs(activity(withPiano, 'strings') - activity(transcription, 'strings')) < 0.05,
-    `the strings moved: ${activity(withPiano, 'strings')} vs ${activity(transcription, 'strings')}`
+    activity(withPiano, 'strings') > 0.8,
+    `the cushion thinned out: strings at ${activity(withPiano, 'strings')}`
   );
 });
 
@@ -96,4 +108,64 @@ test('the piano mode still holds back further than the transcription', { skip: !
     brass(withPiano) < brass(transcription) / 2,
     `brass ${brass(withPiano)} vs ${brass(transcription)} — the piano mode is not holding back`
   );
+});
+
+test('the orchestra accompanies the pianist rather than playing along', { skip: !have }, () => {
+  // Built from the CHORDS, not from the piano's own notes. The first version of
+  // this mode used the piano-copy core, so Violin 1 doubled the piano's top
+  // line in 55% of the eighth-note ticks where both sounded. The reference
+  // edition, whose stated aim is warmth "without replacing the piano melody",
+  // doubles in 17%.
+  const out = arrange('piano_with_orchestra');
+  const piano = out.parts.find((p: any) => /piano|keyboard/i.test(String(p.name)));
+  const v1 = out.parts.find((p: any) => /violin 1|violin i\b/i.test(String(p.name)));
+  assert(piano && v1, 'need both the piano and Violin 1');
+
+  const top = (part: any, bar: number, t: number, staff1Only: boolean): number | null => {
+    const es = (part.measures[bar]?.events ?? [])
+      .filter((e: any) => e.type === 'note' && Number(e.t) <= t + 1e-9 && Number(e.t) + Number(e.dur) > t + 1e-9)
+      .filter((e: any) => !staff1Only || Number(e.staff ?? 1) === 1)
+      .map((e: any) => Number(e.midi))
+      .filter((m: number) => Number.isFinite(m));
+    return es.length ? Math.max(...es) : null;
+  };
+  let sampled = 0, unison = 0;
+  const bars = Math.min(piano.measures.length, v1.measures.length);
+  for (let b = 0; b < bars; b++) {
+    for (let t = 0; t < 4; t += 0.5) {
+      const p = top(piano, b, t, true);
+      const v = top(v1, b, t, false);
+      if (p === null || v === null) continue;
+      sampled++;
+      if (p === v) unison++;
+    }
+  }
+  assert(sampled > 100, `too few overlapping ticks to judge: ${sampled}`);
+  const rate = unison / sampled;
+  assert(rate < 0.25, `Violin 1 doubles the piano in ${Math.round(100 * rate)}% of ticks`);
+});
+
+test('the score is laid out the way orchestration books set it out', { skip: !have }, () => {
+  // Woodwinds, brass, percussion, keyboard, strings — with the horns at the top
+  // of the brass (they bridge the woodwinds and the rest of it, which is why
+  // every text puts them first despite the trumpets being higher), and the
+  // piano between the percussion and the strings.
+  const names: string[] = arrange('piano_with_orchestra').parts.map((p: any) => String(p.name));
+  const at = (re: RegExp) => names.findIndex((n) => re.test(n));
+
+  const flute = at(/^flute/i), bassoon = at(/^bassoon/i);
+  const horn1 = at(/^horn 1/i), trumpet1 = at(/^trumpet 1/i), tuba = at(/^tuba/i);
+  const timpani = at(/^timpani/i), piano = at(/^piano/i), violin1 = at(/^violin 1/i);
+  for (const [label, i] of [['flute', flute], ['bassoon', bassoon], ['horn 1', horn1],
+    ['trumpet 1', trumpet1], ['tuba', tuba], ['timpani', timpani], ['piano', piano],
+    ['violin 1', violin1]] as Array<[string, number]>) {
+    assert(i >= 0, `${label} is missing from the score: ${names.join(', ')}`);
+  }
+  assert(flute < bassoon, 'the woodwinds are out of order');
+  assert(bassoon < horn1, 'the brass should follow the woodwinds');
+  assert(horn1 < trumpet1, 'horns come before trumpets in an orchestral score');
+  assert(trumpet1 < tuba, 'the tuba belongs at the bottom of the brass');
+  assert(tuba < timpani, 'percussion follows the brass');
+  assert(timpani < piano, 'the piano sits below the percussion');
+  assert(piano < violin1, 'the piano sits above the strings');
 });

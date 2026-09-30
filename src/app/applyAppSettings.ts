@@ -2436,11 +2436,27 @@ export function applyAppSettings(
   }
 
   if (wantsPianoWithOrchestra) {
-    // The pianist keeps the music; the orchestra is written around it. Same
-    // shape as piano_with_strings: the orchestra is built from the piano as its
-    // harmony source, then the untouched piano part goes back into the score.
-    const orchResult = arrangeWorshipOrchestraFromPiano(scoreModel, {
+    // The pianist keeps the music; the orchestra is written around it.
+    //
+    // Built from the CHORDS, not from the piano's own notes. The first version
+    // of this mode used the piano-copy core, which meant the orchestra played
+    // what the pianist played: Violin 1 doubled the piano's top line in 55% of
+    // the eighth-note ticks where both sounded, against 17% in the reference
+    // edition, whose stated aim is warmth "without replacing the piano melody".
+    // The chord-driven core is the same one piano_with_strings uses, and that
+    // mode doubles in 3%.
+    const orchChords = chords.length ? chords : inferChordsFromAllVoices(scoreModel);
+    if (!orchChords.length) {
+      warnings.push("[piano+orchestra] Could not infer chords from the piano — the orchestra may be sparse.");
+    }
+    const orchResult = arrangeWorshipOrchestra(scoreModel, orchChords as any, {
       warnings,
+      chords: orchChords as any,
+      key: { fifths: detectedInputKeyFifths, mode: detectedMode },
+      profile: (settings.orchestraTexture === "chorale" ? "bach_chorale"
+        : settings.orchestraTexture === "contrapuntal" ? "countermelody"
+        : "melody_harmony") as any,
+      level: settings.level,
       intensity: settings.orchestraIntensity ?? "build",
       parts: settings.orchestraParts,
       balance: settings.orchestraBalance ?? "default",
