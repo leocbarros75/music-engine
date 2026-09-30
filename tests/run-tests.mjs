@@ -67,6 +67,7 @@ async function main() {
       'tests/arrange/pianoWithOrchestra.test.ts',
       'tests/arrange/innerStringsHold.test.ts',
       'tests/arrange/sectionSplit.test.ts',
+      'tests/arrange/ensembleRouting.test.ts',
       'tests/arrange/innerVoiceMotion.test.ts',
       'tests/arrange/bowing.test.ts',
       'tests/arrange/altoUnderMelody.test.ts',

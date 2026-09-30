@@ -166,6 +166,8 @@ function describeArc(
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import { restThinBars, restArcSentence } from "../arrange/strings/restArc";
+import { mapPianoToJazzBandOpen } from "../arrange/mapToJazzBand";
+import { mapPianoToPercussionOpen } from "../arrange/mapToPercussion";
 import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
 import { arrangeSatbToWoodwindQuartetDirect } from "../arrange/woodwinds/arrangeSatbToWoodwindQuartet";
@@ -1841,6 +1843,34 @@ export function applyAppSettings(
   // accompany them, the way piano_with_strings does for a string section.
   const wantsPianoWithOrchestra = ensemble === "piano_with_orchestra";
   const wantsSatbOrchestra    = ensemble === "satb_orchestra";
+  // Both of these have had a working arranger all along — mapToJazzBand.ts and
+  // mapToPercussion.ts — reachable only through arrangeRouter.ts, which nothing
+  // imports any more. The router went dead when the worship orchestra replaced
+  // mapPianoToFullOrchestraOpen, and these two went with it unnoticed, because
+  // an unrecognised ensemble falls through to SATB without saying so.
+  const wantsJazzBand         = ensemble === "jazz_band";
+  const wantsPercussion       = ensemble === "percussion";
+
+  // An ensemble nobody recognises currently produces a four-part chorale in
+  // silence: "jazz_band", "percussion" and a name typed at random all returned
+  // the same SATB score, byte for byte. Answering a question nobody asked is
+  // worse than refusing, so say so.
+  const KNOWN_ENSEMBLES = new Set([
+    "choral", "satb",
+    "piano", "grand_piano", "acoustic_piano", "piano_with_melody",
+    "string_ensemble", "strings", "piano_string_quartet", "satb_string_quartet", "piano_with_strings",
+    "woodwind_ensemble", "woodwinds", "piano_woodwind_quartet", "satb_woodwind_quartet", "piano_with_woodwinds",
+    "brass_ensemble", "brass", "piano_brass_quartet", "satb_brass_quartet", "piano_with_brass",
+    "orchestra", "full_orchestra", "symphonic_orchestra",
+    "piano_orchestra", "piano_with_orchestra", "satb_orchestra",
+    "jazz_band", "percussion", "reinstrument",
+  ]);
+  if (ensemble && !KNOWN_ENSEMBLES.has(ensemble)) {
+    warnings.push(
+      `[ensemble] "${ensemble}" is not an ensemble this engine knows, so it has been arranged for four voices ` +
+      `(soprano, alto, tenor, bass). Pick one of: ${[...KNOWN_ENSEMBLES].sort().join(", ")}.`
+    );
+  }
   const useStringEnsembleArranger = settings.useStringEnsembleArranger !== false;
   const instrumentation = settings.instrumentation ?? "auto";
   const usePianoCopyStringQuartetInstrumentation =
@@ -2427,6 +2457,31 @@ export function applyAppSettings(
     attachTextureAnalysis(brResult.scoreModel, warnings);
     return {
       scoreModel: brResult.scoreModel as ScoreModel,
+      warnings,
+      detectedInputKeyFifths,
+      appliedTransposeSemitones,
+      styleUsed,
+      cadenceMeasures: []
+    };
+  }
+
+  if (wantsJazzBand || wantsPercussion) {
+    // Straight through to the arranger that was written for it. Neither takes
+    // the harmonizer's output: both read the piano source directly, which is
+    // why they sat outside the SATB path and were easy to lose.
+    const finalScore = wantsJazzBand
+      ? mapPianoToJazzBandOpen(scoreModel)
+      : mapPianoToPercussionOpen(scoreModel);
+    const played = ((finalScore as any)?.parts ?? []).filter((p: any) =>
+      (p?.measures ?? []).some((m: any) => (m?.events ?? []).some((e: any) => e?.type === "note" || e?.type === "unpitched")));
+    if (!played.length) {
+      warnings.push(`[${ensemble}] The arranger produced no sounding parts from this source.`);
+    } else {
+      warnings.push(`[${ensemble}] ${played.length} part(s): ${played.map((p: any) => String(p.name)).join(", ")}.`);
+    }
+    attachTextureAnalysis(finalScore as any, warnings);
+    return {
+      scoreModel: finalScore as ScoreModel,
       warnings,
       detectedInputKeyFifths,
       appliedTransposeSemitones,
