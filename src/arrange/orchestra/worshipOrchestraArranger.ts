@@ -267,7 +267,20 @@ function remapAndRebuildFallback(stringScore: ScoreModel, intensity: IntensityMo
 // Real charts measured: strings ~82–99%, horn ~54–83%, trumpets/tbn ~55–75%,
 // low brass lowest-start→highest-end, flute descant ~50%.
 const SECTION_THRESHOLD: Record<string, number> = {
-  P_VLN1: 0.10, P_VLN2: 0.12, P_VLA: 0.14, P_CELBS: 0.12, // strings — near-constant
+  P_VLN1: 0.10, P_VLN2: 0.12, P_CELBS: 0.12,               // strings — near-constant
+  // The viola is the exception among the strings, and deliberately so. At 0.14
+  // it played 71 of 79 bars, giving 256 events against the reference edition's
+  // 121 across 47 bars. The difference was never re-articulation — ours has
+  // FEWER repeated notes than theirs, 18 against 31 — it was that their viola
+  // sits out a third of the piece. Their own table says why: "deeper interior
+  // tone; SELECTED octave support in larger sections". It thins the middle of
+  // the texture in the quiet music and fills it when the music opens up, which
+  // is a decision rather than an absence.
+  //
+  // The other four stay near-constant. They are the cushion, and thinning the
+  // cushion is a mistake already made here once, when wind thresholds were put
+  // on a string section until it stopped cushioning.
+  P_VLA: 0.46,
   P_HN12: 0.50,                                            // horn — present inner glue
   // Clarinet/Bassoon pulled back (was 0.40/0.34) to hit the pro family balance —
   // 3 doubling wind parts were over-weighting winds (21% vs 16% target). Reserving

@@ -169,3 +169,50 @@ test('the score is laid out the way orchestration books set it out', { skip: !ha
   assert(timpani < piano, 'the piano sits below the percussion');
   assert(piano < violin1, 'the piano sits above the strings');
 });
+
+test('the viola is a selected voice, and the rest of the cushion is not', { skip: !have }, () => {
+  // The viola played 71 of 79 bars — 256 events against the reference's 121
+  // across 47. The difference was never re-articulation: ours has FEWER
+  // repeated notes than theirs, 18 against 31. Their viola simply sits out a
+  // third of the piece, which their own table calls "selected octave support in
+  // larger sections". It thins the middle in the quiet music and fills it when
+  // the music opens up.
+  //
+  // The other four strings must NOT follow it. They are the cushion, and
+  // thinning the cushion is a mistake this repo has made once already.
+  const out = arrange('piano_orchestra');
+  const barsPlayed = (re: RegExp): number => {
+    const p = out.parts.find((x: any) => re.test(String(x.name)));
+    assert(p, `no part matching ${re}`);
+    return (p.measures ?? []).filter((m: any) =>
+      (m.events ?? []).some((e: any) => e.type === 'note')).length;
+  };
+  const total = out.parts[0].measures.length;
+  const viola = barsPlayed(/^viola/i);
+
+  assert(viola < total * 0.75, `the viola plays ${viola} of ${total} bars — it is not selective`);
+  assert(viola > total * 0.35, `the viola plays only ${viola} of ${total} bars — it has stopped supporting`);
+  for (const re of [/^violin 1/i, /^violin 2/i, /^cello/i]) {
+    const n = barsPlayed(re);
+    assert(n > viola, `${re} plays ${n} bars, no more than the viola's ${viola} — the cushion thinned with it`);
+  }
+});
+
+test('no bar of the transcription is left with a thin string section', { skip: !have }, () => {
+  // Making one inner voice selective must not leave a bar without harmony.
+  // Only the transcription is checked: in the piano modes the orchestra enters
+  // gradually on purpose and the pianist covers the opening.
+  const out = arrange('piano_orchestra');
+  const strings = out.parts.filter((p: any) =>
+    /violin|viola|cello|double bass/i.test(String(p.name)));
+  assert(strings.length >= 5, `expected the full section, found ${strings.length}`);
+  const bars = Math.max(...strings.map((p: any) => (p.measures ?? []).length));
+  for (let i = 0; i < bars; i++) {
+    const sounding = strings.filter((p: any) =>
+      (p.measures?.[i]?.events ?? []).some((e: any) => e.type === 'note')).length;
+    const anyoneAtAll = out.parts.some((p: any) =>
+      (p.measures?.[i]?.events ?? []).some((e: any) => e.type === 'note'));
+    if (!anyoneAtAll) continue;
+    assert(sounding >= 3, `bar ${i + 1} has only ${sounding} string voice(s)`);
+  }
+});
