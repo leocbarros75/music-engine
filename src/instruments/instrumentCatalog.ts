@@ -23,6 +23,12 @@ export type InstrumentId =
   | "alto_sax_eb"
   | "tenor_sax_bb"
   | "baritone_sax_eb"
+  // Voices. A choral part had no entry at all, so the playability audit skipped
+  // its range check and reported a Soprano containing D1 as entirely in range.
+  | "soprano"
+  | "alto"
+  | "tenor"
+  | "bass_voice"
   | "timpani"
   | "glockenspiel"
   | "tubular_bells"
@@ -270,6 +276,36 @@ export const InstrumentCatalog: Record<InstrumentId, InstrumentSpec> = {
   },
 
   // ---- Pitched percussion (concert pitch) ----
+  // ---- Voices ----
+  // A choral part had no entry here at all, so getInstrumentSpec returned null
+  // and the playability audit skipped the range check entirely: it reported
+  // outOfRange 0 for a Soprano part containing D1.
+  //
+  // The figures are the harmonizer's own, drawn from Bach and Handel — the
+  // audit has to judge against the same ranges the generator targets, or the
+  // two would disagree about the same note. Comfortable bounds are the
+  // composers' observed working registers rather than the extremes.
+  soprano: {
+    id: "soprano", name: "Soprano", clef: "treble",
+    midi_low: 60, midi_high: 82,      // C4..Bb5
+    preferred_low: 62, preferred_high: 79
+  },
+  alto: {
+    id: "alto", name: "Alto", clef: "treble",
+    midi_low: 52, midi_high: 74,      // E3..D5
+    preferred_low: 55, preferred_high: 72
+  },
+  tenor: {
+    id: "tenor", name: "Tenor", clef: "treble",
+    midi_low: 48, midi_high: 69,      // C3..A4
+    preferred_low: 50, preferred_high: 67
+  },
+  bass_voice: {
+    id: "bass_voice", name: "Bass", clef: "bass",
+    midi_low: 36, midi_high: 63,      // C2..Eb4
+    preferred_low: 43, preferred_high: 60
+  },
+
   timpani: {
     id: "timpani",
     name: "Timpani",

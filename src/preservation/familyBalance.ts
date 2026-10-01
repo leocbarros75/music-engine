@@ -205,6 +205,19 @@ export function buildFamilyBalance(
     const of = (f: Family) => families.find((x) => x.family === f) ?? null;
     const st = of("strings"), ww = of("woodwinds"), br = of("brass");
     if (!st || !ww || !br) return { holds: null, violations: [] };
+    // Strings over winds over brass is a statement about an ensemble that HAS a
+    // string section. A jazz band does not: its one "Bass" is a rhythm-section
+    // instrument that happens to share a word with the double bass, and judging
+    // it against five horns reported every bar of every jazz chart as out of
+    // order. The third time that word has caused this — the same ambiguity
+    // decides who breathes and which range a part is judged by.
+    //
+    // Counting parts was the first attempt and it was the wrong measure: it
+    // also dismissed a section written as one violin line, which is how the
+    // tests here describe a string section and a fair way to describe one. What
+    // settles it is whether any string part names an instrument that can only
+    // BE a string. "Violin" can. "Bass" cannot.
+    if (!hasNamedStrings) return { holds: null, violations: [] };
     if (st.averageActivity <= EPS && ww.averageActivity <= EPS && br.averageActivity <= EPS) {
       return { holds: null, violations: [] };
     }
@@ -218,6 +231,10 @@ export function buildFamilyBalance(
     }
     return { holds: violations.length === 0, violations };
   };
+
+  // Does anything here have to be a string? A part called "Bass" does not.
+  const hasNamedStrings = parts.some((p: any) =>
+    /violin|viola|cello|contrabass|double\s*bass|vln|vla/i.test(`${p?.name ?? ""} ${p?.instrument ?? ""}`));
 
   const families = over(0, barCount);
   const whole = judge(families);

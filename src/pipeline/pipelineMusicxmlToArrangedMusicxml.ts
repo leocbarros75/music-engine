@@ -63,6 +63,84 @@ export type PipelineError = {
   warnings: string[];
 };
 
+/**
+ * Reduce a part to the single line a singer could actually take from it.
+ *
+ * Per onset: the highest note of the upper staff, or of whatever is sounding
+ * when the upper staff is silent. A chord becomes its top note, so what comes
+ * back is monophonic — which is what "melody" means to the harmonizer, and what
+ * it had been assuming it was given.
+ *
+ * Only the part the harmonizer would have chosen is reduced; the rest of the
+ * score is left alone for whatever else reads it.
+ */
+function soprano<T extends { parts?: any[] }>(score: T): T {
+  const parts: any[] = (score as any)?.parts ?? [];
+  if (!parts.length) return score;
+
+  // The same part the harmonizer picks: one named for a voice, else the one
+  // sitting highest on average.
+  const named = parts.findIndex((p) =>
+    /soprano|melody|voice/i.test(String(p?.name ?? "")));
+  let index = named;
+  if (index < 0) {
+    let best = -Infinity;
+    parts.forEach((p, i) => {
+      const midis: number[] = [];
+      for (const m of p?.measures ?? []) {
+        for (const e of m?.events ?? []) {
+          if (e?.type !== "note") continue;
+          const v = typeof e.midi === "number" ? e.midi : null;
+          if (v !== null) midis.push(v);
+        }
+      }
+      if (!midis.length) return;
+      const avg = midis.reduce((a, b) => a + b, 0) / midis.length;
+      if (avg > best) { best = avg; index = i; }
+    });
+  }
+  if (index < 0) return score;
+
+  const part = parts[index];
+  const measures = (part?.measures ?? []).map((m: any) => {
+    const events: any[] = m?.events ?? [];
+    const notes = events.filter((e) => e?.type === "note" && !e.grace);
+    if (notes.length < 2) return m;
+    const others = events.filter((e) => !(e?.type === "note" && !e.grace));
+
+    const byOnset = new Map<number, any[]>();
+    for (const e of notes) {
+      const t = Number(e.t);
+      if (!byOnset.has(t)) byOnset.set(t, []);
+      byOnset.get(t)!.push(e);
+    }
+    const kept: any[] = [];
+    for (const [, group] of byOnset) {
+      const upper = group.filter((e) => Number(e.staff ?? 1) === 1);
+      // Nothing attacking in the upper staff means the right hand is HOLDING
+      // while the left hand moves underneath — 117 of this source's 354 onsets.
+      // Falling back to whatever else is sounding hands the singer the bass
+      // line there, which is where a D1 turned up in a soprano part. The melody
+      // simply carries on through.
+      if (!upper.length) continue;
+      const pool = upper;
+      let top = pool[0];
+      for (const e of pool) {
+        const a = typeof e.midi === "number" ? e.midi : -Infinity;
+        const b = typeof top.midi === "number" ? top.midi : -Infinity;
+        if (a > b) top = e;
+      }
+      kept.push(top);
+    }
+    kept.sort((a, b) => Number(a.t) - Number(b.t));
+    return { ...m, events: [...others, ...kept].sort((a, b) => Number(a.t) - Number(b.t)) };
+  });
+
+  const out = parts.slice();
+  out[index] = { ...part, measures };
+  return { ...(score as any), parts: out };
+}
+
 function normalizeHarmonizeReturn(x: any): any {
   if (x && typeof x === "object" && "scoreModel" in x) return (x as any).scoreModel;
   return x;
@@ -220,7 +298,22 @@ export function pipelineMusicxmlToArrangedMusicxml(
     if (isCopyInstrumentation) {
       harmonizedScore = inputScore;
     } else {
-      const melodyInput = protection.lock ? { ...inputScore, meta: { ...inputScore.meta, inputKeyFifths: protection.lock.expected.measures[0]?.attributes?.key_fifths }, parts: inputScore.parts.filter(p => p.part_id === protection.lock!.partId) } : inputScore;
+      // What the harmonizer is handed as "the melody".
+      //
+      // With a lock it gets the one protected part, which is a melody by
+      // definition. WITHOUT one it was handed the whole score — and a piano
+      // source has no lock, because a lock needs a single unambiguous
+      // monophonic part and a two-stave piano is not one. So the harmonizer
+      // took the piano part entire and sang it: Soprano came out with all 1005
+      // notes of it, spanning D1 to D#5, with four notes sounding at once on
+      // 110 onsets, five on 57 and six on two.
+      //
+      // The same mistake the string DP made, where taking the first sounding
+      // note handed Violin I the left hand. The tune is the top line of the
+      // upper staff.
+      const melodyInput = protection.lock
+        ? { ...inputScore, meta: { ...inputScore.meta, inputKeyFifths: protection.lock.expected.measures[0]?.attributes?.key_fifths }, parts: inputScore.parts.filter(p => p.part_id === protection.lock!.partId) }
+        : soprano(inputScore);
       let outScore: any;
       try {
         outScore = (harmonizeSatbFromChords as any)(melodyInput, finalChords, harmOpts);

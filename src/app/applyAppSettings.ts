@@ -38,6 +38,45 @@ import { applyBreathing, isSectionPart, markStaggeredBreathing } from "../arrang
  * These are church volunteers as often as professionals. A player who can
  * busk a breath where none is written is not the player this is for.
  */
+/**
+ * Give the singers somewhere to breathe.
+ *
+ * Nothing ever did. All four voices ran 188 to 248 beats without air — three
+ * and a half minutes for the sopranos — in music whose whole point is that
+ * people sing it. Of every player in this engine a singer needs air most, and
+ * theirs was the last route to get any.
+ *
+ * Eight beats, which is the limit for winds who have nobody underneath them,
+ * and a four-part texture is exactly that case: each voice is carrying a line
+ * nobody else is holding. The rest is written as well as the comma, because
+ * this is a transcription of a continuous piano texture and there is no other
+ * air anywhere in it.
+ *
+ * A part only counts as a voice when it stands with others — a lone "Bass" in a
+ * rhythm section is a bass player.
+ */
+const VOICE_PART = /^(soprano|mezzo|alto|contralto|tenor|baritone|bass)\b/i;
+const BLOWN = /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium/i;
+
+function breatheVoices(warnings: string[], parts: any[]): void {
+  const voices = (parts ?? []).filter((p) => {
+    const n = String(p?.name ?? "");
+    return VOICE_PART.test(n) && !BLOWN.test(`${n} ${p?.instrument ?? ""}`);
+  });
+  if (voices.length < 3) return;          // not a choir
+  const plan = applyBreathing(voices as any);
+  if (!plan.releases && !plan.marks) return;
+  const bpm = quarterBpmOf(parts?.[0]?.measures ?? []);
+  const seconds = bpm ? ` — about ${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s` : "";
+  warnings.push(
+    `[choral] Staggered breathing for ${voices.length} voices: ${plan.releases} breath rest` +
+    `${plan.releases === 1 ? "" : "s"} (each carrying its comma) and ${plan.marks} comma` +
+    `${plan.marks === 1 ? "" : "s"} alone, so the parts never stop together. ` +
+    `Longest stretch without air now ${plan.longestBreathlessBeats.toFixed(0)} beats${seconds}. ` +
+    "Move them to suit the words; a singer breathes where the sentence does."
+  );
+}
+
 function breatheOrchestra(warnings: string[], label: string, parts: any[]): void {
   const winds = (parts ?? []).filter((p) =>
     /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium/i
@@ -3196,6 +3235,8 @@ export function applyAppSettings(
           })()
         : arrangeStringEnsembleFromSatb(scoreModel, { level: settings.level, warnings })
       : scoreModel;
+  // Singers were the last to be given any air at all.
+  breatheVoices(warnings, (finalScore as any)?.parts ?? []);
   attachTextureAnalysis(finalScore, warnings);
 
   return {

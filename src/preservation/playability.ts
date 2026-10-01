@@ -100,10 +100,31 @@ export function buildPlayabilityAudit(score: ScoreModel): PlayabilityAudit {
   let totalOutOfRange = 0;
   let worst: { part: string; beats: number } | null = null;
 
+  /**
+   * Which range to judge this part against.
+   *
+   * A singer's part carries a voice name as its instrument — "Soprano",
+   * "Bass" — and "Bass" is also what the jazz band calls its bass player. The
+   * same company-it-keeps test that decides who breathes decides this too, or a
+   * bassist gets judged against a baritone's range and every low note is a
+   * fault.
+   */
+  const specForVoice = (name: string) => {
+    const n = name.toLowerCase();
+    if (/^soprano|^mezzo/.test(n)) return getInstrumentSpec("soprano");
+    if (/^alto|^contralto/.test(n)) return getInstrumentSpec("alto");
+    if (/^tenor/.test(n)) return getInstrumentSpec("tenor");
+    if (/^bass|^baritone/.test(n)) return getInstrumentSpec("bass_voice");
+    return null;
+  };
+
   for (const part of (score as any)?.parts ?? []) {
     const measures = part?.measures ?? [];
     const lengths = barLengths(measures);
-    const spec = getInstrumentSpec(part?.instrument);
+    const partName = String(part?.name ?? part?.part_id ?? "?");
+    const singing = isChoir && VOICE_NAME.test(partName) &&
+      !WIND_OR_BRASS.test(`${partName} ${part?.instrument ?? ""}`);
+    const spec = (singing ? specForVoice(partName) : null) ?? getInstrumentSpec(part?.instrument);
 
     // Every sounding span, laid on one timeline so a run can be followed
     // across barlines. A breath mark ends a span: the player takes the time

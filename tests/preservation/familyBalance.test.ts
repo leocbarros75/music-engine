@@ -166,3 +166,29 @@ test('every section is reported, in order, covering the whole piece', () => {
     'sections must tile the piece with no gap and no overlap'
   );
 });
+
+test('a rhythm section is not judged as a string section', () => {
+  // A jazz band's one "Bass" classifies as a string because it shares a word
+  // with the double bass, and judging a section of one against five horns
+  // reported every bar of every jazz chart as out of order. Strings over winds
+  // over brass is a statement about an ensemble that HAS a string section.
+  const b = buildFamilyBalance(score([
+    varying('Bass', Array(16).fill(4)),        // the rhythm section's bass
+    varying('Alto Sax', Array(16).fill(4)),
+    varying('Trumpet', Array(16).fill(4)),
+  ]), { sectionBars: 8 });
+  assert.equal(b.hierarchyHolds, null, 'a lone bass was treated as a string section');
+  assert.equal(b.sectionsOutOfOrder, 0);
+
+  // Counting string parts was the first attempt at this and it was the wrong
+  // measure: it also dismissed a section written as a single violin line, which
+  // is how the fixtures above describe one. A single VIOLIN is still a string
+  // section, because a violin cannot be anything else.
+  const oneViolin = buildFamilyBalance(score([
+    varying('Violin', Array(16).fill(4)),
+    varying('Flute', Array(16).fill(1)),
+    varying('Trumpet', Array(16).fill(3)),     // out of order on purpose
+  ]), { sectionBars: 8 });
+  assert.equal(oneViolin.hierarchyHolds, false,
+    'one violin line stopped counting as a string section');
+});
