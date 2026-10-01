@@ -1,0 +1,6986 @@
+<?xml version='1.0' encoding='utf-8'?>
+<score-partwise version="4.0">
+  <work>
+    <work-title>The Everlasting Love of God</work-title>
+  </work>
+  <identification>
+    <creator type="composer">Matt Boswell, Matt Papa,
+Matt Redman</creator>
+    <creator type="arranger">Jeff Moore
+Orch. by Daniel Galbraith</creator>
+    <creator type="arranger">Jazz band accompaniment: editorial arrangement</creator>
+    <rights>2020 Getty Music Hymns and Songs, Getty Music Publishing, Love Your Enemies Publishing, Messenger Hymns (Admin. by Music Services, Inc.) Integrity Worship Music, Said And Done Music (Admin by Capitol CMG Publishing) | All rights reserved. Used by permission | CCLI #PENDING | Duplication of this music is not allowed except under the terms outlined at www.praisecharts.com/copyright</rights>
+    <encoding>
+      <software>Finale v27.4 for Mac</software>
+      <encoding-date>2026-09-28</encoding-date>
+      <supports attribute="new-system" element="print" type="yes" value="yes" />
+      <supports attribute="new-page" element="print" type="yes" value="yes" />
+      <supports element="accidental" type="yes" />
+      <supports element="beam" type="yes" />
+      <supports element="stem" type="yes" />
+    </encoding>
+  </identification>
+  <defaults>
+    <scaling>
+      <millimeters>7</millimeters>
+      <tenths>40</tenths>
+    </scaling>
+    <page-layout>
+      <page-height>1697</page-height>
+      <page-width>1200</page-width>
+      <page-margins type="both">
+        <left-margin>70</left-margin>
+        <right-margin>70</right-margin>
+        <top-margin>70</top-margin>
+        <bottom-margin>70</bottom-margin>
+      </page-margins>
+    </page-layout>
+  </defaults>
+  <credit page="1">
+    <credit-type>title</credit-type>
+    <credit-words font-size="23" default-x="600.0" default-y="1632" justify="center" valign="top">The Everlasting Love of God</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-type>subtitle</credit-type>
+    <credit-words font-size="11" default-x="600.0" default-y="1587" justify="center" valign="top">Drum Set | Jazz ballad</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-type>composer</credit-type>
+    <credit-words font-size="10" default-x="600.0" default-y="1549" justify="center" valign="top">Matt Boswell, Matt Papa and Matt Redman</credit-words>
+  </credit>
+  <part-list>
+    <score-part id="DR">
+      <part-name>Drum Set</part-name>
+      <part-abbreviation>Dr.</part-abbreviation>
+      <score-instrument id="DR-kick">
+        <instrument-name>Bass drum</instrument-name>
+      </score-instrument>
+      <score-instrument id="DR-snare">
+        <instrument-name>Snare / brushes</instrument-name>
+      </score-instrument>
+      <score-instrument id="DR-hat">
+        <instrument-name>Closed hi-hat</instrument-name>
+      </score-instrument>
+      <score-instrument id="DR-ride">
+        <instrument-name>Ride cymbal</instrument-name>
+      </score-instrument>
+      <midi-device port="2" />
+      <midi-instrument id="DR-kick">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>37</midi-unpitched>
+      </midi-instrument>
+      <midi-instrument id="DR-snare">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>39</midi-unpitched>
+      </midi-instrument>
+      <midi-instrument id="DR-hat">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>43</midi-unpitched>
+      </midi-instrument>
+      <midi-instrument id="DR-ride">
+        <midi-channel>10</midi-channel>
+        <midi-program>1</midi-program>
+        <midi-unpitched>52</midi-unpitched>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="DR">
+    <measure number="1">
+      <attributes>
+        <divisions>8</divisions>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>percussion</sign>
+        </clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <words>Brushes; light cymbal pulse. Pattern may be varied softly.</words>
+        </direction-type>
+      </direction>
+      <direction placement="above">
+        <direction-type>
+          <words>Jazz ballad - quarter = 72; even eighths</words>
+        </direction-type>
+        <sound tempo="72" />
+      </direction>
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>Introduction</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <rest measure="yes" />
+        <duration>32</duration>
+        <type>whole</type>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="2">
+      <note>
+        <rest measure="yes" />
+        <duration>32</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+    <measure number="3">
+      <note>
+        <rest measure="yes" />
+        <duration>32</duration>
+        <type>whole</type>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="4">
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>A - Verse 1</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="5">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="6">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="7">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="8">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="9">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="10">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="11">
+      <attributes>
+        <time>
+          <beats>2</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="12">
+      <attributes>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="13">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="14">
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>B - Verse 2</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="15">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="16">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="17">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="18">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="19">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="20">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="21">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+        <ending number="" type="stop" />
+      </barline>
+    </measure>
+    <measure number="22">
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>C - Chorus</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <direction placement="above">
+        <direction-type>
+          <segno smufl="segnoSerpent1" />
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="23">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="24">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="25">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="26">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="27">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="28">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="29">
+      <attributes>
+        <time>
+          <beats>3</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="30">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="31">
+      <print new-page="yes" />
+      <attributes>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>D - Verse 3</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="32">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="33">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="34">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="35">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="36">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="37">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="38">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="39">
+      <direction placement="above">
+        <direction-type>
+          <words font-size="12" font-weight="bold">Coda</words>
+        </direction-type>
+        <direction-type>
+          <coda font-size="24" />
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="40">
+      <attributes>
+        <time>
+          <beats>3</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>E - Instrumental</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="41">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="42">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="43">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="44">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="45">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="46">
+      <attributes>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>F - Verse 4</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="47">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="48">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="49">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="50">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="51">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="52">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="53">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="54">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="55">
+      <attributes>
+        <time>
+          <beats>2</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="56">
+      <attributes>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="57">
+      <print new-page="yes" />
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>G - Chorus</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="58">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="59">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="60">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="61">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="62">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="63">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="64">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="65">
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>H - Chorus</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="66">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="67">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="68">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="69">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="70">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="71">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="72">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="73">
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="74">
+      <attributes>
+        <time>
+          <beats>2</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="75">
+      <attributes>
+        <time>
+          <beats>3</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>Closing</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="76">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="77">
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>C</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-snare" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <unpitched>
+          <display-step>G</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-hat" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+    </measure>
+    <measure number="78">
+      <attributes>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <words>Molto rit. - follow piano</words>
+        </direction-type>
+      </direction>
+      <note>
+        <rest measure="yes" />
+        <duration>32</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+    <measure number="79">
+      <direction placement="above">
+        <direction-type>
+          <rehearsal>Final release</rehearsal>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics>
+            <pp />
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-ride" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>x</notehead>
+      </note>
+      <note>
+        <chord />
+        <unpitched>
+          <display-step>F</display-step>
+          <display-octave>4</display-octave>
+        </unpitched>
+        <duration>8</duration>
+        <instrument id="DR-kick" />
+        <type>quarter</type>
+        <stem>up</stem>
+        <notehead>normal</notehead>
+      </note>
+      <note>
+        <rest />
+        <duration>24</duration>
+        <type>half</type>
+        <dot />
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>

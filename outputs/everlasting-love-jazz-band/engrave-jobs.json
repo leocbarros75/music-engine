@@ -1,0 +1,74 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-jazz-band.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-jazz-band.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-AS1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-AS1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-AS2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-AS2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TS1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TS1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TS2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TS2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-BS.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-BS.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP3.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP3.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP4.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TP4.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TB1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TB1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TB2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TB2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TB3.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-TB3.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-BT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-BT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-GT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-GT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-BA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-BA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-DR.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-DR.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-piano.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/everlasting-love-jazz-band/everlasting-love-piano.pdf"
+  }
+]

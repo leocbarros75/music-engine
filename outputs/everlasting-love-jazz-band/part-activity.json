@@ -1,0 +1,66 @@
+{
+  "AS1": {
+    "events": 84,
+    "active_quarter_beats": 85.75
+  },
+  "AS2": {
+    "events": 103,
+    "active_quarter_beats": 124.5
+  },
+  "TS1": {
+    "events": 103,
+    "active_quarter_beats": 124.5
+  },
+  "TS2": {
+    "events": 103,
+    "active_quarter_beats": 124.5
+  },
+  "BS": {
+    "events": 103,
+    "active_quarter_beats": 124.5
+  },
+  "TP1": {
+    "events": 8,
+    "active_quarter_beats": 8.5
+  },
+  "TP2": {
+    "events": 8,
+    "active_quarter_beats": 8.5
+  },
+  "TP3": {
+    "events": 8,
+    "active_quarter_beats": 8.5
+  },
+  "TP4": {
+    "events": 8,
+    "active_quarter_beats": 8.5
+  },
+  "TB1": {
+    "events": 9,
+    "active_quarter_beats": 9.5
+  },
+  "TB2": {
+    "events": 9,
+    "active_quarter_beats": 9.5
+  },
+  "TB3": {
+    "events": 9,
+    "active_quarter_beats": 9.5
+  },
+  "BT": {
+    "events": 9,
+    "active_quarter_beats": 9.5
+  },
+  "GT": {
+    "events": 82,
+    "active_quarter_beats": 44.5
+  },
+  "BA": {
+    "events": 205,
+    "active_quarter_beats": 299.0
+  },
+  "DR": {
+    "events": 280,
+    "active_quarter_beats": 280.0
+  }
+}

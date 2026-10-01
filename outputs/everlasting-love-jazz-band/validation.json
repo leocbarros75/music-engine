@@ -1,0 +1,13 @@
+{
+  "measures": 79,
+  "piano_musical_content_preserved": true,
+  "event_pitch_and_timing_round_trip": true,
+  "source_sha256": "cdad3b123fca952a06fb52b74ba49e2f971c9dc0733f463f51999ec87f2b0b39",
+  "arrangement_events": 1131,
+  "piano_pitched_segments": 1345,
+  "review_status": "Structural and engraving checks; no live player or audio review.",
+  "tests_passed": 12,
+  "engraved_pdf_files": 18,
+  "full_score_pages": 20,
+  "visual_review_completed": true
+}

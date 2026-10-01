@@ -1,0 +1,4793 @@
+[
+  {
+    "bar": 1,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 2,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 3,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 4,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 4,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 5,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 5,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 6,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 6,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 7,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 7,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 8,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 8,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 9,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 9,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 10,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 10,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 11,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 12,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 13,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 14,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 14,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 15,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 15,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 16,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 16,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 17,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 17,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 17,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 18,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 18,
+    "on": 16,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 19,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 19,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 19,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 20,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 20,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 20,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 21,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 21,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 22,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 22,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 23,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 23,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 24,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 24,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 25,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 25,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 26,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 26,
+    "on": 16,
+    "root": 5,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 27,
+    "on": 0,
+    "root": 5,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 27,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 28,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 28,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 28,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 29,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 29,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 30,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 30,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 31,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 31,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 32,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 32,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 33,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 33,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 34,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 34,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 34,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 35,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 35,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 36,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 36,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 37,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 37,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 58,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 37,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 50,
+      "TS1": 58,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 38,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 38,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 39,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 39,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 39,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 40,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 40,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 41,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 41,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 42,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 42,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 43,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 43,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 44,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 44,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 45,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 45,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 46,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 46,
+    "on": 24,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 47,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 47,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 48,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 48,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 58,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 49,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 43,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 49,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 50,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 50,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7,
+      0
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 51,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 51,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 51,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 52,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 52,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 52,
+    "on": 24,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7,
+      0
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 53,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 53,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 0,
+    "root": 7,
+    "bass": 7,
+    "kind": "minor-seventh",
+    "pcs": [
+      2,
+      5,
+      7,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 8,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 54,
+    "on": 24,
+    "root": 10,
+    "bass": 2,
+    "kind": "major",
+    "pcs": [
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7,
+      0
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 55,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 56,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 57,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 57,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 58,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 58,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 59,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 59,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 60,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 60,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 61,
+    "on": 0,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor",
+    "pcs": [
+      0,
+      4,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 61,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 62,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 62,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 63,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 64,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 64,
+    "on": 8,
+    "root": 5,
+    "bass": 5,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      5,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 64,
+    "on": 16,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 65,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 65,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 66,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 66,
+    "on": 16,
+    "root": 9,
+    "bass": 9,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 67,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 45,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 67,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 50,
+      "TS1": 60,
+      "AS2": 65,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 68,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 72
+    }
+  },
+  {
+    "bar": 68,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 52,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 74
+    }
+  },
+  {
+    "bar": 69,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major-seventh",
+    "pcs": [
+      0,
+      4,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      4,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 60,
+      "AS2": 69,
+      "AS1": 76
+    }
+  },
+  {
+    "bar": 69,
+    "on": 16,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-seventh",
+    "pcs": [
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 46,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 70,
+    "on": 0,
+    "root": 5,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      7,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 70,
+    "on": 16,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 71,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 71,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 70,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 71,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "suspended-fourth",
+    "pcs": [
+      0,
+      5,
+      7
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      5,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 71,
+    "on": 24,
+    "root": 0,
+    "bass": 0,
+    "kind": "major",
+    "pcs": [
+      0,
+      4,
+      7
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      9,
+      2
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 76
+    }
+  },
+  {
+    "bar": 72,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 73,
+    "on": 0,
+    "root": 10,
+    "bass": 10,
+    "kind": "major-ninth",
+    "pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9,
+      10
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 73,
+    "on": 8,
+    "root": 10,
+    "bass": 7,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 70,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 73,
+    "on": 16,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 79
+    }
+  },
+  {
+    "bar": 74,
+    "on": 0,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 79
+    }
+  },
+  {
+    "bar": 75,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 75,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 70,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 76,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 76,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 79
+    }
+  },
+  {
+    "bar": 77,
+    "on": 0,
+    "root": 2,
+    "bass": 2,
+    "kind": "minor-seventh",
+    "pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      9
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 53,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 77,
+    "on": 8,
+    "root": 10,
+    "bass": 10,
+    "kind": "major",
+    "pcs": [
+      0,
+      2,
+      5,
+      10
+    ],
+    "dur": 16,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      10
+    ],
+    "added_color_pcs": [
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 70,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 78,
+    "on": 0,
+    "root": 5,
+    "bass": 9,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 8,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  },
+  {
+    "bar": 78,
+    "on": 8,
+    "root": 0,
+    "bass": 0,
+    "kind": "power",
+    "pcs": [
+      0,
+      7
+    ],
+    "dur": 24,
+    "arrangement_pcs": [
+      0,
+      7
+    ],
+    "added_color_pcs": [],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 60,
+      "AS2": 67,
+      "AS1": 79
+    }
+  },
+  {
+    "bar": 79,
+    "on": 0,
+    "root": 5,
+    "bass": 5,
+    "kind": "major",
+    "pcs": [
+      0,
+      5,
+      9
+    ],
+    "dur": 32,
+    "arrangement_pcs": [
+      0,
+      2,
+      5,
+      7,
+      9
+    ],
+    "added_color_pcs": [
+      2,
+      7
+    ],
+    "sax_voicing": {
+      "BS": 48,
+      "TS2": 55,
+      "TS1": 62,
+      "AS2": 69,
+      "AS1": 77
+    }
+  }
+]
