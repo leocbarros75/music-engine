@@ -1124,7 +1124,13 @@ function renderMusicXML(scoreModel: ScoreModel): string {
     if (composerText) out += `    <creator type="composer">${xmlEscape(composerText)}</creator>\n`;
     if (arrangerText) out += `    <creator type="arranger">${xmlEscape(arrangerText)}</creator>\n`;
     if (rightsText) out += `    <rights>${xmlEscape(rightsText)}</rights>\n`;
-    out += `    <encoding><software>music-engine</software><encoding-date>${new Date().toISOString().slice(0, 10)}</encoding-date></encoding>\n`;
+    // No date. It was the day the file happened to be written, which made the
+    // output a function of the clock rather than of the input: every exported
+    // score changed at midnight, and the isolation sweep that guards every
+    // change in this repository reported 288 of 300 combinations as different
+    // when nothing had been touched. A score that cannot be reproduced byte for
+    // byte cannot be verified, and the date bought nothing.
+    out += `    <encoding><software>music-engine</software></encoding>\n`;
     out += `  </identification>\n`;
   }
 

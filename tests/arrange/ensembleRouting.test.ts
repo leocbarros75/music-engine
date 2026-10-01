@@ -80,3 +80,20 @@ test('a real ensemble is not accused of being unknown', { skip: !have }, () => {
     );
   }
 });
+
+test('the horns in the jazz band are given somewhere to breathe', { skip: !have }, () => {
+  // All four ran 299 beats — the whole piece — with not one mark in the score.
+  // The route simply never called the breathing pass, which the drums had been
+  // hiding: with percussion uncounted the audit reported this part of the band
+  // as empty rather than as breathless.
+  const { score } = run('jazz_band');
+  const winds = score.parts.filter((p: any) => /sax|trumpet|trombone/i.test(String(p.name)));
+  assert(winds.length >= 3, `expected a horn section, found ${winds.length}`);
+
+  for (const p of winds) {
+    const marks = (p.measures ?? []).flatMap((m: any) =>
+      (m.events ?? []).filter((e: any) =>
+        Array.isArray(e.articulations) && e.articulations.includes('breath-mark')));
+    assert(marks.length > 0, `${p.name} has nowhere to breathe in the whole piece`);
+  }
+});

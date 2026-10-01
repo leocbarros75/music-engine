@@ -110,3 +110,61 @@ test('a clean score says so plainly', () => {
   assert.equal(a.totalOutOfRange, 0);
   assert.match(playabilitySentence(a, 71), /longest stretch without air/);
 });
+
+/**
+ * Who can be short of air.
+ *
+ * This was a list of things that do NOT breathe — piano, harp, timpani — and
+ * anything unlisted was assumed to. So it named a bassist as short of air after
+ * 299 beats, and named violinists before that. A string section changes bow; it
+ * does not breathe, which the reference edition says in as many words about its
+ * own 291-beat cello line.
+ *
+ * The hard case is that "Bass" is a singer in one score and a bass player in
+ * another, with the same part name AND the same instrument: choral emits
+ * Bass[Bass] and the jazz band emits Bass[Bass]. Nothing on the part separates
+ * them, so the company it keeps has to.
+ */
+
+const voice = (name: string, bars = 10) => ({
+  part_id: `P_${name}`, name, instrument: name, staves: 1,
+  measures: Array.from({ length: bars }, (_, i) => bar(i + 1, [note(0, 4, 60)])),
+});
+
+test('a bassist is not short of air, and a bass singer is', () => {
+  // Same part name, same instrument, opposite answers.
+  const band = buildPlayabilityAudit(score([
+    { part_id: 'P_AS', name: 'Alto Sax', instrument: 'Alto Sax', staves: 1,
+      measures: [bar(1, [note(0, 1, 72)])] },
+    { part_id: 'P_TS', name: 'Tenor Sax', instrument: 'Tenor Sax', staves: 1,
+      measures: [bar(1, [note(0, 1, 67)])] },
+    voice('Bass', 10),
+  ]));
+  assert.notEqual(band.worst?.part, 'Bass',
+    'the bass player was named short of air — two saxophones are not a choir');
+
+  const choir = buildPlayabilityAudit(score([
+    voice('Soprano'), voice('Alto'), voice('Tenor'), voice('Bass'),
+  ]));
+  assert(choir.worst, 'nobody in a choir was judged to breathe');
+  assert(/soprano|alto|tenor|bass/i.test(choir.worst!.part), `got ${choir.worst!.part}`);
+});
+
+test('a string section changes bow rather than breathing', () => {
+  const a = buildPlayabilityAudit(score([
+    held('Violin I', 'violin_1', 30, 72),
+    held('Cello', 'cello', 30, 48),
+    held('Double Bass', 'double_bass', 30, 36),
+  ]));
+  assert.equal(a.worst, null, `a string player was named short of air: ${a.worst?.part}`);
+  // Still reported honestly in their own rows.
+  assert.equal(a.parts[0]!.maxContinuousBeatsExceptFinal, 120);
+});
+
+test('the wind in a mixed score is the one that gets named', () => {
+  const a = buildPlayabilityAudit(score([
+    held('Violin I', 'violin_1', 40, 72),   // longer, but bows
+    held('Horn 2', 'horn_f', 6, 60),        // shorter, but breathes
+  ]));
+  assert.equal(a.worst!.part, 'Horn 2', `got ${a.worst!.part}`);
+});

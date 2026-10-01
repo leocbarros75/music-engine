@@ -89,3 +89,19 @@ test('a small score is not shrunk for no reason', () => {
   assert.match(few, /<scaling><millimeters>7<\/millimeters>/,
     'a two-stave score should keep a readable staff size');
 });
+
+test('the same score exports the same bytes, today and tomorrow', () => {
+  // The header once carried the day it was written. That made the output a
+  // function of the clock rather than of the input: every exported score
+  // changed at midnight, and the isolation sweep that guards every change here
+  // reported 288 of 300 combinations as different when nothing had been
+  // touched. A score that cannot be reproduced byte for byte cannot be
+  // verified.
+  const s = score({ title: 'A Song', composer: 'Someone', rights: 'All rights reserved' });
+  const once = exportScoreModelToMusicXML(s);
+  const twice = exportScoreModelToMusicXML(s);
+  assert.equal(once, twice, 'two exports of one score differ');
+  assert.doesNotMatch(once, /<encoding-date>/, 'the export is dated, so it changes by the day');
+  // Provenance is still there, just not the clock.
+  assert.match(once, /<software>music-engine<\/software>/);
+});

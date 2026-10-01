@@ -77,8 +77,26 @@ function barLengths(measures: any[], fallback = 4): number[] {
   return out;
 }
 
+/** Instruments a player blows into. These are the ones that run out of air. */
+const WIND_OR_BRASS =
+  /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium|recorder|cor anglais|english horn/i;
+/** Part names a singer answers to. */
+const VOICE_NAME = /^(soprano|mezzo|alto|contralto|tenor|baritone|bass)\b/i;
+
 export function buildPlayabilityAudit(score: ScoreModel): PlayabilityAudit {
   const parts: PartPlayability[] = [];
+  // "Bass" is a singer in one score and a bass player in another, with the same
+  // part name and the same instrument — choral gives Bass[Bass] and the jazz
+  // band gives Bass[Bass]. Nothing on the part itself separates them, so the
+  // company it keeps decides: a Bass standing beside a Soprano, an Alto and a
+  // Tenor is a voice. A saxophone section is not a choir, so wind and brass
+  // parts are excluded from that count before it is taken — otherwise "Alto
+  // Sax" and "Tenor Sax" vote the bassist into the choir.
+  const voiceParts = ((score as any)?.parts ?? []).filter((p: any) => {
+    const n = String(p?.name ?? "");
+    return VOICE_NAME.test(n) && !WIND_OR_BRASS.test(`${n} ${p?.instrument ?? ""}`);
+  });
+  const isChoir = voiceParts.length >= 3;
   let totalOutOfRange = 0;
   let worst: { part: string; beats: number } | null = null;
 
@@ -154,13 +172,17 @@ export function buildPlayabilityAudit(score: ScoreModel): PlayabilityAudit {
 
     totalOutOfRange += outOfRange;
     const name = String(part?.name ?? part?.part_id ?? "?");
-    // Only players who breathe can be short of air. A piano sustains under the
-    // pedal and a timpanist is not holding a note with their lungs, so a long
-    // unbroken keyboard run is not a finding and must not become "the worst
-    // part in the score".
-    const breathes = !/piano|keyboard|organ|harp|timpani|percussion|drum|guitar/i.test(
-      `${name} ${part?.instrument ?? ""}`
-    );
+    // Only players who breathe can be short of air. This was a list of things
+    // that do NOT — piano, harp, timpani and so on — and anything unlisted was
+    // assumed to. That named a bassist as short of air after 299 beats, and
+    // named violinists before that: a string section changes bow, it does not
+    // breathe, which the reference edition says in as many words about its own
+    // 291-beat cello line.
+    //
+    // So the test is now what a part IS rather than what it is not: you breathe
+    // if you blow into it, or if you are singing.
+    const text = `${name} ${part?.instrument ?? ""}`;
+    const breathes = WIND_OR_BRASS.test(text) || (isChoir && VOICE_NAME.test(name));
     if (events && breathes && (!worst || maxRun > worst.beats)) worst = { part: name, beats: maxRun };
 
     parts.push({

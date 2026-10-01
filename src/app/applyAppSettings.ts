@@ -109,13 +109,19 @@ function breatheWinds(
    * needs the rest written.
    */
   writeRests = true,
+  /**
+   * How long a player may be asked to hold. Left to the default where the winds
+   * carry the arrangement themselves; passed in where something else does —
+   * see breatheOrchestra for the figures the reference editions land on.
+   */
+  maxBreathlessBeats?: number,
 ): void {
   const winds = (parts ?? []).filter((p) =>
     /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium/i
       .test(`${p?.name ?? ""} ${p?.instrument ?? ""} ${p?.part_id ?? ""}`)
   );
   if (!winds.length) return;
-  const plan = applyBreathing(winds as any, { writeRests });
+  const plan = applyBreathing(winds as any, { writeRests, ...(maxBreathlessBeats ? { maxBreathlessBeats } : {}) });
   if (!plan.releases && !plan.marks) return;
   const bpm = quarterBpmOf(parts?.[0]?.measures ?? []);
   const seconds = bpm ? ` — about ${Math.round((plan.longestBreathlessBeats * 60) / bpm)}s` : "";
@@ -2492,6 +2498,14 @@ export function applyAppSettings(
     const finalScore = wantsJazzBand
       ? mapPianoToJazzBandOpen(scoreModel)
       : mapPianoToPercussionOpen(scoreModel);
+    // The horns had never been given anywhere to breathe on this route: all
+    // four ran 299 beats, the whole piece, with not one mark in the score. Four
+    // beats rather than the default eight, for the same reason the orchestra
+    // uses four — a rhythm section of piano, bass and drums is carrying the
+    // line, so nobody is depending on a saxophone to sustain it.
+    if (wantsJazzBand) {
+      breatheWinds(warnings, "jazz band", (finalScore as any).parts ?? [], true, 4);
+    }
     const played = ((finalScore as any)?.parts ?? []).filter((p: any) =>
       (p?.measures ?? []).some((m: any) => (m?.events ?? []).some((e: any) => e?.type === "note" || e?.type === "unpitched")));
     if (!played.length) {
