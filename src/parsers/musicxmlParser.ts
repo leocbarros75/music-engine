@@ -385,6 +385,10 @@ export function parseMusicXMLToScoreModel(xml: string): ScoreModel {
                 source_t: rawT,
                 grace: grace || undefined,
                 articulations: elementsByTagName(el, "articulations").flatMap(a => Array.from(a.childNodes).filter((n: any) => n.nodeType === 1).map((n: any) => localNameOf(n))),
+                // A rhythm slash is a pitched note wearing a slash notehead:
+                // it carries the chord's rhythm and no pitch worth reading.
+                // Without this the arranger cannot tell a chart from a score.
+                notehead: textOf(firstChild(el, "notehead")) || undefined,
                 chord: isChordTone ? true : undefined,
                 tieStart: tieFlags.tieStart ? true : undefined,
                 tieStop: tieFlags.tieStop ? true : undefined

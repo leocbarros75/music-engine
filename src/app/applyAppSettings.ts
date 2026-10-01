@@ -230,7 +230,8 @@ function describeArc(
 }
 import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
-import { restThinBars, restArcSentence } from "../arrange/strings/restArc";
+import { restThinBars, restArcSentence, isChart } from "../arrange/strings/restArc";
+import { markPizzicato, pizzicatoSentence } from "../arrange/strings/pizzicato";
 import { mapPianoToJazzBandOpen } from "../arrange/mapToJazzBand";
 import { mapPianoToPercussionOpen } from "../arrange/mapToPercussion";
 import type { ProfileId } from "../arrange/strings/types";
@@ -3221,6 +3222,14 @@ export function applyAppSettings(
               }
             }
             if (!usePolyphonic) {
+              // A cello reading an unmarked part plays it with the bow, which on
+              // a chart is the wrong sound for the part's own writing. Only on a
+              // chart: asked of every source, this marked a baroque continuo
+              // line — 89% quarter notes, and bowed — as pizzicato.
+              if (isChart((scoreModel as any)?.parts?.[0])) {
+                const pizzLine = pizzicatoSentence(markPizzicato((stringScore as any).parts ?? []));
+                if (pizzLine) warnings.push(pizzLine);
+              }
               // Nobody rested: all five parts played all 62 bars. The source has
               // no air to inherit — this piano never stops in either hand — so
               // the thinness of its writing is what decides who sits out.

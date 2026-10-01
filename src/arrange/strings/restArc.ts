@@ -93,12 +93,39 @@ function barLengths(measures: any[]): number[] {
  * Returns the bars actually rested per part, so the caller can report what it
  * did rather than that it ran.
  */
+/**
+ * Is this a chart rather than a score?
+ *
+ * A rhythm slash is a pitched note wearing a slash notehead. It says "play the
+ * chord, this rhythm" and nothing about how thick the music is — four slashes
+ * are a full bar of band, and a written-out lick in the next bar is not twice
+ * as much music. Counting notes per bar therefore measures NOTATION on a chart,
+ * not weight, and thinning against it rests the rhythm section on exactly the
+ * bars it should be driving.
+ */
+export function isChart(source: any): boolean {
+  let slashes = 0;
+  let notes = 0;
+  for (const m of source?.measures ?? []) {
+    for (const e of m?.events ?? []) {
+      if (e?.type !== "note") continue;
+      notes++;
+      if (String(e.notehead ?? "").toLowerCase() === "slash") slashes++;
+    }
+  }
+  return notes > 0 && slashes / notes >= 0.15;
+}
+
 export function restThinBars(
   outParts: any[],
   source: any,
   levels: Record<AccompanyingVoice, number> = TRANSCRIPTION_REST_LEVELS
 ): Map<string, number[]> {
   const rested = new Map<string, number[]>();
+  // On a chart the band plays throughout, and so should the section. Measured
+  // against the reference edition of one: it rests its inner voices for ONE bar
+  // of 124, where this thinned them for 40 and the bass for 51.
+  if (isChart(source)) return rested;
   const density = densityCurve(source?.measures ?? []);
   if (!density.length) return rested;
 

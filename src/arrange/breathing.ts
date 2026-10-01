@@ -190,10 +190,16 @@ export function markStaggeredBreathing(
   for (const part of parts ?? []) {
     const first = part?.measures?.[0];
     if (!first) continue;
-    const perf: any = (first as any).performance ?? ((first as any).performance = {});
-    const words: any[] = Array.isArray(perf.words) ? perf.words : (perf.words = []);
+    // Copy-on-write. The parts are built by shallow-copying measures, so the
+    // measure objects are distinct while sharing one `performance` object
+    // between them — pushing into it put the direction over every part in the
+    // score. Found when "Pizz." appeared over the violins.
+    const perf: any = { ...((first as any).performance ?? {}) };
+    const words: any[] = Array.isArray(perf.words) ? [...perf.words] : [];
     if (words.some((w) => String(w?.text ?? "") === text)) continue;
     words.push({ t: 0, text, placement: "above" });
+    perf.words = words;
+    (first as any).performance = perf;
     marked++;
   }
   return marked;
