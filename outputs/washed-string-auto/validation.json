@@ -1,0 +1,26 @@
+{
+  "source_measures_including_pickup": 124,
+  "numbered_measures": 123,
+  "opening_melody_segments": 46,
+  "source_chord_symbols": 131,
+  "editorially_harmonized_pickup_and_bars": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "printed_chords_from_bar_9_preserved": true,
+  "source_repeats_and_endings_preserved": true,
+  "opening_melody_preserved": true,
+  "exported_pitches_timing_ties_slurs_checked": true,
+  "arrangement_event_count": 1945,
+  "source_xml_sha256": "e762fcb4b764bd359d85683e18b24762d38a3cc660e9de7417ea25fa4d930b8a",
+  "source_pdf_sha256": "4dfc4ca3d17e4abb372361ec766b336e82e8f6ef4f910f0e7d5f52d9a919d601",
+  "source_type": "Rhythm chart with partial melody and pitched cues, not complete vocal lead sheet",
+  "review_status": "Structural checks; PDF engraving and player review are separate."
+}

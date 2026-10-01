@@ -1,0 +1,15 @@
+{
+  "page_counts": {
+    "washed-CB.pdf": 4,
+    "washed-V1.pdf": 4,
+    "washed-V2.pdf": 4,
+    "washed-VA.pdf": 4,
+    "washed-VC.pdf": 4,
+    "washed-string-auto.pdf": 16
+  },
+  "all_pages_nonempty": true,
+  "review": "Final contact sheets and selected full-size pages inspected; no audio or live-player review.",
+  "total_created_pdf_pages": 36,
+  "visual_review_completed": true,
+  "export_note": "MuseScore wrote all PDFs but returned abnormal shutdown status. PDFs were independently reopened, rendered, and visually inspected."
+}

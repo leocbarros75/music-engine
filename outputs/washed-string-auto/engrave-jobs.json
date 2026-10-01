@@ -1,0 +1,26 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-string-auto.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-string-auto.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-V1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-V1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-V2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-V2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-VA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-VA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-VC.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-VC.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-CB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-string-auto/washed-CB.pdf"
+  }
+]
