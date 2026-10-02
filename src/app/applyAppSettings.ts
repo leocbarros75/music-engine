@@ -16,7 +16,7 @@ import { arrangeStringEnsembleFromSatb } from "../arrange/arrangeStringEnsembleF
 import { arrangeStringQuartetFromPianoInstrumentation, arrangeSatbToStringQuartetDirect, scoreHasPianoPart } from "../arrange/arrangeStringQuartetFromPianoInstrumentation";
 import { arrangeWoodwindQuartetFromPianoInstrumentation } from "../arrange/arrangeWoodwindQuartetFromPianoInstrumentation";
 import { withPianoPart, planArc, applyArc, sustainForBowing, bowLengthBeats, quarterBpmOf, addAnsweringGestures, releaseBeforeNextAttack } from "../arrange/complementary";
-import { applyBreathing, isSectionPart, markStaggeredBreathing } from "../arrange/breathing";
+import { applyBreathing, isSectionPart, carriesTwoPlayers, markStaggeredBreathing } from "../arrange/breathing";
 
 
 /**
@@ -83,10 +83,33 @@ function breatheOrchestra(warnings: string[], label: string, parts: any[]): void
       .test(`${p?.name ?? ""} ${p?.instrument ?? ""} ${p?.part_id ?? ""}`)
   );
   if (!winds.length) return;
-  const sections = winds.filter((p) => isSectionPart(p));
-  const soloists = winds.filter((p) => !isSectionPart(p));
+  // A staff with two notes sounding at once cannot be given a breath — the
+  // shortened note takes the air from both players together, which is the
+  // opposite of staggering. One carrying a single line can, whatever its name
+  // says: "Horn 1-2" in the symphonic orchestra is two players in unison, and a
+  // mark there staggered against the other staves still leaves the line held.
+  //
+  // Judging by the name alone left that orchestra's entire brass section with
+  // no air: 175 beats in the horns, 144, 101, 55 — told to stagger something
+  // that was never broken in the first place.
+  // Two separate questions, and they were being answered by one test.
+  //
+  // WHO IS TOLD TO STAGGER is about the name: a staff headed "Horn 1-2" has two
+  // players on it and they should alternate, whatever else is written.
+  //
+  // WHO GETS WRITTEN BREATHS is about the writing: a staff with two notes
+  // sounding at once cannot take one, because the shortened note takes the air
+  // from both players at the same instant. A staff carrying a single line can,
+  // even when two players read it in unison.
+  //
+  // Answering both by the name left the symphonic orchestra's brass with no air
+  // at all — 175 beats in the horns, 144, 101, 55 — told to stagger something
+  // that was never broken. Every one of those staves is a single line.
+  const sections = winds.filter((p) => carriesTwoPlayers(p));
+  const soloists = winds.filter((p) => !carriesTwoPlayers(p));
+  const sharedStaves = winds.filter((p) => isSectionPart(p));
 
-  const staggered = markStaggeredBreathing(sections);
+  const staggered = markStaggeredBreathing(sharedStaves);
   // How long a wind player may be asked to hold depends on whether anything
   // else is holding the line. The default of eight beats came from the brass
   // ensemble edition, where eight brass players ARE the arrangement and nobody

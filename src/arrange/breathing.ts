@@ -165,6 +165,35 @@ export function longestBreathlessBeats(part: Part): number {
  *
  * A soloist has no one to hide behind, so the line itself has to give way.
  */
+/**
+ * Does this staff carry two players at once?
+ *
+ * The question that matters is the WRITING, not the name. A staff with two
+ * notes sounding together cannot be given a breath: shortening the note takes
+ * the air from both players at the same instant, which is the opposite of
+ * staggering. A staff carrying ONE line can — even when it is headed "Horn
+ * 1-2", because the two players are in unison and a written mark staggered
+ * against the other staves still leaves somebody holding the line.
+ *
+ * Deciding on the name alone left the symphonic orchestra's brass with no air
+ * at all: Horn 1-2 ran 175 beats, Horn 3-4 144, Trumpet 1-2 101, and every one
+ * of those staves is a single line. They were told to stagger something that
+ * was never broken.
+ */
+export function carriesTwoPlayers(part: Part): boolean {
+  if (!isSectionPart(part)) return false;
+  for (const m of part?.measures ?? []) {
+    const byOnset = new Map<number, number>();
+    for (const e of (m as any)?.events ?? []) {
+      if (e?.type !== "note" || e.grace) continue;
+      const t = Number(e.t);
+      byOnset.set(t, (byOnset.get(t) ?? 0) + 1);
+    }
+    for (const n of byOnset.values()) if (n > 1) return true;
+  }
+  return false;
+}
+
 export function isSectionPart(part: Part): boolean {
   const name = `${part?.name ?? ""}`;
   // Two players named on one staff: "Horn 1-2", "Trumpet 2-3", "Violin I-II".

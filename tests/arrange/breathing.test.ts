@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { applyBreathing, breathBars, longestRunBeats, longestBreathlessBeats,
-         isSectionPart, markStaggeredBreathing } from '../../src/arrange/breathing';
+         isSectionPart, carriesTwoPlayers, markStaggeredBreathing } from '../../src/arrange/breathing';
 import { exportScoreModelToMusicXML } from '../../src/exporters/musicxmlExporter';
 
 const note = (t: number, dur: number, midi: number, extra: any = {}) => ({
@@ -340,4 +340,56 @@ test('a stretch with nowhere legal to breathe does not abandon the rest of the p
     (part.measures[i].events ?? []).filter((e: any) =>
       Array.isArray(e.articulations) && e.articulations.includes('breath-mark')).length;
   assert.equal(breathsIn(0) + breathsIn(1), 0, 'a tie was broken to force a breath');
+});
+
+/**
+ * Who can be given a breath, and who is merely told to stagger.
+ *
+ * These were one test and they are two questions. Telling them apart by the
+ * NAME left the symphonic orchestra's whole brass section with no air: Horn 1-2
+ * ran 175 beats, Horn 3-4 144, Trumpet 1-2 101, Trombone 1-2 55 — all of them
+ * told to stagger something that was never broken, because every one of those
+ * staves carries a single line.
+ *
+ * A staff with two notes sounding AT ONCE cannot take a written breath: the
+ * shortened note takes the air from both players at the same instant, which is
+ * the opposite of staggering. A staff carrying one line can, even when two
+ * players read it in unison.
+ */
+
+const onStaff = (name: string, perOnset: 1 | 2) => ({
+  part_id: `P_${name}`, name, instrument: 'horn_f', staves: 1,
+  measures: Array.from({ length: 8 }, (_, i) => ({
+    number: i + 1, attributes: { divisions: 4, time: { beats: 4, beat_type: 4 } },
+    events: perOnset === 2
+      ? [{ id: `a${i}`, t: 0, dur: 4, midi: 67, type: 'note' as const, voice: 1, staff: 1, pitch: { step: 'G', octave: 4 } },
+         { id: `b${i}`, t: 0, dur: 4, midi: 60, type: 'note' as const, voice: 1, staff: 1, pitch: { step: 'C', octave: 4 } }]
+      : [{ id: `a${i}`, t: 0, dur: 4, midi: 67, type: 'note' as const, voice: 1, staff: 1, pitch: { step: 'G', octave: 4 } }],
+  })),
+});
+
+test('a staff with two notes at once carries two players', () => {
+  assert.equal(carriesTwoPlayers(onStaff('Horn 1-2', 2) as any), true);
+});
+
+test('a staff named for two players but carrying one line does not', () => {
+  // The case that mattered: "Horn 1-2" in unison is one line, and a mark on it
+  // staggered against the other staves still leaves somebody holding the note.
+  assert.equal(carriesTwoPlayers(onStaff('Horn 1-2', 1) as any), false);
+  // It is still a shared staff by name, which is what the stagger text follows.
+  assert.equal(isSectionPart(onStaff('Horn 1-2', 1) as any), true);
+});
+
+test('one player is never mistaken for two', () => {
+  assert.equal(carriesTwoPlayers(onStaff('Horn 1', 1) as any), false);
+  assert.equal(carriesTwoPlayers(onStaff('Horn 1', 2) as any), false);
+});
+
+test('a unison section staff is given real breaths', () => {
+  const part: any = onStaff('Horn 1-2', 1);
+  applyBreathing([part], { maxBreathlessBeats: 4 });
+  const marks = part.measures.flatMap((m: any) =>
+    (m.events ?? []).filter((e: any) =>
+      Array.isArray(e.articulations) && e.articulations.includes('breath-mark')));
+  assert(marks.length > 0, 'a single-line staff was left without air');
 });
