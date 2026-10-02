@@ -30,6 +30,7 @@ import {
   QUINTET_VOICES,
   type WoodwindVoiceId,
 } from "./woodwindRanges";
+import { shareMelodyAmongWinds, shareMelodySentence } from "./shareMelody";
 import { buildCandidatesForSlice } from "../strings/candidates";
 import type { Slice, VoiceId, Voicing } from "../strings/types";
 
@@ -438,6 +439,28 @@ export function arrangeWoodwindEnsemble(
 
   if (rhythmPart && chords.length) {
     applyMelodyRhythmToWoodwinds(woodwindScore, rhythmPart, chords, key, options.activity);
+
+    // The flute is the fixed melody carrier on this path — WOODWIND_TO_STRING_VOICE
+    // hands it Violin I and the others an inner line for the whole piece. Pass the
+    // tune around so the clarinet is not reading the viola part from bar 1 to the
+    // end.
+    //
+    // Who may hold it. The flute needs the same test as `isMelody` above: if it is
+    // grounded or less active there is no foreground line to pass in the first
+    // place. For the other two, only "grounded" disqualifies. The default texture
+    // marks the oboe and clarinet "less_active", but that describes the ACCOMPANYING
+    // role, which is the very thing meant to rotate — reading it as "never leads"
+    // is what froze the clarinet into an eight-semitone band for 124 bars. A
+    // grounded voice is a sustained pad by idiom and genuinely should not take a
+    // tune.
+    const leads = (v: "fl" | "ob" | "cl") => {
+      const a = options.activity?.[v];
+      if (v === "fl") return a !== "grounded" && a !== "less_active";
+      return a !== "grounded";
+    };
+    const shared = shareMelodyAmongWinds((woodwindScore as any).parts, { eligible: leads });
+    const line = shareMelodySentence(shared);
+    if (line) warnings.push(line);
   }
 
   return { scoreModel: woodwindScore, warnings };
