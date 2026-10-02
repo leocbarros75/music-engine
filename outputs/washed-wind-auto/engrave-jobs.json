@@ -1,0 +1,22 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-wind-auto.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-wind-auto.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-FL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-FL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-OB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-OB.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-CL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-CL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-BS.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-wind-auto/washed-BS.pdf"
+  }
+]

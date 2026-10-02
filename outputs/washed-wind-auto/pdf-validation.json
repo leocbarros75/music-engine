@@ -1,0 +1,16 @@
+{
+  "page_counts": {
+    "washed-BS.pdf": 4,
+    "washed-CL.pdf": 4,
+    "washed-FL.pdf": 4,
+    "washed-OB.pdf": 4,
+    "washed-wind-auto.pdf": 16
+  },
+  "total_pages": 32,
+  "all_pages_nonempty": true,
+  "visual_review_completed": true,
+  "changed_rendered_pages_after_metadata_update": [],
+  "tests_passed": 18,
+  "audio_audition_completed": false,
+  "live_player_review_completed": false
+}

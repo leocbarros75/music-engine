@@ -65,6 +65,8 @@ outputs/everlasting-love-piano-orchestra/everlasting-love-piano-orchestra/
 # The jazz band edition ships one as well. Verified the same way: its file list
 # holds nothing the parent does not.
 outputs/everlasting-love-jazz-band/everlasting-love-jazz-band/
+# The wind-auto edition ships one as well, verified the same way.
+outputs/washed-wind-auto/washed-wind-auto/
 # An .mxl is a zip under another extension, and its score.xml is the same music
 # as the .musicxml extracted beside it — 2,081 notes either way. The PDFs are
 # what engrave-jobs.json regenerates from that MusicXML, so they are the

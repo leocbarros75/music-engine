@@ -1,0 +1,82 @@
+{
+  "source_measures_including_pickup": 124,
+  "numbered_measures": 123,
+  "opening_melody_segments": 46,
+  "source_chord_symbols": 131,
+  "editorially_harmonized_pickup_and_bars": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "printed_chords_from_bar_9_preserved": true,
+  "source_repeats_and_endings_preserved": true,
+  "opening_melody_preserved": true,
+  "exported_pitches_timing_ties_slurs_checked": true,
+  "arrangement_event_count": 1391,
+  "source_xml_sha256": "e762fcb4b764bd359d85683e18b24762d38a3cc660e9de7417ea25fa4d930b8a",
+  "source_pdf_sha256": "4dfc4ca3d17e4abb372361ec766b336e82e8f6ef4f910f0e7d5f52d9a919d601",
+  "source_type": "Rhythm chart with partial melody and pitched cues, not complete vocal lead sheet",
+  "breathing": {
+    "FL": {
+      "longest_run_quarters": 12.0,
+      "seconds_at_139": 5.18,
+      "minimum_rest_counted_as_opportunity_quarters": 0.5
+    },
+    "OB": {
+      "longest_run_quarters": 8.0,
+      "seconds_at_139": 3.45,
+      "minimum_rest_counted_as_opportunity_quarters": 0.5
+    },
+    "CL": {
+      "longest_run_quarters": 8.0,
+      "seconds_at_139": 3.45,
+      "minimum_rest_counted_as_opportunity_quarters": 0.5
+    },
+    "BS": {
+      "longest_run_quarters": 7.5,
+      "seconds_at_139": 3.24,
+      "minimum_rest_counted_as_opportunity_quarters": 0.5
+    }
+  },
+  "lead_handoffs": {
+    "0": "FL",
+    "9": "OB",
+    "29": "FL",
+    "37": "CL",
+    "53": "OB",
+    "63": "FL",
+    "67": "OB",
+    "69": "CL",
+    "71": "FL",
+    "73": "OB",
+    "75": "CL",
+    "77": "FL",
+    "79": "OB",
+    "81": "CL",
+    "83": "FL",
+    "85": "OB",
+    "87": "CL",
+    "89": "FL",
+    "91": "OB",
+    "93": "CL",
+    "95": "FL",
+    "97": "OB",
+    "99": "CL",
+    "101": "FL",
+    "103": "OB",
+    "105": "CL",
+    "113": "OB",
+    "115": "FL",
+    "117": "OB",
+    "119": "CL",
+    "121": "FL"
+  },
+  "clarinet_transposition": "Written major second above concert; C# major; diatonic -1, chromatic -2",
+  "review_status": "Structural checks; PDF engraving and player review are separate."
+}

@@ -1,0 +1,48 @@
+{
+  "source_note_classifications": {
+    "pitched notation": 425,
+    "rest": 208,
+    "rhythm slash": 228,
+    "percussion cue": 19
+  },
+  "part_ranges": {
+    "FL": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 88
+    },
+    "OB": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 80
+    },
+    "CL": {
+      "low_sounding_midi": 56,
+      "high_sounding_midi": 78
+    },
+    "BS": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 52
+    }
+  },
+  "event_roles": {
+    "source opening melody": 46,
+    "source introduction chord-hit line in flute register": 25,
+    "breath-spaced harmonic support": 163,
+    "editorial return of opening melody": 88,
+    "quiet transition fifth": 2,
+    "source bridge riff in quartet register": 55,
+    "editorial harmonic sequence of bridge riff": 165,
+    "source closing upper line in quartet register": 36,
+    "editorial final tonic": 1,
+    "new motivic continuation": 144,
+    "source turnaround cue in quartet register": 21,
+    "editorial recurrence of source turnaround": 14,
+    "light inner offbeat pulse": 108,
+    "source second-ending cue": 8,
+    "final B-major voicing": 3,
+    "clarinet offbeat response": 40,
+    "source guitar cue in clarinet register": 26,
+    "bassoon cantabile foundation": 26,
+    "lightly tongued bassoon pulse": 375,
+    "bassoon harmonic foundation": 45
+  }
+}
