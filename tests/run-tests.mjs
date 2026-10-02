@@ -78,6 +78,7 @@ async function main() {
       'tests/arrange/rhSustained.test.ts',
       'tests/arrange/woodwindOverlap.test.ts',
       'tests/arrange/windMelodySharing.test.ts',
+      'tests/arrange/windNoteLength.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

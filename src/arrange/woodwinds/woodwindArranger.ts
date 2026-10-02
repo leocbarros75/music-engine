@@ -194,26 +194,53 @@ function applyMelodyRhythmToWoodwinds(
       // ── Rhythm grid from source melody onsets ────────────────────────────
       const srcM = sourceMeasures.find((pm: any) => Number(pm.number) === mnum);
       const onsetSet = new Set<number>();
+      // How long the source holds each of those onsets. Taking the distance to
+      // the next onset instead butts every note against the one after it, which
+      // is what turned a chart written 71% in eighths with 42% of its time
+      // silent into a wall of quarters sounding 92% of the time. The rests in a
+      // wind part are the phrasing; they are not spare room to fill.
+      const srcDur = new Map<number, number>();
       if (srcM) {
         for (const ev of (srcM.events ?? [])) {
           if (ev.type !== "note") continue;
           const t = Number(ev.t ?? 0);
-          if (t >= 0 && t < measureLen) onsetSet.add(Math.round(t * 1000) / 1000);
+          if (t < 0 || t >= measureLen) continue;
+          const key = Math.round(t * 1000) / 1000;
+          onsetSet.add(key);
+          const d = Number(ev.dur);
+          if (Number.isFinite(d) && d > 0) {
+            // A chord sounds as one attack: take the longest of its notes.
+            srcDur.set(key, Math.max(srcDur.get(key) ?? 0, d));
+          }
         }
       }
+      // What a note is worth in this bar when the grid invents an onset the
+      // source does not have. The shortest length the source actually writes
+      // here keeps a filled attack detached like its neighbours instead of
+      // sustaining across them.
+      const srcLengths = [...srcDur.values()];
+      const fillDur = srcLengths.length ? Math.min(...srcLengths) : FILL_STEP;
       if (!onsetSet.size) {
         for (let t = 0; t < measureLen; t += FILL_STEP)
           onsetSet.add(Math.round(t * 1000) / 1000);
       }
 
-      // Fill gaps > 1 beat with quarter notes
-      const sorted = Array.from(onsetSet).sort((a, b) => a - b);
-      const bounds = [...sorted, measureLen];
-      for (let i = 0; i < bounds.length - 1; i++) {
-        const gs = bounds[i]!, ge = bounds[i + 1]!;
-        if (ge - gs > FILL_STEP + 1e-9) {
-          for (let ft = gs + FILL_STEP; ft < ge - 1e-9; ft += FILL_STEP)
-            onsetSet.add(Math.round(ft * 1000) / 1000);
+      // Fill gaps > 1 beat with quarter notes, so an ACCOMPANYING voice keeps the
+      // harmony present while the melody is resting.
+      //
+      // Not for the melody carrier. Where the tune rests, that rest is the tune —
+      // filling it invented 245 attacks on this chart, which is most of the
+      // difference between our flute's 543 notes and the reference's 298, and it
+      // fills in exactly the places a player would breathe.
+      if (!isMelody) {
+        const sorted = Array.from(onsetSet).sort((a, b) => a - b);
+        const bounds = [...sorted, measureLen];
+        for (let i = 0; i < bounds.length - 1; i++) {
+          const gs = bounds[i]!, ge = bounds[i + 1]!;
+          if (ge - gs > FILL_STEP + 1e-9) {
+            for (let ft = gs + FILL_STEP; ft < ge - 1e-9; ft += FILL_STEP)
+              onsetSet.add(Math.round(ft * 1000) / 1000);
+          }
         }
       }
 
@@ -235,7 +262,13 @@ function applyMelodyRhythmToWoodwinds(
         const next   = times[i + 1]!;
         const capDur = measureLen - t;
         if (capDur <= 0) continue;
-        const dur = snapDur(Math.min(capDur, next - t));
+        // The Horn is the one idiomatic sustained pad (Adler/Forsyth), and
+        // thinOnsetsByAgility already hands it a half-measure grid — it should
+        // hold through to its next onset. Everyone else takes the length the
+        // source wrote, so the silence between attacks survives.
+        const sustains = effAgility < 0.5;
+        const want = sustains ? next - t : (srcDur.get(t) ?? fillDur);
+        const dur = snapDur(Math.min(capDur, next - t, want));
         if (dur <= 0) continue;
 
         const slice: Slice = {
