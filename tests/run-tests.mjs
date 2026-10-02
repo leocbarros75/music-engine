@@ -70,6 +70,7 @@ async function main() {
       'tests/arrange/ensembleRouting.test.ts',
       'tests/arrange/choralMelody.test.ts',
       'tests/arrange/pizzicatoAndCharts.test.ts',
+      'tests/arrange/lowerStringPulse.test.ts',
       'tests/arrange/innerVoiceMotion.test.ts',
       'tests/arrange/bowing.test.ts',
       'tests/arrange/altoUnderMelody.test.ts',

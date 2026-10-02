@@ -232,6 +232,7 @@ import { arrangePianoWithStrings } from "../arrange/arrangePianoWithStrings";
 import { arrangeStringEnsemble, applyPianoBassRhythm, applyPianoMelodyRhythm } from "../arrange/strings/stringArranger";
 import { restThinBars, restArcSentence, isChart } from "../arrange/strings/restArc";
 import { markPizzicato, pizzicatoSentence } from "../arrange/strings/pizzicato";
+import { pulseLowerStrings, pulseSentence } from "../arrange/strings/pulse";
 import { mapPianoToJazzBandOpen } from "../arrange/mapToJazzBand";
 import { mapPianoToPercussionOpen } from "../arrange/mapToPercussion";
 import type { ProfileId } from "../arrange/strings/types";
@@ -3227,6 +3228,14 @@ export function applyAppSettings(
               // chart: asked of every source, this marked a baroque continuo
               // line — 89% quarter notes, and bowed — as pizzicato.
               if (isChart((scoreModel as any)?.parts?.[0])) {
+                // The pulse first: pizzicato is marked from what the writing
+                // IS, so the writing has to be right before it is described.
+                const pulsed = pulseLowerStrings(
+                  (stringScore as any).parts ?? [],
+                  (scoreModel as any)?.parts?.[0]
+                );
+                const pulseLine = pulseSentence(pulsed);
+                if (pulseLine) warnings.push(pulseLine);
                 const pizzLine = pizzicatoSentence(markPizzicato((stringScore as any).parts ?? []));
                 if (pizzLine) warnings.push(pizzLine);
               }
