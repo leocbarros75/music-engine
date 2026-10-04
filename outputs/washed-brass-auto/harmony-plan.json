@@ -1,0 +1,4103 @@
+[
+  {
+    "bar": 0,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 8,
+    "voicing": {
+      "TU": 35
+    }
+  },
+  {
+    "bar": 1,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "TB2": 51,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 2,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 3,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "major",
+    "pcs": [
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "TB1": 59,
+      "H2": 56,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 4,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "dominant",
+    "pcs": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 52,
+      "TB1": 59,
+      "H2": 54,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 5,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "TB2": 51,
+      "TB1": 59,
+      "H2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 6,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 7,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "TB1": 59,
+      "H2": 56,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 8,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "dominant",
+    "pcs": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 52,
+      "TB1": 61,
+      "H2": 54,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 9,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 51,
+      "TB1": 59,
+      "H2": 54
+    }
+  },
+  {
+    "bar": 9,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 52,
+      "TB1": 59,
+      "H2": 54
+    }
+  },
+  {
+    "bar": 9,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 58
+    }
+  },
+  {
+    "bar": 10,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 10,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 11,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB1": 59,
+      "H2": 54
+    }
+  },
+  {
+    "bar": 11,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB1": 59,
+      "H2": 54
+    }
+  },
+  {
+    "bar": 11,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 59,
+      "H2": 58
+    }
+  },
+  {
+    "bar": 12,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 58
+    }
+  },
+  {
+    "bar": 12,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 13,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 13,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 13,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 14,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 14,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 15,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB1": 54,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 15,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB1": 54,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 15,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 58,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 16,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 16,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 17,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 17,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 17,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 18,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 18,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 19,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 37,
+      "TB1": 56,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 19,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 20,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 21,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 21,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 61,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 21,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 61,
+      "T2": 70
+    }
+  },
+  {
+    "bar": 22,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 22,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 23,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 23,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 23,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 24,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 24,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 25,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 25,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "T2": 73
+    }
+  },
+  {
+    "bar": 25,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 59,
+      "T2": 73
+    }
+  },
+  {
+    "bar": 26,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 26,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 27,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 37,
+      "TB1": 56,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 27,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 28,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 29,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 29,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 30,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 64,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 31,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 31,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 46,
+      "TB1": 58,
+      "H2": 58,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 32,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 46,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 58,
+      "T2": 73
+    }
+  },
+  {
+    "bar": 33,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 33,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 34,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 64,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 35,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 35,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 46,
+      "TB1": 58,
+      "H2": 58,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 36,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 46,
+      "TB2": 54,
+      "TB1": 58,
+      "H2": 58,
+      "T2": 73
+    }
+  },
+  {
+    "bar": 37,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 59,
+      "H1": 63,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 37,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 56,
+      "H1": 64,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 37,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 54,
+      "H1": 61,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 38,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 58
+    }
+  },
+  {
+    "bar": 38,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 39,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "BT": 47,
+      "H2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 39,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "H2": 56,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 39,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "H2": 61,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 40,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 58
+    }
+  },
+  {
+    "bar": 40,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 63
+    }
+  },
+  {
+    "bar": 41,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 63,
+      "H1": 66,
+      "T2": 71
+    }
+  },
+  {
+    "bar": 41,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 64,
+      "H1": 66,
+      "T2": 68
+    }
+  },
+  {
+    "bar": 41,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 61,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 42,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 42,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 43,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 37,
+      "BT": 47,
+      "H2": 61,
+      "H1": 68
+    }
+  },
+  {
+    "bar": 43,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "H2": 61,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 44,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 45,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 59,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 45,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 56,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 45,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 61,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 46,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 46,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 47,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "BT": 47,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 47,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "H2": 56,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 47,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "H2": 61,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 48,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 58
+    }
+  },
+  {
+    "bar": 48,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 63
+    }
+  },
+  {
+    "bar": 49,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 63,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 49,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 64,
+      "H1": 66,
+      "T2": 68
+    }
+  },
+  {
+    "bar": 49,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 61,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 50,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 50,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 51,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 37,
+      "BT": 47,
+      "H2": 61,
+      "H1": 68
+    }
+  },
+  {
+    "bar": 51,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "H2": 61,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 52,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 53,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 63
+    }
+  },
+  {
+    "bar": 53,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 54,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 55,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 55,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 56,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 57,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 51,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 57,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 58,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54
+    }
+  },
+  {
+    "bar": 59,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB1": 59,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 59,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 60,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 61
+    }
+  },
+  {
+    "bar": 61,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 61,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 61,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 62,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 63,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "TB1": 63,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 64,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 65,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59,
+      "H1": 63,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 66,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 63,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 67,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 68,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 69,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "TB2": 54,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 70,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 71,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "TB1": 64,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 72,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 73,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 74,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 75,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 76,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 52,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 77,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "TB2": 51,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 78,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 79,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "TB1": 64,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 80,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 81,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 82,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 83,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 84,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 52,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 85,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 86,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 87,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB1": 64,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 88,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 89,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 90,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 91,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 92,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 52,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 93,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 94,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 95,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB1": 64,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 96,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 97,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 98,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 35,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66,
+      "T2": 66
+    }
+  },
+  {
+    "bar": 99,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 100,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 52,
+      "TB1": 64,
+      "H2": 59,
+      "T1": 66
+    }
+  },
+  {
+    "bar": 101,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 102,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 103,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB1": 64,
+      "H2": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 104,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 105,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 54,
+      "TB1": 63,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 105,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 54,
+      "TB1": 64,
+      "H1": 68
+    }
+  },
+  {
+    "bar": 105,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 61,
+      "H1": 70
+    }
+  },
+  {
+    "bar": 106,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 70
+    }
+  },
+  {
+    "bar": 106,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 107,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB1": 59,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 107,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB1": 56,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 107,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 61,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 108,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 58
+    }
+  },
+  {
+    "bar": 108,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 63
+    }
+  },
+  {
+    "bar": 109,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "voicing": {
+      "TU": 39,
+      "TB2": 54,
+      "TB1": 63,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 109,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "voicing": {
+      "TU": 40,
+      "TB2": 54,
+      "TB1": 64,
+      "H1": 68
+    }
+  },
+  {
+    "bar": 109,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 61,
+      "H1": 70
+    }
+  },
+  {
+    "bar": 110,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 70
+    }
+  },
+  {
+    "bar": 110,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "BT": 47,
+      "TB2": 51,
+      "H1": 66
+    }
+  },
+  {
+    "bar": 111,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 37,
+      "TB1": 61,
+      "H1": 68
+    }
+  },
+  {
+    "bar": 111,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      5,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB1": 61,
+      "H1": 65
+    }
+  },
+  {
+    "bar": 112,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      5,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 53,
+      "TB1": 61
+    }
+  },
+  {
+    "bar": 113,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 37,
+      "TB2": 49,
+      "H2": 59,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 113,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "TB2": 52,
+      "H2": 59,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 114,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 52,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 115,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 35,
+      "TB1": 63,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 115,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 116,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "TB1": 64,
+      "H2": 59
+    }
+  },
+  {
+    "bar": 117,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "TB2": 54,
+      "TB1": 63,
+      "H2": 59,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 117,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 61,
+      "H2": 59,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 118,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 119,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 16,
+    "voicing": {
+      "TU": 35,
+      "H2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 119,
+    "on": 16,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 12,
+    "voicing": {
+      "TU": 39,
+      "H2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 119,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 40,
+      "H2": 54,
+      "H1": 64
+    }
+  },
+  {
+    "bar": 120,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 40,
+      "BT": 47,
+      "TB2": 54,
+      "H2": 54
+    }
+  },
+  {
+    "bar": 121,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "voicing": {
+      "TU": 32,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 54,
+      "H1": 63
+    }
+  },
+  {
+    "bar": 121,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "voicing": {
+      "TU": 30,
+      "TB2": 54,
+      "TB1": 59,
+      "H2": 54,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 122,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "voicing": {
+      "TU": 30,
+      "BT": 47,
+      "TB2": 54,
+      "H1": 61
+    }
+  },
+  {
+    "bar": 123,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "voicing": {
+      "T2": 66,
+      "H1": 63,
+      "H2": 59,
+      "TB1": 54,
+      "TB2": 47,
+      "BT": 42,
+      "TU": 35
+    }
+  }
+]

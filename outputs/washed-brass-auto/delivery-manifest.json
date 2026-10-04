@@ -1,0 +1,138 @@
+{
+  "package": "Washed - Brass Auto",
+  "files": {
+    "PLAYER-REVIEW.md": {
+      "bytes": 3013,
+      "sha256": "8744d8f555fd53983113042d7fb6110027389e2a8c12c8587358db4a2abe63ba"
+    },
+    "PROCESS.md": {
+      "bytes": 20518,
+      "sha256": "491938711017b0a2b68e92d51ecd5640eae6c15fc2d5e08b26dc0286b1c65a7c"
+    },
+    "README.md": {
+      "bytes": 3739,
+      "sha256": "2f41cfc45d4f42bd3eb85be8cba18c72bf7df4b414fed196865b778923acaa3a"
+    },
+    "arrange.py": {
+      "bytes": 32615,
+      "sha256": "5544f7e0b849567a256e64c52fe0fb3826d5d8818ceada50c5361a2743847061"
+    },
+    "arrangement-events.json": {
+      "bytes": 432807,
+      "sha256": "a5771c11cd67c7a1cf42c3bac084853163cd4f439364d9da42be30a6e83c61f6"
+    },
+    "engrave-jobs.json": {
+      "bytes": 1787,
+      "sha256": "0240bc08803fd4920f827c467501c0761ae186f8ba1a37f749cf86b5adbeef02"
+    },
+    "harmony-plan.json": {
+      "bytes": 57301,
+      "sha256": "20edc5a9766d94621019ba24702c85b06f795571887aa10781ff09c0e930e949"
+    },
+    "notation.py": {
+      "bytes": 2834,
+      "sha256": "195adf60fc57e5a0248abbefdaf7b764b3328522d3273fa9df5da3bea9b1c93d"
+    },
+    "pdf-validation.json": {
+      "bytes": 1096,
+      "sha256": "c8a04ae751eebfa64ecde045f931a1b8d53bf27c89dd24ae50ae278ad3221cc0"
+    },
+    "source-audit.json": {
+      "bytes": 1672,
+      "sha256": "f4c238052a0881ec1c0d9b055cedb79ddee7f4788f877beade33a909495ddac2"
+    },
+    "source-rhythm.musicxml": {
+      "bytes": 397228,
+      "sha256": "e762fcb4b764bd359d85683e18b24762d38a3cc660e9de7417ea25fa4d930b8a"
+    },
+    "source-rhythm.pdf": {
+      "bytes": 271042,
+      "sha256": "4dfc4ca3d17e4abb372361ec766b336e82e8f6ef4f910f0e7d5f52d9a919d601"
+    },
+    "test-results.txt": {
+      "bytes": 2310,
+      "sha256": "b56aaaead360eb97be3ecaed1439425c2cc1609004260cb51bddc94e796ef3e4"
+    },
+    "test_arrangement.py": {
+      "bytes": 7154,
+      "sha256": "05f3e88651fb4f43c1723f1ed8e306ad16cea99a74a814ec1aa714fb246b2d92"
+    },
+    "validation.json": {
+      "bytes": 7224,
+      "sha256": "d0567b30bf109e8ec39210cc574b5f53dd14b9071ec9275f016bcb3a02035183"
+    },
+    "washed-BT.musicxml": {
+      "bytes": 122276,
+      "sha256": "31d583f879316eb281bf6e9b84a7ded68910864ce5b52ab073a47cdd0620f2f6"
+    },
+    "washed-BT.pdf": {
+      "bytes": 83796,
+      "sha256": "60c3f5cfaea630c953c12ad36912e52eb20db62a578f54debe70800555642cab"
+    },
+    "washed-H1.musicxml": {
+      "bytes": 156524,
+      "sha256": "15a28d8aa5658e2714a1efecdcd8ef2d1a33974a16ac5f774d1cc6b8071886d1"
+    },
+    "washed-H1.pdf": {
+      "bytes": 92740,
+      "sha256": "267cce8e1fd411fc4100b956e843a48327107e89b8d9d334f6284beda3e899b5"
+    },
+    "washed-H2.musicxml": {
+      "bytes": 127556,
+      "sha256": "ff3c59f7eca8734ffe18e075ef5d851d7dd6274eac28d20f5f51ab594f4a953c"
+    },
+    "washed-H2.pdf": {
+      "bytes": 86490,
+      "sha256": "d8757f03562fc418162077405d75ec609e7e911882f9fe4cad7de82bdc0d694b"
+    },
+    "washed-T1.musicxml": {
+      "bytes": 125471,
+      "sha256": "5f51dbfbbafb5387181229bb3bd7a29b4eb5372b4ec21a4dfc85ad061e70846a"
+    },
+    "washed-T1.pdf": {
+      "bytes": 86477,
+      "sha256": "2f131898ae359bc1eaabd83a70b6274bae095301308bc5b1bc0c02c505aef4be"
+    },
+    "washed-T2.musicxml": {
+      "bytes": 119766,
+      "sha256": "ee8fb0dc8870f8f58beeca4d0c59c46f75ae4bb083f758f83f1c52aa5b04bf79"
+    },
+    "washed-T2.pdf": {
+      "bytes": 84124,
+      "sha256": "5a31594918f946fae144afd65c3a354e265238f9b966487b89b1ae85086bac42"
+    },
+    "washed-TB1.musicxml": {
+      "bytes": 160463,
+      "sha256": "f064d608378c4a416160e83557f9152fecb7bb7ebd1de4aae6731f7ad7419b07"
+    },
+    "washed-TB1.pdf": {
+      "bytes": 93942,
+      "sha256": "ac6917805961269e45a4455cbd73def130a318c5a54e9c2d788ce7a6a155e3ca"
+    },
+    "washed-TB2.musicxml": {
+      "bytes": 141518,
+      "sha256": "90b80681ef42cc1127f96593069d858102dcea9c086ec3ac6c362978f874e13e"
+    },
+    "washed-TB2.pdf": {
+      "bytes": 85385,
+      "sha256": "4badd525721082bd2e73d197f9d4834320b211dd97c1a6ba7178372ff0a032fb"
+    },
+    "washed-TU.musicxml": {
+      "bytes": 182389,
+      "sha256": "05e159de44a66684d5355ffa2703fafe5ca7de235d47793162ca566434b11af2"
+    },
+    "washed-TU.pdf": {
+      "bytes": 98776,
+      "sha256": "9fd9ba6b2c207a4a48d8b5cf4a675bb8077db721694884d3541bc270a841e39c"
+    },
+    "washed-brass-auto.musicxml": {
+      "bytes": 829607,
+      "sha256": "ecec4adef09a06d32145ae696d74111bdc9b06390433ee7d03812dd1dd2d93c5"
+    },
+    "washed-brass-auto.pdf": {
+      "bytes": 272607,
+      "sha256": "fdb1f7525422a49cf7cefeeb7dcb0ccc01f0d5bc08f2a3db265ce83a689fb6ae"
+    }
+  },
+  "note": "Manifest excludes itself and the ZIP container. PDF engraving and structural verification completed; audio and live-player review not performed."
+}

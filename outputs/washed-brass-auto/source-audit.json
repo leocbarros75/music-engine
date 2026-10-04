@@ -1,0 +1,64 @@
+{
+  "source_note_classifications": {
+    "pitched notation": 425,
+    "rest": 208,
+    "rhythm slash": 228,
+    "percussion cue": 19
+  },
+  "part_ranges": {
+    "T1": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 76
+    },
+    "T2": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 76
+    },
+    "H1": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 71
+    },
+    "H2": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 64
+    },
+    "TB1": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 66
+    },
+    "TB2": {
+      "low_sounding_midi": 47,
+      "high_sounding_midi": 54
+    },
+    "BT": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 47
+    },
+    "TU": {
+      "low_sounding_midi": 30,
+      "high_sounding_midi": 40
+    }
+  },
+  "event_roles": {
+    "source opening melody": 46,
+    "editorial return of opening melody": 88,
+    "source bridge riff in brass register": 55,
+    "soft trumpet response": 32,
+    "source closing upper line in brass register": 36,
+    "editorial final tonic": 1,
+    "source introduction chord-hit line in trumpet register": 25,
+    "source turnaround cue in brass register": 21,
+    "editorial harmonic sequence of bridge riff": 165,
+    "final B-major voicing": 7,
+    "breath-spaced chorale support": 247,
+    "new motivic continuation": 144,
+    "editorial recurrence of source turnaround": 14,
+    "source guitar cue in horn register": 26,
+    "quiet transition fifth": 2,
+    "trombone rhythmic chord": 218,
+    "source second-ending cue": 8,
+    "open low-brass support": 124,
+    "tuba cantabile foundation": 53,
+    "tuba harmonic pulse": 304
+  }
+}

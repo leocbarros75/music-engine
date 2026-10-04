@@ -1,0 +1,38 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-brass-auto.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-brass-auto.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-T1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-T1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-T2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-T2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-H1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-H1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-H2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-H2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-TB1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-TB1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-TB2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-TB2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-BT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-BT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-TU.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-brass-auto/washed-TU.pdf"
+  }
+]

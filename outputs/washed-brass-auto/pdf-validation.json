@@ -1,0 +1,57 @@
+{
+  "page_counts": {
+    "washed-BT.pdf": 4,
+    "washed-H1.pdf": 4,
+    "washed-H2.pdf": 4,
+    "washed-T1.pdf": 4,
+    "washed-T2.pdf": 4,
+    "washed-TB1.pdf": 4,
+    "washed-TB2.pdf": 4,
+    "washed-TU.pdf": 4,
+    "washed-brass-auto.pdf": 16
+  },
+  "page_sizes_mm": {
+    "washed-BT.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-H1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-H2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-T1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-T2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TB1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TB2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TU.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-brass-auto.pdf": [
+      297.0,
+      420.2
+    ]
+  },
+  "all_pages_nonempty": true,
+  "visual_review_completed": true,
+  "review_method": "All 48 pages rendered and inspected on contact sheets; opening score and Horn 1 additionally inspected enlarged.",
+  "audio_review_completed": false,
+  "live_player_review_completed": false,
+  "total_reviewed_output_pages": 48
+}
