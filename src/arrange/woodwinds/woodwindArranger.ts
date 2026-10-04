@@ -200,11 +200,15 @@ function applyMelodyRhythmToWoodwinds(
       // silent into a wall of quarters sounding 92% of the time. The rests in a
       // wind part are the phrasing; they are not spare room to fill.
       const srcDur = new Map<number, number>();
+      let srcNotes = 0;
+      let srcSlashes = 0;
       if (srcM) {
         for (const ev of (srcM.events ?? [])) {
           if (ev.type !== "note") continue;
           const t = Number(ev.t ?? 0);
           if (t < 0 || t >= measureLen) continue;
+          srcNotes++;
+          if (String(ev.notehead ?? "").toLowerCase() === "slash") srcSlashes++;
           const key = Math.round(t * 1000) / 1000;
           onsetSet.add(key);
           const d = Number(ev.dur);
@@ -214,16 +218,37 @@ function applyMelodyRhythmToWoodwinds(
           }
         }
       }
-      // What a note is worth in this bar when the grid invents an onset the
-      // source does not have. The shortest length the source actually writes
-      // here keeps a filled attack detached like its neighbours instead of
-      // sustaining across them.
-      const srcLengths = [...srcDur.values()];
-      const fillDur = srcLengths.length ? Math.min(...srcLengths) : FILL_STEP;
-      if (!onsetSet.size) {
+      // Rhythm slashes rather than written notes: the chart is naming a groove
+      // here, not a melody.
+      const barIsChordRhythm = srcNotes > 0 && srcSlashes / srcNotes >= 0.5;
+      // A bar the source leaves empty: an instrumental gap, where there is no
+      // melody to carry and no rhythm to read.
+      const sourceSilent = !onsetSet.size;
+      if (sourceSilent) {
         for (let t = 0; t < measureLen; t += FILL_STEP)
           onsetSet.add(Math.round(t * 1000) / 1000);
       }
+
+      // What an INVENTED onset is worth — one the grid adds because the source
+      // has nothing there. Three-quarters of its slot: enough to carry the
+      // harmony, with the last quarter left as air.
+      //
+      // Giving it the whole slot is what made the 30 source-empty bars of this
+      // chart four quarter-notes jammed together in all four parts at once —
+      // 4.0 notes a bar and 94% sounding in every one of them, against the
+      // reference's 52-72%. Giving it the shortest note in the bar instead went
+      // too far the other way and left the accompanying voices 15 points under
+      // the reference where the music actually is.
+      //
+      // In a gap the roles invert, which is the oldest rule in the book
+      // (Tovey): the melody instrument leads where the chart gives nothing, and
+      // the others recede under it. The reference does exactly this — its flute
+      // sounds 72% of an empty bar while its oboe drops to 52% — so an
+      // accompanying voice takes a short attack there and the melody keeps the
+      // fuller one.
+      const slotFill = (slot: number) => slot * 0.75;
+      const gapFill = (slot: number) =>
+        sourceSilent && !isMelody ? Math.min(slot, 0.5) : slotFill(slot);
 
       // Fill gaps > 1 beat with quarter notes, so an ACCOMPANYING voice keeps the
       // harmony present while the melody is resting.
@@ -242,6 +267,21 @@ function applyMelodyRhythmToWoodwinds(
               onsetSet.add(Math.round(ft * 1000) / 1000);
           }
         }
+      }
+
+      // Over a groove the melody holds a note; it does not drum along with the
+      // chord rhythm. Keeping every slash onset gave the flute 2.9 attacks a bar
+      // where the reference writes 1.4 — and simply lengthening those attacks
+      // made it louder, not calmer, because the count never came down. So thin
+      // to the half-measure first, then let what is left sustain.
+      if (isMelody && barIsChordRhythm) {
+        const half = measureLen / 2;
+        const kept = [...onsetSet].filter(
+          (t) => Math.abs(t - Math.round(t / half) * half) < 1e-6
+        );
+        if (!kept.length) kept.push(0);        // never drop the bar entirely
+        onsetSet.clear();
+        for (const t of kept) onsetSet.add(t);
       }
 
       // Thin onsets by the instrument's agility so each plays to its idiom:
@@ -264,10 +304,32 @@ function applyMelodyRhythmToWoodwinds(
         if (capDur <= 0) continue;
         // The Horn is the one idiomatic sustained pad (Adler/Forsyth), and
         // thinOnsetsByAgility already hands it a half-measure grid — it should
-        // hold through to its next onset. Everyone else takes the length the
-        // source wrote, so the silence between attacks survives.
+        // hold through to its next onset.
+        //
+        // The MELODY carrier takes the length the source wrote, so the silence
+        // between its attacks survives; that silence is its phrasing. An
+        // accompanying voice does not copy it. Lifting the melody's exact note
+        // lengths into the harmony left the oboe, clarinet and bassoon 8-18
+        // points under the reference wherever the music actually was — the
+        // melody's breathing is not the harmony's. They hold three-quarters of
+        // their slot instead, and recede to a short attack in a gap.
         const sustains = effAgility < 0.5;
-        const want = sustains ? next - t : (srcDur.get(t) ?? fillDur);
+        const own = isMelody ? srcDur.get(t) : undefined;
+        const want = sustains
+          ? next - t
+          : own !== undefined
+            // A slash bar is the chart telling the rhythm section what to play;
+            // it is not a tune. Reading its chord rhythm as melody gave the
+            // flute 2.9 attacks a bar where the reference writes 1.4, 63% of
+            // them a half note or longer — it sustains over the groove rather
+            // than drumming along with it.
+            //
+            // Half of its (now half-measure) span, then air. Holding for the
+            // WHOLE span is how the first attempt at this made the flute louder
+            // instead of calmer: fewer attacks, but each one filling the bar,
+            // came to 77% sounding against the reference's 56%.
+            ? (isMelody && barIsChordRhythm ? Math.max(own, (next - t) * 0.5) : own)
+            : gapFill(next - t);
         const dur = snapDur(Math.min(capDur, next - t, want));
         if (dur <= 0) continue;
 
