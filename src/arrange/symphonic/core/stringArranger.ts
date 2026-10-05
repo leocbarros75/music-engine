@@ -4,6 +4,84 @@ import { buildCandidatesForSlice, buildVoicingStates } from "./candidates";
 import { runDp } from "./dp";
 import { STRING_RANGES } from "./ranges";
 import { midiToPitch, pitchToMidi } from "../../../instruments/instrumentCatalog";
+import { pulseLowerStrings, pulseSentence } from "../../strings/pulse";
+import { isChart } from "../../strings/restArc";
+
+/**
+ * The same three string fixes the worship orchestra got (3f4ee54, b39a355,
+ * afb0607), in this engine's own copy of the arranger.
+ *
+ * Measured against the professional-orchestra reference edition, this route was
+ * the furthest off of the three: strings 98%, woodwinds 61%, brass 33% against
+ * its 52 / 13 / 8. Four of its five string parts sounded 100% of all 124 bars.
+ * A concert orchestra is strings-led by design, which is exactly what this
+ * engine is for, so the balance belongs here rather than on the worship route —
+ * whose own wind and brass levels come from six real PraiseCharts and stay.
+ */
+const STRING_HOLD: Record<VoiceId, number> = {
+  vln1: 0.75,
+  vln2: 0.75,
+  vla:  0.5,
+  vc:   0.5,
+  cb:   0.5,
+};
+
+/** Never write a sixteenth merely to create air. */
+const AIR_FLOOR = 0.5;
+
+/** Under the groove the whole section gives a quarter more air. */
+const GROOVE_HOLD = 0.5;
+
+/** The grid a bar gets when the melody rests. */
+const GAP_STEP = 1.0;
+
+/** The viola and the bass mark the groove; the violins and cello carry the line. */
+const SYMPHONIC_PULSE_VOICES = /^(viola|vla|double bass|contrabass|cb)\b/i;
+
+/**
+ * Let go of each note early enough to leave air before the next one, and only
+ * where there is none. Runs LAST, on the finished parts, so it cannot undo the
+ * merge pass: it shortens, and never touches an onset or a note count.
+ */
+function giveStringsAir(parts: any[], groove: boolean[] = []): number {
+  const voiceOf = (raw: string): VoiceId | null => {
+    const n = raw.toLowerCase().trim();
+    if (/^(violin i|violin 1|vln i|vln1)\b/.test(n)) return "vln1";
+    if (/^(violin ii|violin 2|vln ii|vln2)\b/.test(n)) return "vln2";
+    if (/^(viola|vla)\b/.test(n)) return "vla";
+    if (/^(cello|violoncello|vc)\b/.test(n)) return "vc";
+    if (/^(double bass|contrabass|cb)\b/.test(n)) return "cb";
+    return null;
+  };
+
+  let shortened = 0;
+  for (const part of parts ?? []) {
+    const voice = voiceOf(String(part?.name ?? ""));
+    if (!voice) continue;
+    for (const [bar, m] of (part.measures ?? []).entries()) {
+      const thins = groove[bar] === true && (voice === "vln1" || voice === "vln2");
+      const hold = thins ? Math.min(GROOVE_HOLD, STRING_HOLD[voice]) : STRING_HOLD[voice];
+      const barLen = measureLengthBeats(m);
+      const notes = (m.events ?? [])
+        .filter((e: any) => e?.type === "note" && !e.grace)
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      for (let i = 0; i < notes.length; i++) {
+        const e = notes[i]!;
+        if (e.tieStart || e.tieStop) continue;
+        const dur = Number(e.dur);
+        const end = Number(e.t) + dur;
+        const nextStart = i + 1 < notes.length ? Number(notes[i + 1]!.t) : barLen;
+        if (nextStart > end + 1e-9) continue;
+        const want = snapToStandardDuration(dur * hold);
+        if (want < AIR_FLOOR - 1e-9) continue;
+        if (want >= dur - 1e-9) continue;
+        e.dur = want;
+        shortened++;
+      }
+    }
+  }
+  return shortened;
+}
 
 type ChordEvent = { measure: number; t: number; symbol: string };
 
@@ -118,6 +196,15 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
     }
     times.add(0);
     times.add(measureLen);
+
+    // An instrumental gap: without a grid this measure is ONE slice and every
+    // string holds a single note through it. The orchestra comes forward where
+    // the tune stops, and it cannot if the voicing search is given one decision.
+    if (!melEvents.some((e: any) => e.type === "note")) {
+      for (let t = GAP_STEP; t < measureLen - 1e-9; t += GAP_STEP) {
+        times.add(Math.round(t * 1000) / 1000);
+      }
+    }
     // Re-filter after the forced adds to keep the set clean, then sort.
     const ordered = Array.from(times).filter(t => t >= 0 && t <= measureLen).sort((a, b) => a - b);
     for (let tIdx = 0; tIdx < ordered.length - 1; tIdx++) {
@@ -290,6 +377,32 @@ export function arrangeStringEnsemble(
     buildPart(measuresTemplate, vc, "P_VC", "Cello", "cello"),
     buildPart(measuresTemplate, cb, "P_DB", "Double Bass", "double_bass")
   ];
+
+  // Which bars the chart marks with slashes rather than notes.
+  const groove = (melodyPart.measures ?? []).map((m: any) => {
+    const es = (m?.events ?? []).filter((e: any) => e?.type === "note" && !e.grace);
+    if (!es.length) return false;
+    const slashes = es.filter(
+      (e: any) => String(e.notehead ?? "").toLowerCase() === "slash"
+    ).length;
+    return slashes / es.length >= 0.5;
+  });
+
+  const airy = giveStringsAir(parts, groove);
+  if (airy) {
+    warnings.push(
+      `[strings] ${airy} note(s) released early so there is air before the next attack — ` +
+      "the slice grid tiles the bar, which had four of the five parts sounding every beat of it."
+    );
+  }
+
+  if (isChart(melodyPart)) {
+    const pulsed = pulseLowerStrings(parts, melodyPart, {
+      match: SYMPHONIC_PULSE_VOICES, skipEmptySourceBars: true
+    });
+    const line = pulseSentence(pulsed);
+    if (line) warnings.push(line);
+  }
 
   // melody_pizzicato: Vln I arco; all others pizzicato
   const baseArticulations: StringEnsembleArrangement["articulations"] = [{ measure: 1, t: 0, type: "legato" }];
