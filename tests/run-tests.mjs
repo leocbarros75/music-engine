@@ -89,6 +89,7 @@ async function main() {
       'tests/arrange/orchestraGapGrid.test.ts',
       'tests/arrange/symphonicStringAir.test.ts',
       'tests/arrange/gapFiguration.test.ts',
+      'tests/arrange/brassSectionRoster.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

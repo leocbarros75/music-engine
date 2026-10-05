@@ -413,6 +413,8 @@ export type AppSettings = {
   brassTexture?: "melody_harmony" | "chamber" | "chorale" | "fanfare" | "contrapuntal";
   brassExample?: string;
   brassQuintet?: boolean;  // default true (with Horn); false = quartet
+  /** Eight-part brass section (default) instead of the five-part quintet. */
+  brassSection?: boolean;
   /** Per-instrument activity (overrides idiomatic agility defaults). */
   fluteActivity?:    "grounded" | "less_active" | "active" | "high_active";
   oboeActivity?:     "grounded" | "less_active" | "active" | "high_active";
@@ -2764,6 +2766,12 @@ export function applyAppSettings(
       chords:     brChords as any,
       key:        { fifths: detectedInputKeyFifths, mode: detectedMode },
       quintet:    brQuintet,
+      // An eight-part section unless a quintet or quartet was asked for
+      // explicitly. Passed only here: the piano and SATB brass routes keep the
+      // quintet, where five players against a piano is the point — and that is
+      // enforced by the arranger needing an explicit opt-in rather than by this
+      // line alone, which is what let piano_with_brass grow to eight.
+      section:    settings.brassSection !== false && settings.brassQuintet === undefined,
       activity:   brActivity,
       polyphonic: usePolyphonic || brTexture === "contrapuntal",
       level:      settings.level,

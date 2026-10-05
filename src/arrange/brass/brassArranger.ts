@@ -18,6 +18,7 @@ import { arrangeBrassPolyphonic } from "./polyphony/brassPolyphonicArranger";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId, Slice, Voicing, VoiceId } from "../strings/types";
 import { gateBrassParticipation, participationSentence } from "./participation";
+import { expandBrassSection, expandSectionSentence } from "./expandSection";
 import { shareBrassMelody, shareBrassMelodySentence } from "./shareMelody";
 import { buildCandidatesForSlice } from "../strings/candidates";
 import {
@@ -249,6 +250,16 @@ export type BrassArrangerOptions = {
   key?: { fifths: number; mode: "major" | "minor" };
   warnings?: string[];
   quintet?: boolean;          // true = with Horn (default); false = quartet (no Horn)
+  /**
+   * Eight-part orchestral brass section instead of the five-part quintet.
+   *
+   * Opt-IN, deliberately. Defaulting it on inside the arranger expanded every
+   * caller that did not mention it — the sweep caught piano_with_brass growing
+   * to eight players when the claim was that it stays a quintet. Five against a
+   * piano is the point of that route. The brass_ensemble route passes this
+   * explicitly, so the user-facing default is still a section.
+   */
+  section?: boolean;
   polyphonic?: boolean;       // contrapuntal path
   level?: string;
   activity?: Partial<Record<BrassVoiceId, BrassActivity>>;
@@ -461,6 +472,20 @@ export function arrangeBrassEnsemble(
       `[brass] ${uncrossed} note(s) dropped an octave to keep the section in order — ` +
       "a second trumpet does not play above the first."
     );
+  }
+
+  // Eight players rather than five, when the route asks for a section.
+  //
+  // LAST, after the register and ordering passes. Running it before them put
+  // Horn 2 above Horn 1 in 37 of 377 comparisons: uncrossBrassSection knows
+  // only the five voices the DP writes, so it shifted Horn 1 by an octave and
+  // left the derived part where it was. Deriving from the final lines instead
+  // makes the ordering true by construction — each new voice takes a chord tone
+  // below the donor it will actually sit under.
+  if (options.section === true) {
+    const added = expandBrassSection(brassScore as any);
+    const line = expandSectionSentence(added);
+    if (line) warnings.push(line);
   }
 
   return { scoreModel: brassScore, warnings };
