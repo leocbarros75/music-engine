@@ -85,6 +85,7 @@ async function main() {
       'tests/arrange/brassNoteLength.test.ts',
       'tests/arrange/brassMelodySharing.test.ts',
       'tests/arrange/orchestraStringAir.test.ts',
+      'tests/arrange/orchestraStringPulse.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

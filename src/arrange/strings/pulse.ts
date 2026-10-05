@@ -60,13 +60,32 @@ function soundingAt(measure: any, t: number): any | null {
   return best;
 }
 
-export function pulseLowerStrings(outParts: any[], source: any): PulsePlan[] {
+/**
+ * Which parts take the pulse.
+ *
+ * The default is the foundation — cello and bass — which is what a string
+ * ensemble's lower voices do with a chart. The orchestra passes its own set:
+ * measured there, the two parts grooving in slash bars are the VIOLA (2.1
+ * attacks a bar, 91% eighths) and the double bass (3.3 attacks, 100% eighths),
+ * while its violins and cello stay busier at 55-58% and are carrying a line
+ * rather than marking time. Same idiom, different players.
+ */
+export function pulseLowerStrings(
+  outParts: any[],
+  source: any,
+  opts: { match?: RegExp; skipEmptySourceBars?: boolean } = {}
+): PulsePlan[] {
+  const match = opts.match ?? LOWER_STRINGS;
   const sourceMeasures: any[] = source?.measures ?? [];
   if (!sourceMeasures.length) return [];
   const plans: PulsePlan[] = [];
 
+  /** Has the source written anything at all in this bar? */
+  const sourceSounds = (m: any) =>
+    (m?.events ?? []).some((e: any) => e?.type === "note" && !e.grace);
+
   for (const part of outParts ?? []) {
-    if (!LOWER_STRINGS.test(String(part?.name ?? ""))) continue;
+    if (!match.test(String(part?.name ?? ""))) continue;
     const measures: any[] = part?.measures ?? [];
     let bars = 0;
     let attacks = 0;
@@ -79,6 +98,12 @@ export function pulseLowerStrings(outParts: any[], source: any): PulsePlan[] {
       if (stated.length >= 2) feel = stated;
       const onsets = feel;
       if (onsets.length < 2) continue;          // nothing asked for yet
+      // A bar the source leaves empty is an instrumental gap, not a groove to
+      // mark. Carrying the feel into one thinned the orchestra's viola to 28%
+      // of those bars where the reference edition has it at 75%, sustaining —
+      // in a gap the strings lead rather than keep time. The ensemble route
+      // does not pass this: there the feel carrying on through is the point.
+      if (opts.skipEmptySourceBars && !sourceSounds(sourceMeasures[i])) continue;
       const m = measures[i];
       const notes = (m?.events ?? []).filter((e: any) => e?.type === "note" && !e.grace);
       if (!notes.length) continue;              // the part is resting here

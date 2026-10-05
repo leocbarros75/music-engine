@@ -4,6 +4,11 @@ import { buildCandidatesForSlice, buildVoicingStates } from "./candidates";
 import { runDp } from "./dp";
 import { STRING_RANGES } from "./ranges";
 import { midiToPitch, pitchToMidi } from "../../../instruments/instrumentCatalog";
+import { pulseLowerStrings, pulseSentence } from "../../strings/pulse";
+import { isChart } from "../../strings/restArc";
+
+/** The viola and the bass mark the groove; the violins and cello carry the line. */
+const ORCHESTRA_PULSE_VOICES = /^(viola|vla|double bass|contrabass)\b/i;
 import { parseChordSymbol } from "../../../harmonize/satb/chordSymbol";
 
 type ChordEvent = { measure: number; t: number; symbol: string };
@@ -148,7 +153,18 @@ const AIR_FLOOR = 0.5;
  * already. Ties are left alone — a note tied onward is one gesture, and cutting
  * it would strand the tie.
  */
-function giveStringsAir(parts: any[]): number {
+/**
+ * Under the groove, everyone gives a little more.
+ *
+ * The reference edition's Violin 1 sounds 82% of a bar the chart leaves empty
+ * and 80% of one with a tune in it, but only 58% of a slash bar — and its
+ * Violin 2 drops from 90% to 55%. The whole section thins where the chart is
+ * naming a rhythm, not just the inner voices the pulse covers. A quarter more
+ * air is what that comes to.
+ */
+const GROOVE_HOLD = 0.5;
+
+function giveStringsAir(parts: any[], groove: boolean[] = []): number {
   // Named here rather than through partNameToVoiceId, which only knows the two
   // violins and the viola and returns null for the cello and the bass. Using it
   // left those two at zero gaps while the upper three were fixed — the lower
@@ -168,8 +184,10 @@ function giveStringsAir(parts: any[]): number {
   for (const part of parts ?? []) {
     const voice = voiceOf(String(part?.name ?? ""));
     if (!voice) continue;
-    const hold = STRING_HOLD[voice];
-    for (const m of part.measures ?? []) {
+    for (const [bar, m] of (part.measures ?? []).entries()) {
+      // Violins only: the viola, cello and bass have the pulse for these bars.
+      const thins = groove[bar] === true && (voice === "vln1" || voice === "vln2");
+      const hold = thins ? Math.min(GROOVE_HOLD, STRING_HOLD[voice]) : STRING_HOLD[voice];
       const barLen = measureLengthBeats(m);
       const notes = (m.events ?? [])
         .filter((e: any) => e?.type === "note" && !e.grace)
@@ -464,12 +482,36 @@ export function arrangeStringEnsemble(
   ];
 
   // Last, after the merge pass has had its say: give the section some air.
-  const airy = giveStringsAir(parts);
+  // Which bars the chart marks with slashes rather than notes.
+  const groove = (melodyPart.measures ?? []).map((m: any) => {
+    const es = (m?.events ?? []).filter((e: any) => e?.type === "note" && !e.grace);
+    if (!es.length) return false;
+    const slashes = es.filter(
+      (e: any) => String(e.notehead ?? "").toLowerCase() === "slash"
+    ).length;
+    return slashes / es.length >= 0.5;
+  });
+
+  const airy = giveStringsAir(parts, groove);
   if (airy) {
     warnings.push(
       `[strings] ${airy} note(s) released early so there is air before the next attack — ` +
       "the slice grid tiles the bar, which had all five parts sounding every beat of it."
     );
+  }
+
+  // Where the chart writes slashes it is naming a groove, and the inner and
+  // lowest strings mark it rather than playing through it. In the reference
+  // edition's slash bars the viola takes 2.1 attacks a bar at 91% eighths and
+  // the double bass 3.3 at 100% eighths, against 55-58% for its violins and
+  // cello, which are carrying a line there. Ours had all five at 66-83%.
+  //
+  // Only on a chart. On a written score there are no slashes to read, and
+  // isChart keeps this away from sources that never asked for a groove.
+  if (isChart(melodyPart)) {
+    const pulsed = pulseLowerStrings(parts, melodyPart, { match: ORCHESTRA_PULSE_VOICES, skipEmptySourceBars: true });
+    const line = pulseSentence(pulsed);
+    if (line) warnings.push(line);
   }
 
   // melody_pizzicato: Vln I arco; all others pizzicato
