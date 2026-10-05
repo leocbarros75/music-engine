@@ -109,8 +109,21 @@ const v1 = find(parts, /^violin i\b/i);
   const groove = dens(vla, 8, 16);
   assert.ok(gap.ratio > groove.ratio,
     `the viola should be fuller in an instrumental gap (${(100 * gap.ratio).toFixed(0)}%) than under a groove (${(100 * groove.ratio).toFixed(0)}%)`);
-  assert.ok(gap.longest > 0.5,
-    "and it should be allowed a longer note there, not kept to pulse eighths");
+  // And the groove's rhythm is not imposed on it: a gap bar keeps the quarter
+  // grid the gap fill gives it, not the chart's [0, 0.5, 1] figure.
+  //
+  // Asserting a note longer than an eighth used to serve here, back when a gap
+  // bar was a single four-beat slice. The gap grid now hands it four quarter
+  // slices, so its notes are eighths either way and that test no longer tells
+  // the two apart.
+  const gapOnsets = new Set<number>();
+  for (const m of (vla.measures ?? []).slice(16, 24)) {
+    for (const e of (m.events ?? [])) {
+      if (e?.type === "note" && !e.grace) gapOnsets.add(Number(e.t));
+    }
+  }
+  assert.ok(gapOnsets.has(2) || gapOnsets.has(3),
+    `a gap bar should use the quarter grid, got onsets ${[...gapOnsets].sort((a, b) => a - b).join(",")}`);
 }
 
 // ── A score with no slashes is left alone ──────────────────────────────────

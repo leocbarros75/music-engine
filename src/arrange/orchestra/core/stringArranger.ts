@@ -92,6 +92,10 @@ function pickChordForTime(chords: ChordEvent[], measure: number, t: number): str
  */
 const STANDARD_BEAT_DURATIONS = [4.0, 3.0, 2.0, 1.5, 1.0, 0.75, 0.5, 0.25] as const;
 
+/** The grid a bar gets when the melody rests: a quarter, as the wind and brass
+ *  arrangers use for the same situation. */
+const GAP_STEP = 1.0;
+
 function snapToStandardDuration(dur: number): number {
   for (const s of STANDARD_BEAT_DURATIONS) {
     if (s <= dur + 1e-9) return s;
@@ -235,6 +239,25 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
     }
     times.add(0);
     times.add(measureLen);
+
+    // An instrumental gap: the melody has nothing here. Without a grid this
+    // measure is ONE slice, so every string holds a single note through it —
+    // measured against the reference edition, its violins play 5.6 and 6.2
+    // attacks in such a bar and ours played 1.0. The orchestra is meant to come
+    // forward where the tune stops (Tovey), and it cannot if the voicing search
+    // is given one decision to make.
+    //
+    // It does NOT, measured, unblock fillGapTops, which copies Violin 2's line
+    // into the first violin and the winds through a gap. That pass fires zero
+    // times on this chart both before and after: it only fills a part that is
+    // SILENT in the gap, and in this route none ever is — one note a bar or
+    // four, `hasNote` is true either way. It needs a different condition, or a
+    // reason for those parts to rest in a gap at all.
+    if (!melEvents.some((e: any) => e.type === "note")) {
+      for (let t = GAP_STEP; t < measureLen - 1e-9; t += GAP_STEP) {
+        times.add(Math.round(t * 1000) / 1000);
+      }
+    }
     // Re-filter after the forced adds to keep the set clean, then sort.
     const ordered = Array.from(times).filter(t => t >= 0 && t <= measureLen).sort((a, b) => a - b);
     for (let tIdx = 0; tIdx < ordered.length - 1; tIdx++) {
