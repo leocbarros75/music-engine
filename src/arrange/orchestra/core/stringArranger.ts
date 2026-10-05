@@ -94,6 +94,104 @@ function snapToStandardDuration(dur: number): number {
   return 0.25; // minimum floor
 }
 
+/**
+ * How much of its slice each string voice holds before letting go.
+ *
+ * `buildSlices` tiles the bar and every voice took a note spanning each slice
+ * to the next, so all five parts sounded exactly 100% of all 124 bars of a
+ * chart — no whole-bar rest and no gap anywhere. The reference edition's
+ * strings are 37-90%, and the mechanism is visible in its durations: they are
+ * eighths with real rests between them. Its Violin 1 has 204 gaps and 131
+ * silent beats, its double bass 293 gaps and is 97% eighths. Ours already had
+ * the duration mix roughly right (Violin 1 61% eighths against their 64%) and
+ * 0-2 gaps in the whole piece. The notes were not too long; there was simply no
+ * air between them.
+ *
+ * Shares from its own per-part densities: Violin 1 74%, Violin 2 73%, Viola
+ * 60%, Cello 62%, Double Bass 42% — upper strings carrying, the bass sparsest.
+ * `snapToStandardDuration` truncates DOWN, so only 0.75 and 0.5 survive it
+ * exactly on a quarter slice (0.6 would snap to an eighth and read 50%); these
+ * are chosen to land where they mean to rather than to look precise.
+ *
+ * Scope: this file belongs to the orchestra routes alone. `string_ensemble` has
+ * its own arranger under `src/arrange/strings/`, which is deliberately
+ * sustained and is not touched here.
+ */
+const STRING_HOLD: Record<VoiceId, number> = {
+  vln1: 0.75,
+  vln2: 0.75,
+  vla:  0.5,
+  vc:   0.5,
+  cb:   0.5,
+};
+
+/**
+ * Never write a sixteenth merely to create air.
+ *
+ * Applying the share at the moment each note is emitted looked obvious and was
+ * wrong twice over. The slices on this chart are mostly eighths, and an eighth
+ * times three-quarters snaps down to a sixteenth — so the commonest value in
+ * every part became a sixteenth, a spiccato wash. It also ran BEFORE the pass
+ * that merges repeated pitches into sustained notes, and removing the
+ * contiguity that pass looks for destroyed it: the viola went from 258 notes to
+ * 499 and lost its pad entirely.
+ *
+ * So this runs last, on the finished parts, and declines any cut that would
+ * leave less than an eighth.
+ */
+const AIR_FLOOR = 0.5;
+
+/**
+ * Let go of each note early enough to leave air before the next one.
+ *
+ * Only where there is none: a note already followed by a rest is phrased
+ * already. Ties are left alone — a note tied onward is one gesture, and cutting
+ * it would strand the tie.
+ */
+function giveStringsAir(parts: any[]): number {
+  // Named here rather than through partNameToVoiceId, which only knows the two
+  // violins and the viola and returns null for the cello and the bass. Using it
+  // left those two at zero gaps while the upper three were fixed — the lower
+  // strings are where a chart most needs air, and they were the parts still
+  // tiling every beat.
+  const voiceOf = (raw: string): VoiceId | null => {
+    const n = raw.toLowerCase().trim();
+    if (/^(violin i|violin 1|vln i|vln1)\b/.test(n)) return "vln1";
+    if (/^(violin ii|violin 2|vln ii|vln2)\b/.test(n)) return "vln2";
+    if (/^(viola|vla)\b/.test(n)) return "vla";
+    if (/^(cello|violoncello|vc)\b/.test(n)) return "vc";
+    if (/^(double bass|contrabass|cb)\b/.test(n)) return "cb";
+    return null;
+  };
+
+  let shortened = 0;
+  for (const part of parts ?? []) {
+    const voice = voiceOf(String(part?.name ?? ""));
+    if (!voice) continue;
+    const hold = STRING_HOLD[voice];
+    for (const m of part.measures ?? []) {
+      const barLen = measureLengthBeats(m);
+      const notes = (m.events ?? [])
+        .filter((e: any) => e?.type === "note" && !e.grace)
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      for (let i = 0; i < notes.length; i++) {
+        const e = notes[i]!;
+        if (e.tieStart || e.tieStop) continue;
+        const dur = Number(e.dur);
+        const end = Number(e.t) + dur;
+        const nextStart = i + 1 < notes.length ? Number(notes[i + 1]!.t) : barLen;
+        if (nextStart > end + 1e-9) continue;          // it can breathe already
+        const want = snapToStandardDuration(dur * hold);
+        if (want < AIR_FLOOR - 1e-9) continue;         // too short to be a note
+        if (want >= dur - 1e-9) continue;              // nothing gained
+        e.dur = want;
+        shortened++;
+      }
+    }
+  }
+  return shortened;
+}
+
 function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
   const slices: Slice[] = [];
   const measures = melodyPart?.measures ?? [];
@@ -364,6 +462,15 @@ export function arrangeStringEnsemble(
     buildPart(measuresTemplate, vc, "P_VC", "Cello", "cello"),
     buildPart(measuresTemplate, cb, "P_DB", "Double Bass", "double_bass")
   ];
+
+  // Last, after the merge pass has had its say: give the section some air.
+  const airy = giveStringsAir(parts);
+  if (airy) {
+    warnings.push(
+      `[strings] ${airy} note(s) released early so there is air before the next attack — ` +
+      "the slice grid tiles the bar, which had all five parts sounding every beat of it."
+    );
+  }
 
   // melody_pizzicato: Vln I arco; all others pizzicato
   const baseArticulations: StringEnsembleArrangement["articulations"] = [{ measure: 1, t: 0, type: "legato" }];
