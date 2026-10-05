@@ -18,6 +18,7 @@ import { arrangeBrassPolyphonic } from "./polyphony/brassPolyphonicArranger";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId, Slice, Voicing, VoiceId } from "../strings/types";
 import { gateBrassParticipation, participationSentence } from "./participation";
+import { shareBrassMelody, shareBrassMelodySentence } from "./shareMelody";
 import { buildCandidatesForSlice } from "../strings/candidates";
 import {
   BRASS_RANGES, BRASS_SWEET_SPOT, BRASS_TO_STRING_VOICE, BRASS_PART_META, BRASS_CHARACTER,
@@ -430,9 +431,16 @@ export function arrangeBrassEnsemble(
   if (melodyPart && chords.length) {
     applyBrassRhythm(brassScore, melodyPart, chords, key, options.activity ?? {});
 
-    // Who plays this bar, decided before the register and ordering passes so
-    // they only work on notes that survive and their counts stay honest.
-    const gated = gateBrassParticipation((brassScore as any).parts ?? [], melodyPart);
+    // Hand the tune round first: who is leading decides who may sit out.
+    const shared = shareBrassMelody((brassScore as any).parts ?? []);
+    const shareLine = shareBrassMelodySentence(shared.plans);
+    if (shareLine) warnings.push(shareLine);
+
+    // Then who plays this bar, decided before the register and ordering passes
+    // so they only work on notes that survive and their counts stay honest.
+    const gated = gateBrassParticipation(
+      (brassScore as any).parts ?? [], melodyPart, shared.leadByBar
+    );
     const line = participationSentence(gated);
     if (line) warnings.push(line);
   }

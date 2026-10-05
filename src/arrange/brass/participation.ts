@@ -20,12 +20,13 @@
  * The trumpets' rests are sectional, not scattered: they sit out whole
  * passages. That is the shape reproduced here.
  *
- * What this does NOT do. The reference rests Trumpet 1 in 34 of its 56 melody
- * bars as well, because its tune moves to another instrument and the trumpet is
- * "usually silent when another instrument leads". We have no brass equivalent of
- * the wind melody-sharing pass yet, so our trumpet is the only voice that can
- * carry the tune — silencing it in a melody bar would delete the melody, not
- * redistribute it. So it rests only where the chart gives no tune to carry.
+ * The reference also rests Trumpet 1 through 34 of its 56 melody bars, because
+ * its tune moves elsewhere and the trumpet is silent when another instrument
+ * leads. That needs `leadByBar` from `shareBrassMelody`: pass it and a trumpet
+ * may sit out a bar the chart does fill, so long as it is not the one holding
+ * the tune. Without it the trumpet is the only voice that can carry a melody,
+ * and silencing it in a melody bar would delete the tune rather than
+ * redistribute it — so it then rests only where the chart gives nothing.
  */
 
 export type Participation = { part: string; rested: number; blocks: number };
@@ -102,14 +103,26 @@ function instrumentalBlocks(kinds: BarKind[]): Array<[number, number]> {
  * always there; and the trumpet keeps every bar where the chart has a tune, so
  * the melody is never deleted.
  */
-export function gateBrassParticipation(parts: any[], source: any): Participation[] {
+export function gateBrassParticipation(
+  parts: any[],
+  source: any,
+  leadByBar?: string[]
+): Participation[] {
   const kinds = classify(source);
   if (!kinds.length) return [];
+  /** Does this voice hold the tune in this bar? With no plan, the trumpet does. */
+  const leads = (voice: Voice, i: number) =>
+    leadByBar?.length ? leadByBar[i] === voice : voice === "tpt1";
   const blocks = instrumentalBlocks(kinds);
   const inBlock = new Array<number>(kinds.length).fill(-1);
   blocks.forEach(([s, e], bi) => { for (let i = s; i < e; i++) inBlock[i] = bi; });
 
   const out: Participation[] = [];
+
+  // Decided first, applied second. The melody has to be checked across the
+  // whole section before any of it is cleared — silencing part by part cannot
+  // see that it has just left a bar with no tune in it at all.
+  const plan: Array<{ part: any; voice: Voice; silent: boolean[] }> = [];
 
   for (const part of parts ?? []) {
     const name = String(part?.name ?? "");
@@ -117,19 +130,31 @@ export function gateBrassParticipation(parts: any[], source: any): Participation
     if (!voice || voice === "tuba") continue;     // the foundation never stops
 
     const measures: any[] = part?.measures ?? [];
-    let rested = 0;
-    const touched = new Set<number>();
+    const silentAt = new Array<boolean>(Math.min(measures.length, kinds.length)).fill(false);
 
     for (let i = 0; i < measures.length && i < kinds.length; i++) {
       const bi = inBlock[i]!;
       let silent = false;
 
+      // The trumpets work as a section. When the horn has the tune they are
+      // both out of the melody bars; when either of them has it, both may play,
+      // and uncrossBrassSection keeps the second below the first.
+      //
+      // Resting only the FIRST trumpet was not enough. The horn takes the tune
+      // an octave down to stay inside its range, so a second trumpet still
+      // playing harmony sits above the melody and buries it — measuring the top
+      // sounding voice put Trumpet 2 there for 7 blocks of 16 while it led only
+      // 2. "Usually silent when another instrument leads" is a rule about the
+      // section, not about one player.
+      const trumpetLeads = leads("tpt1", i) || leads("tpt2", i);
+      const buriesTheTune = kinds[i] === "melody" && !trumpetLeads;
+
       if (voice === "tpt1") {
         // Sectional: out for the whole tune-less passage.
-        silent = bi >= 0;
+        silent = bi >= 0 || buriesTheTune;
       } else if (voice === "tpt2") {
         // The same passages, but it answers the phrase that just ended first.
-        silent = bi >= 0 && i - blocks[bi]![0] >= RESPONSE_BARS;
+        silent = (bi >= 0 && i - blocks[bi]![0] >= RESPONSE_BARS) || buriesTheTune;
       } else if (voice === "hn") {
         // A one-bar breath at a steady interval, wherever it falls.
         silent = i > 0 && i % HORN_BREATH_EVERY === 0;
@@ -138,17 +163,66 @@ export function gateBrassParticipation(parts: any[], source: any): Participation
         silent = kinds[i] === "melody" && i % TROMBONE_REST_EVERY === 0;
       }
 
-      if (!silent) continue;
+      // Never drop a SECTION while holding the tune. The trumpets' rests run
+      // for whole passages, and a player cannot hand back seven bars of melody
+      // to nobody.
+      //
+      // The horn's single bar is a different thing and is left alone: a brass
+      // player leading a whole chart has to breathe, and the reference's Horn 1
+      // takes exactly that, resting 7 of the 56 melody bars it otherwise
+      // carries. Protecting it here as well cut its rests from 17 to 7 and had
+      // the workhorse of the section never taking a breath at all.
+      // Only in a MELODY bar: that is where there is a tune to hold. Written as
+      // "not an empty bar" this also fired in slash bars, where with no lead
+      // plan the trumpet counts as leading by default — and it cancelled its
+      // own sectional rest straight through the groove.
+      if (silent && voice !== "hn" && kinds[i] === "melody" && leads(voice, i)) silent = false;
+
+      silentAt[i] = silent;
+    }
+
+    plan.push({ part, voice, silent: silentAt });
+  }
+
+  // A melody bar always keeps a melodic voice.
+  //
+  // The horn is allowed its breath and both trumpets are out under a horn-led
+  // passage, and those two rules together took the tune out of 6 melody bars
+  // altogether — trombone and tuba holding harmony under nothing. The reference
+  // never does that, and what it does instead is obvious once named: somebody
+  // covers the breath. The first trumpet comes back for that one bar.
+  const MELODIC: Voice[] = ["tpt1", "tpt2", "hn"];
+  const slot = (v: Voice) => plan.find((p) => p.voice === v);
+  const cover = slot("tpt1") ?? slot("tpt2");
+  if (cover) {
+    for (let i = 0; i < kinds.length; i++) {
+      if (kinds[i] !== "melody") continue;
+      const anyMelodic = MELODIC.some((v) => {
+        const s = slot(v);
+        if (!s || i >= s.silent.length) return false;
+        if (s.silent[i]) return false;
+        return (s.part.measures?.[i]?.events ?? [])
+          .some((e: any) => e?.type === "note" && !e.grace);
+      });
+      if (!anyMelodic && i < cover.silent.length) cover.silent[i] = false;
+    }
+  }
+
+  for (const { part, silent } of plan) {
+    const measures: any[] = part?.measures ?? [];
+    let rested = 0;
+    const touched = new Set<number>();
+    for (let i = 0; i < silent.length; i++) {
+      if (!silent[i]) continue;
       const m = measures[i];
       if (!m) continue;
       const had = (m.events ?? []).some((e: any) => e?.type === "note" && !e.grace);
       if (!had) continue;
       m.events = (m.events ?? []).filter((e: any) => e?.type !== "note" || e.grace);
       rested++;
-      if (bi >= 0) touched.add(bi);
+      if (inBlock[i]! >= 0) touched.add(inBlock[i]!);
     }
-
-    if (rested) out.push({ part: name, rested, blocks: touched.size });
+    if (rested) out.push({ part: String(part.name), rested, blocks: touched.size });
   }
   return out;
 }
