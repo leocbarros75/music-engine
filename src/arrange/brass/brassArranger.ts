@@ -98,6 +98,57 @@ function remapStringToBrass(stringScore: ScoreModel, voices: BrassVoiceId[]): Sc
 }
 
 // Apply per-voice source rhythm to the brass voices (block path).
+/**
+ * How much of its slot each voice holds before letting go.
+ *
+ * Every part sounded 92-95% of every bar it played, because each note was given
+ * the distance to the next onset and so butted against it. The reference
+ * edition's parts are nothing like that, and nothing like each other either.
+ *
+ * These are its own densities, measured WITHIN the bars each instrument
+ * actually plays — sounding share x total bars / playing bars, so the whole-bar
+ * rests the participation gate already handles are not counted twice:
+ *
+ *   Horn        ~81%   sustained, breath-spaced support
+ *   Tuba        ~70%   a half-time pulse in verses, eighth-and-rest in bridges
+ *   Trombone    ~59%   short chord attacks, mostly on beats 2 and 4
+ *   Trumpet 2   ~53%   brief responses
+ *   Trumpet 1   ~92%   dense when it plays at all — it just plays rarely
+ *
+ * So the first trumpet needs no share at all: as the melody carrier it takes
+ * the length the source wrote, which already comes to about 92%. Its entry here
+ * only covers the bars where it is NOT leading.
+ *
+ * The wind arranger's rule does not port directly. There, one three-quarter
+ * share fitted every accompanying voice and the sustained pad was the horn
+ * (agility below 0.5, holding through to its next onset). Reading agility the
+ * same way here would make the TUBA the pad, at 0.45 — and hold it at nearly
+ * 100% when the reference's tuba is the most detached low voice but for the
+ * trombone. A brass bass pulses; it does not drone.
+ *
+ * This matches density, not placement. The tuba's pulse on beats 1 and 3 and
+ * the trombone's attacks on 2 and 4 are about WHERE the notes fall, which is
+ * separate work (as `pulse.ts` is for the lower strings).
+ *
+ * And `snapDur` truncates to the next standard value DOWN, so a share does not
+ * arrive as a percentage. The tuba sits on a half-measure grid, where 0.7 of a
+ * two-beat slot is 1.4 and snaps to a quarter — which lands it at 50% sounding
+ * rather than 70%, as two quarter notes on beats 1 and 3. That is the
+ * reference's own verse idiom for the instrument, so it stays: raising the
+ * share to 0.75 would snap to 1.5 instead and reach 75%, closer to the
+ * reference's 66% average but as a dotted-quarter drone. The average is higher
+ * than 50% because the reference varies the idiom by section, adding
+ * eighth-and-rest attacks through the bridges — which is placement again, not
+ * length. Matching the number here would cost the groove.
+ */
+const BRASS_HOLD: Record<BrassVoiceId, number> = {
+  tpt1: 0.9,
+  tpt2: 0.55,
+  hn:   0.8,
+  tbn:  0.6,
+  tuba: 0.7,
+};
+
 function applyBrassRhythm(
   score: ScoreModel,
   sourcePart: any,
@@ -134,19 +185,32 @@ function applyBrassRhythm(
 
       const srcM = srcMeasures.find((pm: any) => Number(pm.number) === mnum);
       const onsetSet = new Set<number>();
+      // How long the source holds each onset. Taking the distance to the next
+      // one instead butts every note against the one after it, which is what
+      // made all five parts sound 92-95% of every bar they played.
+      const srcDur = new Map<number, number>();
       if (srcM) for (const ev of (srcM.events ?? [])) {
         if (ev.type !== "note") continue;
         const t = Number(ev.t ?? 0);
-        if (t >= 0 && t < measureLen) onsetSet.add(Math.round(t * 1000) / 1000);
+        if (t < 0 || t >= measureLen) continue;
+        const key = Math.round(t * 1000) / 1000;
+        onsetSet.add(key);
+        const d = Number(ev.dur);
+        // A chord sounds as one attack: take the longest of its notes.
+        if (Number.isFinite(d) && d > 0) srcDur.set(key, Math.max(srcDur.get(key) ?? 0, d));
       }
       if (!onsetSet.size) for (let t = 0; t < measureLen; t += 1.0) onsetSet.add(Math.round(t * 1000) / 1000);
 
-      // quarter-note gap fill
-      const sorted = Array.from(onsetSet).sort((a, b) => a - b);
-      const bounds = [...sorted, measureLen];
-      for (let i = 0; i < bounds.length - 1; i++) {
-        const gs = bounds[i]!, ge = bounds[i + 1]!;
-        if (ge - gs > 1 + 1e-9) for (let ft = gs + 1; ft < ge - 1e-9; ft += 1) onsetSet.add(Math.round(ft * 1000) / 1000);
+      // Quarter-note gap fill, so an ACCOMPANYING voice keeps the harmony
+      // present while the melody rests. Not for the melody carrier: where the
+      // tune rests, that rest is the tune.
+      if (!isMelody) {
+        const sorted = Array.from(onsetSet).sort((a, b) => a - b);
+        const bounds = [...sorted, measureLen];
+        for (let i = 0; i < bounds.length - 1; i++) {
+          const gs = bounds[i]!, ge = bounds[i + 1]!;
+          if (ge - gs > 1 + 1e-9) for (let ft = gs + 1; ft < ge - 1e-9; ft += 1) onsetSet.add(Math.round(ft * 1000) / 1000);
+        }
       }
 
       const times = [...thinOnsets(Array.from(onsetSet).sort((a, b) => a - b), eff, measureLen, isMelody), measureLen];
@@ -154,7 +218,11 @@ function applyBrassRhythm(
       for (let i = 0; i < times.length - 1; i++) {
         const t = times[i]!, next = times[i + 1]!;
         const capDur = measureLen - t; if (capDur <= 0) continue;
-        const dur = snapDur(Math.min(capDur, next - t)); if (dur <= 0) continue;
+        // The lead takes the length the source wrote, so its silence survives.
+        // Everyone else takes their own share of the slot — see BRASS_HOLD.
+        const own = isMelody ? srcDur.get(t) : undefined;
+        const want = own !== undefined ? own : (next - t) * BRASS_HOLD[wv];
+        const dur = snapDur(Math.min(capDur, next - t, want)); if (dur <= 0) continue;
         const slice: Slice = { measure: mnum, t, dur, melodyMidi: null, chordSymbol: pickChordAt(chords, mnum, t) };
         const prevVoicing: Voicing | null = prevMidi !== null
           ? { vln1: null, vln2: null, vla: null, vc: null, cb: null, [stringVoice]: prevMidi } as any : null;
