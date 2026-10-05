@@ -17,6 +17,7 @@ import { arrangeStringEnsemble } from "../strings/stringArranger";
 import { arrangeBrassPolyphonic } from "./polyphony/brassPolyphonicArranger";
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId, Slice, Voicing, VoiceId } from "../strings/types";
+import { gateBrassParticipation, participationSentence } from "./participation";
 import { buildCandidatesForSlice } from "../strings/candidates";
 import {
   BRASS_RANGES, BRASS_SWEET_SPOT, BRASS_TO_STRING_VOICE, BRASS_PART_META, BRASS_CHARACTER,
@@ -360,6 +361,12 @@ export function arrangeBrassEnsemble(
 
   if (melodyPart && chords.length) {
     applyBrassRhythm(brassScore, melodyPart, chords, key, options.activity ?? {});
+
+    // Who plays this bar, decided before the register and ordering passes so
+    // they only work on notes that survive and their counts stay honest.
+    const gated = gateBrassParticipation((brassScore as any).parts ?? [], melodyPart);
+    const line = participationSentence(gated);
+    if (line) warnings.push(line);
   }
 
   // Register first, then order: moving a whole line by an octave would undo
