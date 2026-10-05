@@ -6,6 +6,7 @@ import { STRING_RANGES } from "./ranges";
 import { midiToPitch, pitchToMidi } from "../../../instruments/instrumentCatalog";
 import { pulseLowerStrings, pulseSentence } from "../../strings/pulse";
 import { isChart } from "../../strings/restArc";
+import { breakChordsInGaps, gapFigurationSentence } from "../../strings/gapFiguration";
 
 /**
  * The same three string fixes the worship orchestra got (3f4ee54, b39a355,
@@ -388,6 +389,11 @@ export function arrangeStringEnsemble(
     return slashes / es.length >= 0.5;
   });
 
+  // Bars the melody leaves empty, as buildSlices sees them.
+  const gapBars = (melodyPart.measures ?? []).map(
+    (m: any) => !((m?.events ?? []).some((e: any) => e?.type === "note" && !e.grace))
+  );
+
   const airy = giveStringsAir(parts, groove);
   if (airy) {
     warnings.push(
@@ -395,6 +401,11 @@ export function arrangeStringEnsemble(
       "the slice grid tiles the bar, which had four of the five parts sounding every beat of it."
     );
   }
+
+  // The violins break the chord through those bars; the lower strings hold.
+  const figured = breakChordsInGaps(parts, gapBars);
+  const figLine = gapFigurationSentence(figured);
+  if (figLine) warnings.push(figLine);
 
   if (isChart(melodyPart)) {
     const pulsed = pulseLowerStrings(parts, melodyPart, {

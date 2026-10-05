@@ -6,6 +6,7 @@ import { STRING_RANGES } from "./ranges";
 import { midiToPitch, pitchToMidi } from "../../../instruments/instrumentCatalog";
 import { pulseLowerStrings, pulseSentence } from "../../strings/pulse";
 import { isChart } from "../../strings/restArc";
+import { breakChordsInGaps, gapFigurationSentence } from "../../strings/gapFiguration";
 
 /** The viola and the bass mark the groove; the violins and cello carry the line. */
 const ORCHESTRA_PULSE_VOICES = /^(viola|vla|double bass|contrabass)\b/i;
@@ -515,6 +516,11 @@ export function arrangeStringEnsemble(
     return slashes / es.length >= 0.5;
   });
 
+  // Bars the melody leaves empty, as buildSlices sees them.
+  const gapBars = (melodyPart.measures ?? []).map(
+    (m: any) => !((m?.events ?? []).some((e: any) => e?.type === "note" && !e.grace))
+  );
+
   const airy = giveStringsAir(parts, groove);
   if (airy) {
     warnings.push(
@@ -531,6 +537,11 @@ export function arrangeStringEnsemble(
   //
   // Only on a chart. On a written score there are no slashes to read, and
   // isChart keeps this away from sources that never asked for a groove.
+  // The violins break the chord through those bars; the lower strings hold.
+  const figured = breakChordsInGaps(parts, gapBars);
+  const figLine = gapFigurationSentence(figured);
+  if (figLine) warnings.push(figLine);
+
   if (isChart(melodyPart)) {
     const pulsed = pulseLowerStrings(parts, melodyPart, { match: ORCHESTRA_PULSE_VOICES, skipEmptySourceBars: true });
     const line = pulseSentence(pulsed);

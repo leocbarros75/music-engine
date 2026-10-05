@@ -1228,9 +1228,17 @@ export function arrangeWorshipOrchestra(
   const warnings = options.warnings ?? [];
   const profile = options.profile ?? "melody_harmony";
 
-  const core = options.polyphonic
-    ? arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel
-    : arrangeStringEnsemble(score, chords, { profile }).scoreModel as ScoreModel;
+  // The string core's own warnings were being dropped on the floor here: only
+  // .scoreModel was read, so the air, groove and figuration passes did their
+  // work and never said a word about it.
+  let core: ScoreModel;
+  if (options.polyphonic) {
+    core = arrangeOrchestraPolyphonic(score, chords, { level: options.level }).scoreModel as ScoreModel;
+  } else {
+    const sr = arrangeStringEnsemble(score, chords, { profile });
+    warnings.push(...(sr.warnings ?? []));
+    core = sr.scoreModel as ScoreModel;
+  }
 
   const scoreModel = orchestrateStringCore(core, warnings, { intensity: options.intensity, parts: options.parts, balance: options.balance, partRanges: options.partRanges, pianoLeads: options.pianoLeads, melodyRests: options.melodyRests ?? sourceMelodyRestMeasures(score) });
   return { scoreModel, warnings };

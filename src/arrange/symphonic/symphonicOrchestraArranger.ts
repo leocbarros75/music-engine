@@ -518,9 +518,12 @@ export function arrangeSymphonicOrchestra(
   const period: SymphonicPeriod = options.period === "classical" ? "classical" : "romantic";
 
   // 1) Voice-leading core (symphonic fork: no worship harmony post-processing).
-  const core = arrangeStringEnsemble(score, chords, {
+  // Same here: the core's warnings were discarded with the rest of the result.
+  const coreResult = arrangeStringEnsemble(score, chords, {
     profile: (options.profile ?? "melody_harmony") as any,
-  }).scoreModel as ScoreModel;
+  });
+  warnings.push(...(coreResult.warnings ?? []));
+  const core = coreResult.scoreModel as ScoreModel;
 
   const coreByVoice = new Map<CoreVoice, any>();
   const CORE_NAMES: Record<CoreVoice, RegExp> = {
