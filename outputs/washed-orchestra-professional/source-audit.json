@@ -1,0 +1,120 @@
+{
+  "source_note_classifications": {
+    "pitched notation": 425,
+    "rest": 208,
+    "rhythm slash": 228,
+    "percussion cue": 19
+  },
+  "part_ranges": {
+    "FL1": {
+      "low_sounding_midi": 76,
+      "high_sounding_midi": 90
+    },
+    "FL2": {
+      "low_sounding_midi": 71,
+      "high_sounding_midi": 83
+    },
+    "OB": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 83
+    },
+    "CL": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 78
+    },
+    "BN": {
+      "low_sounding_midi": 47,
+      "high_sounding_midi": 54
+    },
+    "H1": {
+      "low_sounding_midi": 63,
+      "high_sounding_midi": 66
+    },
+    "H2": {
+      "low_sounding_midi": 56,
+      "high_sounding_midi": 59
+    },
+    "T1": {
+      "low_sounding_midi": 70,
+      "high_sounding_midi": 78
+    },
+    "T2": {
+      "low_sounding_midi": 70,
+      "high_sounding_midi": 71
+    },
+    "TB1": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 59
+    },
+    "TB3": {
+      "low_sounding_midi": 47,
+      "high_sounding_midi": 52
+    },
+    "BT": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 47
+    },
+    "TU": {
+      "low_sounding_midi": 30,
+      "high_sounding_midi": 40
+    },
+    "TI": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 47
+    },
+    "V1": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 88
+    },
+    "V2": {
+      "low_sounding_midi": 61,
+      "high_sounding_midi": 85
+    },
+    "VA": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 66
+    },
+    "VC": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 66
+    },
+    "CB": {
+      "low_sounding_midi": 30,
+      "high_sounding_midi": 40
+    }
+  },
+  "event_roles": {
+    "woodwind answering color": 62,
+    "complementary counterline": 320,
+    "counterline chord anchor": 54,
+    "diatonic neighbor": 54,
+    "neighbor resolution": 54,
+    "final B-major voicing": 18,
+    "source introduction chord-hit line in flute": 25,
+    "new motivic continuation": 144,
+    "source turnaround cue": 21,
+    "source bridge riff in orchestral register": 55,
+    "editorial sequence of source bridge riff": 165,
+    "source closing upper line": 34,
+    "editorial return of source turnaround": 14,
+    "quiet transition fifth": 2,
+    "horn harmonic support": 52,
+    "brass structural accent": 132,
+    "timpani cadence emphasis": 24,
+    "source opening melody": 46,
+    "editorial octave return of opening theme": 88,
+    "sustained harmonic strand": 134,
+    "editorial final tonic": 1,
+    "broken-chord string ostinato": 270,
+    "source guitar cue in second violins": 26,
+    "ostinato diatonic approach": 24,
+    "ostinato stepwise resolution": 24,
+    "pizzicato backbeat": 85,
+    "bowed inner pulse": 95,
+    "pizzicato harmonic pulse": 44,
+    "detache cello pulse": 143,
+    "source descending second-ending cue": 8,
+    "pizzicato bass foundation": 342,
+    "arco closing foundation": 13
+  }
+}

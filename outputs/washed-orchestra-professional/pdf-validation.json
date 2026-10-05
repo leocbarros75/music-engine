@@ -1,0 +1,113 @@
+{
+  "page_counts": {
+    "washed-BN.pdf": 4,
+    "washed-BT.pdf": 4,
+    "washed-CB.pdf": 4,
+    "washed-CL.pdf": 4,
+    "washed-FL1.pdf": 4,
+    "washed-FL2.pdf": 4,
+    "washed-H1.pdf": 4,
+    "washed-H2.pdf": 4,
+    "washed-OB.pdf": 4,
+    "washed-T1.pdf": 4,
+    "washed-T2.pdf": 4,
+    "washed-TB1.pdf": 4,
+    "washed-TB3.pdf": 4,
+    "washed-TI.pdf": 4,
+    "washed-TU.pdf": 4,
+    "washed-V1.pdf": 4,
+    "washed-V2.pdf": 4,
+    "washed-VA.pdf": 4,
+    "washed-VC.pdf": 4,
+    "washed-orchestra-professional.pdf": 31
+  },
+  "page_sizes_mm": {
+    "washed-BN.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-BT.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-CB.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-CL.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-FL1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-FL2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-H1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-H2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-OB.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-T1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-T2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TB1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TB3.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TI.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-TU.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-V1.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-V2.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-VA.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-VC.pdf": [
+      209.9,
+      297.0
+    ],
+    "washed-orchestra-professional.pdf": [
+      297.0,
+      420.2
+    ]
+  },
+  "all_pages_nonempty": true,
+  "visual_review_completed": true,
+  "review_method": "All output pages rendered at 1400-pixel height and inspected on 25 contact sheets; opening full score and selected trumpet, violin, and cello pages inspected enlarged.",
+  "audio_review_completed": false,
+  "live_player_review_completed": false,
+  "structural_tests_passed": 32,
+  "total_reviewed_output_pages": 107
+}

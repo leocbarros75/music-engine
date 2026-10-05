@@ -1,0 +1,82 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-orchestra-professional.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-orchestra-professional.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-FL1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-FL1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-FL2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-FL2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-OB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-OB.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-CL.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-CL.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-BN.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-BN.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-H1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-H1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-H2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-H2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-T1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-T1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-T2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-T2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TB1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TB1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TB3.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TB3.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-BT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-BT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TU.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TU.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TI.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-TI.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-V1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-V1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-V2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-V2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-VA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-VA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-VC.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-VC.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-CB.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-orchestra-professional/washed-CB.pdf"
+  }
+]

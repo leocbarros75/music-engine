@@ -1,0 +1,37 @@
+test_bad_mode_preparation_rejected (test_arrangement.ArrangementTests.test_bad_mode_preparation_rejected) ... ok
+test_bad_neighbor_rejected (test_arrangement.ArrangementTests.test_bad_neighbor_rejected) ... ok
+test_complete_roundtrip (test_arrangement.ArrangementTests.test_complete_roundtrip) ... ok
+test_double_bass_written_octave (test_arrangement.ArrangementTests.test_double_bass_written_octave) ... ok
+test_family_activity_hierarchy (test_arrangement.ArrangementTests.test_family_activity_hierarchy) ... ok
+test_fixed_drums (test_arrangement.ArrangementTests.test_fixed_drums) ... ok
+test_independent_counterlines_and_ornaments (test_arrangement.ArrangementTests.test_independent_counterlines_and_ornaments) ... ok
+test_missing_repeat_rejected (test_arrangement.ArrangementTests.test_missing_repeat_rejected) ... ok
+test_missing_tie_rejected (test_arrangement.ArrangementTests.test_missing_tie_rejected) ... ok
+test_nineteen_parts_and_routing (test_arrangement.ArrangementTests.test_nineteen_parts_and_routing) ... ok
+test_opening_and_editorial_provenance (test_arrangement.ArrangementTests.test_opening_and_editorial_provenance) ... ok
+test_original_source_hashes (test_arrangement.ArrangementTests.test_original_source_hashes) ... ok
+test_overlapping_events_rejected (test_arrangement.ArrangementTests.test_overlapping_events_rejected) ... ok
+test_parts_match_score (test_arrangement.ArrangementTests.test_parts_match_score) ... ok
+test_performed_ties (test_arrangement.ArrangementTests.test_performed_ties) ... ok
+test_pickup_and_numbered_duration (test_arrangement.ArrangementTests.test_pickup_and_numbered_duration) ... ok
+test_repeat_aware_breathing (test_arrangement.ArrangementTests.test_repeat_aware_breathing) ... ok
+test_slash_bass_and_anticipation (test_arrangement.ArrangementTests.test_slash_bass_and_anticipation) ... ok
+test_slashes_never_become_melody (test_arrangement.ArrangementTests.test_slashes_never_become_melody) ... ok
+test_transposing_parts_and_spelling (test_arrangement.ArrangementTests.test_transposing_parts_and_spelling) ... ok
+test_tuba_concert_pitch (test_arrangement.ArrangementTests.test_tuba_concert_pitch) ... ok
+test_unbroken_phrase_rejected (test_arrangement.ArrangementTests.test_unbroken_phrase_rejected) ... ok
+test_untuned_timpani_rejected (test_arrangement.ArrangementTests.test_untuned_timpani_rejected) ... ok
+test_wrong_clarinet_transposition (test_arrangement.ArrangementTests.test_wrong_clarinet_transposition) ... ok
+test_wrong_display_type_rejected (test_arrangement.ArrangementTests.test_wrong_display_type_rejected) ... ok
+test_wrong_double_bass_octave (test_arrangement.ArrangementTests.test_wrong_double_bass_octave) ... ok
+test_wrong_duration_rejected (test_arrangement.ArrangementTests.test_wrong_duration_rejected) ... ok
+test_wrong_horn_transposition_rejected (test_arrangement.ArrangementTests.test_wrong_horn_transposition_rejected) ... ok
+test_wrong_note_rejected (test_arrangement.ArrangementTests.test_wrong_note_rejected) ... ok
+test_wrong_printed_chord_rejected (test_arrangement.ArrangementTests.test_wrong_printed_chord_rejected) ... ok
+test_wrong_trumpet_transposition_rejected (test_arrangement.ArrangementTests.test_wrong_trumpet_transposition_rejected) ... ok
+test_wrong_written_harmony_rejected (test_arrangement.ArrangementTests.test_wrong_written_harmony_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 7.391s
+
+OK
