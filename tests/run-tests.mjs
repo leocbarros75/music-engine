@@ -80,6 +80,7 @@ async function main() {
       'tests/arrange/windMelodySharing.test.ts',
       'tests/arrange/windNoteLength.test.ts',
       'tests/arrange/windDensityArc.test.ts',
+      'tests/arrange/windPhrasing.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

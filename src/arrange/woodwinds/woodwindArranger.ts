@@ -221,6 +221,26 @@ function applyMelodyRhythmToWoodwinds(
       // Rhythm slashes rather than written notes: the chart is naming a groove
       // here, not a melody.
       const barIsChordRhythm = srcNotes > 0 && srcSlashes / srcNotes >= 0.5;
+
+      // Does the source's tune ever stop in this bar? A chart melody often runs
+      // wall to wall — this one's 56 melody bars sound 100% of their length —
+      // and a tune that never stops is a tune nobody can play.
+      let covered = 0;
+      {
+        const ts = [...srcDur.keys()].sort((a, b) => a - b);
+        let cursor = 0;
+        for (const t of ts) {
+          const end = Math.min(measureLen, t + (srcDur.get(t) ?? 0));
+          if (end > cursor) { covered += end - Math.max(cursor, t); cursor = end; }
+        }
+      }
+      // Dense AND unbroken. "Unbroken" alone catches a hymn in whole notes,
+      // which is continuous but gives the player one note a bar to shape and
+      // needs no beat of rest carved out of it — cutting the last beat of every
+      // bar would mangle it. Three or more attacks with no air between them is a
+      // stream; this chart's melody bars run 4.5.
+      const sourceNeverStops =
+        srcDur.size >= 3 && covered >= measureLen - 1e-6;
       // A bar the source leaves empty: an instrumental gap, where there is no
       // melody to carry and no rhythm to read.
       const sourceSilent = !onsetSet.size;
@@ -267,6 +287,26 @@ function applyMelodyRhythmToWoodwinds(
               onsetSet.add(Math.round(ft * 1000) / 1000);
           }
         }
+      }
+
+      // The tune breathes at the end of the bar.
+      //
+      // Where the reference rests inside its melody bars is the one strong
+      // signal in its phrasing: beat 3 is silent in 44 of 56, beat 3.5 in 35,
+      // against 6 at beat 1. It drops whatever sits on the last beat about 69%
+      // of the time. Which onsets it keeps elsewhere is nearly flat by beat
+      // position — 31% to 55% — so there is no metrical hierarchy to read off,
+      // and a strong-beat rule would be invention wearing the clothes of
+      // evidence. The end-of-bar breath is the part the data actually supports.
+      //
+      // This DOES drop melody notes, so it is gated on the source leaving the
+      // player no air of its own. A source that already rests is phrased
+      // already: a hymn in half notes keeps every one of them.
+      const breathes = isMelody && !barIsChordRhythm && sourceNeverStops;
+      const breathFrom = measureLen - FILL_STEP;
+      if (breathes) {
+        for (const t of [...onsetSet]) if (t >= breathFrom - 1e-6) onsetSet.delete(t);
+        if (!onsetSet.size) onsetSet.add(0);   // never drop the bar entirely
       }
 
       // Over a groove the melody holds a note; it does not drum along with the
@@ -330,7 +370,11 @@ function applyMelodyRhythmToWoodwinds(
             // came to 77% sounding against the reference's 56%.
             ? (isMelody && barIsChordRhythm ? Math.max(own, (next - t) * 0.5) : own)
             : gapFill(next - t);
-        const dur = snapDur(Math.min(capDur, next - t, want));
+        // Dropping the late onsets is not enough on its own: a note starting
+        // earlier can still hold straight through the breath. Release it at the
+        // barline's door instead.
+        const ceiling = breathes ? Math.max(0.25, breathFrom - t) : capDur;
+        const dur = snapDur(Math.min(capDur, ceiling, next - t, want));
         if (dur <= 0) continue;
 
         const slice: Slice = {
