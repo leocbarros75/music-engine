@@ -91,6 +91,7 @@ async function main() {
       'tests/arrange/gapFiguration.test.ts',
       'tests/arrange/brassSectionRoster.test.ts',
       'tests/arrange/brassRegister.test.ts',
+      'tests/arrange/lowBrassPlacement.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

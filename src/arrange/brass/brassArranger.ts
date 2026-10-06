@@ -19,6 +19,7 @@ import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
 import type { ProfileId, Slice, Voicing, VoiceId } from "../strings/types";
 import { gateBrassParticipation, participationSentence } from "./participation";
 import { expandBrassSection, expandSectionSentence } from "./expandSection";
+import { placeLowBrass, lowBrassPlacementSentence } from "./lowBrassPlacement";
 import { shareBrassMelody, shareBrassMelodySentence } from "./shareMelody";
 import { buildCandidatesForSlice } from "../strings/candidates";
 import {
@@ -509,6 +510,12 @@ export function arrangeBrassEnsemble(
     const added = expandBrassSection(brassScore as any);
     const line = expandSectionSentence(added);
     if (line) warnings.push(line);
+  
+    // And then where each of them puts its attacks: doubling the donor's
+    // rhythm exactly had all three trombones hitting the same four beats.
+    const placed = placeLowBrass((brassScore as any).parts ?? []);
+    const placeLine = lowBrassPlacementSentence(placed);
+    if (placeLine) warnings.push(placeLine);
   }
 
   return { scoreModel: brassScore, warnings };
