@@ -2562,7 +2562,7 @@ export function applyAppSettings(
     // the harmonizer's output: both read the piano source directly, which is
     // why they sat outside the SATB path and were easy to lose.
     const finalScore = wantsJazzBand
-      ? mapPianoToJazzBandOpen(scoreModel)
+      ? mapPianoToJazzBandOpen(scoreModel, undefined, chords as any)
       : mapPianoToPercussionOpen(scoreModel);
     // The horns had never been given anywhere to breathe on this route: all
     // four ran 299 beats, the whole piece, with not one mark in the score. Four

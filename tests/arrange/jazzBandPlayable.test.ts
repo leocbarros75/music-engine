@@ -139,4 +139,71 @@ for (const re of SINGLE_LINE) {
   assert.ok(n > 0, `${p.name} never plays`);
 }
 
+// ── The rhythm section comps: guitar on the backbeat ups, piano in eighths ──
+{
+  // Voiced from the chart's chord SYMBOLS. Without them the mapper can only
+  // derive harmony from notes, and extractOnsetChords on a single-line chart
+  // returns one note per onset — so the bar's "chord" was a single pitch, the
+  // piano could only reach 2.5 notes an onset against the reference's 5, and
+  // the guitar never reached three at all and sat silent in all 124 bars.
+  const bars = 8;
+  const symbols = Array.from({ length: bars }, (_, i) => ({
+    measure: i + 1, t: 0, symbol: "C",
+  }));
+  const withSym: any = mapPianoToJazzBandOpen(pianoScore(bars) as any, undefined, symbols);
+  const ps: any[] = withSym.parts ?? [];
+  const gtr = ps.find((p) => /^rhythm guitar$/i.test(String(p.name)))!;
+  const pno = ps.find((p) => /^piano$/i.test(String(p.name)))!;
+  assert.ok(gtr, "there is a rhythm guitar in the band");
+
+  // The reference's guitar plays on the and of 2 and the and of 4, 50% each,
+  // and nowhere else — a funk upstroke.
+  let gtrOnsets = 0;
+  for (let bar = 0; bar < bars; bar++) {
+    const byT = new Map<number, number>();
+    for (const e of notesIn(gtr, bar)) byT.set(Number(e.t), (byT.get(Number(e.t)) ?? 0) + 1);
+    for (const [t, n] of byT) {
+      gtrOnsets++;
+      assert.ok(t === 1.5 || t === 3.5,
+        `the guitar struck beat ${t}; it plays the and of 2 and the and of 4`);
+      assert.equal(n, 3, `a guitar voicing is three notes, got ${n}`);
+    }
+  }
+  assert.ok(gtrOnsets > 0, "the guitar must actually play");
+
+  // The piano comps in eighths on beat 1, the and of 1, the and of 3 and the
+  // and of 4, with a hand's worth of notes rather than one.
+  for (let bar = 0; bar < bars; bar++) {
+    const byT = new Map<number, number>();
+    for (const e of notesIn(pno, bar)) {
+      byT.set(Number(e.t), (byT.get(Number(e.t)) ?? 0) + 1);
+      assert.equal(Number(e.dur), 0.5, "the comp is in eighths");
+    }
+    for (const [t, n] of byT) {
+      assert.ok([0, 0.5, 2.5, 3.5].includes(t),
+        `the piano struck beat ${t}, off the comping pattern`);
+      assert.ok(n >= 3, `a comping voicing is a handful of notes, got ${n} at beat ${t}`);
+    }
+    // It must USE the pattern, not merely stay inside it. Asserting only that
+    // each onset is one of the four passed with the piano back on beat 1 alone,
+    // which is the whole-note-per-bar fault this replaced; the reference comps
+    // 3.1 onsets a bar.
+    assert.ok(byT.size >= 3,
+      `bar ${bar + 1}: the piano comps ${byT.size} onset(s); the pattern has four`);
+  }
+
+  // Every comped pitch is a chord tone of the symbol — C major here.
+  const MAJ = new Set([0, 4, 7]);
+  const STEPS: Record<string, number> = { C:0,D:2,E:4,F:5,G:7,A:9,B:11 };
+  for (const p of [gtr, pno]) {
+    for (let bar = 0; bar < bars; bar++) {
+      for (const e of notesIn(p, bar)) {
+        const pc = ((STEPS[String(e.pitch?.step)] ?? 0) + Number(e.pitch?.alter ?? 0) + 12) % 12;
+        assert.ok(MAJ.has(pc),
+          `${p.name}: ${e.pitch?.step}${e.pitch?.octave} is not a chord tone of C`);
+      }
+    }
+  }
+}
+
 console.log("PASS jazz band playable");

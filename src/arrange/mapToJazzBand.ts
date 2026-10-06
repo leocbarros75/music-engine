@@ -3,6 +3,7 @@
 import type { ScoreModel } from "../score/types";
 import { shiftOctavesIntoRange, midiToPitch } from "../instruments/instrumentCatalog";
 import { extractOnsetChords } from "../analyze/chordExtractor";
+import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 
 type JazzStyle = "swing" | "bossa" | "ballad";
 
@@ -282,7 +283,20 @@ function writeDrumsForStyle(
  * - The exporter handles written pitch/key for transposing parts via <transpose>.
  * - Bass stays as-is per your request.
  */
-export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOptions): ScoreModel {
+export function mapPianoToJazzBandOpen(
+  score: ScoreModel,
+  options?: JazzBandOptions,
+  /**
+   * The chart's chord symbols.
+   *
+   * Without them this mapper could only derive harmony from notes, and
+   * extractOnsetChords on a single-line chart hands back ONE note per onset —
+   * so the bar's "chord" was a single pitch. A rhythm section comps the chord,
+   * and the chart writes 131 of them; the parsed measures carry no harmony
+   * field, so the pipeline has to pass them in.
+   */
+  symbols?: Array<{ measure: number | string; t?: number; symbol?: string }>,
+): ScoreModel {
   const preset = resolveOptions(options);
 
   const asx = makePart("ASX", "Alto Sax", "alto_sax_eb", 1);
@@ -291,9 +305,10 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
   const tbn = makePart("TBN", "Trombone", "trombone", 1);
   const pno = makePart("PNO", "Piano", "piano", 2);
   const bas = makePart("BASS", "Bass", "bass", 1);
+  const gtr = makePart("GTR", "Rhythm Guitar", "guitar", 1);
   const drm = makePart("DRUMS", "Drums", "drums", 1);
 
-  const partsOut = [asx, tsx, tpt, tbn, pno, bas, drm];
+  const partsOut = [asx, tsx, tpt, tbn, pno, gtr, bas, drm];
 
   const srcPart = score.parts?.[0];
   if (!srcPart?.measures || srcPart.measures.length === 0) {
@@ -301,6 +316,37 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
   }
 
   const chords = extractOnsetChords(score);
+
+  // Chord-symbol pitch classes per measure, carried forward: a band holds the
+  // chord until the chart says otherwise.
+  const pcsByMeasure: Record<string, number[]> = {};
+  const rootByMeasure: Record<string, number | null> = {};
+  {
+    let last: number[] = [];
+    let lastRoot: number | null = null;
+    const byMeasure = new Map<string, string>();
+    for (const sy of symbols ?? []) {
+      const sym = String(sy?.symbol ?? "").trim();
+      if (!sym) continue;
+      const k = String(sy.measure);
+      if (!byMeasure.has(k)) byMeasure.set(k, sym);
+    }
+    for (const m of score.parts?.[0]?.measures ?? []) {
+      const k = String((m as any).number);
+      const sym = byMeasure.get(k);
+      if (sym) {
+        const parsed: any = parseChordSymbol(sym);
+        const got: number[] = parsed?.pcs ?? [];
+        if (got.length) {
+          last = [...new Set(got.map((x: number) => ((x % 12) + 12) % 12))];
+          const r = parsed?.bassPc ?? parsed?.rootPc;
+          lastRoot = typeof r === "number" ? ((r % 12) + 12) % 12 : null;
+        }
+      }
+      pcsByMeasure[k] = last;
+      rootByMeasure[k] = lastRoot;
+    }
+  }
 
   // Group chords by measure number for measure-based piano comping + section-start heuristics
   const chordsByMeasure: Record<string, any[]> = {};
@@ -321,8 +367,9 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
     tpt.measures.push(shells[2]);
     tbn.measures.push(shells[3]);
     pno.measures.push(shells[4]);
-    bas.measures.push(shells[5]);
-    drm.measures.push(shells[6]);
+    gtr.measures.push(shells[5]);
+    bas.measures.push(shells[6]);
+    drm.measures.push(shells[7]);
 
     const divisions = m?.attributes?.divisions ?? score?.global?.divisions ?? 480;
     const beats = m?.attributes?.time?.beats ?? 4;
@@ -336,7 +383,7 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
     const isSectionStart = m.number === 1 || (chordsHere.length > 0 && prevChords.length === 0);
 
     // Drums once per measure
-    writeDrumsForStyle(shells[6], divisions, beats, preset, isSectionStart);
+    writeDrumsForStyle(shells[7], divisions, beats, preset, isSectionStart);
 
     // Piano RH comping per measure (beat 2 only, optional beat 4 and anticipation)
     const beatDur = divisions;
@@ -356,40 +403,113 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
       const mid2 = pick(Math.floor((notesSorted.length - 1) * 0.5));
       const high = pick(notesSorted.length - 1);
 
-      // Piano ranges (concert)
+      // Piano and guitar comping, in BEATS.
+      //
+      // This block used to work in divisions: `const beatDur = divisions` with
+      // `tBeat2 = 1 * beatDur`, so the onsets were 0, 480, 1440 and 1680 in a
+      // bar four beats long. Everything past the first fell outside the bar and
+      // vanished, which is why the piano came out as one whole note a bar in
+      // the bass — 94 notes against the reference edition's 1925, a range of 10
+      // semitones against its 27. The same units error as the horns'.
+      //
+      // The patterns are that edition's own, measured over its 124 bars:
+      //
+      //   Piano   3.1 onsets a bar, 5 notes each, all eighths, falling on
+      //           beat 1 (32%), the and of 1 (27%), the and of 3 (27%) and the
+      //           and of 4 (9%). Range 49-76.
+      //   Guitar  2.0 onsets a bar, 3 notes each, 99% eighths, on the and of 2
+      //           and the and of 4 — 50% each, and nothing anywhere else. That
+      //           is a funk upstroke, and it is silent in 38 of 124 bars.
+      //
+      // Nothing is invented harmonically: every pitch is a chord tone the
+      // extractor already found in this bar, placed into the instrument's own
+      // register.
       const PNO_LH_LO = 36, PNO_LH_HI = 60; // C2..C4
       const PNO_RH_LO = 55, PNO_RH_HI = 88; // G3..E6
       const C_PNO_LH = 45; // A2
       const C_PNO_RH = 67; // G4
+      const GTR_LO = 60, GTR_HI = 79;       // C4..G5 — the reference sits 64-76
+      const C_GTR = 70;
 
-      // LH anchor: one low note at beat 1 only
-      const mPNO_LH = shiftOctavesToward(low, PNO_LH_LO, PNO_LH_HI, C_PNO_LH);
+      /**
+       * The bar's chord voiced for one instrument: `want` notes inside its
+       * register, every one a chord tone.
+       *
+       * Built from the chord's PITCH CLASSES across the whole register, not
+       * from the extractor's note instances. Shifting the instances was the
+       * first attempt and it cannot fill a hand: most bars here voice only two
+       * or three distinct tones, so the piano got 2.5 notes an onset against
+       * the reference's 5, and the guitar never reached three at all and sat
+       * silent in all 124 bars.
+       *
+       * Distinct classes come first, nearest the centre, so a triad voices as a
+       * triad; octave doublings fill any remaining seats.
+       */
+      const voicing = (lo: number, hi: number, centre: number, want: number): number[] => {
+        const fromSymbol = pcsByMeasure[String(m.number)] ?? [];
+        const pcs = fromSymbol.length
+          ? fromSymbol
+          : [...new Set(notesSorted.map((x) => ((x % 12) + 12) % 12))];
+        if (!pcs.length) return [];
+        const picked: number[] = [];
+        const taken = new Set<number>();
 
-      // RH 2-note voicing (avoid duplicates)
-      let mPNO_RH1 = shiftOctavesToward(mid2, PNO_RH_LO, PNO_RH_HI, C_PNO_RH);
-      let mPNO_RH2 = shiftOctavesToward(high, PNO_RH_LO, PNO_RH_HI, C_PNO_RH);
-      const [r1, r2] = unique2(mPNO_RH1, mPNO_RH2);
-      mPNO_RH1 = r1;
-      mPNO_RH2 = r2 ?? r1;
+        // One instance of each class first, the one nearest this register's centre.
+        for (const pc of pcs) {
+          let best: number | null = null;
+          for (let m = lo; m <= hi; m++) {
+            if (((m % 12) + 12) % 12 !== pc) continue;
+            if (best === null || Math.abs(m - centre) < Math.abs(best - centre)) best = m;
+          }
+          if (best !== null && !taken.has(best)) { taken.add(best); picked.push(best); }
+        }
+        // Then octave doublings, nearest the centre, until the hand is full.
+        const extras: number[] = [];
+        for (let m = lo; m <= hi; m++) {
+          if (taken.has(m)) continue;
+          if (pcs.includes(((m % 12) + 12) % 12)) extras.push(m);
+        }
+        extras.sort((a, b) => Math.abs(a - centre) - Math.abs(b - centre));
+        for (const m of extras) {
+          if (picked.length >= want) break;
+          picked.push(m);
+        }
+        return picked.sort((a, b) => a - b).slice(0, want);
+      };
 
-      // LH on staff 2 at beat 1 (voice 2)
-      addNote(shells[4], 0, beatDur, midiToPitch(mPNO_LH), 2, 2);
+      const EIGHTH = 0.5;
+      const barBeats = Number(beats) || 4;
 
-      // RH ONLY on beat 2 (voice 1, staff 1)
-      addNote(shells[4], tBeat2, beatDur, midiToPitch(mPNO_RH1), 1, 1);
-      if (mPNO_RH2 !== mPNO_RH1) addNote(shells[4], tBeat2, beatDur, midiToPitch(mPNO_RH2), 1, 1);
-
-      // Optional beat 4
-      if (preset.pianoAddBeat4 && beats >= 4) {
-        addNote(shells[4], tBeat4, beatDur, midiToPitch(mPNO_RH1), 1, 1);
-        if (mPNO_RH2 !== mPNO_RH1) addNote(shells[4], tBeat4, beatDur, midiToPitch(mPNO_RH2), 1, 1);
+      // ── Piano: left hand roots the bar, right hand comps in eighths ──────
+      // The left hand roots the bar. From the SYMBOL's root — or its bass note
+      // for a slash chord — not from whatever single pitch the extractor found,
+      // which could sit outside the chord entirely.
+      const rootPc = rootByMeasure[String(m.number)];
+      let lhSeed = low;
+      if (typeof rootPc === "number") {
+        let best: number | null = null;
+        for (let cand = PNO_LH_LO; cand <= PNO_LH_HI; cand++) {
+          if (((cand % 12) + 12) % 12 !== rootPc) continue;
+          if (best === null || Math.abs(cand - C_PNO_LH) < Math.abs(best - C_PNO_LH)) best = cand;
+        }
+        if (best !== null) lhSeed = best;
+      }
+      const lh = shiftOctavesToward(lhSeed, PNO_LH_LO, PNO_LH_HI, C_PNO_LH);
+      const rh = voicing(PNO_RH_LO, PNO_RH_HI, C_PNO_RH, 4);
+      const pianoHits = [0, 0.5, 2.5, 3.5].filter((t) => t < barBeats);
+      for (const t of pianoHits) {
+        if (t === 0) addNote(shells[4], 0, EIGHTH, midiToPitch(lh), 2, 2);
+        for (const m of rh) addNote(shells[4], t, EIGHTH, midiToPitch(m), 1, 1);
       }
 
-      // Optional anticipation ("and of 4")
-      if (preset.pianoAddAnticipation && beats >= 4) {
-        const anticDur = Math.max(Math.floor(beatDur / 2), 1);
-        addNote(shells[4], tAntic, anticDur, midiToPitch(mPNO_RH1), 1, 1);
-        if (mPNO_RH2 !== mPNO_RH1) addNote(shells[4], tAntic, anticDur, midiToPitch(mPNO_RH2), 1, 1);
+      // ── Guitar: three notes, on the and of 2 and the and of 4 ────────────
+      // Silent where the bar has too little harmony to voice a triad, which is
+      // roughly the share of bars that edition leaves it out of.
+      const gtrVoicing = voicing(GTR_LO, GTR_HI, C_GTR, 3);
+      if (gtrVoicing.length >= 3) {
+        for (const t of [1.5, 3.5].filter((x) => x < barBeats)) {
+          for (const m of gtrVoicing) addNote(shells[5], t, EIGHTH, midiToPitch(m), 1, 1);
+        }
       }
     }
   }
@@ -529,7 +649,7 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
     addNote(shells[3], t, dur, midiToPitch(mTBN), 1, 1); // Trombone
 
     // Bass stays as-is (your requirement)
-    addNote(shells[5], t, dur, midiToPitch(mBAS), 1, 1);
+    addNote(shells[6], t, dur, midiToPitch(mBAS), 1, 1);
 
     // Piano and drums are measure-based now.
   }
