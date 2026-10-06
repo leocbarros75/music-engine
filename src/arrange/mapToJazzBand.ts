@@ -4,6 +4,7 @@ import type { ScoreModel } from "../score/types";
 import { shiftOctavesIntoRange, midiToPitch } from "../instruments/instrumentCatalog";
 import { extractOnsetChords } from "../analyze/chordExtractor";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
+import { expandJazzSections } from "./jazz/expandSections";
 
 type JazzStyle = "swing" | "bossa" | "ballad";
 
@@ -20,6 +21,16 @@ type JazzBandOptions = {
   // New: light snare comping + crash on section starts
   drumAddSnareComping?: boolean;
   drumCrashOnSectionStarts?: boolean;
+};
+
+/**
+ * Roster, not style. Kept out of `JazzBandOptions` deliberately: that type is
+ * spread across `Required<>` into the three style presets, and how many players
+ * are on the stand is not a swing-versus-bossa decision.
+ */
+type JazzRosterOptions = {
+  /** False writes the eight-piece band. Default is the full seventeen. */
+  sections?: boolean;
 };
 
 type StylePreset = Required<JazzBandOptions>;
@@ -314,7 +325,7 @@ function writeDrumsForStyle(
  */
 export function mapPianoToJazzBandOpen(
   score: ScoreModel,
-  options?: JazzBandOptions,
+  options?: JazzBandOptions & JazzRosterOptions,
   /**
    * The chart's chord symbols.
    *
@@ -703,10 +714,22 @@ export function mapPianoToJazzBandOpen(
     // Piano and drums are measure-based now.
   }
 
-  return {
+  const out = {
     score_id: `ARR_${Math.random().toString(16).slice(2, 10)}`,
     meta: { ensemble: "jazz_band" },
     global: { ...score.global },
     parts: partsOut
   } as any;
+
+  // Eight players is a small band; the reference edition of this chart is a big
+  // band of seventeen. The nine missing chairs are derived from the ones above
+  // them, so this runs last, on finished parts, with every voicing in place for
+  // it to read. It is on by default because both routes into this mapper are
+  // `jazz_band` routes — unlike the brass section's expansion, which shares its
+  // mapper with `piano_with_brass` and so had to be opt-in.
+  if (options?.sections !== false) {
+    out.meta.sectionPlans = expandJazzSections(out);
+  }
+
+  return out;
 }

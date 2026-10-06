@@ -86,14 +86,50 @@ test('the horns in the jazz band are given somewhere to breathe', { skip: !have 
   // The route simply never called the breathing pass, which the drums had been
   // hiding: with percussion uncounted the audit reported this part of the band
   // as empty rather than as breathless.
+  // Counting MARKS was the original assertion, and the band growing to
+  // seventeen showed it to be the wrong measure. The derived brass punctuates:
+  // Trumpet 2 is silent in 117 of 124 bars and never plays two bars in a row,
+  // so it has nothing but air — and it carries no mark, which the mark count
+  // read as breathlessness. The fault this test exists for was a 299-BEAT RUN,
+  // so that is what it now measures, with the mark still required of the parts
+  // that actually carry the chart.
   const { score } = run('jazz_band');
   const winds = score.parts.filter((p: any) => /sax|trumpet|trombone/i.test(String(p.name)));
   assert(winds.length >= 3, `expected a horn section, found ${winds.length}`);
 
+  const BREATHLESS = 8;   // two bars of 4/4 without stopping is already too long
   for (const p of winds) {
-    const marks = (p.measures ?? []).flatMap((m: any) =>
-      (m.events ?? []).filter((e: any) =>
-        Array.isArray(e.articulations) && e.articulations.includes('breath-mark')));
-    assert(marks.length > 0, `${p.name} has nowhere to breathe in the whole piece`);
+    const bars = (p.measures ?? []).length;
+    let run = 0, longest = 0, played = 0, marks = 0;
+    (p.measures ?? []).forEach((m: any, bi: number) => {
+      const es = (m.events ?? [])
+        .filter((e: any) => e?.type === 'note' && !e.grace)
+        .sort((a: any, b: any) => Number(a.t) - Number(b.t));
+      for (const e of es) {
+        if (Array.isArray(e.articulations) && e.articulations.includes('breath-mark')) marks++;
+      }
+      const beats = Number(m?.attributes?.time?.beats ?? 4);
+      if (!es.length) { longest = Math.max(longest, run); run = 0; return; }
+      played++;
+      let cursor = bi * beats;
+      for (const e of es) {
+        const t = bi * beats + Number(e.t);
+        if (t > cursor + 1e-6) { longest = Math.max(longest, run); run = 0; }
+        run += Number(e.dur ?? 0);
+        cursor = Math.max(cursor, t + Number(e.dur ?? 0));
+      }
+      if (cursor < (bi + 1) * beats - 1e-6) { longest = Math.max(longest, run); run = 0; }
+    });
+    longest = Math.max(longest, run);
+
+    assert(
+      longest <= BREATHLESS,
+      `${p.name} plays ${longest} beats without stopping`
+    );
+    // A part that holds the line for most of the piece must be given its mark;
+    // one that punctuates is resting almost throughout and needs none.
+    if (played > bars * 0.5) {
+      assert(marks > 0, `${p.name} carries the chart and has nowhere to breathe`);
+    }
   }
 });

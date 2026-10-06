@@ -257,6 +257,7 @@ import { restThinBars, restArcSentence, isChart } from "../arrange/strings/restA
 import { markPizzicato, pizzicatoSentence } from "../arrange/strings/pizzicato";
 import { pulseLowerStrings, pulseSentence } from "../arrange/strings/pulse";
 import { mapPianoToJazzBandOpen } from "../arrange/mapToJazzBand";
+import { expandJazzSentence } from "../arrange/jazz/expandSections";
 import { mapPianoToPercussionOpen } from "../arrange/mapToPercussion";
 import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
@@ -2571,6 +2572,9 @@ export function applyAppSettings(
     // line, so nobody is depending on a saxophone to sustain it.
     if (wantsJazzBand) {
       breatheWinds(warnings, "jazz band", (finalScore as any).parts ?? [], true, 4);
+      // Which chairs the mapper derived, and where their registers gave way.
+      const sectionLine = expandJazzSentence((finalScore as any)?.meta?.sectionPlans ?? []);
+      if (sectionLine) warnings.push(sectionLine);
     }
     const played = ((finalScore as any)?.parts ?? []).filter((p: any) =>
       (p?.measures ?? []).some((m: any) => (m?.events ?? []).some((e: any) => e?.type === "note" || e?.type === "unpitched")));

@@ -93,6 +93,7 @@ async function main() {
       'tests/arrange/brassRegister.test.ts',
       'tests/arrange/lowBrassPlacement.test.ts',
       'tests/arrange/jazzBandPlayable.test.ts',
+      'tests/arrange/jazzBandRoster.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

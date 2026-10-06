@@ -1078,8 +1078,15 @@ function renderMusicXML(scoreModel: ScoreModel): string {
   // Tbn Tuba | Timp | strings). The generic sort used to rank Trumpet above
   // Horn, which is wrong for an orchestral score; that is fixed at the source
   // now, so this list is about preserving deliberate order, not dodging a bug.
+  // jazz_band emits big-band score order (saxes | trumpets | trombones | rhythm),
+  // which is not orchestral order and must not be sorted into it. The generic
+  // sort put the Baritone Sax at the top of the score, above the first alto,
+  // because the catalog gives that instrument a bass clef and the sort reads
+  // clef as depth; it also lifted the Drums above the Piano. A big band is laid
+  // out by section from the top down, not by pitch.
   const preserveOrder = ensembleTag === "orchestra" || ensembleTag === "full_orchestra" ||
-    ensembleTag === "piano_with_melody" || ensembleTag === "symphonic_orchestra";
+    ensembleTag === "piano_with_melody" || ensembleTag === "symphonic_orchestra" ||
+    ensembleTag === "jazz_band";
   const parts = preserveOrder ? partsRaw : sortPartsOrchestrally(partsRaw);
   // One part means an extracted part, where multi-measure rests belong; a full
   // score keeps every bar so the staves stay aligned.
