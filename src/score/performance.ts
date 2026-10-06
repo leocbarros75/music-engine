@@ -180,8 +180,20 @@ export function buildPerformance(score: {
     const tempoAtStart = marks.map((m, i) => {
         const start = m.tempos?.find(t => t.t === 0)?.bpm ?? inherited;
         for (const t of m.tempos ?? []) {
-            if (!Number.isFinite(t.bpm) || t.bpm <= 0 || !Number.isFinite(t.t) || t.t < 0 || t.t > clock[i].durationBeats)
+            // An unusable VALUE is still fatal.
+            if (!Number.isFinite(t.bpm) || t.bpm <= 0 || !Number.isFinite(t.t) || t.t < 0)
                 throw Error(`Invalid tempo in measure ${i + 1}.`);
+            // A position past the end of the bar is not. The washed chart
+            // writes its closing ritardando as thirteen <sound tempo>
+            // directions whose offsets run 193 to 205 against divisions of 4 —
+            // 48 to 51 beats, in a bar of four. MusicXML lets an offset reach
+            // beyond its measure, and treating that as fatal made an ordinary
+            // written rit. abort playback for the entire score: every route on
+            // this source reported "MIDI/playback unavailable".
+            //
+            // Clamped to the bar, in order, so the ramp still lands and its
+            // final marking wins.
+            if (t.t > clock[i].durationBeats) t.t = clock[i].durationBeats;
             inherited = t.bpm;
         }
         return start;

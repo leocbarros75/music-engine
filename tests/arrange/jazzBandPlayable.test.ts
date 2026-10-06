@@ -206,4 +206,63 @@ for (const re of SINGLE_LINE) {
   }
 }
 
+// ── The drums land inside the bar, on the eighth grid ────────────────────
+{
+  // writeDrumsForStyle was the FOURTH place in this file reading `divisions` as
+  // beats: `const beatDur = divisions` put a beat-2 hit at t=480 in a four-beat
+  // bar. Only the beat-0 hits survived — two onsets of eight, 383 hits against
+  // the reference's 1383, written as quarters where it writes eighths.
+  const bars = 8;
+  const symbols = Array.from({ length: bars }, (_, i) => ({ measure: i + 1, t: 0, symbol: "C" }));
+  const withSym: any = mapPianoToJazzBandOpen(pianoScore(bars) as any, undefined, symbols);
+  const drums = ((withSym.parts ?? []) as any[]).find((p) => /^drums$/i.test(String(p.name)))!;
+  assert.ok(drums, "there is a kit");
+
+  const seen = new Set<number>();
+  let hits = 0;
+  for (let bar = 0; bar < bars; bar++) {
+    for (const e of (drums.measures?.[bar]?.events ?? [])) {
+      if (e?.type !== "unpitched") continue;
+      hits++;
+      const t = Number(e.t), d = Number(e.dur);
+      assert.ok(t >= 0 && t < 4,
+        `a hit at beat ${t} is outside a four-beat bar — divisions read as beats`);
+      assert.ok(d > 0 && d <= 1,
+        `a ${d}-beat drum hit; the reference writes eighths`);
+      // On the eighth grid: a true swung triplet is not writable without the
+      // tuplet markup the exporter does not emit, and at an eighth long it
+      // overlapped the next beat and deleted the hits on 2 and 4.
+      assert.ok(Math.abs(t * 2 - Math.round(t * 2)) < 1e-9,
+        `a hit at beat ${t} is off the eighth grid`);
+      seen.add(t);
+    }
+  }
+  assert.ok(hits > 0, "the kit must play");
+  assert.ok(seen.size >= 4,
+    `the kit uses ${seen.size} onset(s) a bar; it landed on two when the units were wrong`);
+}
+
+// ── The rhythm section keeps going when the melody stops ─────────────────
+{
+  // A bar with a chord symbol but no note of its own: the piano carries on
+  // (the reference's is silent in 1 bar of 124), the guitar sits out (its own
+  // rests in 38).
+  const bars = 6;
+  const score: any = pianoScore(bars);
+  for (const part of score.parts) part.measures[3].events = [];   // bar 4 goes quiet
+  const symbols = Array.from({ length: bars }, (_, i) => ({ measure: i + 1, t: 0, symbol: "C" }));
+  const out: any = mapPianoToJazzBandOpen(score, undefined, symbols);
+  const ps: any[] = out.parts ?? [];
+  const pno = ps.find((p) => /^piano$/i.test(String(p.name)))!;
+  const gtr = ps.find((p) => /^rhythm guitar$/i.test(String(p.name)))!;
+
+  const sounding = (p: any, bar: number) =>
+    (p.measures?.[bar]?.events ?? []).some((e: any) => e?.type === "note" && !e.grace);
+
+  assert.ok(sounding(pno, 3),
+    "the piano should keep comping on the carried chord symbol");
+  assert.ok(!sounding(gtr, 3),
+    "the guitar punctuates where the bar states a chord, and sits out where it is only carried");
+}
+
 console.log("PASS jazz band playable");

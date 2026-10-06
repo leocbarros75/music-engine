@@ -121,3 +121,30 @@ test('piano lower-staff rests retain their staff on round trip', () => {
     assert.equal(model(exportXml(score)).parts[0].measures[0].events.find(e => e.type === 'rest')?.staff, 2);
 });
 console.log(`${passed} performance tests passed.`);
+
+// A written ritardando may place its tempo marks beyond the barline. MusicXML
+// permits an <offset> that reaches past its measure, and the washed chart does
+// exactly that: thirteen <sound tempo> directions with offsets of 193 to 205
+// against divisions of 4 — 48 to 51 beats, in a bar of four. Treating that as
+// fatal aborted playback for the whole score, and every route on that source
+// reported "MIDI/playback unavailable". The position is clamped to the bar; an
+// unusable VALUE is still fatal.
+test('a tempo mark positioned past the barline does not abort playback', () => {
+  const xml = wrap(`<measure number="1">${attrs()}${tempo(120)}${tempo(90, 200)}${note()}</measure>`);
+  const p = buildPerformance(model(xml));
+  assert.ok(p.notes.length > 0, 'the bar still performs');
+  assert.ok(Number.isFinite(p.durationSec) && p.durationSec > 0, 'and has a real duration');
+});
+
+test('a tempo of zero is still rejected', () => {
+  const xml = wrap(`<measure number="1">${attrs()}${tempo(0)}${note()}</measure>`);
+  assert.throws(() => buildPerformance(model(xml)));
+});
+
+// The safeguard the application test used to carry: an unpitched note with no
+// <instrument> reference has nothing to map it by, and playback must say so
+// rather than claim parity it does not have.
+test('an unpitched note naming no instrument still reports a missing drum mapping', () => {
+  const xml = wrap(`<measure number="1">${attrs()}${tempo(120)}<note><unpitched><display-step>C</display-step><display-octave>5</display-octave></unpitched><duration>4</duration><voice>1</voice></note></measure>`);
+  assert.throws(() => buildPerformance(model(xml)), /percussion.*mapping/i);
+});

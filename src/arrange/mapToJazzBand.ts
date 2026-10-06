@@ -174,7 +174,14 @@ function drumId(kind: DrumKind): string {
  * Rhythm patterns
  * Intentionally simple and readable.
  */
-const DRUM_HIT_DUR_FRACTION = 8; // dur = divisions / 8 (short hits)
+/**
+ * How long a drum hit is written, in quarter-note BEATS.
+ *
+ * An eighth, which is what the reference edition writes for 1381 of its 1383
+ * hits. The old constant meant "divisions / 8" — a thirty-second — and was part
+ * of the same units confusion as everything else below.
+ */
+const DRUM_HIT_BEATS = 0.5;
 
 /**
  * Write drums for the chosen style.
@@ -187,8 +194,21 @@ function writeDrumsForStyle(
   preset: StylePreset,
   isSectionStart: boolean
 ) {
-  const beatDur = divisions;
-  const hitDur = Math.max(Math.floor(divisions / DRUM_HIT_DUR_FRACTION), 1);
+  // In BEATS, not divisions.
+  //
+  // This was the fourth place in this file reading `divisions` as beats, after
+  // the note durations and the piano's two. `const beatDur = divisions` made
+  // addAtBeat(1) write a hit at t=480 — four hundred and eighty beats into a
+  // bar four beats long — and `t < barDur` let it through because barDur was
+  // 1920. Only the beat-0 hits survived: the kit landed on two onsets of the
+  // eight, 383 hits against the reference's 1383, and wrote them as quarters
+  // where that edition writes eighths.
+  //
+  // Nothing here may be floored or rounded any more: half a beat is 0.5 and the
+  // swing offset is two thirds, and both become 0 or 1 under integer maths.
+  void divisions;
+  const beatDur = 1;
+  const hitDur = DRUM_HIT_BEATS;
 
   const barDur = beats * beatDur;
 
@@ -224,14 +244,23 @@ function writeDrumsForStyle(
       if (beats >= 4) addAtBeat(3, "snare");
 
       // Ghost: "and of 2" (beat 2 + eighth)
-      const ghostDur = Math.max(Math.floor(hitDur / 2), 1);
-      const tAndOf2 = 1 * beatDur + Math.floor(beatDur / 2);
+      const ghostDur = hitDur / 2;
+      const tAndOf2 = 1 * beatDur + beatDur / 2;
       addAtOffset(tAndOf2, "snare", ghostDur);
     }
 
     // Optional light swing skip offbeats (triplet-ish placement): 2/3 of a beat
     if (preset.drumEnableSwingOffbeats) {
-      const swingOffset = Math.round((2 * beatDur) / 3);
+      // The "and", not a true triplet.
+      //
+      // Two thirds of a beat is where a swung ride actually falls, and it is
+      // not writable here: the exporter emits no tuplet markup, so the rest
+      // before it has no notatable type — and at an eighth long the hit runs to
+      // 1.167 and overlaps the next beat, which is why the hits on beats 2 and
+      // 4 disappeared from every bar. The eighth grid is also what this chart
+      // asks for: its own heading says straight eighths, and the reference
+      // edition puts all 1383 of its hits on the eight eighth positions.
+      const swingOffset = beatDur / 2;
       addAtOffset(0 + swingOffset, "ride");
       if (beats >= 3) addAtOffset(2 * beatDur + swingOffset, "ride");
     }
@@ -251,8 +280,8 @@ function writeDrumsForStyle(
 
     // Optional extra comping: small snare pickup on "and of 4"
     if (preset.drumAddSnareComping && beats >= 4) {
-      const ghostDur = Math.max(Math.floor(hitDur / 2), 1);
-      const tAndOf4 = 3 * beatDur + Math.floor(beatDur / 2);
+      const ghostDur = hitDur / 2;
+      const tAndOf4 = 3 * beatDur + beatDur / 2;
       addAtOffset(tAndOf4, "snare", ghostDur);
     }
 
@@ -392,10 +421,23 @@ export function mapPianoToJazzBandOpen(
     const tAntic = 3 * beatDur + Math.floor(beatDur / 2); // "and of 4"
 
     const refChord = chooseChordForTime(chordsHere, tBeat2) ?? chooseChordForTime(chordsHere, 0);
+    // The rhythm section keeps comping when the melody stops.
+    //
+    // Gating on the note-derived chord alone left the piano silent in 30 bars
+    // against the reference edition's 1: those bars carry a chord symbol but no
+    // note for the extractor to find, and a band does not stop playing because
+    // the tune has. The symbol carried forward gives the voicing something to
+    // build on; `low` falls back to the symbol's root for the left hand.
+    const symbolPcs = pcsByMeasure[String(m.number)] ?? [];
+    const symbolRoot = rootByMeasure[String(m.number)];
     const chordMidis = refChord ? pickChordMidiNotes(refChord) : [];
+    const carried =
+      chordMidis.length === 0 && symbolPcs.length > 0 && typeof symbolRoot === "number"
+        ? [48 + ((symbolRoot - 48) % 12 + 12) % 12]
+        : chordMidis;
 
-    if (chordMidis.length > 0) {
-      const notesSorted = chordMidis.slice().sort((a, b) => a - b);
+    if (carried.length > 0) {
+      const notesSorted = carried.slice().sort((a, b) => a - b);
 
       const pick = (idx: number) => notesSorted[clampInt(idx, 0, notesSorted.length - 1)];
 
@@ -505,7 +547,14 @@ export function mapPianoToJazzBandOpen(
       // ── Guitar: three notes, on the and of 2 and the and of 4 ────────────
       // Silent where the bar has too little harmony to voice a triad, which is
       // roughly the share of bars that edition leaves it out of.
-      const gtrVoicing = voicing(GTR_LO, GTR_HI, C_GTR, 3);
+      // The guitar punctuates; it does not comp through everything.
+      //
+      // Carrying the chord symbol forward keeps the PIANO playing where the
+      // melody has stopped, which is right — the reference edition's piano is
+      // silent in 1 bar of 124. Letting the guitar do the same took it to 0
+      // silent bars against that edition's 38. So it plays where the bar states
+      // a chord of its own, and sits out where the harmony is only carried.
+      const gtrVoicing = chordMidis.length > 0 ? voicing(GTR_LO, GTR_HI, C_GTR, 3) : [];
       if (gtrVoicing.length >= 3) {
         for (const t of [1.5, 3.5].filter((x) => x < barBeats)) {
           for (const m of gtrVoicing) addNote(shells[5], t, EIGHTH, midiToPitch(m), 1, 1);

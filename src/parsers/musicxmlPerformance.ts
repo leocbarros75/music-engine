@@ -21,7 +21,16 @@ export function readMeasurePerformance(measure: any, initialDivisions: number): 
             t -= Number(text(e, 'duration')) / divisions;
         if (tag === 'forward')
             t += Number(text(e, 'duration')) / divisions;
-        if (tag === 'note' && all(e, 'unpitched').length)
+        // An unpitched note is only unplayable when it names no instrument at
+        // all. One that carries <instrument id="..."> is mapped by the
+        // part-list's <midi-instrument><midi-unpitched>, which this function
+        // cannot see from inside a single measure.
+        //
+        // Flagging every unpitched note was a false positive on our own output:
+        // the exporter writes ten of those mappings for a jazz band and the
+        // reference edition writes twelve, yet every run still reported
+        // "MIDI/playback unavailable" and blamed the drums.
+        if (tag === 'note' && all(e, 'unpitched').length && !all(e, 'instrument').length)
             issues.push('Unpitched percussion needs an explicit MIDI drum mapping.');
         if (tag === 'note' && !all(e, 'chord').length && !all(e, 'grace').length)
             t += Number(text(e, 'duration', '0')) / divisions;

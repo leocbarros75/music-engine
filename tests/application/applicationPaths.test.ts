@@ -112,14 +112,29 @@ test('web proxy covers every API endpoint used by the web client', () => {
   }
 });
 
-test('full rhythm orchestra reports unsupported percussion playback instead of claiming MIDI parity', () => {
+// This asserted the opposite until 2026-10-06: that unpitched percussion made
+// playback 'unsupported', so as not to claim MIDI parity the engine did not
+// have. The exporter has since gained the mappings — scoreInstrumentXml writes
+// <midi-instrument><midi-unpitched> for every percussion instrument a part
+// uses — so the old status was a false negative, and it was reported on every
+// run of every route carrying a drum. Measured on this very output: 2 unpitched
+// notes, 2 <midi-unpitched> declarations, 2 <instrument id> references.
+//
+// The intent of the original test is kept by its companion below: an unpitched
+// note with NOTHING to map it by must still report unsupported.
+test('full rhythm orchestra maps its percussion for playback', () => {
   const result = arrangeRhythmChart({ beats: 4, beatType: 4, keyFifths: 0, warnings: [],
     measures: [{ number: 1, chords: [{ t: 0, symbol: 'C' }], kicks: [0] }] }, { ensemble: 'orchestra' });
   assert.equal(result.ok, true);
-  assert.equal(result.meta.performance.status, 'unsupported');
-  assert.match(result.meta.performance.reason, /percussion.*mapping/i);
-  assert.equal(result.midiBase64, undefined);
-  assert(result.musicxml.includes('<unpitched>'));
+  assert(result.musicxml.includes('<unpitched>'), 'there is percussion to map');
+  // Every unpitched note names an instrument, and every named instrument is
+  // declared with a MIDI drum note.
+  const refs = (result.musicxml.match(/<instrument id=/g) ?? []).length;
+  const maps = (result.musicxml.match(/<midi-unpitched>/g) ?? []).length;
+  const hits = (result.musicxml.match(/<unpitched>/g) ?? []).length;
+  assert.equal(refs, hits, 'each percussion note names its instrument');
+  assert(maps > 0, 'and the part-list declares the drum mapping');
+  assert.equal(result.meta.performance.status, 'ready');
 });
 
 test('chord-text generation uses the same application output contract', async () => {
