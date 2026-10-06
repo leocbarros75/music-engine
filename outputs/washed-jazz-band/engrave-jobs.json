@@ -1,0 +1,74 @@
+[
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-jazz-band.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-jazz-band.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-AS1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-AS1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-AS2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-AS2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TS1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TS1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TS2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TS2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-BS.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-BS.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP3.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP3.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP4.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TP4.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TB1.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TB1.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TB2.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TB2.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TB3.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-TB3.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-BT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-BT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-PI.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-PI.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-GT.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-GT.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-BA.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-BA.pdf"
+  },
+  {
+    "in": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-DR.musicxml",
+    "out": "/Users/leobarros/Desktop/music-engine/outputs/washed-jazz-band/washed-DR.pdf"
+  }
+]

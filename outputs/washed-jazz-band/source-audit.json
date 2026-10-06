@@ -1,0 +1,103 @@
+{
+  "source_note_classifications": {
+    "pitched notation": 425,
+    "rest": 208,
+    "rhythm slash": 228,
+    "percussion cue": 19
+  },
+  "part_ranges": {
+    "AS1": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 78
+    },
+    "AS2": {
+      "low_sounding_midi": 59,
+      "high_sounding_midi": 78
+    },
+    "TS1": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 76
+    },
+    "TS2": {
+      "low_sounding_midi": 51,
+      "high_sounding_midi": 66
+    },
+    "BS": {
+      "low_sounding_midi": 40,
+      "high_sounding_midi": 52
+    },
+    "TP1": {
+      "low_sounding_midi": 70,
+      "high_sounding_midi": 78
+    },
+    "TP2": {
+      "low_sounding_midi": 66,
+      "high_sounding_midi": 75
+    },
+    "TP3": {
+      "low_sounding_midi": 63,
+      "high_sounding_midi": 71
+    },
+    "TP4": {
+      "low_sounding_midi": 59,
+      "high_sounding_midi": 66
+    },
+    "TB1": {
+      "low_sounding_midi": 42,
+      "high_sounding_midi": 68
+    },
+    "TB2": {
+      "low_sounding_midi": 54,
+      "high_sounding_midi": 59
+    },
+    "TB3": {
+      "low_sounding_midi": 46,
+      "high_sounding_midi": 53
+    },
+    "BT": {
+      "low_sounding_midi": 40,
+      "high_sounding_midi": 42
+    },
+    "PI": {
+      "low_sounding_midi": 49,
+      "high_sounding_midi": 76
+    },
+    "GT": {
+      "low_sounding_midi": 52,
+      "high_sounding_midi": 64
+    },
+    "BA": {
+      "low_sounding_midi": 28,
+      "high_sounding_midi": 49
+    }
+  },
+  "event_roles": {
+    "source opening melody": 46,
+    "new motivic continuation": 144,
+    "saxophone harmonic response": 1141,
+    "editorial return of opening theme": 76,
+    "source turnaround cue": 21,
+    "source bridge riff in jazz register": 55,
+    "editorial sequence of source bridge riff": 165,
+    "source closing upper line": 30,
+    "editorial final tonic": 1,
+    "source introduction cue in alto saxophone": 25,
+    "source guitar cue in alto saxophone": 26,
+    "final B-major voicing": 13,
+    "editorial return of source turnaround": 14,
+    "quiet transition fifth": 2,
+    "brass syncopated punch": 302,
+    "source descending second-ending cue": 8,
+    "piano color voicing": 384,
+    "final piano tonic": 2,
+    "piano guide-tone comp": 384,
+    "guitar offbeat comp": 170,
+    "final guitar tonic": 1,
+    "two-feel bass": 189,
+    "walking bass chord tone": 241,
+    "chromatic bass approach": 47,
+    "straight-eighth drum groove": 906,
+    "drum fill": 22,
+    "final drum release": 1
+  }
+}

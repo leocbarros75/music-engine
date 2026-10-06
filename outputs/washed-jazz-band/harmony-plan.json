@@ -1,0 +1,9291 @@
+[
+  {
+    "bar": 0,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {}
+  },
+  {
+    "bar": 1,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "TS1": 61,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        66,
+        68,
+        73
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 2,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 56,
+        "TS1": 59,
+        "AS2": 63
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        66,
+        70,
+        75
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 3,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "major",
+    "pcs": [
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "TS1": 61,
+        "AS2": 64
+      },
+      "piano_lh": [
+        56,
+        61
+      ],
+      "piano_rh": [
+        66,
+        71,
+        73
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 4,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "dominant",
+    "pcs": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 64
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        66,
+        71,
+        73
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 5,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        66,
+        68,
+        73
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 6,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        66,
+        70,
+        75
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 7,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 64
+      },
+      "piano_lh": [
+        56,
+        61
+      ],
+      "piano_rh": [
+        66,
+        71,
+        73
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 8,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "dominant",
+    "pcs": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "origin": "editorial opening harmonization",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 64
+      },
+      "trombones": {
+        "BT": 40,
+        "TB3": 47,
+        "TB2": 54,
+        "TB1": 61
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        66,
+        71,
+        73
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 9,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        66,
+        68,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 9,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        66,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 9,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 10,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 10,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 63
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 11,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 11,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 64
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 11,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 63
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 12,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 63
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 12,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 63
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 13,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 68
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 13,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 13,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 14,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 14,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 15,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 15,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 15,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 16,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 16,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 17,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 17,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 17,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 18,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 18,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 19,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      4,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      3
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 61,
+        "AS1": 68
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        63,
+        68,
+        71
+      ],
+      "guitar": [
+        56,
+        59,
+        64
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 19,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 20,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 21,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 21,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 21,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 22,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 22,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 23,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 23,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 23,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 24,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 24,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 25,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 25,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 25,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 26,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 26,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 27,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      4,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      3
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 52,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        63,
+        68,
+        71
+      ],
+      "guitar": [
+        56,
+        59,
+        64
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 27,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 28,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 47,
+        "TB2": 54,
+        "TB1": 61
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 29,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 29,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 30,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 31,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 31,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 58,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        63,
+        68,
+        73
+      ],
+      "guitar": [
+        54,
+        58,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 32,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 58,
+        "AS2": 63
+      },
+      "trumpets": {
+        "TP4": 61,
+        "TP3": 63,
+        "TP2": 68,
+        "TP1": 78
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        63,
+        68,
+        73
+      ],
+      "guitar": [
+        54,
+        58,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 33,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 33,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 34,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 35,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 35,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 58,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        63,
+        68,
+        73
+      ],
+      "guitar": [
+        54,
+        58,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 36,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 58,
+        "AS2": 63
+      },
+      "trumpets": {
+        "TP4": 61,
+        "TP3": 63,
+        "TP2": 68,
+        "TP1": 78
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 46,
+        "TB2": 56,
+        "TB1": 61
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        63,
+        68,
+        73
+      ],
+      "guitar": [
+        54,
+        58,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 37,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 37,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 37,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 38,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 38,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 70
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 39,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 39,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 39,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 40,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 40,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 70
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 41,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 41,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 41,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 42,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 42,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 70
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 43,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      4,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      3
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        63,
+        68,
+        71
+      ],
+      "guitar": [
+        56,
+        59,
+        64
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 43,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 44,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 45,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 45,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 45,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 46,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 46,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 70
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 47,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 47,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 47,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 48,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 48,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 70
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 49,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 49,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 49,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 50,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 50,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63,
+        "AS1": 70
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 51,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      4,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      3
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        63,
+        68,
+        71
+      ],
+      "guitar": [
+        56,
+        59,
+        64
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 51,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 52,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 49,
+        "TB2": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 53,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 49,
+        "TB2": 59,
+        "TB1": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 53,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 54,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 55,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 55,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 56,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "trumpets": {
+        "TP4": 61,
+        "TP3": 66,
+        "TP2": 71,
+        "TP1": 78
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 57,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 51,
+        "TB2": 59,
+        "TB1": 68
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 57,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 58,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 59,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 59,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 60,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 59
+      },
+      "trumpets": {
+        "TP4": 61,
+        "TP3": 66,
+        "TP2": 71,
+        "TP1": 78
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 49,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 61,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 63
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 51,
+        "TB2": 59,
+        "TB1": 68
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 61,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 61
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 49,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 62,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 42,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 61
+      },
+      "trumpets": {
+        "TP4": 61,
+        "TP3": 66,
+        "TP2": 71,
+        "TP1": 78
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 49,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 63,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS1": 56,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 64,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS1": 56,
+        "AS2": 61,
+        "AS1": 71
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 65,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 56,
+        "AS2": 61
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 66,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 56,
+        "AS2": 61
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 67,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 68,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 69,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 70,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "AS2": 63,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 71,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "AS2": 64,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 72,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "AS2": 64,
+        "AS1": 71
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 73,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 74,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 75,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 76,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 77,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 78,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 79,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "AS2": 64,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 80,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "AS2": 64,
+        "AS1": 71
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 66,
+        "TP2": 71,
+        "TP1": 76
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 81,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 82,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 83,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 84,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 85,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 51,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 86,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 51,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 87,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 88,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 66,
+        "TP2": 71,
+        "TP1": 76
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 89,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66,
+        "AS1": 68
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 66,
+        "TP2": 68
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 90,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66,
+        "AS1": 68
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 91,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 92,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 93,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 51,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 66,
+        "TP2": 68,
+        "TP1": 75
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 94,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 51,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 95,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 96,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 66,
+        "TP2": 71,
+        "TP1": 76
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 97,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66,
+        "AS1": 68
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 66,
+        "TP2": 68
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 98,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 51,
+        "TS1": 61,
+        "AS2": 66,
+        "AS1": 68
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 99,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 100,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 52,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 64,
+        "TP2": 66
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 101,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 51,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 63,
+        "TP2": 68,
+        "TP1": 78
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 102,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 51,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 103,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 104,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 40,
+        "TS2": 52,
+        "TS1": 59,
+        "AS2": 66
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 64,
+        "TP2": 66,
+        "TP1": 78
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59,
+        "TB1": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 105,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 105,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 44,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 105,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 106,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 106,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 46,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 71
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 107,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 107,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 107,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 108,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 108,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 109,
+    "on": 0,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 8,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 109,
+    "on": 8,
+    "root": 4,
+    "bass": 4,
+    "kind": "major-sixth",
+    "pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 20,
+    "arrangement_pcs": [
+      1,
+      4,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 76
+      },
+      "piano_lh": [
+        49,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 109,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 110,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "major",
+    "pcs": [
+      1,
+      6,
+      10,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      3,
+      8
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        51,
+        58
+      ],
+      "piano_rh": [
+        61,
+        68,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 110,
+    "on": 4,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        70,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 111,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      4,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      3
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 64,
+        "AS1": 75
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        63,
+        68,
+        71
+      ],
+      "guitar": [
+        56,
+        59,
+        64
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 111,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      5,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      5,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 65,
+        "AS1": 73
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        65,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 112,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      5,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      5,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 65,
+        "AS1": 73
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 53,
+        "TB2": 59,
+        "TB1": 61
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        65,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 113,
+    "on": 0,
+    "root": 1,
+    "bass": 1,
+    "kind": "minor-seventh",
+    "pcs": [
+      1,
+      4,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      4,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      3
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "TS1": 61,
+        "AS2": 64,
+        "AS1": 75
+      },
+      "piano_lh": [
+        52,
+        59
+      ],
+      "piano_rh": [
+        64,
+        68,
+        75
+      ],
+      "guitar": [
+        56,
+        59,
+        64
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 113,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 76
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        76
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 114,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64,
+        "AS1": 76
+      },
+      "trumpets": {
+        "TP4": 59,
+        "TP3": 64,
+        "TP2": 66,
+        "TP1": 78
+      },
+      "trombones": {
+        "BT": 42,
+        "TB3": 52,
+        "TB2": 59
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        76
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 115,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 61,
+        "AS2": 63
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        63,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 115,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 116,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 59,
+        "AS2": 64
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 117,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 117,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 118,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 119,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 16,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "TS1": 61,
+        "AS2": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 119,
+    "on": 16,
+    "root": 11,
+    "bass": 3,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 12,
+    "arrangement_pcs": [
+      1,
+      3,
+      6,
+      8,
+      11
+    ],
+    "added_color_pcs": [
+      8,
+      1
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "TS1": 61,
+        "AS2": 66
+      },
+      "piano_lh": [
+        51,
+        56
+      ],
+      "piano_rh": [
+        61,
+        66,
+        73
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 119,
+    "on": 28,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 64,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 120,
+    "on": 0,
+    "root": 4,
+    "bass": 4,
+    "kind": "suspended-second",
+    "pcs": [
+      4,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      4,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "TS1": 64,
+        "AS2": 66
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        64,
+        66,
+        71
+      ],
+      "guitar": [
+        52,
+        54,
+        59
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 121,
+    "on": 0,
+    "root": 8,
+    "bass": 8,
+    "kind": "minor-seventh",
+    "pcs": [
+      3,
+      6,
+      8,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 28,
+    "arrangement_pcs": [
+      3,
+      6,
+      8,
+      10,
+      11
+    ],
+    "added_color_pcs": [
+      10
+    ],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 56,
+        "AS2": 66,
+        "AS1": 75
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        63,
+        66,
+        70
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": true
+  },
+  {
+    "bar": 121,
+    "on": 28,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 4,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 122,
+    "on": 0,
+    "root": 6,
+    "bass": 6,
+    "kind": "suspended-fourth",
+    "pcs": [
+      1,
+      6,
+      11
+    ],
+    "origin": "carried source harmony",
+    "dur": 32,
+    "arrangement_pcs": [
+      1,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "BS": 47,
+        "TS2": 54,
+        "AS2": 66,
+        "AS1": 73
+      },
+      "piano_lh": [
+        54,
+        59
+      ],
+      "piano_rh": [
+        61,
+        66,
+        71
+      ],
+      "guitar": [
+        54,
+        59,
+        61
+      ]
+    },
+    "piano_rootless": false
+  },
+  {
+    "bar": 123,
+    "on": 0,
+    "root": 11,
+    "bass": 11,
+    "kind": "major",
+    "pcs": [
+      3,
+      6,
+      11
+    ],
+    "origin": "source chord symbol",
+    "dur": 32,
+    "arrangement_pcs": [
+      3,
+      6,
+      11
+    ],
+    "added_color_pcs": [],
+    "voicing": {
+      "saxophones": {
+        "AS1": 71,
+        "AS2": 66,
+        "TS1": 63,
+        "TS2": 59,
+        "BS": 47
+      },
+      "trumpets": {
+        "TP1": 78,
+        "TP2": 75,
+        "TP3": 71,
+        "TP4": 66
+      },
+      "trombones": {
+        "TB1": 59,
+        "TB2": 54,
+        "TB3": 47,
+        "BT": 42
+      },
+      "piano_lh": [
+        51,
+        59
+      ],
+      "piano_rh": [
+        66,
+        71,
+        75
+      ],
+      "guitar": [
+        54,
+        59,
+        63
+      ]
+    },
+    "piano_rootless": false
+  }
+]

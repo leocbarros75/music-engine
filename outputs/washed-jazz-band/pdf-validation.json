@@ -1,0 +1,210 @@
+{
+  "page_counts": {
+    "washed-AS1.pdf": 4,
+    "washed-AS2.pdf": 4,
+    "washed-BA.pdf": 4,
+    "washed-BS.pdf": 4,
+    "washed-BT.pdf": 4,
+    "washed-DR.pdf": 4,
+    "washed-GT.pdf": 4,
+    "washed-PI.pdf": 8,
+    "washed-TB1.pdf": 4,
+    "washed-TB2.pdf": 4,
+    "washed-TB3.pdf": 4,
+    "washed-TP1.pdf": 4,
+    "washed-TP2.pdf": 4,
+    "washed-TP3.pdf": 4,
+    "washed-TP4.pdf": 4,
+    "washed-TS1.pdf": 4,
+    "washed-TS2.pdf": 4,
+    "washed-jazz-band.pdf": 31
+  },
+  "all_pages_nonempty": true,
+  "visual_review_completed": true,
+  "total_pages": 103,
+  "pdf_details": {
+    "washed-AS1.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-AS2.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-BA.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-BS.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-BT.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-DR.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-GT.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-PI.pdf": {
+      "pages": 8,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TB1.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TB2.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TB3.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TP1.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TP2.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TP3.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TP4.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TS1.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-TS2.pdf": {
+      "pages": 4,
+      "page_sizes_mm": [
+        [
+          209.9,
+          297.0
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    },
+    "washed-jazz-band.pdf": {
+      "pages": 31,
+      "page_sizes_mm": [
+        [
+          297.0,
+          420.2
+        ]
+      ],
+      "title_and_part_identity_checked": true
+    }
+  },
+  "visual_review": "All 103 pages inspected in contact sheets; score opening, piano bridge, tenor lead and drum groove inspected at full page scale.",
+  "audio_review_completed": false,
+  "live_player_review_completed": false
+}

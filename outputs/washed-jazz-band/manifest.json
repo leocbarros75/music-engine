@@ -1,0 +1,227 @@
+{
+  "title": "Washed - Jazz Band",
+  "edition": "2026-10-06",
+  "instrumentation": "17 parts, 18 staves; five saxophones, four trumpets, four trombones, piano, guitar, acoustic bass, drums",
+  "style": "Jazz-funk/gospel; straight eighths; quarter = 139",
+  "source_originals_verified_byte_identical": true,
+  "tests_passed": 32,
+  "arrangement_pdf_count": 18,
+  "arrangement_pdf_pages": 103,
+  "visual_review_completed": true,
+  "audio_review_completed": false,
+  "live_player_review_completed": false,
+  "files": {
+    "PLAYER-REVIEW.md": {
+      "bytes": 4112,
+      "sha256": "c3f898dd0ee9a18efe86d249bac14c2ad85f439ceea9c1769e48ce0e96b8e86c"
+    },
+    "PROCESS.md": {
+      "bytes": 20609,
+      "sha256": "8029c909f914b29359765c13c43c086f19697c4a92aae4c6f8cd4f58e4004062"
+    },
+    "README.md": {
+      "bytes": 5724,
+      "sha256": "454e0dd865a2e58dca4c6a57868a30ecac41fd14db0dff5a82c961de58d1e2be"
+    },
+    "REGISTERS.md": {
+      "bytes": 1801,
+      "sha256": "862544d1b42d10da323620d804d58f4b45be143c5e72bb70054fda6d8d132b3d"
+    },
+    "arrange.py": {
+      "bytes": 43304,
+      "sha256": "fdbb65dd48e41f6fcabab2ba26c2816d2bf8fdf0e53af4219207c4c61be0a77a"
+    },
+    "arrangement-events.json": {
+      "bytes": 1366370,
+      "sha256": "7bd3b0752c693946ac93f943fcc3138c07c4c7af89ade7b70635ed2950bedf7a"
+    },
+    "engrave-jobs.json": {
+      "bytes": 3531,
+      "sha256": "850e91a308198ca505f096b89248f7f0d9a5f082e16bb9a4cb6f1c4c0d855e8c"
+    },
+    "harmony-plan.json": {
+      "bytes": 128908,
+      "sha256": "20e5e354e4bdbf3656ca0585b5b5f5df3e609d8a5732ba4f736b70758f4440e3"
+    },
+    "notation.py": {
+      "bytes": 2871,
+      "sha256": "6af0f3ceece4a82be5b77d97780f9f48d9454c57f7d3951517e19b4873f7e0cf"
+    },
+    "pdf-validation.json": {
+      "bytes": 4091,
+      "sha256": "7698d97603cb1eb2d7eb668d6e158aeb96140ebd6c08f6f0842497895fa473cf"
+    },
+    "source-audit.json": {
+      "bytes": 2488,
+      "sha256": "1689c4f60c2004e921a46932cb8b844df581c8f059d0bba7ca545a36e040d63f"
+    },
+    "source-rhythm.musicxml": {
+      "bytes": 397228,
+      "sha256": "e762fcb4b764bd359d85683e18b24762d38a3cc660e9de7417ea25fa4d930b8a"
+    },
+    "source-rhythm.pdf": {
+      "bytes": 271042,
+      "sha256": "4dfc4ca3d17e4abb372361ec766b336e82e8f6ef4f910f0e7d5f52d9a919d601"
+    },
+    "test-results.txt": {
+      "bytes": 3611,
+      "sha256": "7503d8b20683c5e9bb912b233751f253df6902471753f533238e25d0beb525dc"
+    },
+    "test_arrangement.py": {
+      "bytes": 9649,
+      "sha256": "50572597af27bec66455b6149aa21a21a3c20839423414000f01a231684dbe02"
+    },
+    "validation.json": {
+      "bytes": 14295,
+      "sha256": "d49009237bb52467a9fde038ccb0e744ff468489bde30e006b3b25c8dab74121"
+    },
+    "verify_package.py": {
+      "bytes": 1817,
+      "sha256": "fad389d6bb40ebee7ca620a9e72ad5dadfd7c18d6a1e59a343be33bb8e48ecd8"
+    },
+    "washed-AS1.musicxml": {
+      "bytes": 218957,
+      "sha256": "e1800c6245c15ed3ad3d1fc648e5a537ebd3f966a5fc8f7cd823f94a243a8170"
+    },
+    "washed-AS1.pdf": {
+      "bytes": 106242,
+      "sha256": "1286f5384eac0b8d7d95442bf26d8498574c83bc4f1abeef720422c7b29bf890"
+    },
+    "washed-AS2.musicxml": {
+      "bytes": 204749,
+      "sha256": "cc374dad244e1b14dcacf144df8caf23ea1988ddedeaa7994b522c66d3dad18b"
+    },
+    "washed-AS2.pdf": {
+      "bytes": 96251,
+      "sha256": "8145eb6e3eca98b6c0bbfed45be5aa2544412bfbc3159c1b8c50e880a1fe57d9"
+    },
+    "washed-BA.musicxml": {
+      "bytes": 166237,
+      "sha256": "70f0af0615470282094c05811d7808f6961cb2cee28aa4ebb1b8600527a1666d"
+    },
+    "washed-BA.pdf": {
+      "bytes": 90551,
+      "sha256": "845570e9a967e6cbfe4c7629563c1dc82d28743f18fcb1c095a780fb047b4c5c"
+    },
+    "washed-BS.musicxml": {
+      "bytes": 205563,
+      "sha256": "ba8074c7a703ae5930731c1e111d05a619ca9bb3e40177ca0f2e34e2a3d9502a"
+    },
+    "washed-BS.pdf": {
+      "bytes": 97338,
+      "sha256": "370f4fcb5d535dc3131f8400047cfc4b5086c9a08ae8b3a97630aeed47969b57"
+    },
+    "washed-BT.musicxml": {
+      "bytes": 99325,
+      "sha256": "f65f4d31e289b1ee30d069e18c7752496a757f7bdc4cc27660416fe43b996d77"
+    },
+    "washed-BT.pdf": {
+      "bytes": 77461,
+      "sha256": "041c38d9d2a547096f26e88211822e7d768283f2da89c5389ebed83af7c203b0"
+    },
+    "washed-DR.musicxml": {
+      "bytes": 520526,
+      "sha256": "1f87f8f51c29b948ac844e7dbb3f9564aca763f4eba89e08ddf6889ae43c19d3"
+    },
+    "washed-DR.pdf": {
+      "bytes": 99926,
+      "sha256": "e2aa18f19350d58be44b8d8b40756379c54c727e5c440b8c68e0699af5a8ebe9"
+    },
+    "washed-GT.musicxml": {
+      "bytes": 262757,
+      "sha256": "ab4773b47c899bad11f7a3057e39f8d3707c5701a2b8839253ace018d0bc0e85"
+    },
+    "washed-GT.pdf": {
+      "bytes": 92385,
+      "sha256": "43dd6f252d86ab2cba566a125ec5181e0742604a2e522f3846dd5967cd6901b9"
+    },
+    "washed-PI.musicxml": {
+      "bytes": 635795,
+      "sha256": "9969833a1f17b1811f7338fa287033e8bbf0e3a38ef153460706e9a83228281f"
+    },
+    "washed-PI.pdf": {
+      "bytes": 140274,
+      "sha256": "bd7989c4dea22f0149ed9e117aea7bd2421a6ceb1f25c8c59e5edbca0f56c226"
+    },
+    "washed-TB1.musicxml": {
+      "bytes": 116242,
+      "sha256": "4ecb671f64e3913594227c82021625442a97c12930deb451f7595fd88ad49437"
+    },
+    "washed-TB1.pdf": {
+      "bytes": 82671,
+      "sha256": "0261af29dfbf3d756bc233e414b363e505544bc5d611e435a712f729a4cb8f5c"
+    },
+    "washed-TB2.musicxml": {
+      "bytes": 98455,
+      "sha256": "45ba279540271579893004cb79c5f9a54c4dcc6cd4c6be35aac8554ed3c4cec2"
+    },
+    "washed-TB2.pdf": {
+      "bytes": 77203,
+      "sha256": "9ba826558e27afcaea25c719d6dfbc5d075b066c3127c6e60b1ed7019a3bbfcb"
+    },
+    "washed-TB3.musicxml": {
+      "bytes": 98644,
+      "sha256": "f055f2fe4ae227aa4c37f083e3cc3ecb8c1731611ef82e75927633c5d24a3795"
+    },
+    "washed-TB3.pdf": {
+      "bytes": 77745,
+      "sha256": "800c8ee869f36b500d047055b67e16a94af42cf72783ef91d44312b0d352cc63"
+    },
+    "washed-TP1.musicxml": {
+      "bytes": 109055,
+      "sha256": "df9ceccbd8962517afd342ab866360869f466fb9d25b106a7360187114542608"
+    },
+    "washed-TP1.pdf": {
+      "bytes": 80614,
+      "sha256": "009c62c2225d00ff8b1ca5d80a762f1e6f134b78dbeb8870f1b77b869644c32a"
+    },
+    "washed-TP2.musicxml": {
+      "bytes": 101469,
+      "sha256": "447bdfec66450c3458a71357abf5af64afdb19cde5a74ce70c4756dcd5b2fd22"
+    },
+    "washed-TP2.pdf": {
+      "bytes": 78580,
+      "sha256": "c9b1a776cd999695a6cd284c7b3cf0f2fb3216fb1f8f29aaa52016f3342d1252"
+    },
+    "washed-TP3.musicxml": {
+      "bytes": 101301,
+      "sha256": "2ce4005a431340158174d42a88ee85518b529a7a5a6f94966a9324d4e22f57c6"
+    },
+    "washed-TP3.pdf": {
+      "bytes": 78659,
+      "sha256": "4cdfb318a99f3fc6475f02403e8035ade7ee9593aa9aa3ec4497f7bd26016308"
+    },
+    "washed-TP4.musicxml": {
+      "bytes": 101497,
+      "sha256": "613083072c42660258a44d700ecc0ee83952cbedf755595c09b047ec2556d504"
+    },
+    "washed-TP4.pdf": {
+      "bytes": 78565,
+      "sha256": "adefac0d0f941297b22743c711c87d97f6ae45c87595630002d2c30882cd05cf"
+    },
+    "washed-TS1.musicxml": {
+      "bytes": 217415,
+      "sha256": "9f9061f77e2bf82119df4078ac8007632d345bccc54287b43fa0c0a945765eeb"
+    },
+    "washed-TS1.pdf": {
+      "bytes": 100496,
+      "sha256": "da3fb07f19876a9ab9837f74e8e58178dd03cbbe861f28fa3701c6549c4c1708"
+    },
+    "washed-TS2.musicxml": {
+      "bytes": 206921,
+      "sha256": "dc5eca509ef0761dba33407660f494eeaaaf10c65f393d4e46624e87cce91d2f"
+    },
+    "washed-TS2.pdf": {
+      "bytes": 96878,
+      "sha256": "1138136507cbd07c717556ba19495465102e80acf47e9ad6694ec586010b4a19"
+    },
+    "washed-jazz-band.musicxml": {
+      "bytes": 2742874,
+      "sha256": "9b6982c61532a169ab2aef6200a16b56db804463c14c78ba1b16060987960f7e"
+    },
+    "washed-jazz-band.pdf": {
+      "bytes": 531002,
+      "sha256": "54abfd2eb809970c5c09de0d9f342d5c2b2f91035a03dfa3c9eaa1126c7a1e50"
+    }
+  }
+}
