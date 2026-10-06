@@ -248,12 +248,15 @@ function buildSlices(melodyPart: any, chords: ChordEvent[]): Slice[] {
     // forward where the tune stops (Tovey), and it cannot if the voicing search
     // is given one decision to make.
     //
-    // It does NOT, measured, unblock fillGapTops, which copies Violin 2's line
-    // into the first violin and the winds through a gap. That pass fires zero
-    // times on this chart both before and after: it only fills a part that is
-    // SILENT in the gap, and in this route none ever is — one note a bar or
-    // four, `hasNote` is true either way. It needs a different condition, or a
-    // reason for those parts to rest in a gap at all.
+    // This, with the violin figuration beside it, is what makes the orchestra
+    // come forward in a gap. An older pass called fillGapTops tried to, by
+    // copying Violin 2's line into the first violin and the winds — it fired
+    // zero times from any of the four orchestra routes, because it only filled
+    // a part that was SILENT in the gap and none ever is. It has been removed
+    // rather than repaired: the strings now reach 75% of a gap bar with moving
+    // pitch in 26 and 21 of 30, and pushing more material into the winds would
+    // only worsen a family already running 65-75% there against the reference
+    // edition's 25-38%.
     if (!melEvents.some((e: any) => e.type === "note")) {
       for (let t = GAP_STEP; t < measureLen - 1e-9; t += GAP_STEP) {
         times.add(Math.round(t * 1000) / 1000);

@@ -200,10 +200,29 @@ export function orchestrateStringCore(
   // Open spacing: widen muddy low intervals + spread excessive unison piles
   // (overtone-series principle — wide at the bottom, closer at the top).
   refineSpacing(orch);
-  // Ritornello fills: in instrumental gaps the top voices take the lead so the
-  // orchestra has a melodic top where the vocal would be (both build + tutti).
-  fillGapTops(orch, gaps);
-  if (gaps.some(Boolean)) warnings.push(`[orchestra] Ritornello: orchestra comes forward in ${gaps.filter(Boolean).length} instrumental gap measure(s).`);
+  // Ritornello: in instrumental gaps the strings take the lead so the orchestra
+  // has a melodic top where the vocal would be.
+  //
+  // fillGapTops used to sit here, copying Violin 2's line into the winds and
+  // the first violin. It fired ZERO times from any of the four orchestra
+  // routes, because it only filled a part that had no note of its own in the
+  // gap and none is ever silent there. The warning below went out regardless,
+  // which is exactly the sort of message that reads like evidence and is none.
+  //
+  // Its job is done now, and by the right mechanism: a gap bar gets a slice
+  // grid of its own (afb0607) and the violins break the chord over it
+  // (e898fbf), so Violin 1 and 2 sound 75% of those bars with moving pitch in
+  // 26 and 21 of 30 — against the reference edition's 82% and 90%, moving in
+  // 22 and 20. Reviving the old pass would now make things worse: it pushes
+  // more material into winds already running 65% and 75% of a gap bar where
+  // that edition writes 25% and 38%.
+  if (gaps.some(Boolean)) {
+    warnings.push(
+      `[orchestra] Ritornello: the strings come forward in ${gaps.filter(Boolean).length} ` +
+      `instrumental gap measure(s) — a grid of their own and a broken chord over it, ` +
+      `rather than one held note each.`
+    );
+  }
   // Climaxes: the flute descant lifts an octave (its brilliant register) so the
   // final choruses gain a true top instead of sitting in the narrow melody octave.
   liftFluteAtClimaxes(orch, phraseInt, phraseLen);
@@ -255,7 +274,6 @@ function remapAndRebuildFallback(stringScore: ScoreModel, intensity: IntensityMo
   const phraseInt = computePhraseIntensities(orch, phraseLen);
   const gaps = detectInstrumentalGaps(orch);
   if (intensity === "build") gateSections(orch, phraseInt, phraseLen, gaps);
-  fillGapTops(orch, gaps);
   addPercussion(orch, phraseInt, phraseLen);
   return (orch as any).parts;
 }
@@ -615,35 +633,6 @@ export function sourceMelodyRestMeasures(score: ScoreModel): boolean[] {
   return rests;
 }
 
-/**
- * In instrumental gaps, give the lyrical top voices (Flute/Oboe + Violin 1) the
- * top harmony line (from Violin 2) so the orchestra's ritornello has a real
- * melodic top where the vocal would otherwise be — instead of a bottom-heavy pad.
- */
-function fillGapTops(orch: ScoreModel, gaps: boolean[]): void {
-  const parts: any[] = (orch as any).parts ?? [];
-  const topSrc = parts.find((p) => p.part_id === "P_VLN2");
-  if (!topSrc) return;
-  const targets: Array<[string, string]> = [["P_FLOB", "fl"], ["P_VLN1", "vln1"]];
-  for (let mi = 0; mi < gaps.length; mi++) {
-    if (!gaps[mi]) continue;
-    const srcNotes = (topSrc.measures?.[mi]?.events ?? []).filter((e: any) => e?.type === "note" && e.pitch);
-    if (!srcNotes.length) continue;
-    for (const [pid, regKey] of targets) {
-      const p = parts.find((x) => x.part_id === pid);
-      const m = p?.measures?.[mi];
-      if (!m) continue;
-      const hasNote = (m.events ?? []).some((e: any) => e?.type === "note" && e.pitch);
-      if (hasNote) continue; // the melody voice already plays here — leave it
-      m.events = srcNotes.map((e: any, i: number) => {
-        const midi = eventMidi(e);
-        if (midi === null) return e;
-        const placed = place(midi, REG[regKey]!, p.instrument);
-        return { id: `${pid}-fill-${mi}-${i}`, t: e.t, dur: e.dur, type: "note", pitch: midiToPitch(placed), voice: 1, staff: 1 };
-      });
-    }
-  }
-}
 
 // ── Percussion: Timpani (pitched) + Crash/Triangle (unpitched) ───────────────
 // Two staves: a pitched timpani part (bass roots on downbeats + cadences, enters
