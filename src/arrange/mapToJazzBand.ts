@@ -409,15 +409,87 @@ export function mapPianoToJazzBandOpen(score: ScoreModel, options?: JazzBandOpti
   const C_TBN = 52; // E3
   const C_BAS = 40; // E2
 
+  // How long a written note lasts: until the next chord onset in its bar, or
+  // the barline.
+  //
+  // Every note used to be given `n.dur ?? 480`, and extractOnsetChords supplies
+  // no duration at all — so n.dur was undefined for all 672 of them and every
+  // note was written 480 BEATS long, a hundred and twenty bars. The fallback
+  // was written in divisions and read as beats. Each part's notes then overlapped
+  // the whole piece, and the exporter folded overlapping same-voice notes
+  // together: eight simultaneous notes on one saxophone, 62 of 95 onsets
+  // carrying more than three, 49 carrying the same pitch twice.
+  //
+  // The breathing audit had been reporting it the whole time — "longest stretch
+  // without air now 483 beats" — and nobody read it as the symptom it was.
+  const onsetsByMeasure: Record<string, number[]> = {};
   for (const ch of chords) {
+    const k = String(ch.measure);
+    (onsetsByMeasure[k] ??= []).push(Number(ch.t));
+  }
+  for (const k of Object.keys(onsetsByMeasure)) {
+    onsetsByMeasure[k] = [...new Set(onsetsByMeasure[k]!)].sort((a, b) => a - b);
+  }
+
+  // One note per player per onset.
+  //
+  // extractOnsetChords hands back 881 events for this chart and 169 of its
+  // onsets carry between two and eight of them — the first bar alone has eight
+  // at beat 1. The writer below puts one note per EVENT into each single-line
+  // part, so a saxophone came out holding eight simultaneous notes, 62 of 95
+  // onsets carried more than three, and 49 carried the same pitch twice. A
+  // sorted pick over one event's two or three notes also kept landing on the
+  // same degree for two players, which is why Tenor Sax and Trumpet, and
+  // Trombone and Bass, were byte-identical.
+  //
+  // Events sharing an onset are one chord, so they are merged into one before
+  // any voice is assigned: the union of their pitches, deduplicated. Nothing is
+  // invented — every pitch is one the extractor already found at that moment —
+  // and each player now takes exactly one of them.
+  const merged: any[] = [];
+  {
+    const byOnset = new Map<string, any>();
+    for (const ch of chords) {
+      const key = `${ch.measure}@${ch.t}`;
+      const found = byOnset.get(key);
+      if (!found) {
+        byOnset.set(key, { ...ch, notes: [...(ch.notes ?? [])] });
+        continue;
+      }
+      found.notes.push(...(ch.notes ?? []));
+    }
+    for (const ch of byOnset.values()) {
+      const seen = new Set<number>();
+      ch.notes = (ch.notes ?? []).filter((n: any) => {
+        const m = Number(n?.midi);
+        if (!Number.isFinite(m) || seen.has(m)) return false;
+        seen.add(m);
+        return true;
+      });
+      merged.push(ch);
+    }
+    merged.sort((a, b) =>
+      Number(a.measure) - Number(b.measure) || Number(a.t) - Number(b.t));
+  }
+
+  for (const ch of merged) {
     const shells = measureMap[String(ch.measure)];
     if (!shells) continue;
 
     const notes = ch.notes.slice().sort((a: any, b: any) => a.midi - b.midi);
     if (notes.length === 0) continue;
 
-    const t = ch.t;
-    const dur = Math.max(...notes.map((n: any) => n.dur ?? 480), 1);
+    const t = Number(ch.t);
+    const barBeats = Number(
+      measureMap[String(ch.measure)]?.[0]?.attributes?.time?.beats ?? 4
+    );
+    const barType = Number(
+      measureMap[String(ch.measure)]?.[0]?.attributes?.time?.beat_type ?? 4
+    );
+    const barLen = barType > 0 ? (barBeats * 4) / barType : 4;
+    const here = onsetsByMeasure[String(ch.measure)] ?? [t];
+    const nextOnset = here.find((x) => x > t + 1e-9) ?? barLen;
+    const dur = Math.max(0.25, Math.min(nextOnset, barLen) - t);
 
     const pick = (idx: number) => notes[Math.min(Math.max(idx, 0), notes.length - 1)].midi;
 
