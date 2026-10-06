@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { expandBrassSection, expandSectionSentence } from "../../src/arrange/brass/expandSection";
 import { midiToPitch, pitchToMidi } from "../../src/instruments/instrumentCatalog";
-import { BRASS_RANGES } from "../../src/arrange/brass/brassRanges";
+import { BRASS_RANGES, BRASS_SWEET_SPOT } from "../../src/arrange/brass/brassRanges";
 
 /**
  * Eight players, not five.
@@ -101,6 +101,42 @@ const BARS = 6;
   below(/^horn 2$/i, /^horn in f$/i);
   below(/^trombone 2$/i, /^trombone$/i);
   below(/^bass trombone$/i, /^trombone 2$/i);
+}
+
+// ── Horn 2 stays inside the horn's register, doubling at the bottom ───────
+{
+  // Taking any chord tone below the donor put 21% of its notes beneath the
+  // horn's own floor, because Horn 1 often sits near that floor itself and
+  // Horn 2 reached under it. The reference's Horn 2 never goes below 54 and
+  // doubles the first horn instead — horns in unison down there is ordinary.
+  const low = quintet(BARS, { "Horn in F": BRASS_SWEET_SPOT.hn.lo });
+  expandBrassSection(low);
+  const h1 = find(low, /^horn in f$/i);
+  const h2 = find(low, /^horn 2$/i);
+  assert.ok(h2, "Horn 2 is still created when the first horn is at its floor");
+  for (let bar = 0; bar < BARS; bar++) {
+    for (const m of midisIn(h2, bar)) {
+      assert.ok(m >= BRASS_SWEET_SPOT.hn.lo,
+        `Horn 2 reached ${m}, below the horn's register floor of ${BRASS_SWEET_SPOT.hn.lo}`);
+    }
+  }
+  // With nowhere to go below, it doubles rather than dropping out of range.
+  assert.deepEqual(midisIn(h2, 0), midisIn(h1, 0),
+    "at the bottom of the register the two horns double");
+}
+
+// ── And it keeps to the lower half when there is room ────────────────────
+{
+  const high = quintet(BARS, { "Horn in F": 71 });
+  expandBrassSection(high);
+  const h2 = find(high, /^horn 2$/i);
+  const mid = Math.round((BRASS_SWEET_SPOT.hn.lo + BRASS_SWEET_SPOT.hn.hi) / 2);
+  for (let bar = 0; bar < BARS; bar++) {
+    for (const m of midisIn(h2, bar)) {
+      assert.ok(m <= mid,
+        `Horn 2 at ${m} is above the middle of the register (${mid}); a second horn fills in under the first`);
+    }
+  }
 }
 
 // ── Only chord tones the section is already sounding ──────────────────────

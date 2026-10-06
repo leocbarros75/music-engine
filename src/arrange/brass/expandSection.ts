@@ -1,5 +1,5 @@
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
-import { BRASS_RANGES } from "./brassRanges";
+import { BRASS_RANGES, BRASS_SWEET_SPOT } from "./brassRanges";
 
 /**
  * Eight players, not five.
@@ -34,6 +34,24 @@ const LOW_BRASS_GAP = 4;
 /** How far below its donor a derived part may reach for a chord tone. */
 const MAX_DROP = 14;
 
+/**
+ * A second horn sits in the lower half of the register, not wherever the first
+ * one leaves room.
+ *
+ * Taking any chord tone below the donor made Horn 2 THIRTY-ONE semitones wide,
+ * wider than the Horn 1 it shadows, where the reference edition's is ten and
+ * the first horn's seventeen: its Horn 1 runs 54-71 sounding and its Horn 2
+ * 54-64. A second horn fills in under the first; it does not range further.
+ *
+ * So Horn 2 prefers a chord tone that also stays at or below the middle of the
+ * horn's own register, and only ignores that ceiling when nothing is available
+ * there — the alternative being no note at all.
+ */
+function lowerHalfCeiling(voice: keyof typeof BRASS_SWEET_SPOT): number {
+  const spot = BRASS_SWEET_SPOT[voice];
+  return Math.round((spot.lo + spot.hi) / 2);
+}
+
 type Derived = {
   /** The part this one is derived from, by name. */
   donor: RegExp;
@@ -59,7 +77,7 @@ const DERIVED: Derived[] = [
   { donor: /^trombone 2/i, id: "P_BTBN", name: "Bass Trombone", instrument: "trombone", range: "tbn",  after: /^trombone 2/i },
 ];
 
-export type ExpandPlan = { part: string; from: string; notes: number; crowded?: number };
+export type ExpandPlan = { part: string; from: string; notes: number; crowded?: number; narrowed?: number };
 
 function eventMidi(ev: any): number | null {
   if (!ev?.pitch) return null;
@@ -94,6 +112,7 @@ export function expandBrassSection(score: any): ExpandPlan[] {
 
     let notes = 0;
     let crowded = 0;
+    let narrowed = 0;
     const measures = (donor.measures ?? []).map((m: any, bar: number) => {
       const copy = JSON.parse(JSON.stringify(m));
       const src = (m?.events ?? []).filter((e: any) => e?.type === "note" && !e.grace);
@@ -139,6 +158,23 @@ export function expandBrassSection(score: any): ExpandPlan[] {
         let pick = chordToneBelow(
           cur, pcs, spec.id === "P_BTBN" ? floor : floor + LOW_BRASS_GAP
         );
+        // Horn 2 keeps to the lower half of the horn's register, and never drops
+        // out of the register's bottom to find a note below the first horn.
+        //
+        // Taking any chord tone below the donor put 79 of its 377 notes — 21% —
+        // below the horn's own floor, because Horn 1 often sits near that floor
+        // itself and Horn 2 then reached under it. The reference's Horn 2 runs
+        // 54-64 sounding and never goes beneath 54 at all, which means that
+        // where the first horn is at the bottom the two simply double: horns in
+        // unison down there is ordinary writing, and it is what keeps the second
+        // one inside its instrument instead of below it.
+        if (spec.id === "P_HN2") {
+          const spot = BRASS_SWEET_SPOT.hn;
+          const ceiling = lowerHalfCeiling("hn");
+          const want = chordToneBelow(Math.min(cur, ceiling + 1), pcs, spot.lo);
+          if (want !== null && want !== pick) { pick = want; narrowed++; }
+          else if (want === null && cur >= spot.lo) { pick = cur; narrowed++; }  // unison
+        }
         if (pick === null && spec.id === "P_BTBN") {
           pick = chordToneBelow(cur, pcs, range.absMin);
           if (pick !== null) crowded++;
@@ -174,7 +210,7 @@ export function expandBrassSection(score: any): ExpandPlan[] {
     if (anchor >= 0) parts.splice(anchor + 1, 0, part);
     else parts.push(part);
 
-    out.push({ part: spec.name, from: String(donor.name), notes, crowded });
+    out.push({ part: spec.name, from: String(donor.name), notes, crowded, narrowed });
   }
 
   return out;
