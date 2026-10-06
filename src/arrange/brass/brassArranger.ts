@@ -291,7 +291,10 @@ export type BrassArrangerOptions = {
  * if it brings the line's median closer to the middle of the sweet spot AND
  * leaves every note inside the instrument.
  */
-function centreOnSweetSpot(score: ScoreModel, voices: BrassVoiceId[]): number {
+/** Past this share of a part, out-of-range notes mean the wrong octave, not outliers. */
+const OUTLIER_SHARE = 0.10;
+
+export function centreOnSweetSpot(score: ScoreModel, voices: BrassVoiceId[]): number {
   let shifted = 0;
   for (const v of voices) {
     const part = ((score as any).parts ?? []).find((p: any) => p.part_id === BRASS_PART_META[v].part_id);
@@ -307,10 +310,27 @@ function centreOnSweetSpot(score: ScoreModel, voices: BrassVoiceId[]): number {
     const centre = (spot.lo + spot.hi) / 2;
     const range = BRASS_RANGES[v];
 
+    // A handful of outliers must not veto the whole part.
+    //
+    // Requiring EVERY note to stay in range after the shift is why the tuba sat
+    // ten semitones above the reference edition's: 6 of its 225 notes would
+    // have fallen below the instrument's floor an octave down, and those 6
+    // blocked the other 219 from being placed at all. It read 37-52 with a
+    // median of 44 against that edition's 30-40 and median 35 — and the error
+    // then propagated, because the derived bass trombone keeps its clearance
+    // above the tuba and had nowhere to go.
+    //
+    // So the shift is judged on the line as a whole and the stragglers are
+    // clamped back by octave, which is what happens to out-of-range notes
+    // everywhere else here. Past a tenth of the part it is not a few outliers
+    // any more, it is the wrong octave for the line, and the shift is refused.
     let best = 0;
     let bestGap = Math.abs(median - centre);
     for (const oct of [-24, -12, 12, 24]) {
-      if (Math.min(...midis) + oct < range.absMin || Math.max(...midis) + oct > range.absMax) continue;
+      const outside = midis.filter(
+        (m) => m + oct < range.absMin || m + oct > range.absMax
+      ).length;
+      if (outside > midis.length * OUTLIER_SHARE) continue;
       const gap = Math.abs(median + oct - centre);
       if (gap < bestGap - 1e-9) { bestGap = gap; best = oct; }
     }
@@ -319,8 +339,11 @@ function centreOnSweetSpot(score: ScoreModel, voices: BrassVoiceId[]): number {
     for (const e of notes) {
       const m = eventMidi(e);
       if (m === null) continue;
-      e.midi = m + best;
-      e.pitch = midiToPitch(m + best);
+      let moved = m + best;
+      while (moved < range.absMin) moved += 12;
+      while (moved > range.absMax) moved -= 12;
+      e.midi = moved;
+      e.pitch = midiToPitch(moved);
       shifted++;
     }
   }

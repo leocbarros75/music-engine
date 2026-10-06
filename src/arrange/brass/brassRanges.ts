@@ -51,12 +51,34 @@ export const BRASS_RANGES: Record<BrassVoiceId, BrassRange> = {
  * 58 to 70 against 74 to 79 in a hand-written edition of the same song. In
  * range, and nowhere near the register the instrument is for.
  */
+/*
+ * Two of these came from the textbook and did not survive measurement.
+ *
+ * They were read off BRASS_CHARACTER.sweetSpot — the register each instrument
+ * is documented to live in. Against the hand-written brass edition of this song
+ * (`outputs/washed-brass-auto/`), whose actual SOUNDING registers are
+ * Trumpet 1 66-76, Trumpet 2 54-76, Horn 1 54-71, Horn 2 54-64,
+ * Trombone 1 42-66, Trombone 2 47-54, Bass Trombone 42-47 and Tuba 30-40:
+ *
+ *   The horn was six semitones too low. "C3-G4" is the noble middle register in
+ *   the abstract, but a horn carrying lines in a section sits higher, and ours
+ *   got pulled down an octave once the placement rule stopped being vetoed by
+ *   stray notes — 35-64 sounding against that edition's 54-71.
+ *
+ *   The tuba was ten too high at the top. "G1-D3" let its median settle at 44
+ *   against the edition's 35: D3 is a tuba note but not where a bass line
+ *   lives, and the error propagated, since the derived bass trombone keeps its
+ *   clearance above the tuba and so had nowhere to sit.
+ *
+ * The trumpets and the trombone already agreed with the measurement and are
+ * untouched.
+ */
 export const BRASS_SWEET_SPOT: Record<BrassVoiceId, { lo: number; hi: number }> = {
   tpt1: { lo: 67, hi: 79 },  // G4–G5
   tpt2: { lo: 64, hi: 76 },  // E4–E5
-  hn:   { lo: 48, hi: 67 },  // C3–G4
+  hn:   { lo: 54, hi: 71 },  // F#3–B4 — measured, not C3–G4
   tbn:  { lo: 43, hi: 58 },  // G2–Bb3
-  tuba: { lo: 31, hi: 50 },  // G1–D3
+  tuba: { lo: 30, hi: 42 },  // F#1–F#2 — a bass line, not up to D3
 };
 
 export type BrassCharacter = {
