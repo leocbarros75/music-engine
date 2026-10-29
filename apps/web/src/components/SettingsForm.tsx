@@ -23,7 +23,12 @@ const ENSEMBLE_OPTIONS: Array<{ label: string; value: Settings["ensemble"] }> = 
   { label: "worship orchestra (auto)", value: "orchestra" },
   { label: "piano → worship orchestra", value: "piano_orchestra" },
   { label: "SATB → worship orchestra", value: "satb_orchestra" },
-  { label: "symphonic orchestra (classical / romantic)", value: "symphonic_orchestra" }
+  { label: "symphonic orchestra (classical / romantic)", value: "symphonic_orchestra" },
+  // The engine has routed these for a long time and the API serves them — a
+  // jazz_band request returns all seventeen parts — but they were never on this
+  // list, so no user could reach them.
+  { label: "jazz band (big band)", value: "jazz_band" },
+  { label: "percussion", value: "percussion" }
 ];
 
 // Symphonic roster — mirrors SYMPHONIC_PARTS in the engine (ids must match).

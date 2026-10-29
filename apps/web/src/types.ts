@@ -23,7 +23,11 @@ export type Settings = {
     | "orchestra"
     | "piano_orchestra"
     | "satb_orchestra"
-    | "symphonic_orchestra";
+    | "symphonic_orchestra"
+    // Third place these had to be listed, after the dropdown and App's
+    // ensembleReady gate. The engine has routed both for a long time.
+    | "jazz_band"
+    | "percussion";
   /** Re-instrumentation remap table: reassign parts to new instruments (sounding preserved). */
   reinstrument?: Array<{ part: string; to: string }>;
   /** Worship-orchestra intensity: "build" (light intro → climaxes) or "tutti" (full throughout). */

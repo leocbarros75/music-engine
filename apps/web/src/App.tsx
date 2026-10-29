@@ -148,7 +148,12 @@ export default function App() {
     settings.ensemble === "orchestra" ||
     settings.ensemble === "piano_orchestra" ||
     settings.ensemble === "satb_orchestra" ||
-    settings.ensemble === "symphonic_orchestra";
+    settings.ensemble === "symphonic_orchestra" ||
+    // Second allowlist. The dropdown is the other one, and both omitted these,
+    // so the engine's jazz and percussion routes were unreachable from the app
+    // even though the API serves them.
+    settings.ensemble === "jazz_band" ||
+    settings.ensemble === "percussion";
 
   const isOrchestraMode = settings.ensemble === "orchestra" || settings.ensemble === "piano_orchestra" || settings.ensemble === "satb_orchestra";
   // A chord/rhythm-chart PDF drives the GENERATIVE ensembles. The "copy" modes
