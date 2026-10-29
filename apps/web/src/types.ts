@@ -47,6 +47,8 @@ export type Settings = {
   tempo: number;
   style: "baroque" | "classical" | "romantic" | "modern" | "worship" | "latino" | "pop" | "rock" | "funk" | "samba";
   level: "beginner" | "intermediate" | "advanced" | "professional";
+  /** Per-part override of `level`, by part name or id. */
+  partLevels?: Array<{ part: string; level: "beginner" | "intermediate" | "advanced" | "professional" }>;
   accompaniment: "homophonic" | "chordal" | "polyphonic" | "alberti_bass" | "heterophonic";
   ruleStrictness: "relaxed" | "standard" | "strict";
   textureMode:

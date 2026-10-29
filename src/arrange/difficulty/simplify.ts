@@ -1,0 +1,298 @@
+import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
+import { bandFor, playableRange, isPlayerLevel, type Band, type PlayerLevel } from "./levels";
+
+/**
+ * A simplified alternate for a part that sits too high or too low for the
+ * player who has to read it.
+ *
+ * Phase 1 moves REGISTER and nothing else. Every note keeps its pitch class,
+ * its onset and its duration; only the octave may change. That is a deliberate
+ * limit, not an oversight — moving a line into a comfortable register makes it
+ * reachable, and leaves it exactly as rhythmically hard as it was.
+ *
+ * The professional part is never touched. A simplified part is ADDED beside it,
+ * named "<part> (simplified)", the way a publisher prints an alternate: the
+ * director chooses at the stand, and nothing that already worked can regress.
+ */
+
+/** A note that has to leave the band loses less than a line that wanders. */
+const CLAMP_COST = 3;
+
+/**
+ * What introducing a crossing with a neighbouring part costs.
+ *
+ * A cost, NOT a veto. Crossing is ordinary music — measured on the reference
+ * jazz edition, its bass sits above its own bass trombone at 10 of 19 shared
+ * onsets — so forbidding it outright would block most useful simplification.
+ * This only discourages an octave choice that newly tangles a part with the one
+ * above or below it when another choice fits the register just as well.
+ */
+const CROSS_COST = 2;
+
+/** Whole octaves only. A simplified part is the same music. */
+const OCTAVE_CHOICES = [0, -12, 12, -24, 24];
+
+/**
+ * The band's CEILING is the constraint; its floor is not.
+ *
+ * What makes a part hard is height — the notes above the staff are where tone,
+ * intonation and endurance all fail first. Sitting below a band is usually
+ * comfortable, and on most of these instruments it is where a student is
+ * happiest.
+ *
+ * Treating the floor as a constraint too produced the opposite of
+ * simplification: a flute line at 66-76 fell one semitone under the catalog's
+ * preferred floor of 67, so the pass moved the ENTIRE line up an octave, to
+ * 78-88, to satisfy it. The part got harder. Only the ceiling pushes a line,
+ * and only downwards; the floor is enforced solely by the instrument's own
+ * range, which is a different question and is handled by the wall below.
+ */
+function tooHigh(midi: number, band: Band): boolean {
+  return midi > band.hi;
+}
+
+export type SimplifyPlan = {
+  part: string;
+  instrument: string;
+  level: PlayerLevel;
+  band: Band;
+  /** Notes whose octave moved. */
+  moved: number;
+  notes: number;
+  /** The constant octave applied to the whole line, before per-note repairs. */
+  lineShift: number;
+  /** Notes still above the band's ceiling, no lower octave being playable. */
+  outside: number;
+  /** Crossings with a neighbouring part that the move introduced. */
+  crossings: number;
+  lowBefore: number; highBefore: number;
+  lowAfter: number; highAfter: number;
+};
+
+export type LevelSelection = {
+  default?: PlayerLevel;
+  /** Per part, by part name or part_id. One weak player, not a weak orchestra. */
+  byPart?: Record<string, PlayerLevel>;
+};
+
+function isNote(e: any): boolean {
+  return e?.type === "note" && !e.grace;
+}
+
+function eventMidi(ev: any): number | null {
+  if (!ev?.pitch) return null;
+  try { return pitchToMidi(ev.pitch); } catch { return null; }
+}
+
+/** Every sounding note of a part, with where it lives. */
+function noteRefs(part: any): Array<{ bar: number; ev: any; midi: number }> {
+  const out: Array<{ bar: number; ev: any; midi: number }> = [];
+  (part?.measures ?? []).forEach((m: any, bar: number) => {
+    for (const ev of (m?.events ?? [])) {
+      if (!isNote(ev)) continue;
+      const midi = eventMidi(ev);
+      if (midi !== null) out.push({ bar, ev, midi });
+    }
+  });
+  return out;
+}
+
+/** The highest note each neighbour sounds at each onset, for the crossing cost. */
+function onsetTops(part: any): Map<string, number> {
+  const tops = new Map<string, number>();
+  (part?.measures ?? []).forEach((m: any, bar: number) => {
+    for (const ev of (m?.events ?? [])) {
+      if (!isNote(ev)) continue;
+      const midi = eventMidi(ev);
+      if (midi === null) continue;
+      const key = `${bar}:${Number(ev.t)}`;
+      const prev = tops.get(key);
+      if (prev === undefined || midi > prev) tops.set(key, midi);
+    }
+  });
+  return tops;
+}
+
+/**
+ * One octave for the whole line, chosen on the whole line.
+ *
+ * Note by note this would be wrong twice over, and both mistakes have already
+ * been made in this codebase: choosing each note's octave separately collapsed
+ * a derived saxophone line to three semitones, and treating an out-of-range
+ * note as disqualifying stranded 392 notes an octave high because 14 of them
+ * would have dropped under the horn. A player's register is a property of the
+ * part, not of each note in it.
+ */
+function chooseLineShift(
+  line: number[],
+  band: Band,
+  playable: Band | null,
+  above: Map<string, number> | null,
+  below: Map<string, number> | null,
+  keys: string[],
+): number {
+  if (!line.length) return 0;
+
+  let best = 0;
+  let bestScore = Infinity;
+  for (const o of OCTAVE_CHOICES) {
+    let outside = 0, unplayable = 0, crossings = 0;
+    for (let i = 0; i < line.length; i++) {
+      const m = line[i]! + o;
+      if (tooHigh(m, band)) outside++;
+      if (playable && (m < playable.lo || m > playable.hi)) unplayable++;
+      // A crossing this move would INTRODUCE: it did not cross before and does
+      // now. An ordering the arranger already chose is none of our business.
+      const key = keys[i]!;
+      const up = above?.get(key);
+      if (up !== undefined && line[i]! <= up && m > up) crossings++;
+      const dn = below?.get(key);
+      if (dn !== undefined && line[i]! >= dn && m < dn) crossings++;
+    }
+    // The tie-break is to MOVE THE MUSIC LEAST, not to centre it in the band.
+    //
+    // Centring was the first version and it put the fault back by another door:
+    // with nothing above the ceiling at either octave, the distance-to-centre
+    // term still dragged a flute line sitting at 66-76 up to 78-88, because the
+    // preferred band's middle is 80. A simplified part should differ from the
+    // original as little as it can and no less.
+    const score =
+      outside + unplayable * CLAMP_COST + crossings * CROSS_COST + Math.abs(o) / 1000;
+    if (score < bestScore) { bestScore = score; best = o; }
+  }
+  return best;
+}
+
+/** The level that applies to a part: its own override, else the score default. */
+function levelFor(part: any, levels: LevelSelection): PlayerLevel {
+  const byPart = levels.byPart ?? {};
+  for (const key of [String(part?.name ?? ""), String(part?.part_id ?? "")]) {
+    const v = key ? byPart[key] : undefined;
+    if (isPlayerLevel(v)) return v;
+  }
+  return isPlayerLevel(levels.default) ? levels.default : "professional";
+}
+
+/**
+ * Add a simplified alternate for every part that needs one. Mutates `parts` in
+ * place and returns what was added, so the caller can say so.
+ */
+export function simplifyForLevel(parts: any[], levels: LevelSelection): SimplifyPlan[] {
+  if (!Array.isArray(parts) || !parts.length) return [];
+  // Nothing to do at all unless some part is below professional. This is what
+  // makes the pass provably inert by default.
+  const wanted = parts.some((p) => levelFor(p, levels) !== "professional");
+  if (!wanted) return [];
+  if (parts.some((p) => /\(simplified\)\s*$/i.test(String(p?.name ?? "")))) return [];
+
+  const out: SimplifyPlan[] = [];
+  // Snapshot the original line-up: neighbours are judged against the score as
+  // the arranger left it, not against alternates added as we go.
+  const original = parts.slice();
+
+  for (const part of original) {
+    const level = levelFor(part, levels);
+    if (level === "professional") continue;
+
+    const instrument = String(part?.instrument ?? "");
+    const band = bandFor(instrument, level);
+    if (!band) continue;
+
+    const refs = noteRefs(part);
+    if (!refs.length) continue;
+
+    const playable = playableRange(instrument);
+    const idx = original.indexOf(part);
+    const above = idx > 0 ? onsetTops(original[idx - 1]) : null;
+    const below = idx >= 0 && idx < original.length - 1 ? onsetTops(original[idx + 1]) : null;
+    const keys = refs.map((r) => `${r.bar}:${Number(r.ev.t)}`);
+
+    const lineShift = chooseLineShift(refs.map((r) => r.midi), band, playable, above, below, keys);
+
+    // Phase two: a note still outside the band moves on its own, but ONLY when
+    // that brings it inside and keeps it on the instrument. A note that cannot
+    // be helped is left where the arranger put it and counted, never forced to
+    // some other pitch — that would change the harmony to flatter a metric.
+    const after: number[] = [];
+    let moved = 0, outside = 0;
+    for (const r of refs) {
+      let m = r.midi + lineShift;
+      // Only a note ABOVE the ceiling is brought down on its own, and only when
+      // dropping it lands inside the band and stays on the instrument.
+      if (tooHigh(m, band)) {
+        for (const step of [-12, -24]) {
+          const cand = m + step;
+          if (cand > band.hi || cand < band.lo) continue;
+          if (playable && (cand < playable.lo || cand > playable.hi)) continue;
+          m = cand;
+          break;
+        }
+      }
+      // The hard wall: never hand a player a note the instrument cannot sound.
+      if (playable) {
+        while (m > playable.hi) m -= 12;
+        while (m < playable.lo) m += 12;
+      }
+      if (tooHigh(m, band)) outside++;
+      if (m !== r.midi) moved++;
+      after.push(m);
+    }
+
+    if (!moved) continue;   // already comfortable; an alternate would be a copy
+
+    // What the move actually did to the neighbours, for the report.
+    let crossings = 0;
+    refs.forEach((r, i) => {
+      const key = keys[i]!;
+      const up = above?.get(key);
+      if (up !== undefined && r.midi <= up && after[i]! > up) crossings++;
+      const dn = below?.get(key);
+      if (dn !== undefined && r.midi >= dn && after[i]! < dn) crossings++;
+    });
+
+    const clone = JSON.parse(JSON.stringify(part));
+    clone.part_id = `${String(part.part_id ?? "P")}_SIMPLE`;
+    clone.name = `${String(part.name ?? "Part")} (simplified)`;
+    const cloneRefs = noteRefs(clone);
+    cloneRefs.forEach((r, i) => { r.ev.pitch = midiToPitch(after[i]!); });
+
+    parts.splice(parts.indexOf(part) + 1, 0, clone);
+
+    out.push({
+      part: String(part.name ?? part.part_id ?? "Part"),
+      instrument, level, band, moved, notes: refs.length, lineShift, outside, crossings,
+      lowBefore: Math.min(...refs.map((r) => r.midi)),
+      highBefore: Math.max(...refs.map((r) => r.midi)),
+      lowAfter: Math.min(...after),
+      highAfter: Math.max(...after),
+    });
+  }
+
+  return out;
+}
+
+/** One line naming what was simplified and what it cost. */
+export function simplifySentence(plans: SimplifyPlan[]): string | null {
+  if (!plans.length) return null;
+  const bits = plans.map((p) =>
+    `${p.part} for a ${p.level} player (${p.moved} of ${p.notes} notes, ` +
+    `${p.lowBefore}-${p.highBefore} into ${p.lowAfter}-${p.highAfter}, target ${p.band.lo}-${p.band.hi})`
+  );
+  const outside = plans.reduce((n, p) => n + p.outside, 0);
+  const crossings = plans.reduce((n, p) => n + p.crossings, 0);
+
+  return (
+    `[level] Simplified alternates added beside the original parts, which are ` +
+    `unchanged: ${bits.join("; ")}. Only the octave moves — every note keeps its ` +
+    `pitch, its place in the bar and its length, so these parts sit better on the ` +
+    `instrument but are no easier rhythmically.` +
+    (outside
+      ? ` ${outside} note(s) stay above the target register because no lower octave ` +
+        `of them is both inside it and playable.`
+      : "") +
+    (crossings
+      ? ` ${crossings} note(s) now cross a neighbouring part where they did not ` +
+        `before.`
+      : "")
+  );
+}

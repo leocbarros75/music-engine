@@ -162,6 +162,13 @@ export function normalizeAppSettings(raw: unknown): AppSettings {
       ? anyRaw.bassRhythm : undefined,
     bassFinalNote: anyRaw.bassFinalNote === "follow_melody" || anyRaw.bassFinalNote === "default"
       ? anyRaw.bassFinalNote : undefined,
+    // Whitelisted here or it never reaches the engine: this file is an explicit
+    // allowlist, and a setting it does not name is dropped at the API boundary.
+    partLevels: Array.isArray(anyRaw.partLevels)
+      ? anyRaw.partLevels
+          .filter((r: any) => r && typeof r.part === "string" && typeof r.level === "string")
+          .map((r: any) => ({ part: r.part, level: r.level }))
+      : undefined,
     reinstrument: Array.isArray(anyRaw.reinstrument)
       ? anyRaw.reinstrument
           .filter((r: any) => r && typeof r.part === "string" && typeof r.to === "string")

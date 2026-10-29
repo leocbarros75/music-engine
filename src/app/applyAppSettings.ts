@@ -296,6 +296,8 @@ export type AppSettings = {
   tempo?: number;
   style?: string;
   level?: "beginner" | "intermediate" | "advanced" | "professional";
+  /** Per-part override of `level`. One weak player, not a weak orchestra. */
+  partLevels?: Array<{ part: string; level: "beginner" | "intermediate" | "advanced" | "professional" }>;
   /**
    * Suzuki method volume number (1–8+).
    * When provided, overrides `level` for string-ensemble outputs and maps to

@@ -14,6 +14,8 @@ import { parseMusicXMLToScoreModel } from "../parsers/musicxmlParser";
 import { harmonizeSatbFromChords } from "../harmonize/satb/harmonizeSatbFromChords";
 import { inferChordsFromMelody } from "../harmonize/satb/inferChordsFromMelody";
 import { applyAppSettings, type AppSettings } from "../app/applyAppSettings";
+import { simplifyForLevel, simplifySentence } from "../arrange/difficulty/simplify";
+import { isPlayerLevel } from "../arrange/difficulty/levels";
 import { checkChoralRules } from "../rules/choral/checkChoralRules";
 import { exportScoreModelToMusicXML, ensureFinalBarlines } from "../exporters/musicxmlExporter";
 import { extractChordEventsFromMusicXml, type ChordEvent } from "../extract/chordEventsFromMusicXml";
@@ -341,6 +343,25 @@ export function pipelineMusicxmlToArrangedMusicxml(
     const appResult = applyAppSettings(harmonizedScore, settings, finalChords as any);
     let scoreModelOut = appResult.scoreModel as any;
     if (Array.isArray(appResult.warnings)) warnings.push(...appResult.warnings);
+
+    // A part written for a professional, beside one the player in front of you
+    // can actually read. The level setting has existed in the UI for a long
+    // time and did nothing for seven of eight ensembles; this is the one place
+    // it means something, and it is here rather than in each arranger because
+    // `scoreModelOut` is the finished score for EVERY ensemble.
+    //
+    // Before carrySourceMarks on purpose: a part added after that call would be
+    // missing the source's repeats, endings and dynamics.
+    const simplified = simplifyForLevel(scoreModelOut?.parts ?? [], {
+      default: isPlayerLevel(settings.level) ? settings.level : undefined,
+      byPart: Object.fromEntries(
+        (settings.partLevels ?? [])
+          .filter((r: any) => r && typeof r.part === "string" && isPlayerLevel(r.level))
+          .map((r: any) => [r.part, r.level])
+      ),
+    });
+    const simplifyLine = simplifySentence(simplified);
+    if (simplifyLine) warnings.push(simplifyLine);
 
     // The source's repeats, endings and dynamics belong on the parts written
     // from it, whatever the ensemble. Done here rather than in each arranger
