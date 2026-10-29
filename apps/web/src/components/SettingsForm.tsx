@@ -96,6 +96,22 @@ const PIANO_STYLE_OPTIONS: Array<{ label: string; value: Settings["style"]; help
   { label: "Latino",     value: "latino",    help: "Latin rhythmic patterns and harmonic colour." }
 ];
 const LEVEL_OPTIONS: Settings["level"][] = ["beginner", "intermediate", "advanced", "professional"];
+
+/**
+ * Simplified parts, and deliberately a control of its own rather than a second
+ * meaning for Level.
+ *
+ * Level already drives the piano writing and the rule strictness, and the app
+ * defaults it to "intermediate" — so hanging simplification off it added an
+ * easier copy of every part for every user who never touched the setting.
+ * This one is Off until it is asked for.
+ */
+const SIMPLIFY_OPTIONS: Array<{ value: NonNullable<Settings["simplifyLevel"]>; label: string }> = [
+  { value: "off", label: "Off" },
+  { value: "advanced", label: "For an advanced player" },
+  { value: "intermediate", label: "For an intermediate player" },
+  { value: "beginner", label: "For a beginner" },
+];
 const ACCOMP_OPTIONS: Settings["accompaniment"][] = [
   "homophonic",
   "chordal",
@@ -1424,6 +1440,24 @@ export default function SettingsForm({ settings, onChange }: Props) {
             </select>
           </div>
 
+          {/* Simplified parts — an easier copy beside the original, off by default */}
+          <div className="field">
+            <label>Simplified parts</label>
+            <select
+              value={settings.simplifyLevel ?? "off"}
+              onChange={(e) => onChange({ ...settings, simplifyLevel: e.target.value as Settings["simplifyLevel"] })}
+            >
+              {SIMPLIFY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <p className="help">
+              Adds a second, easier copy of each part beside the original — lower
+              where it sits too high, on a simpler rhythm, with somewhere to
+              breathe. The original parts are never changed.
+            </p>
+          </div>
+
           {/* Accompaniment — homophonic / polyphonic only; hidden in copy mode */}
           {!isCopyInstrumentation && <div className="field">
             <label>Accompaniment</label>
@@ -1903,6 +1937,24 @@ export default function SettingsForm({ settings, onChange }: Props) {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Simplified parts — an easier copy beside the original, off by default */}
+          <div className="field">
+            <label>Simplified parts</label>
+            <select
+              value={settings.simplifyLevel ?? "off"}
+              onChange={(e) => onChange({ ...settings, simplifyLevel: e.target.value as Settings["simplifyLevel"] })}
+            >
+              {SIMPLIFY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <p className="help">
+              Adds a second, easier copy of each part beside the original — lower
+              where it sits too high, on a simpler rhythm, with somewhere to
+              breathe. The original parts are never changed.
+            </p>
           </div>
 
           <div className="field">

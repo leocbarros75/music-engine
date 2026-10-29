@@ -164,6 +164,11 @@ export function normalizeAppSettings(raw: unknown): AppSettings {
       ? anyRaw.bassFinalNote : undefined,
     // Whitelisted here or it never reaches the engine: this file is an explicit
     // allowlist, and a setting it does not name is dropped at the API boundary.
+    simplifyLevel:
+      anyRaw.simplifyLevel === "beginner" || anyRaw.simplifyLevel === "intermediate" ||
+      anyRaw.simplifyLevel === "advanced" || anyRaw.simplifyLevel === "off"
+        ? (anyRaw.simplifyLevel as AppSettings["simplifyLevel"])
+        : undefined,
     partLevels: Array.isArray(anyRaw.partLevels)
       ? anyRaw.partLevels
           .filter((r: any) => r && typeof r.part === "string" && typeof r.level === "string")

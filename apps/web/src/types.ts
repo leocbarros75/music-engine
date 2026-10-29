@@ -47,7 +47,14 @@ export type Settings = {
   tempo: number;
   style: "baroque" | "classical" | "romantic" | "modern" | "worship" | "latino" | "pop" | "rock" | "funk" | "samba";
   level: "beginner" | "intermediate" | "advanced" | "professional";
-  /** Per-part override of `level`, by part name or id. */
+  /**
+   * Simplified parts: add an easier copy of each part beside the original.
+   * Undefined or "off" means no simplification — this is deliberately NOT
+   * `level`, which already drives piano writing and rule strictness, and whose
+   * default of "intermediate" would have turned this on for everybody.
+   */
+  simplifyLevel?: "off" | "beginner" | "intermediate" | "advanced";
+  /** Per-part override of `simplifyLevel`, by part name or id. */
   partLevels?: Array<{ part: string; level: "beginner" | "intermediate" | "advanced" | "professional" }>;
   accompaniment: "homophonic" | "chordal" | "polyphonic" | "alberti_bass" | "heterophonic";
   ruleStrictness: "relaxed" | "standard" | "strict";

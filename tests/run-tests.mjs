@@ -97,6 +97,7 @@ async function main() {
       'tests/arrange/jazzLeadBrass.test.ts',
       'tests/score/percussionPlayback.test.ts',
       'tests/arrange/difficultySimplify.test.ts',
+      'tests/arrange/simplifyOffByDefault.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',

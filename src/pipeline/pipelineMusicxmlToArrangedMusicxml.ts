@@ -353,7 +353,13 @@ export function pipelineMusicxmlToArrangedMusicxml(
     // Before carrySourceMarks on purpose: a part added after that call would be
     // missing the source's repeats, endings and dynamics.
     const simplified = simplifyForLevel(scoreModelOut?.parts ?? [], {
-      default: isPlayerLevel(settings.level) ? settings.level : undefined,
+      // `simplifyLevel`, NOT `level`. The app defaults level to "intermediate"
+      // and always sends it, so driving this from level turned simplification
+      // on for every user by default — a thing the sweep could not see, because
+      // the sweep sends no level at all. This setting is absent unless asked
+      // for, which is what makes the feature off by default in the product and
+      // not merely in the API.
+      default: isPlayerLevel(settings.simplifyLevel) ? settings.simplifyLevel : undefined,
       byPart: Object.fromEntries(
         (settings.partLevels ?? [])
           .filter((r: any) => r && typeof r.part === "string" && isPlayerLevel(r.level))
