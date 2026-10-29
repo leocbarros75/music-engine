@@ -5,6 +5,7 @@ import { shiftOctavesIntoRange, midiToPitch } from "../instruments/instrumentCat
 import { extractOnsetChords } from "../analyze/chordExtractor";
 import { parseChordSymbol } from "../harmonize/satb/chordSymbol";
 import { expandJazzSections } from "./jazz/expandSections";
+import { gateLeadBrass } from "./jazz/leadBrass";
 
 type JazzStyle = "swing" | "bossa" | "ballad";
 
@@ -577,16 +578,32 @@ export function mapPianoToJazzBandOpen(
   // Ranges in MIDI (concert). Exporter writes transposed instruments as needed.
   const ASX_LO = 49, ASX_HI = 80; // Alto Sax concert
   const TSX_LO = 44, TSX_HI = 75; // Tenor Sax concert
-  const TPT_LO = 54, TPT_HI = 84; // Trumpet concert
-  const TBN_LO = 40, TBN_HI = 70; // Trombone concert
+  // Lead brass registers, measured from the reference edition rather than taken
+  // from the instrument's outer limits. A lead trumpet's top in that score is 78
+  // concert, not the 84 this had, and 84 is a C6 that no section player is asked
+  // to punch repeatedly; its lead trombone tops out at 68.
+  const TPT_LO = 54, TPT_HI = 79; // Trumpet concert — reference TP1 runs 70-78
+  const TBN_LO = 40, TBN_HI = 70; // Trombone concert — reference TB1 runs 42-68
 
   const BAS_LO = 28, BAS_HI = 60; // Bass concert
 
-  // Centers (stability)
+  // Centres (stability). shiftOctavesToward only moves by octaves, so a centre
+  // decides which octave a folded chord tone lands in — and therefore where the
+  // whole part sits.
+  //
+  // The two lead brass centres were textbook, not measured, and both were low.
+  // Against the reference edition, by median concert pitch: its lead trumpet
+  // sits at 78 and ours at 71, its lead trombone at 59 and ours at 49.
+  //
+  // The trombone's mattered twice over, because the three derived trombones hang
+  // BELOW it: with the lead at 49 there was no room, so Trombone 2 came out at a
+  // median of 48 against the reference's 59, Trombone 3 at 44 against 52, and
+  // most of the 228 notes our derived chairs placed outside their measured
+  // registers were theirs. Lifting the lead lifts the section with it.
   const C_ASX = 69; // A4
   const C_TSX = 60; // C4
-  const C_TPT = 72; // C5
-  const C_TBN = 52; // E3
+  const C_TPT = 76; // E5 — reference TP1 median 78
+  const C_TBN = 59; // B3 — reference TB1 median 59
   const C_BAS = 40; // E2
 
   // How long a written note lasts: until the next chord onset in its bar, or
@@ -728,6 +745,10 @@ export function mapPianoToJazzBandOpen(
   // `jazz_band` routes — unlike the brass section's expansion, which shares its
   // mapper with `piano_with_brass` and so had to be opt-in.
   if (options?.sections !== false) {
+    // Order matters: the leads are thinned FIRST, so the derived chairs double a
+    // donor that has already been gated. A lead keeps every punch bar, so its
+    // chairs always find it where they need it.
+    out.meta.leadPlans = gateLeadBrass(partsOut, (partsOut[0]?.measures ?? []).length);
     out.meta.sectionPlans = expandJazzSections(out);
   }
 

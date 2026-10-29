@@ -258,6 +258,7 @@ import { markPizzicato, pizzicatoSentence } from "../arrange/strings/pizzicato";
 import { pulseLowerStrings, pulseSentence } from "../arrange/strings/pulse";
 import { mapPianoToJazzBandOpen } from "../arrange/mapToJazzBand";
 import { expandJazzSentence } from "../arrange/jazz/expandSections";
+import { leadBrassSentence } from "../arrange/jazz/leadBrass";
 import { mapPianoToPercussionOpen } from "../arrange/mapToPercussion";
 import type { ProfileId } from "../arrange/strings/types";
 import { arrangeWoodwindEnsemble, type WoodwindActivity } from "../arrange/woodwinds/woodwindArranger";
@@ -2575,6 +2576,8 @@ export function applyAppSettings(
       // Which chairs the mapper derived, and where their registers gave way.
       const sectionLine = expandJazzSentence((finalScore as any)?.meta?.sectionPlans ?? []);
       if (sectionLine) warnings.push(sectionLine);
+      const leadLine = leadBrassSentence((finalScore as any)?.meta?.leadPlans ?? []);
+      if (leadLine) warnings.push(leadLine);
     }
     const played = ((finalScore as any)?.parts ?? []).filter((p: any) =>
       (p?.measures ?? []).some((m: any) => (m?.events ?? []).some((e: any) => e?.type === "note" || e?.type === "unpitched")));
