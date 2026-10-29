@@ -293,6 +293,54 @@ function score(): any[] {
   assert.ok(breathCapFor("beginner")! < breathCapFor("advanced")!, "a beginner needs air sooner");
 }
 
+// ── A swung chart keeps its eighths at every level ──
+{
+  // In swing the eighth is the pulse, not an ornament on it. A one-beat grid
+  // moved every onset of a big band onto the beat and cut 901 notes to 416 —
+  // a textbook beginner part, and no longer jazz. A big-band chart is
+  // simplified by register, density and air instead.
+  for (const ens of ["jazz_band", "Jazz Band", "big band", "swing"]) {
+    assert.equal(gridFor("beginner", ens), 0.5, `${ens} should keep its eighths at beginner`);
+    assert.equal(gridFor("intermediate", ens), 0.5, `${ens} at intermediate`);
+    assert.equal(gridFor("advanced", ens), 0.25, `${ens} at advanced still reads sixteenths`);
+    assert.equal(gridFor("professional", ens), null);
+  }
+  // It is the ENSEMBLE that decides, not the instrument: the same trumpeter
+  // reads a concert band part and a big band part differently.
+  assert.equal(gridFor("beginner", "brass_ensemble"), 1, "a concert idiom counts beats");
+  assert.equal(gridFor("beginner", "orchestra"), 1);
+  assert.equal(gridFor("beginner"), 1, "no ensemble named falls back to the concert grid");
+}
+
+// ── The ensemble reaches the pass, not just the table ──
+{
+  // gridFor can be perfectly right and never consulted. This fails if the
+  // ensemble is not threaded into simplifyForLevel.
+  const offbeat = (id: string) => ({
+    part_id: id, name: "Tenor Sax", instrument: "tenor_sax_bb", staves: 1,
+    measures: Array.from({ length: 4 }, (_, i) => ({
+      number: i + 1,
+      attributes: { time: { beats: 4, beat_type: 4 }, divisions: 480 },
+      events: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5].map((t, k) => ({
+        id: `${id}${i}-${k}`, t, dur: 0.5, type: "note",
+        pitch: midiToPitch(60 + (k % 5)), voice: 1, staff: 1,
+      })),
+    })),
+  });
+
+  const swung: any[] = [offbeat("A")];
+  simplifyForLevel(swung, { default: "beginner" }, { ensemble: "jazz_band" });
+  const sAlt = swung.find((p) => /simplified/.test(String(p.name)));
+  const sOnsets = sAlt ? (sAlt.measures[0].events as any[]).map((e) => Number(e.t)).sort((x, y) => x - y) : [];
+  assert.deepEqual(sOnsets, [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], "a swung beginner keeps every eighth");
+
+  const concert: any[] = [offbeat("B")];
+  simplifyForLevel(concert, { default: "beginner" }, { ensemble: "brass_ensemble" });
+  const cAlt = concert.find((p) => /simplified/.test(String(p.name)))!;
+  const cOnsets = (cAlt.measures[0].events as any[]).map((e) => Number(e.t)).sort((x, y) => x - y);
+  assert.deepEqual(cOnsets, [0, 1, 2, 3], "a concert beginner counts beats");
+}
+
 // ── PHASE 2: a part that never stops is given air ──
 {
   // Eight bars of whole notes is 32 beats without a breath. A trombonist at

@@ -84,6 +84,14 @@ export type SimplifyPlan = {
   longestHold: number;
 };
 
+export type SimplifyOptions = {
+  /**
+   * The ensemble being written, which decides how coarse the rhythmic grid may
+   * get. A swung chart keeps its eighths at every level — see gridFor.
+   */
+  ensemble?: string;
+};
+
 export type LevelSelection = {
   default?: PlayerLevel;
   /** Per part, by part name or part_id. One weak player, not a weak orchestra. */
@@ -192,7 +200,11 @@ function levelFor(part: any, levels: LevelSelection): PlayerLevel {
  * Add a simplified alternate for every part that needs one. Mutates `parts` in
  * place and returns what was added, so the caller can say so.
  */
-export function simplifyForLevel(parts: any[], levels: LevelSelection): SimplifyPlan[] {
+export function simplifyForLevel(
+  parts: any[],
+  levels: LevelSelection,
+  options: SimplifyOptions = {},
+): SimplifyPlan[] {
   if (!Array.isArray(parts) || !parts.length) return [];
   // Nothing to do at all unless some part is below professional. This is what
   // makes the pass provably inert by default.
@@ -272,7 +284,7 @@ export function simplifyForLevel(parts: any[], levels: LevelSelection): Simplify
     clone.name = `${String(part.name ?? "Part")} (simplified)`;
     noteRefs(clone).forEach((r, i) => { r.ev.pitch = midiToPitch(after[i]!); });
 
-    const grid = gridFor(level);
+    const grid = gridFor(level, options.ensemble);
     const q = grid ? quantizeToGrid(clone, grid) : { kept: 0, dropped: 0, moved: 0 };
 
     // Air last, so it is measured against the rhythm the player will actually

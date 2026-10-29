@@ -359,7 +359,7 @@ export function pipelineMusicxmlToArrangedMusicxml(
           .filter((r: any) => r && typeof r.part === "string" && isPlayerLevel(r.level))
           .map((r: any) => [r.part, r.level])
       ),
-    });
+    }, { ensemble: String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "") });
     const simplifyLine = simplifySentence(simplified);
     if (simplifyLine) warnings.push(simplifyLine);
 

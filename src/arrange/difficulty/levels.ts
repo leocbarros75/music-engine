@@ -135,6 +135,21 @@ export function playableRange(instrument: string | undefined): Band | null {
 }
 
 /**
+ * Ensembles whose idiom IS the eighth note.
+ *
+ * In swing the eighth is not an ornament on the beat, it is the pulse — the
+ * horns, the ride cymbal and the comping all live on it. Putting a big band on
+ * a one-beat grid cut 901 notes to 416 and moved every onset onto the beat:
+ * a textbook beginner part, and no longer jazz. What makes a big-band chart
+ * hard for a student is its density, its register and its endurance, none of
+ * which is the eighth note.
+ */
+const SWUNG = /jazz|swing|big.?band/i;
+
+/** The finest grid an idiom will tolerate before it stops being that idiom. */
+const SWUNG_FLOOR = 0.5;
+
+/**
  * The rhythmic grid a player at this level is asked to read, in quarter-beats.
  *
  * PROVISIONAL, like the bands, and from the same place: what method books put
@@ -143,12 +158,22 @@ export function playableRange(instrument: string | undefined): Band | null {
  * reads sixteenths, which on our output is close to no constraint at all — 1%
  * of notes are shorter than that — and that is the intent. `professional`
  * returns null, which is what keeps the whole pass inert by default.
+ *
+ * The ensemble decides how coarse the grid may get. It is the ENSEMBLE rather
+ * than the instrument family that matters here, because the question is one of
+ * idiom, not of technique: the same trumpeter reads a concert band part and a
+ * big band part differently.
  */
-export function gridFor(level: PlayerLevel): number | null {
-  if (level === "beginner") return 1;        // on the beat
-  if (level === "intermediate") return 0.5;  // eighths
-  if (level === "advanced") return 0.25;     // sixteenths
-  return null;
+export function gridFor(level: PlayerLevel, ensemble?: string): number | null {
+  const base =
+    level === "beginner" ? 1 :
+    level === "intermediate" ? 0.5 :
+    level === "advanced" ? 0.25 :
+    null;
+  if (base === null) return null;
+  // Never coarser than the idiom's own floor. A swung chart keeps its eighths
+  // at every level; it is simplified by register, density and air instead.
+  return SWUNG.test(String(ensemble ?? "")) ? Math.min(base, SWUNG_FLOOR) : base;
 }
 
 /**
