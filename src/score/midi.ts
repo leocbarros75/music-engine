@@ -115,9 +115,22 @@ export function exportMidi(scoreModel: any, bpmOverride?: number): Uint8Array {
     // Channel pool: 0-8 then 10-15 (skip 9 = General MIDI drums)
     const channelPool = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
     const tracks: number[][] = [buildTempoTrack(performance, title)];
+    // Melodic parts take the pool in order; a kit takes channel 9 and does not
+    // consume a melodic slot. Channel 9 is where a drum number means a drum —
+    // the same note on any other channel is a pitch, which is what the kit got
+    // before: the pool skipped 9 for everyone, so an exported jazz chart played
+    // its drums as whatever melodic program the part had landed on.
+    let melodic = 0;
     parts.forEach((part, i) => {
-        const ch = channelPool[i % channelPool.length];
-        tracks.push(buildPartTrack(part, ch, notes.filter(n => n.partIdx === i), Math.floor(i / channelPool.length)));
+        const partNotes = notes.filter(n => n.partIdx === i);
+        if (instrumentPlayback(part).percussion) {
+            tracks.push(buildPartTrack(part, 9, partNotes, 0));
+            return;
+        }
+        const ch = channelPool[melodic % channelPool.length];
+        const port = Math.floor(melodic / channelPool.length);
+        melodic++;
+        tracks.push(buildPartTrack(part, ch, partNotes, port));
     });
     // MThd header
     const header: number[] = [

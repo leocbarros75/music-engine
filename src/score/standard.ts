@@ -1,3 +1,4 @@
+import { percussionMidi } from './percussionMidi';
 /** Shared, browser-safe score contract. No filesystem or UI dependencies. */
 export const SCORE_STANDARD_VERSION = 1 as const;
 export const DEFAULT_TIME = { beats: 4, beat_type: 4 };
@@ -75,6 +76,39 @@ export function soundingMidi(part: any, event: any): number | null {
   if (event.type !== 'note') return null;
   const stored = event.pitch ? pitchToMidi(event.pitch) : event.midi;
   return Number.isFinite(stored) ? stored + writtenToSoundingOffset(part) : null;
+}
+
+/**
+ * What a part SOUNDS at playback, including the drums.
+ *
+ * `soundingMidi` answers a question about pitch, and a drum has none — it
+ * returns null for anything that is not `type: 'note'`. Percussion is written
+ * as `type: 'unpitched'`, so the jazz band's 1499 drum events produced exactly
+ * zero playable notes: both the browser player and the MIDI export scheduled
+ * the whole kit as silence.
+ *
+ * The number a drum needs is already on the event. The parser reads it back
+ * from the instrument id the exporter writes ("<part>-I<midiUnpitched>") and
+ * stores it as `midiUnpitched`, which is a General MIDI percussion key — 36 is
+ * the kick, 38 the snare, 42 the hi-hat. It is an identity, not a pitch, so no
+ * transposition is applied to it.
+ *
+ * This is kept separate from `soundingMidi` on purpose: that function also
+ * feeds `buildNoteTimeline`, which the preservation checks use to compare a
+ * source against an arrangement, and drums are not notes there.
+ */
+export function playbackMidi(part: any, event: any): number | null {
+  if (event?.type === 'unpitched') {
+    // Two shapes reach this. An arranger's own score model — which is what the
+    // app plays — carries the drum as a NAME in `instrumentId`; a score parsed
+    // back from MusicXML carries the number the exporter wrote, as
+    // `midiUnpitched`. Taking only the second would have left the app silent
+    // while every file-based check passed.
+    const stored = Number(event.midiUnpitched);
+    const drum = Number.isInteger(stored) ? stored : percussionMidi(event.instrumentId);
+    return drum !== null && Number.isInteger(drum) && drum >= 0 && drum <= 127 ? drum : null;
+  }
+  return soundingMidi(part, event);
 }
 
 export type TimedNote = { partIdx: number; measureIndex: number; startBeat: number; durationBeats: number; midi: number };

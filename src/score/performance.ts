@@ -1,4 +1,4 @@
-import { buildMeasureTimeline, soundingMidi, type MeasurePosition } from './standard';
+import { buildMeasureTimeline, playbackMidi, type MeasurePosition } from './standard';
 export type MeasurePerformance = {
     tempos?: Array<{
         t: number;
@@ -269,7 +269,7 @@ export function buildPerformance(score: {
                     continue;
                 if (!Number.isFinite(e.t) || !Number.isFinite(e.dur) || e.t < 0 || e.dur <= 0 || e.t + e.dur > visit.durationBeats + EPS)
                     throw Error(`Invalid event timing in ${part.name}, measure ${bar.number}.`);
-                const midi = soundingMidi(part, e);
+                const midi = playbackMidi(part, e);
                 if (midi === null)
                     continue;
                 if (!Number.isInteger(midi) || midi < 0 || midi > 127)
@@ -300,7 +300,7 @@ export function buildPerformance(score: {
                         slot++; return slot; });
                     const slotCount = slot + 1;
                     group.forEach((g, n) => {
-                        const pitch = soundingMidi(part, g)!;
+                        const pitch = playbackMidi(part, g)!;
                         if (!Number.isInteger(pitch) || pitch < 0 || pitch > 127)
                             throw Error('Invalid grace-note pitch.');
                         notes.push({ partIdx, measureIndex: visit.index, startBeat: startBeat + slots[n] * steal / slotCount, durationBeats: steal / slotCount, midi: pitch, velocity: vel, startSec: 0, durationSec: 0 });

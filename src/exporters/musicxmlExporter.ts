@@ -146,7 +146,10 @@ function getTransposeForInstrument(instrument: string | undefined): TransposeSpe
     return { diatonic: 0, chromatic: 0, octaveChange: -1 };
   }
 
-  if (id === "bass" || id === "electric_bass") {
+  if (id === "bass" || id === "electric_bass" || id === "acoustic_bass") {
+    // acoustic_bass joined this list when the jazz band's bass took a specific
+    // id to stop sharing a playback key with a choral bass. It sounds an octave
+    // below where it is written either way, so the engraving must not move.
     return { diatonic: 0, chromatic: 0, octaveChange: -1 };
   }
 
@@ -890,7 +893,8 @@ function sortPartsOrchestrally<T extends { instrument?: string; part_id?: string
  * Unpitched percussion map (expanded).
  * instrumentId is what your arranger writes into ev.instrumentId.
  */
-function getPercussionMap(instrumentId: string): PercMap | null {
+/** Exported so a test can prove it agrees with `percussionMidi`. */
+export function getPercussionMap(instrumentId: string): PercMap | null {
   const id = (instrumentId ?? "").toLowerCase();
 
   if (id === "kick" || id === "bd" || id === "bass_drum") {

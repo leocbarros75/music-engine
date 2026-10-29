@@ -345,7 +345,11 @@ export function mapPianoToJazzBandOpen(
   const tpt = makePart("TPT", "Trumpet", "trumpet_bb", 1);
   const tbn = makePart("TBN", "Trombone", "trombone", 1);
   const pno = makePart("PNO", "Piano", "piano", 2);
-  const bas = makePart("BASS", "Bass", "bass", 1);
+  // "acoustic_bass", not "bass": a choral bass part is also named "Bass" with
+  // instrument "Bass", so the two produced an identical playback key and this
+  // one was being played by a choir. The name stays "Bass", which is what a big
+  // band's part is called; only the instrument id becomes specific.
+  const bas = makePart("BASS", "Bass", "acoustic_bass", 1);
   const gtr = makePart("GTR", "Rhythm Guitar", "guitar", 1);
   const drm = makePart("DRUMS", "Drums", "drums", 1);
 
