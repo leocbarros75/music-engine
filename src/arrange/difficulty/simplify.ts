@@ -1,5 +1,10 @@
 import { midiToPitch, pitchToMidi } from "../../instruments/instrumentCatalog";
-import { bandFor, playableRange, isPlayerLevel, type Band, type PlayerLevel } from "./levels";
+import {
+  bandFor, playableRange, isPlayerLevel, gridFor, breathCapFor, WIND_OR_BRASS,
+  type Band, type PlayerLevel,
+} from "./levels";
+import { quantizeToGrid } from "./rhythm";
+import { applyBreathing } from "../breathing";
 
 /**
  * A simplified alternate for a part that sits too high or too low for the
@@ -67,6 +72,16 @@ export type SimplifyPlan = {
   crossings: number;
   lowBefore: number; highBefore: number;
   lowAfter: number; highAfter: number;
+  /** Quarter-beats per grid slot, or null where the rhythm was left alone. */
+  grid: number | null;
+  /** Notes absorbed by the one that began their slot. */
+  dropped: number;
+  /** Notes whose onset or length moved onto the grid. */
+  requantized: number;
+  /** Breath rests written so the part is not asked to hold too long. */
+  breaths: number;
+  /** Longest stretch without air afterwards, in quarter-beats. */
+  longestHold: number;
 };
 
 export type LevelSelection = {
@@ -238,8 +253,6 @@ export function simplifyForLevel(parts: any[], levels: LevelSelection): Simplify
       after.push(m);
     }
 
-    if (!moved) continue;   // already comfortable; an alternate would be a copy
-
     // What the move actually did to the neighbours, for the report.
     let crossings = 0;
     refs.forEach((r, i) => {
@@ -250,11 +263,30 @@ export function simplifyForLevel(parts: any[], levels: LevelSelection): Simplify
       if (dn !== undefined && r.midi >= dn && after[i]! < dn) crossings++;
     });
 
+    // One clone, three passes: register, then rhythm, then air. The clone is
+    // built before anything is known to have changed, because a part can be
+    // perfectly placed and still be unreadable — register alone was Phase 1,
+    // and a part already in its band may still need its rhythm simplified.
     const clone = JSON.parse(JSON.stringify(part));
     clone.part_id = `${String(part.part_id ?? "P")}_SIMPLE`;
     clone.name = `${String(part.name ?? "Part")} (simplified)`;
-    const cloneRefs = noteRefs(clone);
-    cloneRefs.forEach((r, i) => { r.ev.pitch = midiToPitch(after[i]!); });
+    noteRefs(clone).forEach((r, i) => { r.ev.pitch = midiToPitch(after[i]!); });
+
+    const grid = gridFor(level);
+    const q = grid ? quantizeToGrid(clone, grid) : { kept: 0, dropped: 0, moved: 0 };
+
+    // Air last, so it is measured against the rhythm the player will actually
+    // read rather than the one the professional was given. Only the players who
+    // run out of breath: a string part tires, but it does not breathe.
+    const cap = breathCapFor(level);
+    const blows = WIND_OR_BRASS.test(`${part?.name ?? ""} ${instrument}`);
+    const breath = cap && blows
+      ? applyBreathing([clone] as any, { maxBreathlessBeats: cap, writeRests: true })
+      : null;
+
+    // Nothing to offer: an alternate identical to the original would tell the
+    // director something untrue about the part.
+    if (!moved && !q.dropped && !q.moved && !(breath?.releases)) continue;
 
     parts.splice(parts.indexOf(part) + 1, 0, clone);
 
@@ -265,6 +297,11 @@ export function simplifyForLevel(parts: any[], levels: LevelSelection): Simplify
       highBefore: Math.max(...refs.map((r) => r.midi)),
       lowAfter: Math.min(...after),
       highAfter: Math.max(...after),
+      grid,
+      dropped: q.dropped,
+      requantized: q.moved,
+      breaths: breath?.releases ?? 0,
+      longestHold: breath?.longestBreathlessBeats ?? 0,
     });
   }
 
@@ -274,18 +311,31 @@ export function simplifyForLevel(parts: any[], levels: LevelSelection): Simplify
 /** One line naming what was simplified and what it cost. */
 export function simplifySentence(plans: SimplifyPlan[]): string | null {
   if (!plans.length) return null;
-  const bits = plans.map((p) =>
-    `${p.part} for a ${p.level} player (${p.moved} of ${p.notes} notes, ` +
-    `${p.lowBefore}-${p.highBefore} into ${p.lowAfter}-${p.highAfter}, target ${p.band.lo}-${p.band.hi})`
-  );
+  const bits = plans.map((p) => {
+    const parts: string[] = [];
+    if (p.moved) parts.push(`${p.moved}/${p.notes} notes re-octaved, ${p.lowBefore}-${p.highBefore} into ${p.lowAfter}-${p.highAfter}`);
+    if (p.requantized || p.dropped) {
+      parts.push(`${p.requantized} onto a ${p.grid}-beat grid` + (p.dropped ? `, ${p.dropped} absorbed` : ""));
+    }
+    if (p.breaths) {
+      const held = Math.round(p.longestHold);
+      parts.push(`${p.breaths} breath rest${p.breaths === 1 ? "" : "s"}, longest hold now ${held} beat${held === 1 ? "" : "s"}`);
+    }
+    return `${p.part} for a ${p.level} player (${parts.join("; ") || "no change"})`;
+  });
   const outside = plans.reduce((n, p) => n + p.outside, 0);
   const crossings = plans.reduce((n, p) => n + p.crossings, 0);
+  const dropped = plans.reduce((n, p) => n + p.dropped, 0);
 
   return (
     `[level] Simplified alternates added beside the original parts, which are ` +
-    `unchanged: ${bits.join("; ")}. Only the octave moves — every note keeps its ` +
-    `pitch, its place in the bar and its length, so these parts sit better on the ` +
-    `instrument but are no easier rhythmically.` +
+    `unchanged: ${bits.join("; ")}. Register moves by whole octaves only, so every ` +
+    `note keeps its pitch class; the rhythm is put on a grid, which is lossy by ` +
+    `design — a simplified part has fewer notes than the one it stands in for.` +
+    (dropped
+      ? ` ${dropped} note(s) were absorbed by the note that began their grid slot; ` +
+        `no pitch was invented.`
+      : "") +
     (outside
       ? ` ${outside} note(s) stay above the target register because no lower octave ` +
         `of them is both inside it and playable.`

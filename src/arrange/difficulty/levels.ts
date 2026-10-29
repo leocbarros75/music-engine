@@ -133,3 +133,41 @@ export function playableRange(instrument: string | undefined): Band | null {
   const spec = getInstrumentSpec(String(instrument ?? "").toLowerCase());
   return spec ? { lo: spec.midi_low, hi: spec.midi_high } : null;
 }
+
+/**
+ * The rhythmic grid a player at this level is asked to read, in quarter-beats.
+ *
+ * PROVISIONAL, like the bands, and from the same place: what method books put
+ * in front of a player in their first years. A beginner counts beats, so the
+ * grid is the beat itself; an intermediate reads eighths; an advanced player
+ * reads sixteenths, which on our output is close to no constraint at all — 1%
+ * of notes are shorter than that — and that is the intent. `professional`
+ * returns null, which is what keeps the whole pass inert by default.
+ */
+export function gridFor(level: PlayerLevel): number | null {
+  if (level === "beginner") return 1;        // on the beat
+  if (level === "intermediate") return 0.5;  // eighths
+  if (level === "advanced") return 0.25;     // sixteenths
+  return null;
+}
+
+/**
+ * How long this player may be asked to play without air, in quarter-beats.
+ *
+ * `applyBreathing` already enforces a cap and already takes one — its default
+ * is 8 beats where rests are written. Breath is where a student fails first and
+ * where the professional part is least forgiving, so the cap tightens as the
+ * level drops rather than a second mechanism being invented for it.
+ *
+ * Null for a professional: the default stands and nothing is re-breathed.
+ */
+export function breathCapFor(level: PlayerLevel): number | null {
+  if (level === "beginner") return 4;
+  if (level === "intermediate") return 6;
+  if (level === "advanced") return 8;
+  return null;
+}
+
+/** Players who run out of air. A string part tires, but it does not breathe. */
+export const WIND_OR_BRASS =
+  /flute|piccolo|oboe|clarinet|bassoon|sax|horn|trumpet|cornet|trombone|tuba|euphonium|recorder/i;
