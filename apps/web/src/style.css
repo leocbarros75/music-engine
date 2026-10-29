@@ -273,6 +273,19 @@ button.ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--accent)
   border-radius: 4px; padding: 2px 7px; font-size: 11px; color: var(--text);
 }
 
+/* ─── Per-part player level ─── */
+.part-levels { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.part-levels-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.part-levels-rows { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.part-levels-row { display: flex; align-items: center; gap: 8px; }
+.part-levels-name { flex: 1; font-size: 12px; color: var(--text); }
+.part-levels-row select { flex: 0 0 auto; max-width: 58%; font-size: 12px; }
+.link-button {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 11px; color: var(--muted); text-decoration: underline;
+}
+.link-button:hover { color: var(--text); }
+
 /* ─── Misc ─── */
 .muted { font-size: 12px; color: var(--muted); }
 code { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; font-size: 12px; }

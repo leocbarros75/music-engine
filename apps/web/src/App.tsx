@@ -5,6 +5,7 @@ import AISettingsHelper from "./components/AISettingsHelper";
 import ScoreViewer from "./components/ScoreViewer";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AudioPlayer from "./components/AudioPlayer";
+import PartLevelsTable from "./components/PartLevelsTable";
 import PartsSelector from "./components/PartsSelector";
 import ReinstrumentTable from "./components/ReinstrumentTable";
 import LandingPage from "./components/LandingPage";
@@ -771,6 +772,13 @@ export default function App() {
                         <span key={i} className="result-part-chip">{p.name || p.instrument}</span>
                       ))}
                     </div>
+                    {/* Per-part level, driven by the parts the engine just
+                        wrote — they do not exist before it has written them. */}
+                    <PartLevelsTable
+                      parts={jobResult.meta.parts}
+                      partLevels={settings.partLevels ?? []}
+                      onChange={(partLevels) => setSettings({ ...settings, partLevels })}
+                    />
                   </div>
                 )}
                 <div className="result-actions">

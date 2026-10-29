@@ -62,4 +62,33 @@ function partsFor(settings: any): string[] {
   assert.equal(names.length, base.length + alts.length, "only alternates were added");
 }
 
+// ── A single player can be marked, with the rest of the band left alone ──
+{
+  // The real case is one weak player, not a weak section — so this has to work
+  // with the score-wide switch OFF.
+  const alts = partsFor({
+    ensemble: "brass_ensemble",
+    simplifyLevel: "off",
+    partLevels: [{ part: "Horn 2", level: "beginner" }],
+  }).filter((n) => /\(simplified\)/i.test(n));
+  assert.deepEqual(alts, ["Horn 2 (simplified)"], `only the named player, got ${alts.join(", ")}`);
+}
+
+// ── And a single player can be held back while the band is simplified ──
+{
+  // The inverse, and the reason the override takes a level rather than a flag:
+  // one reader who wants the part as written.
+  const all = partsFor({ ensemble: "brass_ensemble", simplifyLevel: "beginner" })
+    .filter((n) => /\(simplified\)/i.test(n));
+  assert.ok(all.includes("Horn 2 (simplified)"), "Horn 2 is simplified when the band is");
+
+  const held = partsFor({
+    ensemble: "brass_ensemble",
+    simplifyLevel: "beginner",
+    partLevels: [{ part: "Horn 2", level: "professional" }],
+  }).filter((n) => /\(simplified\)/i.test(n));
+  assert.ok(!held.includes("Horn 2 (simplified)"), "Horn 2 should keep the written part");
+  assert.equal(held.length, all.length - 1, "everyone else keeps their alternate");
+}
+
 console.log("simplifyOffByDefault: ok");
