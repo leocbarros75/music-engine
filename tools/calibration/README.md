@@ -104,15 +104,65 @@ Three things the pair says, none of which were assumptions going in:
   25% fewer notes (median ratio 0.75), and in two of ten the answer is TACET —
   the simplified players sit the piece out.
 
+## The second kind of evidence: a published grade chart
+
+No publisher issues a wind or brass part at two levels that we have — the
+Hymns Project ships Viola, Cello, String Bass and its three doubling parts at
+one level only, and nothing else on the machine comes in a graded pair. So the
+winds and brass cannot be measured the way the violins were.
+
+They are instead **sourced** from the [UIL Sight-Reading Band Instrument
+Ranges](https://www.uiltexas.org/music/concert-sight-reading-info/sight-reading-band-instrument-ranges)
+(rev. 2026), which states the range a player at each contest level is expected
+to read. That is the same *kind* of statement a graded edition makes — an
+editor saying what to ask of a given player — tabulated rather than embodied in
+a score. It is citable and it is not invented. It is **not** a measurement of
+real printed parts, and nothing here calls it calibrated.
+
+`graded-band-ranges.json` records, per instrument and level, the written range
+as the chart gives it, the transposition applied, and the resulting concert
+pitch, so every constant can be re-derived rather than taken on trust.
+
+Two things the chart does not say, both settled from the chart itself:
+
+- **Written or concert?** The page does not state it. At its top levels the
+  clarinet and bass clarinet both bottom out on **E3** — each instrument's
+  written low note, which is only true of written pitch. So: written, and the
+  transposition in the JSON is applied on top.
+- **Which level is which?** `beginner` ← Level 1, `intermediate` ← Levels 2 & 3,
+  using the chart's own groupings. Level 4 is recorded but **not** wired in:
+  `advanced` stays the catalog's preferred band, for the same reason it does
+  for the violins.
+
+Sources were not mixed. TRN Music publishes a comparable per-grade chart and
+Alfred's submission guidelines another, and they disagree with UIL and each
+other (TRN puts Grade 1 trumpet at A–E where UIL puts Level 1 at B♭3–C5). One
+chart, cited, beats an average of three.
+
+### What it changed, and what it did not
+
+The seeding was **already right for the brass**: horn, both trumpets and
+trombone land on exactly the ceiling they had been guessed at. The woodwinds
+did not — flute +5, clarinet +7, oboe +4 semitones, the same direction as the
+violin's ten.
+
+That is worth keeping in mind about guesses generally. "Nothing above the
+staff" happens to be a fair description of what makes a brass part tire a
+player, so the brass seeding encoded something true. It is not what makes a
+flute part hard — the third octave is — so the same rule of thumb, applied
+where it did not fit, came out four to seven semitones low.
+
 ## What this does and does not calibrate
 
-Calibrated from measurement: `violin_1` and `violin_2`.
+**Measured** from graded editions: `violin_1`, `violin_2`.
 
-Still seeded from pedagogy: every other entry in `STUDENT_BAND` — all the
-winds, all the brass, the saxophones, the voices, the mallets, and the
-remaining strings. **No graded pair exists for them in this pack**, and a
-violin-derived offset applied to a horn would be the same invention the
-measurement was meant to replace. They are marked in the table.
+**Sourced** from a published grade chart: flute, oboe, clarinet, bassoon, the
+three saxophones, both trumpets, horn, trombone, tuba.
+
+**Still seeded**, and marked in the table: `soprano_sax_bb` and `bass_trombone`
+(absent from the UIL chart), the remaining strings, the voices and the mallets.
+A violin-derived offset applied to a horn would be the same invention the
+measurement was meant to replace, so none was applied.
 
 Known limits of what *is* calibrated:
 

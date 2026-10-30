@@ -1,0 +1,316 @@
+{
+  "source": {
+    "name": "UIL Sight-Reading Band Instrument Ranges",
+    "publisher": "University Interscholastic League (Texas)",
+    "url": "https://www.uiltexas.org/music/concert-sight-reading-info/sight-reading-band-instrument-ranges",
+    "revision": "Revised 2026",
+    "retrieved": "2026-10-30",
+    "kind": "sourced-pedagogy",
+    "note": "Editorial guidance, NOT a measurement. The chart states the range a player at each contest level is expected to read, which is the same KIND of statement a graded edition makes, tabulated rather than embodied in a score. It is not evidence from real printed parts and must not be described as calibrated.",
+    "pitch": "WRITTEN. The page does not say so. Determined from the chart itself: at its top levels the clarinet and bass clarinet both bottom out on E3, each instrument's written low note, which only holds for written pitch.",
+    "level_mapping": "beginner <- UIL Level 1; intermediate <- UIL Levels 2 & 3; advanced <- UIL Level 4 (recorded here, NOT wired into bandFor - see README).",
+    "staff_positions": "Treble: bottom line E4, top line F5; spaces above G5 B5 D6 F6; ledger lines above A5 C6 E6 G6; below, D4 space / C4 ledger / B3 space / A3 ledger / G3 space. Bass: bottom line G2, top line A3; A2 C3 E3 G3 spaces; below, F2 space / E2 ledger / D2 space / C2 ledger / B1 space / A1 ledger."
+  },
+  "not_covered": {
+    "soprano_sax_bb": "not in the UIL chart; still seeded",
+    "bass_trombone": "not in the UIL chart; still seeded",
+    "bass_clarinet_bb": "in the chart but not in InstrumentCatalog, so nothing to apply it to",
+    "euphonium": "in the chart but not in InstrumentCatalog"
+  },
+  "instruments": {
+    "flute": {
+      "beginner": {
+        "written": "F4-C6",
+        "lo": 65,
+        "hi": 84,
+        "concert": "F4-C6"
+      },
+      "intermediate": {
+        "written": "F4-F6",
+        "lo": 65,
+        "hi": 89,
+        "concert": "F4-F6"
+      },
+      "advanced": {
+        "written": "F4-G6",
+        "lo": 65,
+        "hi": 91,
+        "concert": "F4-G6"
+      },
+      "transpose": 0
+    },
+    "oboe": {
+      "beginner": {
+        "written": "Eb4-A5",
+        "lo": 63,
+        "hi": 81,
+        "concert": "D#4-A5"
+      },
+      "intermediate": {
+        "written": "C4-A5",
+        "lo": 60,
+        "hi": 81,
+        "concert": "C4-A5"
+      },
+      "advanced": {
+        "written": "C4-C6",
+        "lo": 60,
+        "hi": 84,
+        "concert": "C4-C6"
+      },
+      "transpose": 0
+    },
+    "bassoon": {
+      "beginner": {
+        "written": "G2-C4",
+        "lo": 43,
+        "hi": 60,
+        "concert": "G2-C4"
+      },
+      "intermediate": {
+        "written": "G2-C4",
+        "lo": 43,
+        "hi": 60,
+        "concert": "G2-C4"
+      },
+      "advanced": {
+        "written": "F2-F4",
+        "lo": 41,
+        "hi": 65,
+        "concert": "F2-F4"
+      },
+      "transpose": 0
+    },
+    "clarinet_bb": {
+      "beginner": {
+        "written": "G3-G5",
+        "lo": 53,
+        "hi": 77,
+        "concert": "F3-F5"
+      },
+      "intermediate": {
+        "written": "G3-G5",
+        "lo": 53,
+        "hi": 77,
+        "concert": "F3-F5"
+      },
+      "advanced": {
+        "written": "F3-C6",
+        "lo": 51,
+        "hi": 82,
+        "concert": "D#3-A#5"
+      },
+      "transpose": -2
+    },
+    "bass_clarinet_bb": {
+      "beginner": {
+        "written": "G3-Bb4",
+        "lo": 41,
+        "hi": 56,
+        "concert": "F2-G#3"
+      },
+      "intermediate": {
+        "written": "G3-C5",
+        "lo": 41,
+        "hi": 58,
+        "concert": "F2-A#3"
+      },
+      "advanced": {
+        "written": "E3-G5",
+        "lo": 38,
+        "hi": 65,
+        "concert": "D2-F4"
+      },
+      "transpose": -14
+    },
+    "alto_sax_eb": {
+      "beginner": {
+        "written": "D4-G5",
+        "lo": 53,
+        "hi": 70,
+        "concert": "F3-A#4"
+      },
+      "intermediate": {
+        "written": "D4-C6",
+        "lo": 53,
+        "hi": 75,
+        "concert": "F3-D#5"
+      },
+      "advanced": {
+        "written": "D4-D6",
+        "lo": 53,
+        "hi": 77,
+        "concert": "F3-F5"
+      },
+      "transpose": -9
+    },
+    "tenor_sax_bb": {
+      "beginner": {
+        "written": "E4-G5",
+        "lo": 50,
+        "hi": 65,
+        "concert": "D3-F4"
+      },
+      "intermediate": {
+        "written": "D4-G5",
+        "lo": 48,
+        "hi": 65,
+        "concert": "C3-F4"
+      },
+      "advanced": {
+        "written": "D4-C6",
+        "lo": 48,
+        "hi": 70,
+        "concert": "C3-A#4"
+      },
+      "transpose": -14
+    },
+    "baritone_sax_eb": {
+      "beginner": {
+        "written": "E4-G5",
+        "lo": 43,
+        "hi": 58,
+        "concert": "G2-A#3"
+      },
+      "intermediate": {
+        "written": "D4-G5",
+        "lo": 41,
+        "hi": 58,
+        "concert": "F2-A#3"
+      },
+      "advanced": {
+        "written": "D4-C6",
+        "lo": 41,
+        "hi": 63,
+        "concert": "F2-D#4"
+      },
+      "transpose": -21
+    },
+    "horn_f": {
+      "beginner": {
+        "written": "Bb3-C5",
+        "lo": 51,
+        "hi": 65,
+        "concert": "D#3-F4"
+      },
+      "intermediate": {
+        "written": "Bb3-D5",
+        "lo": 51,
+        "hi": 67,
+        "concert": "D#3-G4"
+      },
+      "advanced": {
+        "written": "G3-F5",
+        "lo": 48,
+        "hi": 70,
+        "concert": "C3-A#4"
+      },
+      "transpose": -7
+    },
+    "trumpet_bb_1": {
+      "beginner": {
+        "written": "Bb3-C5",
+        "lo": 56,
+        "hi": 70,
+        "concert": "G#3-A#4"
+      },
+      "intermediate": {
+        "written": "Bb3-F5",
+        "lo": 56,
+        "hi": 75,
+        "concert": "G#3-D#5"
+      },
+      "advanced": {
+        "written": "A3-G5",
+        "lo": 55,
+        "hi": 77,
+        "concert": "G3-F5"
+      },
+      "transpose": -2
+    },
+    "trumpet_bb_2": {
+      "beginner": {
+        "written": "Bb3-C5",
+        "lo": 56,
+        "hi": 70,
+        "concert": "G#3-A#4"
+      },
+      "intermediate": {
+        "written": "Bb3-F5",
+        "lo": 56,
+        "hi": 75,
+        "concert": "G#3-D#5"
+      },
+      "advanced": {
+        "written": "A3-G5",
+        "lo": 55,
+        "hi": 77,
+        "concert": "G3-F5"
+      },
+      "transpose": -2
+    },
+    "trombone": {
+      "beginner": {
+        "written": "Ab2-Bb3",
+        "lo": 44,
+        "hi": 58,
+        "concert": "G#2-A#3"
+      },
+      "intermediate": {
+        "written": "Ab2-D4",
+        "lo": 44,
+        "hi": 62,
+        "concert": "G#2-D4"
+      },
+      "advanced": {
+        "written": "F2-F4",
+        "lo": 41,
+        "hi": 65,
+        "concert": "F2-F4"
+      },
+      "transpose": 0
+    },
+    "euphonium": {
+      "beginner": {
+        "written": "Ab2-Bb3",
+        "lo": 44,
+        "hi": 58,
+        "concert": "G#2-A#3"
+      },
+      "intermediate": {
+        "written": "Ab2-D4",
+        "lo": 44,
+        "hi": 62,
+        "concert": "G#2-D4"
+      },
+      "advanced": {
+        "written": "F2-F4",
+        "lo": 41,
+        "hi": 65,
+        "concert": "F2-F4"
+      },
+      "transpose": 0
+    },
+    "tuba_c": {
+      "beginner": {
+        "written": "Ab1-C3",
+        "lo": 32,
+        "hi": 48,
+        "concert": "G#1-C3"
+      },
+      "intermediate": {
+        "written": "Ab1-C3",
+        "lo": 32,
+        "hi": 48,
+        "concert": "G#1-C3"
+      },
+      "advanced": {
+        "written": "G1-Eb3",
+        "lo": 31,
+        "hi": 51,
+        "concert": "G1-D#3"
+      },
+      "transpose": 0
+    }
+  }
+}

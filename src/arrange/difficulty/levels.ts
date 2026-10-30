@@ -24,8 +24,8 @@ export function isPlayerLevel(x: unknown): x is PlayerLevel {
 /**
  * The register a less able player should be asked to play, in concert pitch.
  *
- * Two entries are MEASURED and the rest are SEEDED, and the difference matters
- * enough to mark on every line.
+ * Entries are MEASURED, SOURCED or SEEDED, and the difference matters enough to
+ * mark on every line.
  *
  * Measured means: a publisher issued the same arrangement twice, once as
  * written and once simplified, and the simplified edition's ceiling was read
@@ -34,10 +34,18 @@ export function isPlayerLevel(x: unknown): x is PlayerLevel {
  * the source, the method and how the reader was checked; the measurements
  * themselves are in `tools/calibration/measured-bands.json`.
  *
+ * Sourced means: a published chart states the range a player at this level is
+ * expected to read. That is the same KIND of statement a graded edition makes —
+ * an editor saying what to ask of a given player — tabulated instead of
+ * embodied in a score. It is citable and it is not mine, but it is still not a
+ * measurement of real printed parts, and it is not called calibrated. The winds
+ * and brass come from the UIL chart; `tools/calibration/graded-band-ranges.json`
+ * records the written ranges, the transposition applied, and how the levels map.
+ *
  * Seeded means: the register a method book stays inside in a first year. It is
- * a guess, it has never been checked against a graded edition, and the one
- * place a guess could finally be checked it was wrong by ten semitones. Treat
- * the rest of this table with that in mind.
+ * a guess, it has never been checked against anything, and the one place a guess
+ * could finally be checked against real editions it was wrong by ten semitones.
+ * Three entries are still seeded, each marked.
  *
  * It lives here rather than in `InstrumentCatalog` on purpose: the catalog
  * answers what an instrument can physically play, which is a fact about the
@@ -45,26 +53,31 @@ export function isPlayerLevel(x: unknown): x is PlayerLevel {
  * which is a different question about the same instrument.
  */
 const STUDENT_BAND: Record<string, { lo: number; hi: number }> = {
-  // ── Woodwinds. SEEDED — no graded edition available.
-  flute:           { lo: 60, hi: 79 }, // C4-G5
-  oboe:            { lo: 62, hi: 77 }, // D4-F5
-  clarinet_bb:     { lo: 50, hi: 70 }, // D3-Bb4 concert — stays under the break
-  bassoon:         { lo: 41, hi: 60 }, // F2-C4
-  soprano_sax_bb:  { lo: 58, hi: 77 },
-  alto_sax_eb:     { lo: 51, hi: 72 },
-  tenor_sax_bb:    { lo: 46, hi: 67 },
-  baritone_sax_eb: { lo: 39, hi: 60 },
+  // ── Woodwinds. SOURCED from the UIL chart, Level 1, converted to concert.
+  flute:           { lo: 65, hi: 84 }, // written F4-C6
+  oboe:            { lo: 63, hi: 81 }, // written Eb4-A5
+  clarinet_bb:     { lo: 53, hi: 77 }, // written G3-G5, Bb
+  bassoon:         { lo: 43, hi: 60 }, // written G2-C4
+  alto_sax_eb:     { lo: 53, hi: 70 }, // written D4-G5, Eb
+  tenor_sax_bb:    { lo: 50, hi: 65 }, // written E4-G5, Bb
+  baritone_sax_eb: { lo: 43, hi: 58 }, // written E4-G5, Eb
+  soprano_sax_bb:  { lo: 58, hi: 77 }, // SEEDED — not in the UIL chart
 
-  // ── Brass. SEEDED. Nothing above the staff, which is where endurance goes
-  // first.
-  trumpet_bb_1:    { lo: 53, hi: 70 }, // F3-Bb4
-  trumpet_bb_2:    { lo: 53, hi: 70 },
-  horn_f:          { lo: 53, hi: 65 }, // F3-F4 — the narrowest band here, and
-                                       // deliberately so: the horn is the
-                                       // hardest of these to pitch accurately.
-  trombone:        { lo: 41, hi: 58 }, // F2-Bb3
-  bass_trombone:   { lo: 36, hi: 55 },
-  tuba_c:          { lo: 34, hi: 53 }, // Bb1-F3
+  // ── Brass. SOURCED from the same chart and level.
+  //
+  // Worth recording that the seeding was ALREADY RIGHT here: the horn, both
+  // trumpets and the trombone land on exactly the ceiling they were guessed at.
+  // The woodwinds did not — flute, clarinet and oboe were 4 to 7 semitones too
+  // low, the same way round as the violin. A guess is not uniformly bad; it is
+  // bad where the instrument's real limit is something other than "don't go
+  // above the staff", which is what the brass seeding happened to encode
+  // correctly and the flute's third octave does not.
+  trumpet_bb_1:    { lo: 56, hi: 70 }, // written Bb3-C5, Bb
+  trumpet_bb_2:    { lo: 56, hi: 70 },
+  horn_f:          { lo: 51, hi: 65 }, // written Bb3-C5, F
+  trombone:        { lo: 44, hi: 58 }, // written Ab2-Bb3
+  tuba_c:          { lo: 32, hi: 48 }, // written Ab1-C3
+  bass_trombone:   { lo: 36, hi: 55 }, // SEEDED — not in the UIL chart
 
   // ── Violins. MEASURED, from 8 published simplified editions (Semsen, The
   // Hymns Project Vol. 3, arr. Duren). The ceiling is the median of what those
@@ -148,8 +161,27 @@ export type Band = { lo: number; hi: number };
  * though this publisher never did.
  */
 const INTERMEDIATE_HI: Record<string, number> = {
+  // Violins — measured, see above.
   violin_1: 88, // E6
   violin_2: 84, // C6
+
+  // Winds and brass — SOURCED, UIL Levels 2 & 3, converted to concert. The
+  // midpoint rule is wrong here for the same reason it was wrong for the
+  // violin: it splits the difference with the catalog's preferred band, which
+  // describes a professional's comfort and not a developing player's. Where the
+  // chart names the level outright there is no reason to interpolate.
+  flute:           89, // written F4-F6
+  oboe:            81, // written C4-A5
+  clarinet_bb:     77, // written G3-G5, Bb
+  bassoon:         60, // written G2-C4
+  alto_sax_eb:     75, // written D4-C6, Eb
+  tenor_sax_bb:    65, // written D4-G5, Bb
+  baritone_sax_eb: 58, // written D4-G5, Eb
+  trumpet_bb_1:    75, // written Bb3-F5, Bb
+  trumpet_bb_2:    75,
+  horn_f:          67, // written Bb3-D5, F
+  trombone:        62, // written Ab2-D4
+  tuba_c:          48, // written Ab1-C3
 };
 
 /**
