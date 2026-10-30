@@ -344,31 +344,6 @@ export function pipelineMusicxmlToArrangedMusicxml(
     let scoreModelOut = appResult.scoreModel as any;
     if (Array.isArray(appResult.warnings)) warnings.push(...appResult.warnings);
 
-    // A part written for a professional, beside one the player in front of you
-    // can actually read. The level setting has existed in the UI for a long
-    // time and did nothing for seven of eight ensembles; this is the one place
-    // it means something, and it is here rather than in each arranger because
-    // `scoreModelOut` is the finished score for EVERY ensemble.
-    //
-    // Before carrySourceMarks on purpose: a part added after that call would be
-    // missing the source's repeats, endings and dynamics.
-    const simplified = simplifyForLevel(scoreModelOut?.parts ?? [], {
-      // `simplifyLevel`, NOT `level`. The app defaults level to "intermediate"
-      // and always sends it, so driving this from level turned simplification
-      // on for every user by default — a thing the sweep could not see, because
-      // the sweep sends no level at all. This setting is absent unless asked
-      // for, which is what makes the feature off by default in the product and
-      // not merely in the API.
-      default: isPlayerLevel(settings.simplifyLevel) ? settings.simplifyLevel : undefined,
-      byPart: Object.fromEntries(
-        (settings.partLevels ?? [])
-          .filter((r: any) => r && typeof r.part === "string" && isPlayerLevel(r.level))
-          .map((r: any) => [r.part, r.level])
-      ),
-    }, { ensemble: String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "") });
-    const simplifyLine = simplifySentence(simplified);
-    if (simplifyLine) warnings.push(simplifyLine);
-
     // The source's repeats, endings and dynamics belong on the parts written
     // from it, whatever the ensemble. Done here rather than in each arranger
     // because it is an invariant of the whole pipeline, and because the
@@ -410,6 +385,40 @@ export function pipelineMusicxmlToArrangedMusicxml(
     }
 
     const protectedTargetId = protection.lock ? lockSourceInModel(protection.lock, scoreModelOut, settings) : undefined;
+
+    // A part written for a professional, beside one the player in front of you
+    // can actually read. The level setting has existed in the UI for a long
+    // time and did nothing for seven of eight ensembles; this is the one place
+    // it means something, and it is here rather than in each arranger because
+    // `scoreModelOut` is the finished score for EVERY ensemble.
+    //
+    // AFTER lockSourceInModel, and that placement is load-bearing. This ran
+    // before carrySourceMarks for a while, on the reasoning that a part added
+    // later would miss the source's repeats, endings and dynamics. It does not:
+    // the alternate is a deep copy of its donor, so it inherits whatever the
+    // donor is carrying at the moment it is cloned, and by here the donor has
+    // the marks. What running early DID cost was the melody itself. The lock
+    // writes the protected source melody into the part that carries it, so a
+    // copy taken beforehand was a simplification of music that never ships —
+    // in the symphonic orchestra the alternate sat a full octave above the
+    // Violin I it was meant to stand in for. Cloning last is the only point at
+    // which the donor is the part the player will actually be handed.
+    const simplified = simplifyForLevel(scoreModelOut?.parts ?? [], {
+      // `simplifyLevel`, NOT `level`. The app defaults level to "intermediate"
+      // and always sends it, so driving this from level turned simplification
+      // on for every user by default — a thing the sweep could not see, because
+      // the sweep sends no level at all. This setting is absent unless asked
+      // for, which is what makes the feature off by default in the product and
+      // not merely in the API.
+      default: isPlayerLevel(settings.simplifyLevel) ? settings.simplifyLevel : undefined,
+      byPart: Object.fromEntries(
+        (settings.partLevels ?? [])
+          .filter((r: any) => r && typeof r.part === "string" && isPlayerLevel(r.level))
+          .map((r: any) => [r.part, r.level])
+      ),
+    }, { ensemble: String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "") });
+    const simplifyLine = simplifySentence(simplified);
+    if (simplifyLine) warnings.push(simplifyLine);
 
     // 6. Choral rule check (skip for non-SATB ensembles)
     const ensembleRaw = String(settings.ensemble ?? scoreModelOut?.meta?.ensemble ?? "").toLowerCase();

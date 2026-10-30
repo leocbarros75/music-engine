@@ -99,6 +99,7 @@ async function main() {
       'tests/arrange/difficultySimplify.test.ts',
       'tests/arrange/simplifyOffByDefault.test.ts',
       'tests/arrange/calibratedBands.test.ts',
+      'tests/arrange/simplifiedAlternate.test.ts',
       'tests/arrange/tieAndArticulation.test.ts',
       'tests/arrange/brassQuintetCopy.test.ts',
       'tests/arrange/rangeTables.test.ts',
