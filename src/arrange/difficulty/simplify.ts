@@ -62,6 +62,22 @@ function tooHigh(midi: number, band: Band): boolean {
   return midi > band.hi;
 }
 
+/**
+ * The widest interval the line already asks for, in semitones.
+ *
+ * The ceiling on what simplifying may introduce. Using the line's own widest
+ * jump rather than a fixed figure keeps the rule honest in both directions: a
+ * stepwise hymn part gets no new leaps at all, while a line that already jumps
+ * around is not forbidden from a join it would have made anyway.
+ */
+function widestLeap(line: number[]): number {
+  let widest = 0;
+  for (let i = 1; i < line.length; i++) {
+    widest = Math.max(widest, Math.abs(line[i]! - line[i - 1]!));
+  }
+  return widest;
+}
+
 export type SimplifyPlan = {
   part: string;
   instrument: string;
@@ -242,33 +258,56 @@ export function simplifyForLevel(
 
     const lineShift = chooseLineShift(refs.map((r) => r.midi), band, playable, above, below, keys);
 
-    // Phase two: a note still outside the band moves on its own, but ONLY when
-    // that brings it inside and keeps it on the instrument. A note that cannot
-    // be helped is left where the arranger put it and counted, never forced to
-    // some other pitch — that would change the harmony to flatter a metric.
-    const after: number[] = [];
-    let moved = 0, outside = 0;
-    for (const r of refs) {
-      let m = r.midi + lineShift;
-      // Only a note ABOVE the ceiling is brought down on its own, and only when
-      // dropping it lands inside the band and stays on the instrument.
-      if (tooHigh(m, band)) {
-        for (const step of [-12, -24]) {
-          const cand = m + step;
-          if (cand > band.hi || cand < band.lo) continue;
-          if (playable && (cand < playable.lo || cand > playable.hi)) continue;
-          m = cand;
-          break;
-        }
+    // Phase two: a PASSAGE still above the ceiling comes down together, and
+    // only when the join it makes is no wider than a jump the line already
+    // asks for. A note that cannot be helped on those terms is left where the
+    // arranger put it and counted, never forced to some other pitch — that
+    // would change the harmony to flatter a metric.
+    //
+    // This used to move each stubborn note on its own, which is the fault the
+    // line shift exists to avoid, arriving one step later. On the brass it
+    // turned a trumpet line reading 71 71 73 73 73 71 into 71 71 61 61 61 71:
+    // every note over the ceiling dropped an octave while its neighbours
+    // stayed, so a two-semitone step became a ten-semitone leap. Measured over
+    // three ensembles, 7 of 37 alternates came out with a WIDER leap than the
+    // part they replaced — the first violin of them going from no octave leaps
+    // to eight. A part full of octave jumps is harder to play than the one it
+    // was meant to simplify, whatever its register says.
+    //
+    // Leaps are not otherwise modelled here, so nothing was scoring that trade.
+    // The bound is the line's own widest interval rather than a fixed figure:
+    // it asks only that the alternate not demand a bigger jump than the music
+    // already does, which is the same promise the rest of this pass makes.
+    const shifted = refs.map((r) => r.midi + lineShift);
+    const widest = widestLeap(shifted);
+    const after = [...shifted];
+    for (let i = 0; i < after.length; ) {
+      if (!tooHigh(after[i]!, band)) { i++; continue; }
+      // the whole run of consecutive notes above the ceiling moves as one
+      let j = i;
+      while (j + 1 < after.length && tooHigh(after[j + 1]!, band)) j++;
+      for (const step of [-12, -24]) {
+        const run = after.slice(i, j + 1).map((m) => m + step);
+        if (run.some((m) => m > band.hi || m < band.lo)) continue;
+        if (playable && run.some((m) => m < playable.lo || m > playable.hi)) continue;
+        const joinBefore = i > 0 ? Math.abs(run[0]! - after[i - 1]!) : 0;
+        const joinAfter = j + 1 < after.length ? Math.abs(after[j + 1]! - run[run.length - 1]!) : 0;
+        if (Math.max(joinBefore, joinAfter) > widest) continue;
+        for (let k = i; k <= j; k++) after[k] = run[k - i]!;
+        break;
       }
+      i = j + 1;
+    }
+
+    let moved = 0, outside = 0;
+    for (let i = 0; i < after.length; i++) {
       // The hard wall: never hand a player a note the instrument cannot sound.
       if (playable) {
-        while (m > playable.hi) m -= 12;
-        while (m < playable.lo) m += 12;
+        while (after[i]! > playable.hi) after[i]! -= 12;
+        while (after[i]! < playable.lo) after[i]! += 12;
       }
-      if (tooHigh(m, band)) outside++;
-      if (m !== r.midi) moved++;
-      after.push(m);
+      if (tooHigh(after[i]!, band)) outside++;
+      if (after[i] !== refs[i]!.midi) moved++;
     }
 
     // What the move actually did to the neighbours, for the report.

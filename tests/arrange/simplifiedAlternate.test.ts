@@ -27,7 +27,7 @@ function partsOf(xml: string) {
     /<score-part id="([^"]+)">[\s\S]*?<part-name[^>]*>([^<]*)<\/part-name>/g
   )) names.set(m[1]!, m[2]!);
 
-  const out = new Map<string, { lo: number; hi: number; n: number; marks: number }>();
+  const out = new Map<string, { lo: number; hi: number; n: number; marks: number; leap: number }>();
   for (const m of xml.matchAll(/<part id="([^"]+)">([\s\S]*?)<\/part>/g)) {
     const body = m[2]!;
     const ms: number[] = [];
@@ -35,8 +35,10 @@ function partsOf(xml: string) {
       /<pitch>\s*<step>([A-G])<\/step>\s*(?:<alter>(-?\d+)<\/alter>\s*)?<octave>(-?\d+)<\/octave>/g
     )) ms.push(12 * (Number(p[3]) + 1) + MAP[p[1]!]! + Number(p[2] ?? 0));
     if (!ms.length) continue;
+    let leap = 0;
+    for (let i = 1; i < ms.length; i++) leap = Math.max(leap, Math.abs(ms[i]! - ms[i - 1]!));
     out.set(names.get(m[1]!) ?? m[1]!, {
-      lo: Math.min(...ms), hi: Math.max(...ms), n: ms.length,
+      lo: Math.min(...ms), hi: Math.max(...ms), n: ms.length, leap,
       marks: (body.match(/<repeat\b|<ending\b|<dynamics\b/g) ?? []).length,
     });
   }
@@ -77,6 +79,20 @@ function arrange(src: string, settings: any) {
       assert.ok(
         a.lo >= original!.lo - 24,
         `${ensemble}: "${alt}" bottoms out at ${a.lo}, more than two octaves under its original's ${original!.lo}`
+      );
+
+      // And it may not ask for a WIDER jump than the part it replaces.
+      //
+      // Register is not the only thing that makes a part hard, and it was the
+      // only thing being scored. Bringing a stubborn note down on its own used
+      // to turn a trumpet's 71 71 73 73 73 71 into 71 71 61 61 61 71 — a
+      // two-semitone step becoming a ten-semitone leap, in the part meant to be
+      // the easier one. Over three ensembles 7 of 37 alternates came out with a
+      // wider leap, the worst going from no octave leaps to eight.
+      assert.ok(
+        a.leap <= original!.leap,
+        `${ensemble}: "${alt}" leaps ${a.leap} semitones where its original leaps at most ` +
+        `${original!.leap}. A simplified part may not ask for a bigger jump than the music does.`
       );
       checked++;
     }
