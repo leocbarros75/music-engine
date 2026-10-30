@@ -1,0 +1,753 @@
+{
+  "source": "The-Hymns-Project-Vol3_Strings-Pack_1701A24C015",
+  "pieces": 10,
+  "tacet": [
+    "It Came Upon the Midnight Clear - Violin 1, 2 (Simplified)",
+    "O Little Town of Bethlehem - Violin 1, 2 (Simplified)"
+  ],
+  "unassigned_notehead_warnings": [],
+  "instruments": {
+    "bass_clarinet_bb": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 51,
+          "median": 53,
+          "max": 60
+        },
+        "floor": {
+          "min": 38,
+          "median": 39,
+          "max": 41
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 154,
+            "lo": 39,
+            "hi": 53
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 102,
+            "lo": 39,
+            "hi": 53
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 99,
+            "lo": 38,
+            "hi": 53
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 132,
+            "lo": 38,
+            "hi": 51
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 73,
+            "lo": 38,
+            "hi": 55
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 105,
+            "lo": 39,
+            "hi": 55
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 263,
+            "lo": 38,
+            "hi": 57
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 27,
+            "lo": 39,
+            "hi": 51
+          },
+          {
+            "piece": "The First Noel",
+            "n": 108,
+            "lo": 39,
+            "hi": 60
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 72,
+            "lo": 41,
+            "hi": 53
+          }
+        ]
+      }
+    },
+    "bassoon": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 62,
+          "median": 64,
+          "max": 67
+        },
+        "floor": {
+          "min": 35,
+          "median": 41,
+          "max": 48
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 296,
+            "lo": 45,
+            "hi": 65
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 181,
+            "lo": 41,
+            "hi": 67
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 117,
+            "lo": 35,
+            "hi": 65
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 248,
+            "lo": 48,
+            "hi": 64
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 130,
+            "lo": 41,
+            "hi": 62
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 413,
+            "lo": 38,
+            "hi": 62
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 525,
+            "lo": 45,
+            "hi": 64
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 102,
+            "lo": 41,
+            "hi": 64
+          },
+          {
+            "piece": "The First Noel",
+            "n": 289,
+            "lo": 47,
+            "hi": 65
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 143,
+            "lo": 41,
+            "hi": 67
+          }
+        ]
+      }
+    },
+    "cello": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 62,
+          "median": 64,
+          "max": 67
+        },
+        "floor": {
+          "min": 36,
+          "median": 41,
+          "max": 48
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 296,
+            "lo": 45,
+            "hi": 65
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 181,
+            "lo": 41,
+            "hi": 67
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 117,
+            "lo": 36,
+            "hi": 65
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 248,
+            "lo": 48,
+            "hi": 64
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 130,
+            "lo": 41,
+            "hi": 62
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 413,
+            "lo": 38,
+            "hi": 62
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 525,
+            "lo": 45,
+            "hi": 64
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 102,
+            "lo": 41,
+            "hi": 64
+          },
+          {
+            "piece": "The First Noel",
+            "n": 289,
+            "lo": 47,
+            "hi": 65
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 143,
+            "lo": 41,
+            "hi": 67
+          }
+        ]
+      }
+    },
+    "clarinet_bb": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 65,
+          "median": 70,
+          "max": 79
+        },
+        "floor": {
+          "min": 50,
+          "median": 51,
+          "max": 57
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 144,
+            "lo": 55,
+            "hi": 70
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 126,
+            "lo": 50,
+            "hi": 70
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 78,
+            "lo": 53,
+            "hi": 65
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 158,
+            "lo": 53,
+            "hi": 72
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 87,
+            "lo": 51,
+            "hi": 70
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 385,
+            "lo": 50,
+            "hi": 70
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 368,
+            "lo": 51,
+            "hi": 79
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 68,
+            "lo": 50,
+            "hi": 65
+          },
+          {
+            "piece": "The First Noel",
+            "n": 276,
+            "lo": 57,
+            "hi": 72
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 90,
+            "lo": 50,
+            "hi": 72
+          }
+        ]
+      }
+    },
+    "double_bass": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 45,
+          "median": 47,
+          "max": 55
+        },
+        "floor": {
+          "min": 33,
+          "median": 33,
+          "max": 36
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 154,
+            "lo": 33,
+            "hi": 50
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 102,
+            "lo": 33,
+            "hi": 48
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 99,
+            "lo": 35,
+            "hi": 53
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 132,
+            "lo": 33,
+            "hi": 47
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 73,
+            "lo": 33,
+            "hi": 47
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 105,
+            "lo": 33,
+            "hi": 45
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 263,
+            "lo": 35,
+            "hi": 45
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 27,
+            "lo": 36,
+            "hi": 50
+          },
+          {
+            "piece": "The First Noel",
+            "n": 108,
+            "lo": 35,
+            "hi": 55
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 72,
+            "lo": 33,
+            "hi": 47
+          }
+        ]
+      }
+    },
+    "viola": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 65,
+          "median": 71,
+          "max": 79
+        },
+        "floor": {
+          "min": 50,
+          "median": 52,
+          "max": 57
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 144,
+            "lo": 55,
+            "hi": 71
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 126,
+            "lo": 50,
+            "hi": 71
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 78,
+            "lo": 53,
+            "hi": 65
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 158,
+            "lo": 53,
+            "hi": 72
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 87,
+            "lo": 52,
+            "hi": 71
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 385,
+            "lo": 50,
+            "hi": 71
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 368,
+            "lo": 52,
+            "hi": 79
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 68,
+            "lo": 50,
+            "hi": 65
+          },
+          {
+            "piece": "The First Noel",
+            "n": 276,
+            "lo": 57,
+            "hi": 72
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 90,
+            "lo": 50,
+            "hi": 72
+          }
+        ]
+      }
+    },
+    "violin_1": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 84,
+          "median": 92,
+          "max": 93
+        },
+        "floor": {
+          "min": 55,
+          "median": 57,
+          "max": 71
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 215,
+            "lo": 55,
+            "hi": 93
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 182,
+            "lo": 57,
+            "hi": 93
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 73,
+            "lo": 57,
+            "hi": 84
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 331,
+            "lo": 57,
+            "hi": 93
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 229,
+            "lo": 59,
+            "hi": 93
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 206,
+            "lo": 60,
+            "hi": 91
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 373,
+            "lo": 57,
+            "hi": 93
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 78,
+            "lo": 57,
+            "hi": 84
+          },
+          {
+            "piece": "The First Noel",
+            "n": 255,
+            "lo": 71,
+            "hi": 91
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 125,
+            "lo": 60,
+            "hi": 91
+          }
+        ]
+      },
+      "simplified": {
+        "editions": 8,
+        "ceiling": {
+          "min": 85,
+          "median": 86,
+          "max": 88
+        },
+        "floor": {
+          "min": 55,
+          "median": 58,
+          "max": 60
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 208,
+            "lo": 55,
+            "hi": 85
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 169,
+            "lo": 57,
+            "hi": 86
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 326,
+            "lo": 57,
+            "hi": 86
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 219,
+            "lo": 59,
+            "hi": 86
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 206,
+            "lo": 60,
+            "hi": 86
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 369,
+            "lo": 57,
+            "hi": 88
+          },
+          {
+            "piece": "The First Noel",
+            "n": 253,
+            "lo": 60,
+            "hi": 86
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 118,
+            "lo": 60,
+            "hi": 88
+          }
+        ]
+      }
+    },
+    "violin_2": {
+      "published": {
+        "editions": 10,
+        "ceiling": {
+          "min": 72,
+          "median": 81,
+          "max": 88
+        },
+        "floor": {
+          "min": 55,
+          "median": 57,
+          "max": 60
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 215,
+            "lo": 55,
+            "hi": 81
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 182,
+            "lo": 57,
+            "hi": 81
+          },
+          {
+            "piece": "It Came Upon the Midnight Clear",
+            "n": 73,
+            "lo": 57,
+            "hi": 72
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 331,
+            "lo": 57,
+            "hi": 81
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 229,
+            "lo": 55,
+            "hi": 88
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 206,
+            "lo": 57,
+            "hi": 83
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 373,
+            "lo": 57,
+            "hi": 81
+          },
+          {
+            "piece": "O Little Town of Bethlehem",
+            "n": 78,
+            "lo": 57,
+            "hi": 83
+          },
+          {
+            "piece": "The First Noel",
+            "n": 255,
+            "lo": 59,
+            "hi": 79
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 125,
+            "lo": 60,
+            "hi": 79
+          }
+        ]
+      },
+      "simplified": {
+        "editions": 8,
+        "ceiling": {
+          "min": 79,
+          "median": 81,
+          "max": 81
+        },
+        "floor": {
+          "min": 55,
+          "median": 57,
+          "max": 60
+        },
+        "per_edition": [
+          {
+            "piece": "Good Christian Men, Rejoice",
+            "n": 208,
+            "lo": 55,
+            "hi": 81
+          },
+          {
+            "piece": "Hark! the Herald Angels Sing",
+            "n": 169,
+            "lo": 57,
+            "hi": 81
+          },
+          {
+            "piece": "Joy to the World!",
+            "n": 326,
+            "lo": 57,
+            "hi": 81
+          },
+          {
+            "piece": "O Come, All Ye Faithful",
+            "n": 219,
+            "lo": 55,
+            "hi": 81
+          },
+          {
+            "piece": "O Come, O Come, Emmanuel",
+            "n": 206,
+            "lo": 57,
+            "hi": 79
+          },
+          {
+            "piece": "O Holy Night!",
+            "n": 369,
+            "lo": 57,
+            "hi": 81
+          },
+          {
+            "piece": "The First Noel",
+            "n": 253,
+            "lo": 59,
+            "hi": 79
+          },
+          {
+            "piece": "What Child Is This",
+            "n": 118,
+            "lo": 60,
+            "hi": 79
+          }
+        ]
+      }
+    }
+  }
+}

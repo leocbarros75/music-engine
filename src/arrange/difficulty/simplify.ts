@@ -51,6 +51,12 @@ const OCTAVE_CHOICES = [0, -12, 12, -24, 24];
  * 78-88, to satisfy it. The part got harder. Only the ceiling pushes a line,
  * and only downwards; the floor is enforced solely by the instrument's own
  * range, which is a different question and is handled by the wall below.
+ *
+ * This began as a judgement call after that flute regression. It is now also
+ * what the published editions do: across eight arrangements issued both as
+ * written and simplified, the ceiling falls by a median of six semitones while
+ * the floor never rises — in six of the eight it is unchanged, and where it
+ * moves it moves down. See `tools/calibration/README.md`.
  */
 function tooHigh(midi: number, band: Band): boolean {
   return midi > band.hi;

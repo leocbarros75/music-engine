@@ -22,24 +22,30 @@ export function isPlayerLevel(x: unknown): x is PlayerLevel {
 }
 
 /**
- * The register a FIRST- OR SECOND-YEAR player is at home in, in concert pitch.
+ * The register a less able player should be asked to play, in concert pitch.
  *
- * PROVISIONAL. These are seeded from the ranges standard band and orchestra
- * method books stay inside during a first year — first position and no shifting
- * for the strings, no crossing the break for the clarinet, nothing above the
- * staff for the brass. They are NOT measured against graded editions, which is
- * the only thing that would make them calibrated, and they should not be
- * described as if they were.
+ * Two entries are MEASURED and the rest are SEEDED, and the difference matters
+ * enough to mark on every line.
  *
- * They live here rather than in `InstrumentCatalog` on purpose: the catalog
+ * Measured means: a publisher issued the same arrangement twice, once as
+ * written and once simplified, and the simplified edition's ceiling was read
+ * off the engraving. That is a professional editor stating, about real music,
+ * what a weaker player should be handed. See `tools/calibration/README.md` for
+ * the source, the method and how the reader was checked; the measurements
+ * themselves are in `tools/calibration/measured-bands.json`.
+ *
+ * Seeded means: the register a method book stays inside in a first year. It is
+ * a guess, it has never been checked against a graded edition, and the one
+ * place a guess could finally be checked it was wrong by ten semitones. Treat
+ * the rest of this table with that in mind.
+ *
+ * It lives here rather than in `InstrumentCatalog` on purpose: the catalog
  * answers what an instrument can physically play, which is a fact about the
  * instrument. This answers what a particular player should be asked to play,
- * which is a different question about the same instrument — and it is the one
- * number in this feature most likely to be re-pointed, so it is kept in one
- * table that can be replaced wholesale.
+ * which is a different question about the same instrument.
  */
 const STUDENT_BAND: Record<string, { lo: number; hi: number }> = {
-  // ── Woodwinds
+  // ── Woodwinds. SEEDED — no graded edition available.
   flute:           { lo: 60, hi: 79 }, // C4-G5
   oboe:            { lo: 62, hi: 77 }, // D4-F5
   clarinet_bb:     { lo: 50, hi: 70 }, // D3-Bb4 concert — stays under the break
@@ -49,7 +55,8 @@ const STUDENT_BAND: Record<string, { lo: number; hi: number }> = {
   tenor_sax_bb:    { lo: 46, hi: 67 },
   baritone_sax_eb: { lo: 39, hi: 60 },
 
-  // ── Brass. Nothing above the staff, which is where endurance goes first.
+  // ── Brass. SEEDED. Nothing above the staff, which is where endurance goes
+  // first.
   trumpet_bb_1:    { lo: 53, hi: 70 }, // F3-Bb4
   trumpet_bb_2:    { lo: 53, hi: 70 },
   horn_f:          { lo: 53, hi: 65 }, // F3-F4 — the narrowest band here, and
@@ -59,21 +66,34 @@ const STUDENT_BAND: Record<string, { lo: number; hi: number }> = {
   bass_trombone:   { lo: 36, hi: 55 },
   tuba_c:          { lo: 34, hi: 53 }, // Bb1-F3
 
-  // ── Strings, first position, no shifting.
-  violin_1:        { lo: 55, hi: 76 }, // G3-E5
-  violin_2:        { lo: 55, hi: 76 },
+  // ── Violins. MEASURED, from 8 published simplified editions (Semsen, The
+  // Hymns Project Vol. 3, arr. Duren). The ceiling is the median of what those
+  // editions actually use; the floor is the open G string, because across all
+  // eight the floor does not rise when the music is simplified — in six it is
+  // identical and where it moves it moves down.
+  //
+  // The seeded guess here was G3-E5, a strict first-position reading. A real
+  // simplified edition goes to D6, ten semitones higher, so the engine had
+  // been dropping violin parts roughly an octave further than any publisher
+  // does. Violin 2 is lower not because the player is weaker but because the
+  // editions leave the second line alone: its register is already reachable,
+  // and simplification is spent on the top line.
+  violin_1:        { lo: 55, hi: 86 }, // G3-D6
+  violin_2:        { lo: 55, hi: 81 }, // G3-A5
+
+  // ── Remaining strings. SEEDED, first position, no shifting.
   viola:           { lo: 48, hi: 69 }, // C3-A4
   cello:           { lo: 36, hi: 62 }, // C2-D4
   double_bass:     { lo: 28, hi: 47 }, // E1-B2
 
-  // ── Voices. An amateur choir, not a trained one.
+  // ── Voices. SEEDED. An amateur choir, not a trained one.
   soprano:         { lo: 60, hi: 76 },
   alto:            { lo: 55, hi: 70 },
   tenor:           { lo: 48, hi: 64 },
   bass_voice:      { lo: 41, hi: 57 },
 
-  // ── Pitched percussion. Narrowed mostly so a part does not run off the ends
-  // of the instrument in front of a student.
+  // ── Pitched percussion. SEEDED. Narrowed mostly so a part does not run off
+  // the ends of the instrument in front of a student.
   glockenspiel:    { lo: 96, hi: 115 },
   tubular_bells:   { lo: 62, hi: 81 },
   vibraphone:      { lo: 57, hi: 81 },
@@ -94,6 +114,26 @@ const EXCLUDED = new Set(["piano", "drums"]);
 export type Band = { lo: number; hi: number };
 
 /**
+ * An intermediate ceiling set outright, where splitting the difference does not
+ * give a sensible answer.
+ *
+ * The midpoint rule works when both ends mean something. For the violin the top
+ * end does not: the catalog calls B6 comfortable, which is higher than anything
+ * in ten published professional parts (max A6, median G#6), so halving the gap
+ * to the student band landed intermediate on G6 — a semitone under what this
+ * publisher asks of a professional. An "intermediate" player was being handed a
+ * professional's register.
+ *
+ * E6 is Leo's call, and the editions back it: it is the ceiling of the two most
+ * demanding simplified parts in the pack (What Child Is This, O Holy Night).
+ * So intermediate now means "the hardest simplified part a publisher actually
+ * wrote", which is a real place to stand rather than an arithmetic midpoint.
+ */
+const INTERMEDIATE_HI: Record<string, number> = {
+  violin_1: 88, // E6
+};
+
+/**
  * The register a part may use at a given level.
  *
  * `professional` returns null, meaning no constraint at all — and that is what
@@ -101,7 +141,15 @@ export type Band = { lo: number; hi: number };
  *
  * `advanced` is the catalog's own preferred band. `intermediate` sits halfway
  * between that and the student band rather than having a third table of
- * invented numbers: one set of provisional figures is enough.
+ * invented numbers.
+ *
+ * Only `beginner` is measured, and only for the violins. A publisher issues an
+ * arrangement at two levels, as written and simplified, so two levels are all
+ * a graded edition can speak to; the engine has four. `advanced` stays the
+ * catalog's preferred band on purpose — a published professional part records
+ * what one arranger chose to write, not what a good player can manage, so
+ * using it as a ceiling would cap advanced players at that arranger's taste.
+ * `intermediate` is the midpoint except where `INTERMEDIATE_HI` overrides it.
  */
 export function bandFor(instrument: string | undefined, level: PlayerLevel): Band | null {
   if (level === "professional") return null;
@@ -124,7 +172,7 @@ export function bandFor(instrument: string | undefined, level: PlayerLevel): Ban
 
   return {
     lo: Math.round((student.lo + prefLo) / 2),
-    hi: Math.round((student.hi + prefHi) / 2),
+    hi: INTERMEDIATE_HI[spec.id] ?? INTERMEDIATE_HI[id] ?? Math.round((student.hi + prefHi) / 2),
   };
 }
 
@@ -152,12 +200,23 @@ const SWUNG_FLOOR = 0.5;
 /**
  * The rhythmic grid a player at this level is asked to read, in quarter-beats.
  *
- * PROVISIONAL, like the bands, and from the same place: what method books put
- * in front of a player in their first years. A beginner counts beats, so the
- * grid is the beat itself; an intermediate reads eighths; an advanced player
- * reads sixteenths, which on our output is close to no constraint at all — 1%
- * of notes are shorter than that — and that is the intent. `professional`
- * returns null, which is what keeps the whole pass inert by default.
+ * STILL PROVISIONAL — unlike the violin bands beside it, which are now
+ * measured. It comes from the same place the bands started: what method books
+ * put in front of a player in their first years. A beginner counts beats, so
+ * the grid is the beat itself; an intermediate reads eighths; an advanced
+ * player reads sixteenths, which on our output is close to no constraint at
+ * all — 1% of notes are shorter than that — and that is the intent.
+ * `professional` returns null, which is what keeps the whole pass inert by
+ * default.
+ *
+ * The graded editions do say something here, but not enough to set a grid from.
+ * A published simplified part carries about 25% fewer notes than the edition it
+ * stands beside (median ratio 0.75 over eight pairs), so thinning is real and
+ * roughly a quarter of the material. That is a measure of DENSITY, not of note
+ * value: reading it as a grid would be inventing a number and calling it
+ * evidence. Calibrating this properly needs the note values off those
+ * engravings, which means reading beams and flags, which the reader in
+ * `tools/calibration/` deliberately does not do.
  *
  * The ensemble decides how coarse the grid may get. It is the ENSEMBLE rather
  * than the instrument family that matters here, because the question is one of
