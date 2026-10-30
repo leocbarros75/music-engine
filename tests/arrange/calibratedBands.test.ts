@@ -172,4 +172,49 @@ const measured = JSON.parse(readFileSync(DATA, "utf8"));
     bandFor("violin_1", "intermediate")!.hi > bandFor("violin_1", "beginner")!.hi,
     "violin_1: intermediate and beginner have collapsed onto the same ceiling",
   );
+
+  // Neither violin's intermediate may be STRICTER than published simplified
+  // practice. An intermediate player being handed less than the hardest part a
+  // publisher already calls simplified would be the feature working backwards.
+  for (const id of ["violin_1", "violin_2"]) {
+    const int = bandFor(id, "intermediate")!;
+    const hardest = inst[id].simplified.ceiling.max;
+    assert.ok(
+      int.hi >= hardest,
+      `${id}: intermediate ceiling ${int.hi} is below the hardest published simplified ` +
+      `edition's ${hardest} — an intermediate player would get less than a simplified part`,
+    );
+  }
+
+  // The second line stays under the first, as the editions draw it.
+  assert.ok(
+    bandFor("violin_2", "intermediate")!.hi < bandFor("violin_1", "intermediate")!.hi,
+    `violin_2's intermediate ceiling (${bandFor("violin_2", "intermediate")!.hi}) has caught ` +
+    `violin_1's (${bandFor("violin_1", "intermediate")!.hi})`,
+  );
+
+  // What the number DOES, not what it is. A ceiling is only meaningful through
+  // the parts it would and would not rewrite, so check it against the real
+  // editions: it must leave every published simplified second violin alone, and
+  // act on at most the single outlier among the professional ones (nine of ten
+  // stop at B5; O Holy Night climbs to E6). Set it to A5 and this fails at
+  // three; set it to E6 and the tier stops doing anything at all.
+  {
+    const int = bandFor("violin_2", "intermediate")!.hi;
+    const pro = inst.violin_2.published.per_edition.map((e) => e.hi);
+    const sim = inst.violin_2.simplified.per_edition.map((e) => e.hi);
+    const rewritesSimplified = sim.filter((h) => h > int).length;
+    const rewritesPro = pro.filter((h) => h > int).length;
+    assert.equal(
+      rewritesSimplified, 0,
+      `violin_2: an intermediate ceiling of ${int} would rewrite ${rewritesSimplified} of ` +
+      `${sim.length} parts the publisher already calls simplified`,
+    );
+    assert.ok(
+      rewritesPro >= 1 && rewritesPro <= 2,
+      `violin_2: an intermediate ceiling of ${int} would rewrite ${rewritesPro} of ` +
+      `${pro.length} published professional parts — ${rewritesPro === 0
+        ? "the tier is doing nothing" : "that is ordinary second violin writing, not an outlier"}`,
+    );
+  }
 }

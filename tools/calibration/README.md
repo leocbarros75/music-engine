@@ -121,12 +121,19 @@ Known limits of what *is* calibrated:
   targets, which is why it is worth having, and it is still one sample.
 - Two published levels cannot calibrate four engine levels. `beginner` is
   measured and `advanced` remains the catalog's preferred range.
-  `intermediate` is an interpolation between them everywhere except
-  `violin_1`, where the interpolation gave a bad answer: the catalog calls B6
-  comfortable — higher than anything in ten published professional parts — so
-  halving the gap landed intermediate on G6, a semitone under this arranger's
-  professional median. It is now set outright to **E6**, the ceiling of the two
-  most demanding simplified parts in the pack. That is Leo's call, anchored to
-  the editions rather than derived from them.
+  `intermediate` is an interpolation between them except for the violins,
+  where the interpolation gave bad answers. `violin_1` is set outright to
+  **E6**, the ceiling of the two most demanding simplified parts in the pack —
+  the midpoint had landed on G6, a semitone under this arranger's professional
+  median, because the catalog calls B6 comfortable. `violin_2` is set to
+  **C6**: the same reference would collapse it onto beginner, since the
+  publisher does not simplify the second line at all, so it is anchored instead
+  to where second violin parts normally stop (B5 in nine of ten editions).
+  Both are Leo's calls, anchored to the editions rather than derived from them.
+
+  On the measured editions C6 behaves exactly as the old D♯6 midpoint did —
+  B5 through D♯6 all rewrite only the single E6 outlier and leave every
+  simplified edition alone. The test pins that behaviour band rather than the
+  value, because the editions do not support finer precision than that.
 - Ceiling only. The floors are recorded but set nothing, because the editions
   show the floor is not a difficulty constraint.

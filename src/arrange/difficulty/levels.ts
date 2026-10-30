@@ -128,9 +128,28 @@ export type Band = { lo: number; hi: number };
  * demanding simplified parts in the pack (What Child Is This, O Holy Night).
  * So intermediate now means "the hardest simplified part a publisher actually
  * wrote", which is a real place to stand rather than an arithmetic midpoint.
+ *
+ * Violin 2 cannot use that same reference. The publisher does not simplify the
+ * second line at all — its published and simplified ceilings are the same note,
+ * A5 — so "the hardest simplified edition" would collapse intermediate onto
+ * beginner and start rewriting ordinary second violin parts. The question for a
+ * second violin is not how high the player can reach but how high the LINE
+ * normally goes, because that is what decides when a part is unusual enough to
+ * be worth pulling down. Nine of the ten published second violin parts stop at
+ * B5 or below; the tenth climbs to E6.
+ *
+ * C6 sits a semitone above that, below violin 1's E6 so the two lines keep the
+ * distinction the editions draw sharply, and it leaves all eight published
+ * simplified editions untouched. Be straight about what it buys: on the
+ * measured editions C6 behaves exactly as the midpoint D#6 did — both rewrite
+ * only the one E6 outlier. What changes is that the number now says something
+ * ("a second violin stays under a first") instead of falling out of arithmetic,
+ * and it will act on a line between C6 and D#6 that this engine can write even
+ * though this publisher never did.
  */
 const INTERMEDIATE_HI: Record<string, number> = {
   violin_1: 88, // E6
+  violin_2: 84, // C6
 };
 
 /**
